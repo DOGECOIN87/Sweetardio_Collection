@@ -70,7 +70,6 @@ def generate_random_combination():
     layers.append(os.path.join(TRAITS_DIR, chosen_folder, bg))
     
     # Check for Background Overlay
-    # Check if the overlay exists in either background folder (or the original one)
     overlay_path = None
     possible_overlay_paths = [
         os.path.join(TRAITS_DIR, chosen_folder, "Whitehouse_Lawn_Overlay.png"),
@@ -100,6 +99,13 @@ def generate_random_combination():
         # Gummy Bear: Character (before) -> Skinz
         layers.append(os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png"))
         layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
+    elif "churro" in char_name:
+        # Churro: Skinz -> Character
+        layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
+        char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
+        if not os.path.exists(char_path):
+            char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
+        layers.append(char_path)
     else:
         # Others & Special Bases
         wat_files = get_files(WHAT_ARE_THOSEZ)
@@ -116,7 +122,6 @@ def generate_random_combination():
         layers.append(char_path)
         
         # Overlay
-        # Some overlays might have 'layer-' prefix due to previous duplicate logic
         wat_overlay = f"{what_are_those}_Overlay.png"
         wat_overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, wat_overlay)
         if not os.path.exists(wat_overlay_path):
