@@ -6,22 +6,12 @@ TRAITS_DIR = "traits"
 
 # Asset Categories
 BACKGROUNDZ = "backgroundz"
-BACKGROUNDS_POP = "backgrounds_pop"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
 MOUTHZ = "mouthz"
 WHAT_ARE_THOSEZ = "what_are_thosez"
 STICKERZ = "stickerz"
-
-# Character groups
-ICE_CREAM_CHARS = [
-    "cyan_sherbert_ice_cream", "neopolitan_ice_cream", "rainbow_sherbert_ice_cream",
-    "vanilla_ice_cream", "rocky_road_ice_cream", "zaffre_sherbert_ice_cream",
-    "mint_chocolate_chip_ice_cream", "pink_sherbert_ice_cream"
-]
-
-GUMMY_BEAR_CHARS = ["gummy_bear"]
 
 def get_files(category):
     path = os.path.join(TRAITS_DIR, category)
@@ -32,6 +22,11 @@ def get_files(category):
 def generate_random_combination():
     # 1. Select Character
     char_files = get_files(CHARACTERZ)
+    if not char_files:
+        raise ValueError("No character assets found in traits/characterz")
+    
+    # Identify base characters by looking at files
+    # Files are now like: Oreo.png, after_skinz_brownie_bite.png, before_skinz_zebra_cake.png
     base_names = set()
     for f in char_files:
         name = f.replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
@@ -41,9 +36,9 @@ def generate_random_combination():
     
     # 2. Select Required Traits
     # Background
-    bg_folders = [BACKGROUNDZ, BACKGROUNDS_POP]
-    chosen_folder = random.choice(bg_folders)
-    bg_files = get_files(chosen_folder)
+    bg_files = get_files(BACKGROUNDZ)
+    if not bg_files:
+        raise ValueError("No background assets found in traits/backgroundz")
     bg = random.choice(bg_files)
     
     # Skin (Required)
@@ -51,6 +46,7 @@ def generate_random_combination():
     if not skin_files:
         raise ValueError("No skin assets found in traits/skinz")
     
+    # Basic weighting for skins
     weights = []
     for f in skin_files:
         if "White" in f or "Black" in f:
@@ -64,6 +60,8 @@ def generate_random_combination():
     # Eyez and Mouthz (Required)
     eye_files = get_files(EYEZ)
     mouth_files = get_files(MOUTHZ)
+    if not eye_files or not mouth_files:
+        raise ValueError("Missing eyes or mouth assets")
     eye = random.choice(eye_files)
     mouth = random.choice(mouth_files)
     
@@ -71,93 +69,54 @@ def generate_random_combination():
     sticker_files = get_files(STICKERZ)
     sticker = random.choice(sticker_files) if sticker_files else None
     
-    # Layering Logic
+    # 3. Layering Logic
+    # Order: Background -> Footwear Base -> Character (before) -> Character (base/after) -> Skinz -> Footwear Overlay -> Eyez -> Mouthz -> Sticker
     layers = []
     
-    # Background is always first
-    layers.append(os.path.join(TRAITS_DIR, chosen_folder, bg))
+    # Background
+    layers.append(os.path.join(TRAITS_DIR, BACKGROUNDZ, bg))
     
-    # Check for Background Overlay
-    overlay_path = None
-    possible_overlay_paths = [
-        os.path.join(TRAITS_DIR, chosen_folder, "Whitehouse_Lawn_Overlay.png"),
-        os.path.join(TRAITS_DIR, "background", "Whitehouse_Lawn_Overlay.png")
-    ]
-    for p in possible_overlay_paths:
-        if os.path.exists(p):
-            overlay_path = p
-            break
-            
-    has_bg_overlay = "Whitehouse_Lawn" in bg and overlay_path
-
-    is_ice_cream = any(ic in char_name for ic in ICE_CREAM_CHARS)
-    is_gummy_bear = char_name == "gummy_bear"
+    # Footwear Base (if any)
+    wat_files = get_files(WHAT_ARE_THOSEZ)
+    wat_bases = [f.replace("_Base.png", "") for f in wat_files if f.endswith("_Base.png")]
+    chosen_wat = None
+    if wat_bases:
+        chosen_wat = random.choice(wat_bases)
+        layers.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Base.png"))
     
-    if is_ice_cream:
-        # Ice Cream: Character (before) -> Skinz -> Character (after)
-        layers.append(os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png"))
-        layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
-        after_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
-        if os.path.exists(after_path):
-            layers.append(after_path)
-    elif is_gummy_bear:
-        # Gummy Bear: Character (before) -> Skinz
-        layers.append(os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png"))
-        layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
-    elif "churro" in char_name:
-        # Churro: Skinz -> Character
-        layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
-        char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
-        if not os.path.exists(char_path):
-            char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
-        layers.append(char_path)
-    else:
-        # Others & Footwear (what_are_thosez)
-        wat_files = get_files(WHAT_ARE_THOSEZ)
-        wat_bases = [f.replace("_Base.png", "") for f in wat_files if f.endswith("_Base.png")]
-        
-        if wat_bases:
-            what_are_those = random.choice(wat_bases)
-            # Footwear Base
-            layers.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{what_are_those}_Base.png"))
-            
-            # Character Skin (Always required now)
-            layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
-            
-            # Character
-            char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
-            if not os.path.exists(char_path):
-                char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
-            layers.append(char_path)
-            
-            # Footwear Overlay
-            wat_overlay = f"{what_are_those}_Overlay.png"
-            wat_overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, wat_overlay)
-            if os.path.exists(wat_overlay_path):
-                layers.append(wat_overlay_path)
-            
-            # Handle Shiba specific overlays
-            if what_are_those == "Shiba":
-                for side in ["Left", "Right"]:
-                    side_overlay = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"Shiba_Overlay_{side}.png")
-                    if os.path.exists(side_overlay):
-                        layers.append(side_overlay)
-        else:
-            # Fallback if no footwear found
-            layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
-            char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
-            if not os.path.exists(char_path):
-                char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
-            layers.append(char_path)
-
+    # Character - "before_skinz" part if it exists
+    before_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
+    if os.path.exists(before_path):
+        layers.append(before_path)
+    
+    # Character - main part or "after_skinz" part
+    # If it's a simple name like "Oreo.png", use that.
+    main_char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"{char_name}.png")
+    if not os.path.exists(main_char_path):
+        main_char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
+    
+    if os.path.exists(main_char_path):
+        layers.append(main_char_path)
+    
+    # Skinz - ALWAYS AFTER CHARACTER now
+    layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
+    
+    # Footwear Overlay
+    if chosen_wat:
+        overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Overlay.png")
+        if os.path.exists(overlay_path):
+            layers.append(overlay_path)
+        # Handle Shiba specific overlays
+        if chosen_wat == "Shiba":
+            for side in ["Left", "Right"]:
+                side_overlay = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"Shiba_Overlay_{side}.png")
+                if os.path.exists(side_overlay):
+                    layers.append(side_overlay)
+    
     # Eyez and Mouthz
     layers.append(os.path.join(TRAITS_DIR, EYEZ, eye))
     layers.append(os.path.join(TRAITS_DIR, MOUTHZ, mouth))
     
-    # Background Overlay (if applicable) - before sticker
-    if has_bg_overlay:
-        layers.append(overlay_path)
-        
     # Sticker
     if sticker:
         layers.append(os.path.join(TRAITS_DIR, STICKERZ, sticker))
@@ -167,6 +126,8 @@ def generate_random_combination():
 def create_image(layers, output_name=None):
     if output_name is None:
         import time
+        if not os.path.exists("output"):
+            os.makedirs("output")
         output_name = f"output/gen_{int(time.time())}_{random.randint(1000, 9999)}.png"
     
     base_img = None
@@ -182,17 +143,20 @@ def create_image(layers, output_name=None):
     
     if base_img:
         base_img.save(output_name)
-        print(f"Generated: {output_name}")
+        return output_name
+    return None
 
 if __name__ == "__main__":
     if not os.path.exists("output"):
         os.makedirs("output")
     
-    print("Starting generation with updated logic...")
+    print("Starting generation with updated logic (Skinz always after Character)...")
     for i in range(5):
         try:
             layers, char_name = generate_random_combination()
             print(f"Generating combination {i+1} for {char_name}...")
-            create_image(layers, f"output/test_{i+1}_{char_name}.png")
+            out_file = create_image(layers, f"output/test_{i+1}_{char_name}.png")
+            if out_file:
+                print(f"Saved to {out_file}")
         except Exception as e:
             print(f"Error generating combination {i+1}: {e}")
