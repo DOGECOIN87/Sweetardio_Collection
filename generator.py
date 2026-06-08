@@ -5,7 +5,8 @@ from PIL import Image
 TRAITS_DIR = "traits"
 
 # Asset Categories
-BACKGROUNDS = "background"
+BACKGROUNDZ = "backgroundz"
+BACKGROUNDS_POP = "backgrounds_pop"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -43,7 +44,11 @@ def generate_random_combination():
     char_name = random.choice(list(base_names))
     
     # 2. Select other traits
-    bg = random.choice(get_files(BACKGROUNDS))
+    bg_folders = [BACKGROUNDZ, BACKGROUNDS_POP]
+    chosen_folder = random.choice(bg_folders)
+    bg_files = get_files(chosen_folder)
+    bg = random.choice(bg_files)
+    
     skin_files = get_files(SKINZ)
     weights = []
     for f in skin_files:
@@ -62,12 +67,21 @@ def generate_random_combination():
     layers = []
     
     # Background is always first
-    layers.append(os.path.join(TRAITS_DIR, BACKGROUNDS, bg))
+    layers.append(os.path.join(TRAITS_DIR, chosen_folder, bg))
     
     # Check for Background Overlay
-    overlay_path = os.path.join(TRAITS_DIR, BACKGROUNDS, "Whitehouse_Lawn_Overlay.png")
-    if bg == "Whitehouse_Lawn.png" and os.path.exists(overlay_path):
-        # We'll place this later, after characters but before stickers
+    # Check if the overlay exists in either background folder (or the original one)
+    overlay_path = None
+    possible_overlay_paths = [
+        os.path.join(TRAITS_DIR, chosen_folder, "Whitehouse_Lawn_Overlay.png"),
+        os.path.join(TRAITS_DIR, "background", "Whitehouse_Lawn_Overlay.png")
+    ]
+    for p in possible_overlay_paths:
+        if os.path.exists(p):
+            overlay_path = p
+            break
+            
+    if "Whitehouse_Lawn" in bg and overlay_path:
         has_bg_overlay = True
     else:
         has_bg_overlay = False
