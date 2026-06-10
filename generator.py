@@ -47,12 +47,18 @@ def get_files(category):
     return [f for f in os.listdir(path) if f.endswith(".png")]
 
 def generate_random_combination():
-    # 1. Select Character
+    # 1. Select Character (MANDATORY)
     char_files = get_files(CHARACTERZ)
+    if not char_files:
+        raise ValueError("No character assets found in traits/characterz")
+    
     base_names = set()
     for f in char_files:
         name = f.replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
         base_names.add(name)
+    
+    if not base_names:
+        raise ValueError("No valid character names found")
     
     char_name = random.choice(list(base_names))
     
@@ -64,6 +70,8 @@ def generate_random_combination():
     # 2. Select Required Traits
     # Background
     bg_files = get_files(BACKGROUNDZ)
+    if not bg_files:
+        raise ValueError("No background assets found in traits/backgroundz")
     bg = random.choice(bg_files)
     
     # Skin (Required)
@@ -84,6 +92,11 @@ def generate_random_combination():
     # Eyez and Mouthz (Required)
     eye_files = get_files(EYEZ)
     mouth_files = get_files(MOUTHZ)
+    if not eye_files:
+        raise ValueError("No eye assets found in traits/eyez")
+    if not mouth_files:
+        raise ValueError("No mouth assets found in traits/mouthz")
+    
     eye = random.choice(eye_files)
     mouth = random.choice(mouth_files)
     
@@ -91,64 +104,73 @@ def generate_random_combination():
     sticker_files = get_files(STICKERZ)
     sticker = random.choice(sticker_files) if sticker_files else None
     
+    # Optional "What are thosez" - only for non-ice-cream characters
+    chosen_wat = None
+    wat_overlays = []
+    if not is_ice_cream:
+        wat_files = get_files(WHAT_ARE_THOSEZ)
+        wat_bases = [f.replace("_Base.png", "") for f in wat_files if f.endswith("_Base.png")]
+        
+        if wat_bases:
+            chosen_wat = random.choice(wat_bases)
+            
+            # Determine which overlays exist for this base
+            overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Overlay.png")
+            if os.path.exists(overlay_path):
+                wat_overlays.append(overlay_path)
+            
+            # Handle Shiba specific overlays (Left and Right)
+            if chosen_wat == "Shiba":
+                for side in ["Left", "Right"]:
+                    side_overlay = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"Shiba_Overlay_{side}.png")
+                    if os.path.exists(side_overlay):
+                        wat_overlays.append(side_overlay)
+    
     # Layering Logic
     layers = []
     
-    # Background is always first
+    # 1. Background is always first
     layers.append(os.path.join(TRAITS_DIR, BACKGROUNDZ, bg))
     
-    # Footwear base (optional) - ONLY if not ice cream
-    wat_files = get_files(WHAT_ARE_THOSEZ)
-    wat_bases = [f.replace("_Base.png", "") for f in wat_files if f.endswith("_Base.png")]
+    # 2. Footwear BASE (if selected) - BEFORE CHARACTER
+    if chosen_wat:
+        base_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Base.png")
+        if os.path.exists(base_path):
+            layers.append(base_path)
     
-    chosen_wat = None
-    if not is_ice_cream and wat_bases:
-        chosen_wat = random.choice(wat_bases)
-        layers.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Base.png"))
-    
-    # Character - before_skinz part if it exists
+    # 3. Character - before_skinz part if it exists
     before_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"before_skinz_{char_name}.png")
     if os.path.exists(before_path):
         layers.append(before_path)
     
-    # Character - main part or after_skinz part
+    # 4. Character - main part or after_skinz part (MANDATORY)
     main_char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"{char_name}.png")
     if not os.path.exists(main_char_path):
         main_char_path = os.path.join(TRAITS_DIR, CHARACTERZ, f"after_skinz_{char_name}.png")
     
-    if os.path.exists(main_char_path):
-        layers.append(main_char_path)
+    if not os.path.exists(main_char_path):
+        raise ValueError(f"Character asset not found for: {char_name}")
     
-    # Skinz - ALWAYS AFTER CHARACTER
+    layers.append(main_char_path)
+    
+    # 5. Skinz - ALWAYS AFTER CHARACTER
     layers.append(os.path.join(TRAITS_DIR, SKINZ, skin))
     
-    # Eyez and Mouthz
+    # 6. Eyez and Mouthz
     layers.append(os.path.join(TRAITS_DIR, EYEZ, eye))
     layers.append(os.path.join(TRAITS_DIR, MOUTHZ, mouth))
     
-    # Footwear overlay - PLACED AFTER CHARACTER AND EYEZ/MOUTHZ
-    # Only ONE set of what_are_thosez per generation
-    if chosen_wat:
-        # Handle Shiba specific overlays
-        if chosen_wat == "Shiba":
-            for side in ["Left", "Right"]:
-                side_overlay = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"Shiba_Overlay_{side}.png")
-                if os.path.exists(side_overlay):
-                    layers.append(side_overlay)
-        else:
-            # For other footwear, only add the overlay if it exists
-            overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Overlay.png")
-            if os.path.exists(overlay_path):
-                layers.append(overlay_path)
+    # 7. Footwear OVERLAY(s) - AFTER CHARACTER AND EYEZ/MOUTHZ
+    for overlay_path in wat_overlays:
+        layers.append(overlay_path)
     
-    # Gorbhouse overlay for specific characters (added before sticker)
-    # Note: Using Gorbhouse_Base.png since Overlay doesn't exist for it
+    # 8. Gorbhouse overlay for specific characters (added before sticker)
     if gets_gorbhouse:
         gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Base.png")
         if os.path.exists(gorbhouse_path):
             layers.append(gorbhouse_path)
     
-    # Sticker (added after gorbhouse overlay)
+    # 9. Sticker (added last)
     if sticker:
         layers.append(os.path.join(TRAITS_DIR, STICKERZ, sticker))
     
@@ -183,6 +205,8 @@ if __name__ == "__main__":
     
     print("Starting generation with updated logic...")
     print("Rules:")
+    print("- Character trait: MANDATORY")
+    print("- What are thosez: Base BEFORE character, Overlay(s) AFTER character")
     print("- Skinz always after character")
     print("- Ice cream characters: NO what_are_thosez")
     print("- Gorbhouse overlay for: Twinkie, Waffle, Doughnuts, Poptarts, Zebra Cake")
