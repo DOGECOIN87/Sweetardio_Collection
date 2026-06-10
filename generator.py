@@ -127,16 +127,19 @@ def generate_random_combination():
     layers.append(os.path.join(TRAITS_DIR, MOUTHZ, mouth))
     
     # Footwear overlay - PLACED AFTER CHARACTER AND EYEZ/MOUTHZ
+    # Only ONE set of what_are_thosez per generation
     if chosen_wat:
-        overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Overlay.png")
-        if os.path.exists(overlay_path):
-            layers.append(overlay_path)
         # Handle Shiba specific overlays
         if chosen_wat == "Shiba":
             for side in ["Left", "Right"]:
                 side_overlay = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"Shiba_Overlay_{side}.png")
                 if os.path.exists(side_overlay):
                     layers.append(side_overlay)
+        else:
+            # For other footwear, only add the overlay if it exists
+            overlay_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f"{chosen_wat}_Overlay.png")
+            if os.path.exists(overlay_path):
+                layers.append(overlay_path)
     
     # Gorbhouse overlay for specific characters (added before sticker)
     # Note: Using Gorbhouse_Base.png since Overlay doesn't exist for it
