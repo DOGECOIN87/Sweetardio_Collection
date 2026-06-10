@@ -139,8 +139,9 @@ def generate_random_combination():
     layers.append(os.path.join(TRAITS_DIR, MOUTHZ, mouth))
     
     # Gorbhouse overlay for specific characters (added before sticker)
+    # Note: Using Gorbhouse_Base.png since Overlay doesn't exist for it
     if gets_gorbhouse:
-        gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
+        gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Base.png")
         if os.path.exists(gorbhouse_path):
             layers.append(gorbhouse_path)
     
@@ -185,7 +186,7 @@ if __name__ == "__main__":
     print("- Canvas size: 1393x1393")
     print()
     
-    for i in range(5):
+    for i in range(20):
         try:
             layers, char_name = generate_random_combination()
             print(f"Generating combination {i+1} for {char_name}...")
