@@ -38,7 +38,7 @@ def generate():
 @app.route('/api/stats', methods=['GET'])
 def stats():
     try:
-        from generator import get_files, CHARACTERZ, SKINZ, EYEZ, MOUTHZ, STICKERZ, WHAT_ARE_THOSEZ, BACKGROUNDZ
+        from generator import get_files, CHARACTERZ, SKINZ, EYEZ, MOUTHZ, STICKERZ, WHAT_ARE_THOSEZ, BACKGROUNDZ, ARMZ
         
         char_files = get_files(CHARACTERZ)
         base_names = set()
@@ -53,7 +53,8 @@ def stats():
             'eyes': len(get_files(EYEZ)),
             'mouths': len(get_files(MOUTHZ)),
             'stickers': len(get_files(STICKERZ)),
-            'footwear': len(get_files(WHAT_ARE_THOSEZ))
+            'footwear': len(get_files(WHAT_ARE_THOSEZ)),
+            'arms': len(get_files(ARMZ))
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

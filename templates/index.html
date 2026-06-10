@@ -46,7 +46,7 @@
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
             padding: 20px;
@@ -192,6 +192,14 @@
                 <div class="stat-number" id="bgCount">-</div>
                 <div class="stat-label">Backgrounds</div>
             </div>
+            <div class="stat-item">
+                <div class="stat-number" id="footwearCount">-</div>
+                <div class="stat-label">Footwear</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="armCount">-</div>
+                <div class="stat-label">Arms</div>
+            </div>
         </div>
         
         <div class="error" id="error"></div>
@@ -226,6 +234,8 @@
                 document.getElementById('charCount').textContent = data.characters;
                 document.getElementById('skinCount').textContent = data.skins;
                 document.getElementById('bgCount').textContent = data.backgrounds;
+                document.getElementById('footwearCount').textContent = data.footwear;
+                document.getElementById('armCount').textContent = data.arms;
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
