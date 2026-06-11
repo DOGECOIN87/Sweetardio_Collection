@@ -1,10 +1,14 @@
 # Background Pop Studies
 
-Adaptive, measurement-driven grading of the 34 active background plates in
-`traits/backgroundz/` so the dessert characters own the colour contrast.
-Output: `traits/backgroundz_pop/` (committed; ~95 MB, fully regenerable
-with one command below). Originals are never modified. Every operation is a deterministic, reversible tone/colour
-transform — nothing generated or repainted.
+Adaptive, measurement-driven grading of the Sweetardio background plates so
+the dessert characters own the colour contrast.
+
+Layout: **`traits/backgroundz/` holds the 34 GRADED plates** the generator
+uses (ungraded sources preserved in `traits/backgroundz_originals/`), and
+**`traits/backgrounds_pop/` holds the 13 graded Legendary plates** (sources
+in `traits/backgrounds_pop_originals/`). Originals are never modified —
+every operation is a deterministic, reversible tone/colour transform,
+nothing generated or repainted; regrade anytime with the commands below.
 
 ## Why this direction (measured, not assumed)
 
@@ -64,7 +68,9 @@ the one JPG source is written as PNG.
 
 ```bash
 pip install pillow numpy
-python3 background_pop_studies/grade.py            # 34 plates -> traits/backgroundz_pop/ + log
+python3 background_pop_studies/grade.py            # backgroundz_originals -> backgroundz + log
+python3 background_pop_studies/grade.py --src traits/backgrounds_pop_originals \
+        --dst traits/backgrounds_pop --log background_pop_studies/LEGENDARY_GRADE_LOG.md
 python3 background_pop_studies/make_proofs.py --final    # proof pairs + 3x3 grid
 python3 background_pop_studies/make_proofs.py --verify   # single-tone worst cases
 python3 asset_assessment/analyze.py                # re-measure everything
@@ -74,9 +80,8 @@ python3 asset_assessment/verify_separation.py      # cast-wide separation check
 `grade.py --only <substr>...` grades a subset; `--src/--dst/--log` override
 paths. Everything is deterministic — same inputs, same bytes out.
 
-**Note:** `generator.py` reads `traits/backgroundz_pop` (committed; falls
-back to the original `traits/backgroundz` with a warning if the folder is
-ever missing). Eye↔background pairing is governed by `traits/eyez_compat.json`
+**Note:** `generator.py` reads `traits/backgroundz` (graded; falls back to
+`traits/backgroundz_originals` with a warning if the folder is ever empty). Eye↔background pairing is governed by `traits/eyez_compat.json`
 (anti-clash, built by `asset_assessment/build_eyez_compat.py`); delete the
 file or rebuild with `--mode match` to change the rule. Curated showcase:
 `python3 background_pop_studies/make_showcase.py` → `showcase/`.

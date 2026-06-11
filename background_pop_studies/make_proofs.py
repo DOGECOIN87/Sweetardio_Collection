@@ -20,8 +20,8 @@ import os
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-SRC = "traits/backgroundz"
-DST = "traits/backgroundz_pop"
+SRC = "traits/backgroundz_originals"
+DST = "traits/backgroundz"
 OUT = "background_pop_studies/samples"
 CANVAS = 1393
 OFFSET = 150

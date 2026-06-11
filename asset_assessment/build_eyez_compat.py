@@ -84,7 +84,7 @@ def plate_band_share(px, hue0):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", default="traits/backgroundz")
+    ap.add_argument("--src", default="traits/backgroundz")  # graded set
     ap.add_argument("--mode", choices=["anti-clash", "match"],
                     default="anti-clash")
     ap.add_argument("--dry-run", action="store_true")
