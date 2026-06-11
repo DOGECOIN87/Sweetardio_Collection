@@ -1,8 +1,26 @@
+import json
 import os
 import random
 from PIL import Image
 
 TRAITS_DIR = "traits"
+
+# Background overlays are NOT standalone plates: they ride on top of the
+# whole stack (placed last) whenever their parent plate is the background.
+BG_OVERLAY_PAIRS = {
+    "Sweetardio_11314.png": "Whitehouse_Lawn_Overlay.png",
+}
+
+# Optional eye <-> background compatibility map built by
+# asset_assessment/build_eyez_compat.py. Missing file = no restrictions.
+EYEZ_COMPAT_PATH = os.path.join(TRAITS_DIR, "eyez_compat.json")
+
+def load_eyez_blocklist():
+    try:
+        with open(EYEZ_COMPAT_PATH) as f:
+            return json.load(f).get("blocked", {})
+    except (OSError, ValueError):
+        return {}
 
 # Asset Categories
 BACKGROUNDZ = "backgroundz"
@@ -103,6 +121,8 @@ def generate_random_combination():
     
     # 2. Select Required Traits
     bg_files = get_files(BACKGROUNDZ)
+    # overlays pair with their parent plate; they are never a background
+    bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
     if not bg_files:
         raise ValueError("No background assets found in traits/backgroundz")
     bg = random.choice(bg_files)
@@ -128,7 +148,10 @@ def generate_random_combination():
     if not mouth_files:
         raise ValueError("No mouth assets found in traits/mouthz")
     
-    eye = random.choice(eye_files)
+    # eye <-> background compatibility (optional, measured blocklist)
+    eyez_blocked = load_eyez_blocklist().get(bg, [])
+    allowed_eyes = [f for f in eye_files if f not in eyez_blocked]
+    eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
     mouth = random.choice(mouth_files)
     
     arm_files = get_files(ARMZ)
@@ -138,12 +161,19 @@ def generate_random_combination():
     sticker = random.choice(sticker_files) if sticker_files else None
     
     # Optional "What are thosez"
+    # base files look like "layer-Bunny_Slippers_Base (1).png": match the
+    # "_base" marker with an optional " (n)" suffix, case-insensitively
+    import re as _re
+    def wat_base_name(f):
+        m = _re.match(r"(.+?)_base(?:\s*\(\d+\))?\.png$", f, _re.IGNORECASE)
+        return m.group(1) if m else None
+
     chosen_wat = None
     wat_overlays = []
     if not should_exclude_wat:
         wat_files = get_files(WHAT_ARE_THOSEZ)
-        wat_bases = [f.replace("_base.png", "").replace("_Base.png", "") for f in wat_files if f.lower().endswith("_base.png")]
-        wat_bases = [b for b in wat_bases if "gorbhouse" not in b.lower()]
+        wat_bases = [wat_base_name(f) for f in wat_files]
+        wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
         
         # 70% chance to have footwear if not excluded
         if wat_bases and random.random() < 0.7:
@@ -158,11 +188,12 @@ def generate_random_combination():
     # 1. Background
     layers.append({"path": os.path.join(TRAITS_DIR, BACKGROUNDZ, bg), "offset": False})
     
-    # 2. What Are Thosez BASE
+    # 2. What Are Thosez BASE (placed before characterz)
     if chosen_wat:
         wat_files = get_files(WHAT_ARE_THOSEZ)
         for f in wat_files:
-            if f.lower() == f"{chosen_wat.lower()}_base.png":
+            base = wat_base_name(f)
+            if base and base.lower() == chosen_wat.lower():
                 layers.append({"path": os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f), "offset": False})
                 break
     
@@ -226,7 +257,13 @@ def generate_random_combination():
     # 10. Sticker - DON'T MOVE DOWN
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
-    
+
+    # 11. Paired background overlay - always placed LAST, on top of everything
+    if bg in BG_OVERLAY_PAIRS:
+        ov_path = os.path.join(TRAITS_DIR, BACKGROUNDZ, BG_OVERLAY_PAIRS[bg])
+        if os.path.exists(ov_path):
+            layers.append({"path": ov_path, "offset": False})
+
     return layers, char_name
 
 def create_image(layers, output_name=None):
