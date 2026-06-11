@@ -22,7 +22,7 @@ from PIL import Image, ImageDraw
 
 sys.path.insert(0, ".")
 from generator import (BG_OVERLAY_PAIRS, EXCLUDE_WAT_CHARS, GORBHOUSE_CHARS,
-                       NO_OFFSET_CHARS, create_image, face_fit, is_skin_under,
+                       NO_OFFSET_CHARS, ball_fit, create_image,
                        load_eyez_blocklist)
 
 BG = "traits/backgroundz"
@@ -128,20 +128,15 @@ def main():
         layers = [{"path": f"{BG}/{plate}", "offset": False}]
         if foot:
             layers.append({"path": f"{WAT}/{foot[0]}", "offset": False})
-        skin_under = is_skin_under(char)
-        if skin_under:
-            layers.append({"path": skin, "offset": offset})
         layers.append({"path": f"{CH}/{char}", "offset": offset})
         if foot:
             for ov in foot[1]:
                 layers.append({"path": f"{WAT}/{ov}", "offset": False})
-        if not skin_under:
-            layers.append({"path": skin, "offset": offset})
-        fit, ctr = face_fit(skin, f"{EY}/{eyes}")
-        layers.append({"path": f"{EY}/{eyes}", "offset": offset,
-                       "fscale": fit, "fcenter": ctr})
-        layers.append({"path": f"{MO}/{mouth}", "offset": offset,
-                       "fscale": fit, "fcenter": ctr})
+        bfit, bctr = ball_fit(skin, f"{EY}/{eyes}")
+        layers.append({"path": skin, "offset": offset,
+                       "fscale": bfit, "fcenter": bctr})
+        layers.append({"path": f"{EY}/{eyes}", "offset": offset})
+        layers.append({"path": f"{MO}/{mouth}", "offset": offset})
         layers.append({"path": arms, "offset": offset})
         for ex in extras:
             if "Gorbhouse" in ex:

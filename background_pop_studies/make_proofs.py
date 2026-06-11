@@ -80,17 +80,15 @@ def build_character(char_file, offset=True, eyes=None):
     """Composite a character cutout exactly like generator.py (no plate)."""
     import sys
     sys.path.insert(0, ".")
-    from generator import is_skin_under, face_fit, scale_about
+    from generator import ball_fit, scale_about
     cut = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
     eye_path = eyes or EYES
     char_path = f"traits/characterz/{char_file}.png"
-    body = [SKIN, char_path] if is_skin_under(f"{char_file}.png") \
-        else [char_path, SKIN]
-    fit, ctr = face_fit(SKIN, eye_path)
-    for p in body + [eye_path, MOUTH, ARMS]:
+    bfit, bctr = ball_fit(SKIN, eye_path)
+    for p in [char_path, SKIN, eye_path, MOUTH, ARMS]:
         im = load_layer(p)
-        if p in (eye_path, MOUTH):
-            im = scale_about(im, fit, ctr)
+        if p == SKIN:
+            im = scale_about(im, bfit, bctr)
         if offset:
             shifted = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
             shifted.paste(im, (0, OFFSET))
