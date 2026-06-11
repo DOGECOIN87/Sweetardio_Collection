@@ -63,7 +63,7 @@ SAT_FLOOR = 0.45           # never desaturate below 45 % of original chroma
 # all neutrals. (lo, hi, feather, strength):
 KEEPOUT_BANDS = [(0.0, 75.0, 15.0, 0.18),
                  (172.0, 202.0, 12.0, 0.15),
-                 (276.0, 336.0, 14.0, 0.15)]
+                 (270.0, 345.0, 14.0, 0.18)]
 SPLIT_MAX_SH = 0.16        # max shadow tint blend (warmest plate)
 SPLIT_MAX_HL = 0.10        # max highlight tint blend
 TEMP_COOL, TEMP_WARM = -60.0, 45.0   # temp range mapped 0..1 for split-tone

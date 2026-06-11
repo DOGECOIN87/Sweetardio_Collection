@@ -51,6 +51,17 @@ PHASE1 = [
      "before_skinz_pink_sherbert_ice_cream", False, None),
 ]
 
+# single-tone worst cases (cast is NOT all dual-tone): gummy worm lives in
+# the stage's own blue corridor; cyan poptart is uniformly cool; chocolate
+# doughnut is uniformly dark-warm on the darkest navy plate.
+VERIFY = [
+    ("Sweetardio_115 (1)", "layer-after_skinz_gummy_worm (1)", True,
+     "traits/eyez/Cerise.png"),
+    ("Sweetardio_113 (31)", "before_skinz_cyan_frosted_poptart", True,
+     "traits/eyez/Cerise.png"),
+    ("Sweetardio_11327", "after_skinz_chocolate_doughnut", True, None),
+]
+
 
 def font(sz):
     try:
@@ -148,11 +159,15 @@ def cohesion_grid(out_path, n=9, cell=420):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--phase1", action="store_true")
+    ap.add_argument("--verify", action="store_true",
+                    help="single-tone worst-case pairs only")
     ap.add_argument("--final", action="store_true")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
-    prefix = "phase1" if args.phase1 else "final"
-    for stem, char_file, off, eyes in PHASE1:
+    prefix = "verify" if args.verify else ("phase1" if args.phase1
+                                           else "final")
+    pairs = VERIFY if args.verify else PHASE1
+    for stem, char_file, off, eyes in pairs:
         safe = stem.replace(" ", "_").replace("(", "").replace(")", "")[:40]
         side_by_side(stem, char_file, off,
                      os.path.join(OUT, f"{prefix}_{safe}.png"), eyes)
