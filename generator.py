@@ -85,6 +85,55 @@ NO_OFFSET_CHARS = [
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 
+# ---- face composition rules (from measured asset geometry) ----
+# Bodies with a transparent face cavity seat the skin ball BEHIND the body
+# so the cavity rim occludes it ("after_skinz" prefix = body drawn after
+# the skin). The Oreo character has a center hole but no prefix, so it is
+# listed explicitly.
+SKIN_UNDER_PREFIXES = ("after_skinz_", "layer-after_skinz_")
+SKIN_UNDER_EXTRA = ("Sweetardio_115 (22)",)
+# The widest eyes (284-287px) are wider than most skin balls (268-280px),
+# so eyes+mouth are scaled about the ball center to fit inside it.
+EYE_FIT_MARGIN = 0.85
+
+_bbox_cache = {}
+
+def _opaque_bbox(path, thresh=128):
+    """Bounding box of pixels with alpha >= thresh, in canvas coordinates."""
+    if path not in _bbox_cache:
+        im = Image.open(path).convert("RGBA")
+        if im.size != (CANVAS_SIZE, CANVAS_SIZE):
+            im = im.resize((CANVAS_SIZE, CANVAS_SIZE), Image.Resampling.LANCZOS)
+        mask = im.getchannel("A").point(lambda a: 255 if a >= thresh else 0)
+        _bbox_cache[path] = mask.getbbox()
+    return _bbox_cache[path]
+
+def is_skin_under(char_filename):
+    return (char_filename.startswith(SKIN_UNDER_PREFIXES)
+            or any(k in char_filename for k in SKIN_UNDER_EXTRA))
+
+def face_fit(skin_path, eye_path):
+    """Scale factor + pivot (skin ball center) so the eyes fit the ball."""
+    sx0, sy0, sx1, sy1 = _opaque_bbox(skin_path)
+    ex0, _, ex1, _ = _opaque_bbox(eye_path)
+    ball_w = max(sx1 - sx0, 1)
+    eye_w = max(ex1 - ex0, 1)
+    factor = min(1.0, EYE_FIT_MARGIN * ball_w / eye_w)
+    return factor, ((sx0 + sx1) / 2.0, (sy0 + sy1) / 2.0)
+
+def scale_about(img, factor, center):
+    """Scale an RGBA canvas-sized layer about a fixed point."""
+    if factor >= 0.999:
+        return img
+    w, h = img.size
+    scaled = img.resize((max(1, round(w * factor)), max(1, round(h * factor))),
+                        Image.Resampling.LANCZOS)
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cx, cy = center
+    out.paste(scaled, (round(cx * (1 - factor)), round(cy * (1 - factor))),
+              scaled)
+    return out
+
 def get_files(category):
     path = os.path.join(TRAITS_DIR, category)
     if not os.path.exists(path):
@@ -214,11 +263,12 @@ def generate_random_combination():
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
     
-    # 3. Character
+    # 3. Character (collected first: skin z-order depends on the body type)
+    char_layers = []
     char_found = False
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+            char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
             char_found = True
             break
             
@@ -227,7 +277,7 @@ def generate_random_combination():
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
                 main_found = True
                 char_found = True
                 break
@@ -236,22 +286,33 @@ def generate_random_combination():
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
                 char_found = True
                 break
+
+    skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
+    skin_layer = {"path": skin_path, "offset": apply_offset}
+    skin_under = any(is_skin_under(os.path.basename(l["path"]))
+                     for l in char_layers)
+    if skin_under:
+        # cavity-faced body: ball seats behind it, rim occludes the ball
+        layers.append(skin_layer)
+    layers.extend(char_layers)
 
     # 4. What Are Thosez OVERLAY
     for overlay_path in wat_overlays:
         layers.append({"path": overlay_path, "offset": False})
     
-    # 5. Skinz
-    layers.append({"path": os.path.join(TRAITS_DIR, SKINZ, skin), "offset": apply_offset})
+    # 5. Skinz (flat-faced bodies keep the ball on top)
+    if not skin_under:
+        layers.append(skin_layer)
     
-    # 6. Eyez
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset})
-    
-    # 7. Mouthz
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset})
+    # 6./7. Eyez + Mouthz, scaled about the ball center to fit inside it
+    fit, fcenter = face_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
+    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset,
+                   "fscale": fit, "fcenter": fcenter})
+    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset,
+                   "fscale": fit, "fcenter": fcenter})
     
     # 8. Armz
     if arm:
@@ -297,6 +358,9 @@ def create_image(layers, output_name=None):
         img = Image.open(layer_path).convert("RGBA")
         if img.size != (CANVAS_SIZE, CANVAS_SIZE):
             img = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.Resampling.LANCZOS)
+        
+        if layer_info.get("fscale", 1.0) < 0.999:
+            img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
         
         if should_offset:
             # Create a new image for the offset layer
