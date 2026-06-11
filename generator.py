@@ -37,7 +37,9 @@ WHAT_ARE_THOSEZ = "what_are_thosez"
 ARMZ = "armz"
 STICKERZ = "stickerz"
 
-# Characters that get Gorbhouse overlay
+# Characters that get Gorbhouse overlay. NOTE: the Gorbhouse trash-can
+# slippers are a what_are_thosez (footwear) trait, so EXCLUDE_WAT_CHARS
+# overrides this list — see gets_gorbhouse_overlay().
 GORBHOUSE_CHARS = [
     "Twinkie",
     "waffle",
@@ -84,6 +86,16 @@ NO_OFFSET_CHARS = [
 
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
+
+def is_wat_excluded(char_name):
+    """True when this character must never get what_are_thosez (footwear)."""
+    return any(ex.lower() in char_name.lower() for ex in EXCLUDE_WAT_CHARS)
+
+def gets_gorbhouse_overlay(char_name):
+    """Gorbhouse slippers are footwear, so the WAT exclusion wins over
+    GORBHOUSE_CHARS membership (twinkie/poptarts are in both lists)."""
+    return (any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
+            and not is_wat_excluded(char_name))
 
 # ---- face composition rule (from measured asset geometry) ----
 # The widest eyes (284-287px) are wider than the skin balls (268-303px).
@@ -135,7 +147,8 @@ def get_files(category):
     path = os.path.join(TRAITS_DIR, category)
     if not os.path.exists(path):
         return []
-    return [f for f in os.listdir(path) if f.endswith(".png")]
+    # sorted so seeded runs are reproducible across processes
+    return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
 def generate_random_combination():
     # 1. Select Character (MANDATORY)
@@ -157,18 +170,15 @@ def generate_random_combination():
     if not base_names:
         raise ValueError("No valid character names found")
     
-    char_name = random.choice(list(base_names))
+    # sorted: set iteration order varies per process (hash randomization),
+    # which silently breaks seeded reproducibility
+    char_name = random.choice(sorted(base_names))
     
     # Check if this character should be excluded from what_are_thosez
-    # Using lower() and checking for presence in char_name
-    should_exclude_wat = False
-    for ex in EXCLUDE_WAT_CHARS:
-        if ex.lower() in char_name.lower():
-            should_exclude_wat = True
-            break
-    
-    # Check if this character gets gorbhouse overlay
-    gets_gorbhouse = any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
+    should_exclude_wat = is_wat_excluded(char_name)
+
+    # Check if this character gets gorbhouse overlay (WAT exclusion wins)
+    gets_gorbhouse = gets_gorbhouse_overlay(char_name)
     
     # 2. Select Required Traits
     bg_dir = BACKGROUNDZ
