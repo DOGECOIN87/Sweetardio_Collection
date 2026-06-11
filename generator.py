@@ -1,11 +1,32 @@
+import json
 import os
 import random
 from PIL import Image
 
 TRAITS_DIR = "traits"
 
+# Background overlays are NOT standalone plates: they ride on top of the
+# whole stack (placed last) whenever their parent plate is the background.
+BG_OVERLAY_PAIRS = {
+    "Sweetardio_11314.png": "Whitehouse_Lawn_Overlay.png",
+}
+
+# Optional eye <-> background compatibility map built by
+# asset_assessment/build_eyez_compat.py. Missing file = no restrictions.
+EYEZ_COMPAT_PATH = os.path.join(TRAITS_DIR, "eyez_compat.json")
+
+def load_eyez_blocklist():
+    try:
+        with open(EYEZ_COMPAT_PATH) as f:
+            return json.load(f).get("blocked", {})
+    except (OSError, ValueError):
+        return {}
+
 # Asset Categories
-BACKGROUNDZ = "backgroundz"
+# Graded plates (regenerate with: python3 background_pop_studies/grade.py);
+# falls back to the original "backgroundz" folder if the graded set is absent.
+BACKGROUNDZ = "backgroundz_pop"
+BACKGROUNDZ_FALLBACK = "backgroundz"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -27,8 +48,26 @@ GORBHOUSE_CHARS = [
     "zebra_cake",
 ]
 
-# Characters that should NOT get what_are_thosez
+# Characters that should NOT get what_are_thosez (footwear):
+# churro, twinkie, poptarts and all ice creams
 EXCLUDE_WAT_CHARS = [
+    "cyan_sherbert_ice_cream",
+    "neopolitan_ice_cream",
+    "rainbow_sherbert_ice_cream",
+    "vanilla_ice_cream",
+    "rocky_road_ice_cream",
+    "zaffre_sherbert_ice_cream",
+    "mint_chocolate_chip_ice_cream",
+    "pink_sherbert_ice_cream",
+    "twinkie",
+    "churro",
+    "poptart",
+]
+
+# Characters that keep the raised (non-offset) position even without
+# footwear. Kept separate from EXCLUDE_WAT_CHARS so making a character
+# footwear-ineligible (e.g. poptarts) does not change where it stands.
+NO_OFFSET_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
     "rainbow_sherbert_ice_cream",
@@ -58,7 +97,11 @@ def generate_random_combination():
     
     base_names = set()
     for f in char_files:
-        name = f.replace("before_skinz_", "").replace("after_skinz_", "").replace("layer-after_skinz_", "").replace(".png", "")
+        # strip the longest prefix first: "layer-after_skinz_" must go
+        # before "after_skinz_", otherwise names like
+        # "layer-after_skinz_churro" become "layer-churro" and never
+        # match their own layer files again
+        name = f.replace("layer-after_skinz_", "").replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
         import re
         name = re.sub(r'\s*\(\d+\)', '', name).strip()
         base_names.add(name)
@@ -80,9 +123,18 @@ def generate_random_combination():
     gets_gorbhouse = any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
     
     # 2. Select Required Traits
-    bg_files = get_files(BACKGROUNDZ)
+    bg_dir = BACKGROUNDZ
+    bg_files = get_files(bg_dir)
     if not bg_files:
-        raise ValueError("No background assets found in traits/backgroundz")
+        print(f"Warning: traits/{BACKGROUNDZ} is empty (run "
+              f"background_pop_studies/grade.py to build it); "
+              f"falling back to traits/{BACKGROUNDZ_FALLBACK}")
+        bg_dir = BACKGROUNDZ_FALLBACK
+        bg_files = get_files(bg_dir)
+    # overlays pair with their parent plate; they are never a background
+    bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
+    if not bg_files:
+        raise ValueError("No background assets found")
     bg = random.choice(bg_files)
     
     skin_files = get_files(SKINZ)
@@ -106,7 +158,10 @@ def generate_random_combination():
     if not mouth_files:
         raise ValueError("No mouth assets found in traits/mouthz")
     
-    eye = random.choice(eye_files)
+    # eye <-> background compatibility (optional, measured blocklist)
+    eyez_blocked = load_eyez_blocklist().get(bg, [])
+    allowed_eyes = [f for f in eye_files if f not in eyez_blocked]
+    eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
     mouth = random.choice(mouth_files)
     
     arm_files = get_files(ARMZ)
@@ -116,12 +171,19 @@ def generate_random_combination():
     sticker = random.choice(sticker_files) if sticker_files else None
     
     # Optional "What are thosez"
+    # base files look like "layer-Bunny_Slippers_Base (1).png": match the
+    # "_base" marker with an optional " (n)" suffix, case-insensitively
+    import re as _re
+    def wat_base_name(f):
+        m = _re.match(r"(.+?)_base(?:\s*\(\d+\))?\.png$", f, _re.IGNORECASE)
+        return m.group(1) if m else None
+
     chosen_wat = None
     wat_overlays = []
     if not should_exclude_wat:
         wat_files = get_files(WHAT_ARE_THOSEZ)
-        wat_bases = [f.replace("_base.png", "").replace("_Base.png", "") for f in wat_files if f.lower().endswith("_base.png")]
-        wat_bases = [b for b in wat_bases if "gorbhouse" not in b.lower()]
+        wat_bases = [wat_base_name(f) for f in wat_files]
+        wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
         
         # 70% chance to have footwear if not excluded
         if wat_bases and random.random() < 0.7:
@@ -134,19 +196,22 @@ def generate_random_combination():
     layers = []
     
     # 1. Background
-    layers.append({"path": os.path.join(TRAITS_DIR, BACKGROUNDZ, bg), "offset": False})
+    layers.append({"path": os.path.join(TRAITS_DIR, bg_dir, bg), "offset": False})
     
-    # 2. What Are Thosez BASE
+    # 2. What Are Thosez BASE (placed before characterz)
     if chosen_wat:
         wat_files = get_files(WHAT_ARE_THOSEZ)
         for f in wat_files:
-            if f.lower() == f"{chosen_wat.lower()}_base.png":
+            base = wat_base_name(f)
+            if base and base.lower() == chosen_wat.lower():
                 layers.append({"path": os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f), "offset": False})
                 break
     
     # Determine if we should apply offset
     # Rule: If no footwear AND (not ice cream, not twinkie, not churro)
-    apply_offset = not chosen_wat and not should_exclude_wat
+    no_offset_char = any(ex.lower() in char_name.lower()
+                         for ex in NO_OFFSET_CHARS)
+    apply_offset = not chosen_wat and not no_offset_char
     
     # 3. Character
     char_found = False
@@ -202,7 +267,13 @@ def generate_random_combination():
     # 10. Sticker - DON'T MOVE DOWN
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
-    
+
+    # 11. Paired background overlay - always placed LAST, on top of everything
+    if bg in BG_OVERLAY_PAIRS:
+        ov_path = os.path.join(TRAITS_DIR, bg_dir, BG_OVERLAY_PAIRS[bg])
+        if os.path.exists(ov_path):
+            layers.append({"path": ov_path, "offset": False})
+
     return layers, char_name
 
 def create_image(layers, output_name=None):
