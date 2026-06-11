@@ -21,7 +21,8 @@ import sys
 from PIL import Image, ImageDraw
 
 sys.path.insert(0, ".")
-from generator import create_image
+from generator import (BG_OVERLAY_PAIRS, EXCLUDE_WAT_CHARS, GORBHOUSE_CHARS,
+                       NO_OFFSET_CHARS, create_image, load_eyez_blocklist)
 
 BG = "traits/backgroundz_pop"
 CH = "traits/characterz"
@@ -47,57 +48,84 @@ PEPE = ("layer-Pepe_Base (1).png", ["layer-Pepe_Overlay (1).png"])
 SHIBA = ("layer-Shiba_Base (1).png", ["layer-Shiba_Overlay_Left (1).png",
                                       "layer-Shiba_Overlay_Right (1).png"])
 
-# (name, plate, character, footwear, skin, eyes, mouth, arms, sticker,
+# Eyes are PREFERENCE LISTS: the first entry allowed by the measured
+# anti-clash blocklist (traits/eyez_compat.json) is used, so the showcase
+# obeys the same eye <-> background rule as the generator.
+# (name, plate, character, footwear, skin, eye_prefs, mouth, arms, sticker,
 #  offset, extras)
 COMBOS = [
     ("01_glazed_on_tootsie_navy", "Sweetardio_11327.png",
      "after_skinz_glazed_doughnut.png", BUNNY, WHITE,
-     "layer-Eyes_Googly (1).png", "Awkward_smile.png", SHY, None, False, []),
+     ["layer-Eyes_Googly (1).png"], "Awkward_smile.png", SHY, None, False, []),
     ("02_cyan_sherbert_in_bakery", "Sweetardio_11325.png",
      "before_skinz_cyan_sherbert_ice_cream.png", None, WHITE,
-     "Cerise.png", "layer-Mouth_Tasty-1.png", SHY, None, False, []),
+     ["Cerise.png", "Blue.png"], "layer-Mouth_Tasty-1.png", SHY, None, False, []),
     ("03_brownie_on_spotlight_stage", "Sweetardio_115 (1).png",
      "after_skinz_brownie_bite.png", SHIBA, GOLD,
-     "layer-Eyes_Cyan (1).png", "layer-Mouth_Blunt (1).png", SHY,
-     "07_Rare_Candy.png", False, []),
+     ["layer-Eyes_Cyan (1).png", "Cerise.png", "layer-Eyes_Googly (1).png"],
+     "layer-Mouth_Blunt (1).png", SHY, "07_Rare_Candy.png", False, []),
     ("04_pink_sherbert_at_castle", "Sweetardio_114 (15).png",
      "before_skinz_pink_sherbert_ice_cream.png", None, WHITE,
-     "layer-Eyes_Cyan (1).png", "layer-Mouth_Lollipop (1).png", SHY,
-     None, False, []),
+     ["layer-Eyes_Cyan (1).png", "Cerise.png", "layer-Eyes_Side_Eye (1).png"],
+     "layer-Mouth_Lollipop (1).png", SHY, None, False, []),
     ("05_twinkie_gorbhouse_waffle", "Sweetardio_114 (10).png",
      "Twinkie.png", None, BLACK,
-     "layer-Eyes_Side_Eye (1).png", "layer-Mouth_Flat (1).png", SHY,
+     ["layer-Eyes_Side_Eye (1).png"], "layer-Mouth_Flat (1).png", SHY,
      "25_Zombieland_Twinkie.png", False,
      [f"{WAT}/Gorbhouse_overlay.png"]),
     ("06_marshmallow_gum_corridor",
      "file_000000002bb471fdac3ce6f00e2304bd.png",
      "after_skinz_marshmallow.png", PEPE, WHITE,
-     "Blue.png", "layer-Mouth_Fang (1).png", NERF, None, False, []),
+     ["Blue.png", "layer-Eyes_Cyan (1).png"], "layer-Mouth_Fang (1).png", NERF, None, False, []),
     ("07_cookie_whitehouse_lawn", "Sweetardio_11314.png",
      "after_skinz_chocolate_chip_cookie.png", BUNNY, WHITE,
-     "Blue.png", "Awkward_smile.png", SHY, None, False,
+     ["Blue.png", "Cerise.png"], "Awkward_smile.png", SHY, None, False,
      [f"{BG}/Whitehouse_Lawn_Overlay.png"]),
     ("08_zaffre_sherbert_canyon", "Sweetardio_114 (18).png",
      "before_skinz_zaffre_sherbert_ice_cream.png", None, WHITE,
-     "layer-Eyes_Googly (1).png", "layer-Mouth_Tasty-1.png", SHY,
+     ["layer-Eyes_Googly (1).png"], "layer-Mouth_Tasty-1.png", SHY,
      None, False, []),
     ("09_churro_liberty_coin", "Sweetardio_114 (29).png",
      "layer-after_skinz_churro (1) (1).png", None, CYANSKIN,
-     "layer-Eyes_Lowkey (1).png", "layer-Mouth_Blunt (1).png", AK,
+     ["layer-Eyes_Lowkey (1).png"], "layer-Mouth_Blunt (1).png", AK,
      "24_Golden_Ticket.png", False, []),
     ("10_gummy_worm_money_bed",
      "file_00000000c78071f8bca305176ffecb04.png",
      "layer-after_skinz_gummy_worm (1).png", None, WHITE,
-     "Cerise.png", "layer-layer-layer-Mouth_Sad (1).png", SHY,
+     ["Cerise.png", "Blue.png"], "layer-layer-layer-Mouth_Sad (1).png", SHY,
      "22_Sweet_Tooth.png", True, []),
 ]
 
 
+def check_rules(plate, char, foot, eye, offset, extras):
+    """Assert this combo obeys every generator rule."""
+    cl = char.lower()
+    if any(ex.lower() in cl for ex in EXCLUDE_WAT_CHARS):
+        assert foot is None, f"{char} must not get footwear"
+    if any(ex.lower() in cl for ex in NO_OFFSET_CHARS) or foot:
+        assert not offset, f"{char} must not be offset"
+    blocked = load_eyez_blocklist().get(plate, [])
+    assert eye not in blocked, f"{eye} blocked on {plate}"
+    if any("Gorbhouse" in e for e in extras):
+        assert any(g.lower() in cl for g in GORBHOUSE_CHARS), char
+    if plate in BG_OVERLAY_PAIRS:
+        assert any(BG_OVERLAY_PAIRS[plate] in e for e in extras), \
+            f"{plate} requires its paired overlay"
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
+    blocked_map = load_eyez_blocklist()
     outs = []
-    for (name, plate, char, foot, skin, eyes, mouth, arms, sticker,
+    for (name, plate, char, foot, skin, eye_prefs, mouth, arms, sticker,
          offset, extras) in COMBOS:
+        blocked = blocked_map.get(plate, [])
+        eyes = next((e for e in eye_prefs if e not in blocked),
+                    "layer-Eyes_Googly (1).png")
+        if eyes != eye_prefs[0]:
+            print(f"  [eye rule] {name}: {eye_prefs[0]} blocked on {plate}"
+                  f" -> using {eyes}")
+        check_rules(plate, char, foot, eyes, offset, extras)
         layers = [{"path": f"{BG}/{plate}", "offset": False}]
         if foot:
             layers.append({"path": f"{WAT}/{foot[0]}", "offset": False})
