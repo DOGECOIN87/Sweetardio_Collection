@@ -41,25 +41,24 @@ ARMS = "traits/armz/layer-layer-layer-layer-Shy-1.png"
 # bluest plate, cerise scoop on the magenta plate. Ice creams get no
 # vertical offset (generator.py EXCLUDE_WAT_CHARS rule).
 PHASE1 = [
-    ("Sweetardio_114 (10)", "after_skinz_brownie_bite", True, None),
-    ("Sweetardio_11317", "after_skinz_marshmallow", True, None),
-    ("Sweetardio_114", "after_skinz_glazed_doughnut", True, None),
-    ("Sweetardio_11325", "after_skinz_chocolate_chip_cookie", True, None),
-    ("Sweetardio_1142", "before_skinz_cyan_sherbert_ice_cream", False,
+    ("Cookboy", "after_skinz_brownie_bite", True, None),
+    ("Celestial", "after_skinz_marshmallow", True, None),
+    ("Why_So_Cereal", "after_skinz_glazed_doughnut", True, None),
+    ("Sweetardio", "after_skinz_chocolate_chip_cookie", True, None),
+    ("Sweet_Castle_2", "before_skinz_cyan_sherbert_ice_cream", False,
      "traits/eyez/Cerise.png"),
-    ("file_000000002bb471fdac3ce6f00e2304bd",
-     "before_skinz_pink_sherbert_ice_cream", False, None),
+    ("Bubble_Trouble", "before_skinz_pink_sherbert_ice_cream", False, None),
 ]
 
 # single-tone worst cases (cast is NOT all dual-tone): gummy worm lives in
 # the stage's own blue corridor; cyan poptart is uniformly cool; chocolate
 # doughnut is uniformly dark-warm on the darkest navy plate.
 VERIFY = [
-    ("Sweetardio_115 (1)", "layer-after_skinz_gummy_worm (1)", True,
+    ("Smuckers_Blue", "layer-after_skinz_gummy_worm (1)", True,
      "traits/eyez/Cerise.png"),
-    ("Sweetardio_113 (31)", "before_skinz_cyan_frosted_poptart", True,
+    ("Blue_Fur", "before_skinz_cyan_frosted_poptart", True,
      "traits/eyez/Cerise.png"),
-    ("Sweetardio_11327", "after_skinz_chocolate_doughnut", True, None),
+    ("Tootsie_Blue", "after_skinz_chocolate_doughnut", True, None),
 ]
 
 

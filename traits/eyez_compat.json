@@ -2,91 +2,91 @@
  "mode": "anti-clash",
  "src": "traits/backgroundz",
  "blocked": {
-  "Sweetardio_113 (24).png": [
+  "Ben_dot_Eth.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Blue_Fur.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Bubble_Trouble.png": [
+   "Cerise.png"
+  ],
+  "Celestial.png": [
    "Blue.png",
    "Cerise.png"
   ],
-  "Sweetardio_113 (31).png": [
+  "Cereal_Killer.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_11317.png": [
+  "Cookboy.png": [
    "Blue.png",
    "Cerise.png"
   ],
-  "Sweetardio_11319.png": [
+  "NFTs_Arent_Dead.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_11327.png": [
-   "Blue.png"
-  ],
-  "Sweetardio_114 (10).png": [
-   "Blue.png",
-   "Cerise.png"
-  ],
-  "Sweetardio_114 (15).png": [
+  "NFTs_Arent_Dead_2.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_114 (24).png": [
+  "Smuckers_Blue.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_114.png": [
+  "Smuckers_Red.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_1141.png": [
+  "Sweet_Castle.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_1142.png": [
+  "Sweet_Castle_2.png": [
    "Blue.png",
    "Cerise.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Sweetardio_115 (1).png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
-  ],
-  "Sweetardio_115 (10).png": [
+  "Toasted.png": [
    "Blue.png",
    "Cerise.png"
   ],
-  "Sweetardio_115 (2).png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  "Tootsie_Blue.png": [
+   "Blue.png"
   ],
-  "file_000000002bb471fdac3ce6f00e2304bd.png": [
+  "Tootsie_Cerise.png": [
+   "Blue.png",
    "Cerise.png"
   ],
-  "file_00000000947471fd9e567111688f30a3.png": [
+  "UAP_Taskforce.png": [
    "Blue.png",
-   "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "podium_speech_press.png": [
+  "Why_So_Cereal.png": [
    "Blue.png",
+   "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ]
