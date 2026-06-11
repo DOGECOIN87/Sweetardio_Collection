@@ -1,0 +1,94 @@
+{
+ "mode": "anti-clash",
+ "src": "traits/backgroundz_pop",
+ "blocked": {
+  "Sweetardio_113 (24).png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Sweetardio_113 (31).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_11317.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Sweetardio_11319.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_11327.png": [
+   "Blue.png"
+  ],
+  "Sweetardio_114 (10).png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Sweetardio_114 (15).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_114 (24).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_114.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_1141.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_1142.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_115 (1).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio_115 (10).png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Sweetardio_115 (2).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "file_000000002bb471fdac3ce6f00e2304bd.png": [
+   "Cerise.png"
+  ],
+  "file_00000000947471fd9e567111688f30a3.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "podium_speech_press.png": [
+   "Blue.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ]
+ }
+}

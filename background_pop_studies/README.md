@@ -74,3 +74,11 @@ python3 asset_assessment/verify_separation.py      # cast-wide separation check
 
 `grade.py --only <substr>...` grades a subset; `--src/--dst/--log` override
 paths. Everything is deterministic — same inputs, same bytes out.
+
+**Note:** `generator.py` now reads `traits/backgroundz_pop` (falling back to
+the original `traits/backgroundz` with a warning if the graded set hasn't
+been built). After a fresh clone, run `python3 background_pop_studies/grade.py`
+once. Eye↔background pairing is governed by `traits/eyez_compat.json`
+(anti-clash, built by `asset_assessment/build_eyez_compat.py`); delete the
+file or rebuild with `--mode match` to change the rule. Curated showcase:
+`python3 background_pop_studies/make_showcase.py` → `showcase/`.

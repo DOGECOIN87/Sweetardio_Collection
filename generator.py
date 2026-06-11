@@ -23,7 +23,10 @@ def load_eyez_blocklist():
         return {}
 
 # Asset Categories
-BACKGROUNDZ = "backgroundz"
+# Graded plates (regenerate with: python3 background_pop_studies/grade.py);
+# falls back to the original "backgroundz" folder if the graded set is absent.
+BACKGROUNDZ = "backgroundz_pop"
+BACKGROUNDZ_FALLBACK = "backgroundz"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -120,11 +123,18 @@ def generate_random_combination():
     gets_gorbhouse = any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
     
     # 2. Select Required Traits
-    bg_files = get_files(BACKGROUNDZ)
+    bg_dir = BACKGROUNDZ
+    bg_files = get_files(bg_dir)
+    if not bg_files:
+        print(f"Warning: traits/{BACKGROUNDZ} is empty (run "
+              f"background_pop_studies/grade.py to build it); "
+              f"falling back to traits/{BACKGROUNDZ_FALLBACK}")
+        bg_dir = BACKGROUNDZ_FALLBACK
+        bg_files = get_files(bg_dir)
     # overlays pair with their parent plate; they are never a background
     bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
     if not bg_files:
-        raise ValueError("No background assets found in traits/backgroundz")
+        raise ValueError("No background assets found")
     bg = random.choice(bg_files)
     
     skin_files = get_files(SKINZ)
@@ -186,7 +196,7 @@ def generate_random_combination():
     layers = []
     
     # 1. Background
-    layers.append({"path": os.path.join(TRAITS_DIR, BACKGROUNDZ, bg), "offset": False})
+    layers.append({"path": os.path.join(TRAITS_DIR, bg_dir, bg), "offset": False})
     
     # 2. What Are Thosez BASE (placed before characterz)
     if chosen_wat:
@@ -260,7 +270,7 @@ def generate_random_combination():
 
     # 11. Paired background overlay - always placed LAST, on top of everything
     if bg in BG_OVERLAY_PAIRS:
-        ov_path = os.path.join(TRAITS_DIR, BACKGROUNDZ, BG_OVERLAY_PAIRS[bg])
+        ov_path = os.path.join(TRAITS_DIR, bg_dir, BG_OVERLAY_PAIRS[bg])
         if os.path.exists(ov_path):
             layers.append({"path": ov_path, "offset": False})
 
