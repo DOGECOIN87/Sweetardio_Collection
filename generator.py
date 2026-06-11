@@ -92,6 +92,10 @@ VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 # within BALL_FIT_MARGIN of the ball's width. The ball always sits on top
 # of the body ("B everywhere").
 BALL_FIT_MARGIN = 0.92
+# Optional soft contact shadow around the skin ball's edge (set to None to
+# disable). Rendered from the scaled ball's alpha, offset slightly downward,
+# and clipped to the foreground so it never falls on the background plate.
+SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 
 _bbox_cache = {}
 
@@ -292,8 +296,11 @@ def generate_random_combination():
     # 5. Skinz: ball on top, enlarged so the chosen eyes fit inside it
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
-    layers.append({"path": skin_path, "offset": apply_offset,
-                   "fscale": bfit, "fcenter": bcenter})
+    skin_layer = {"path": skin_path, "offset": apply_offset,
+                  "fscale": bfit, "fcenter": bcenter}
+    if SKIN_SHADOW:
+        skin_layer["shadow"] = dict(SKIN_SHADOW)
+    layers.append(skin_layer)
     
     # 6. Eyez (original size and placement)
     layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset})
@@ -333,8 +340,12 @@ def create_image(layers, output_name=None):
         output_name = f"output/gen_{int(time.time())}_{random.randint(1000, 9999)}.png"
     
     base_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
+    from PIL import ImageChops, ImageFilter
+    fg_mask = Image.new("L", (CANVAS_SIZE, CANVAS_SIZE), 0)
+    layer_index = -1
     
     for layer_info in layers:
+        layer_index += 1
         layer_path = layer_info["path"]
         should_offset = layer_info["offset"]
         
@@ -356,7 +367,22 @@ def create_image(layers, output_name=None):
             offset_img.paste(img, (0, VERTICAL_OFFSET))
             img = offset_img
             
+        sh = layer_info.get("shadow")
+        if sh:
+            a = img.getchannel("A")
+            blurred = a.filter(ImageFilter.GaussianBlur(sh["blur"]))
+            moved = Image.new("L", a.size, 0)
+            moved.paste(blurred, (sh.get("dx", 0), sh.get("dy", 0)))
+            op = sh["opacity"]
+            shadow_a = moved.point(lambda v: int(v * op))
+            # clip to what is already drawn above the background plate
+            shadow_a = ImageChops.multiply(shadow_a, fg_mask)
+            shadow = Image.new("RGBA", a.size, (0, 0, 0, 255))
+            shadow.putalpha(shadow_a)
+            base_img.alpha_composite(shadow)
         base_img.alpha_composite(img)
+        if layer_index > 0:  # everything except the background plate
+            fg_mask = ImageChops.lighter(fg_mask, img.getchannel("A"))
     
     base_img.save(output_name)
     return output_name
