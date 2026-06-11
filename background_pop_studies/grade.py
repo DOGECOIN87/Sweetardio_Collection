@@ -9,7 +9,7 @@ bodies' red-orange band.
 
 Every operation is a deterministic, parameter-logged tone/colour transform of
 the existing plate - no generation, no repainting. Originals are never
-modified; output goes to traits/backgroundz_pop/. Alpha is preserved bit-for-
+modified; graded output goes to traits/backgroundz/. Alpha is preserved bit-for-
 bit. All parameters are continuous functions of each plate's measured
 L / S / busyness / temperature:
 
@@ -42,8 +42,8 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 # ---------------------------------------------------------------- constants
-SRC_DEFAULT = "traits/backgroundz"
-DST_DEFAULT = "traits/backgroundz_pop"
+SRC_DEFAULT = "traits/backgroundz_originals"
+DST_DEFAULT = "traits/backgroundz"
 LOG_PATH = "background_pop_studies/ULTIMATE_GRADE_LOG.md"
 ALPHA_OPAQUE = 128
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render 10 curated high-separation showcase combinations.
 
-Plates come from the graded set (traits/backgroundz_pop). Layer semantics
+Plates come from the graded set (traits/backgroundz). Layer semantics
 follow generator.py exactly: background -> footwear base -> character ->
 footwear overlay -> skin -> eyes -> mouth -> arms -> gorbhouse -> sticker ->
 paired background overlay last. Offsets follow the generator rules
@@ -24,7 +24,7 @@ sys.path.insert(0, ".")
 from generator import (BG_OVERLAY_PAIRS, EXCLUDE_WAT_CHARS, GORBHOUSE_CHARS,
                        NO_OFFSET_CHARS, create_image, load_eyez_blocklist)
 
-BG = "traits/backgroundz_pop"
+BG = "traits/backgroundz"
 CH = "traits/characterz"
 WAT = "traits/what_are_thosez"
 SK = "traits/skinz"

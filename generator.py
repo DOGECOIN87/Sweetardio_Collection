@@ -23,10 +23,10 @@ def load_eyez_blocklist():
         return {}
 
 # Asset Categories
-# Graded plates (regenerate with: python3 background_pop_studies/grade.py);
-# falls back to the original "backgroundz" folder if the graded set is absent.
-BACKGROUNDZ = "backgroundz_pop"
-BACKGROUNDZ_FALLBACK = "backgroundz"
+# traits/backgroundz holds the GRADED plates (sources preserved in
+# traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
+BACKGROUNDZ = "backgroundz"
+BACKGROUNDZ_FALLBACK = "backgroundz_originals"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -126,9 +126,8 @@ def generate_random_combination():
     bg_dir = BACKGROUNDZ
     bg_files = get_files(bg_dir)
     if not bg_files:
-        print(f"Warning: traits/{BACKGROUNDZ} is empty (run "
-              f"background_pop_studies/grade.py to build it); "
-              f"falling back to traits/{BACKGROUNDZ_FALLBACK}")
+        print(f"Warning: traits/{BACKGROUNDZ} is empty; falling back to "
+              f"the ungraded traits/{BACKGROUNDZ_FALLBACK}")
         bg_dir = BACKGROUNDZ_FALLBACK
         bg_files = get_files(bg_dir)
     # overlays pair with their parent plate; they are never a background

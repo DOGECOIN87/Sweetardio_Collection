@@ -13,7 +13,7 @@ channels are weak simultaneously:
   saturated enough for hue to matter, S_plate >= 0.15)
 
 Usage: python3 asset_assessment/verify_separation.py [graded_dir]
-Compares traits/backgroundz vs graded_dir (default traits/backgroundz_pop)
+Compares traits/backgroundz_originals vs graded_dir (default traits/backgroundz)
 for every plate present in graded_dir.
 """
 
@@ -27,7 +27,7 @@ from PIL import Image
 sys.path.insert(0, "background_pop_studies")
 from grade import measure  # same metric definitions as the engine
 
-SRC = "traits/backgroundz"
+SRC = "traits/backgroundz_originals"
 
 
 def plate_stats(path):
@@ -87,7 +87,7 @@ def at_risk(cL, cS, cH, p):
 
 
 def main():
-    graded_dir = sys.argv[1] if len(sys.argv) > 1 else "traits/backgroundz_pop"
+    graded_dir = sys.argv[1] if len(sys.argv) > 1 else "traits/backgroundz"
     cast = cast_entries()
     print(f"cast entries: {len(cast)} (29 whole bodies + cone-style halves)")
     print(f"{'plate':<44}{'at-risk before':>15}{'after':>7}  worst remaining")
