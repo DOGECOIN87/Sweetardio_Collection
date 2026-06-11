@@ -27,8 +27,26 @@ GORBHOUSE_CHARS = [
     "zebra_cake",
 ]
 
-# Characters that should NOT get what_are_thosez
+# Characters that should NOT get what_are_thosez (footwear):
+# churro, twinkie, poptarts and all ice creams
 EXCLUDE_WAT_CHARS = [
+    "cyan_sherbert_ice_cream",
+    "neopolitan_ice_cream",
+    "rainbow_sherbert_ice_cream",
+    "vanilla_ice_cream",
+    "rocky_road_ice_cream",
+    "zaffre_sherbert_ice_cream",
+    "mint_chocolate_chip_ice_cream",
+    "pink_sherbert_ice_cream",
+    "twinkie",
+    "churro",
+    "poptart",
+]
+
+# Characters that keep the raised (non-offset) position even without
+# footwear. Kept separate from EXCLUDE_WAT_CHARS so making a character
+# footwear-ineligible (e.g. poptarts) does not change where it stands.
+NO_OFFSET_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
     "rainbow_sherbert_ice_cream",
@@ -58,7 +76,11 @@ def generate_random_combination():
     
     base_names = set()
     for f in char_files:
-        name = f.replace("before_skinz_", "").replace("after_skinz_", "").replace("layer-after_skinz_", "").replace(".png", "")
+        # strip the longest prefix first: "layer-after_skinz_" must go
+        # before "after_skinz_", otherwise names like
+        # "layer-after_skinz_churro" become "layer-churro" and never
+        # match their own layer files again
+        name = f.replace("layer-after_skinz_", "").replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
         import re
         name = re.sub(r'\s*\(\d+\)', '', name).strip()
         base_names.add(name)
@@ -146,7 +168,9 @@ def generate_random_combination():
     
     # Determine if we should apply offset
     # Rule: If no footwear AND (not ice cream, not twinkie, not churro)
-    apply_offset = not chosen_wat and not should_exclude_wat
+    no_offset_char = any(ex.lower() in char_name.lower()
+                         for ex in NO_OFFSET_CHARS)
+    apply_offset = not chosen_wat and not no_offset_char
     
     # 3. Character
     char_found = False
