@@ -35,13 +35,20 @@ EYES = "traits/eyez/Blue.png"
 MOUTH = "traits/mouthz/Awkward_smile.png"
 ARMS = "traits/armz/layer-layer-layer-layer-Shy-1.png"
 
-# plate -> (character base name, needs_offset) ; hard cases on purpose:
-# dark-on-dark, bright-on-bright, busy+mid, warm-on-warm
+# plate -> (character, needs_offset, eyes) ; hard cases on purpose:
+# dark-on-dark, bright-on-bright, busy+mid, warm-on-warm, plus the two
+# palette-collision cases from the vertical split study: cyan scoop on the
+# bluest plate, cerise scoop on the magenta plate. Ice creams get no
+# vertical offset (generator.py EXCLUDE_WAT_CHARS rule).
 PHASE1 = [
-    ("Sweetardio_114 (10)", "after_skinz_brownie_bite", True),
-    ("Sweetardio_11317", "after_skinz_marshmallow", True),
-    ("Sweetardio_114", "after_skinz_glazed_doughnut", True),
-    ("Sweetardio_11325", "after_skinz_chocolate_chip_cookie", True),
+    ("Sweetardio_114 (10)", "after_skinz_brownie_bite", True, None),
+    ("Sweetardio_11317", "after_skinz_marshmallow", True, None),
+    ("Sweetardio_114", "after_skinz_glazed_doughnut", True, None),
+    ("Sweetardio_11325", "after_skinz_chocolate_chip_cookie", True, None),
+    ("Sweetardio_1142", "before_skinz_cyan_sherbert_ice_cream", False,
+     "traits/eyez/Cerise.png"),
+    ("file_000000002bb471fdac3ce6f00e2304bd",
+     "before_skinz_pink_sherbert_ice_cream", False, None),
 ]
 
 
@@ -59,10 +66,11 @@ def load_layer(path):
     return im
 
 
-def build_character(char_file, offset=True):
+def build_character(char_file, offset=True, eyes=None):
     """Composite a character cutout exactly like generator.py (no plate)."""
     cut = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    layers = [f"traits/characterz/{char_file}.png", SKIN, EYES, MOUTH, ARMS]
+    layers = [f"traits/characterz/{char_file}.png", SKIN, eyes or EYES,
+              MOUTH, ARMS]
     for p in layers:
         im = load_layer(p)
         if offset:
@@ -101,8 +109,8 @@ def panel(plate_path, char, label, chips, width=660):
     return out
 
 
-def side_by_side(stem, char_file, offset, out_path):
-    char = build_character(char_file, offset)
+def side_by_side(stem, char_file, offset, out_path, eyes=None):
+    char = build_character(char_file, offset, eyes)
     chips = BRAND + [(f"body{i+1}", h)
                      for i, h in enumerate(dominant_of(char_file))]
     src = None
@@ -144,10 +152,10 @@ def main():
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     prefix = "phase1" if args.phase1 else "final"
-    for stem, char_file, off in PHASE1:
-        safe = stem.replace(" ", "_").replace("(", "").replace(")", "")
+    for stem, char_file, off, eyes in PHASE1:
+        safe = stem.replace(" ", "_").replace("(", "").replace(")", "")[:40]
         side_by_side(stem, char_file, off,
-                     os.path.join(OUT, f"{prefix}_{safe}.png"))
+                     os.path.join(OUT, f"{prefix}_{safe}.png"), eyes)
     if args.final:
         cohesion_grid(os.path.join(OUT, "final_cohesion_3x3.png"))
 

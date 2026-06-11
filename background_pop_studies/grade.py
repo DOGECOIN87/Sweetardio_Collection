@@ -17,7 +17,10 @@ L / S / busyness / temperature:
      brightest body 206), partial strength, luma-ratio applied (hue-safe)
   2. gentle smoothstep S-curve, reduced on busy / already-contrasty plates
   3. desaturation toward mean S 0.30 (~half of body 0.63) with a floor,
-     plus an extra squeeze inside the bodies' 0-60 degree hue band
+     plus an extra squeeze inside the character-owned hue bands (warm
+     0-75, cyan scoop 172-202, violet/cerise 276-336 - see the vertical
+     split study in asset_assessment/): the stage keeps only the muted
+     slate-navy corridor and neutrals
   4. cool split-tone (shadows -> slate-navy, highlights -> pale cyan),
      amount = smoothstep of plate temperature: warm plates get the most
   5. depth blur + local-contrast reduction, gated to busy plates only
@@ -51,7 +54,16 @@ MIDKEY_STRENGTH = 0.55     # partial normalization (log-space lerp toward 1)
 P_CLAMP = (0.55, 1.30)     # power-curve exponent clamp (no plate flattened)
 SCURVE_BASE = 0.32         # base smoothstep blend
 SAT_FLOOR = 0.45           # never desaturate below 45 % of original chroma
-BODYBAND_SQUEEZE = 0.18    # extra desat inside hue 0-60 deg (feather 15 deg)
+# Character-owned hue bands get an extra per-pixel saturation squeeze so the
+# stage never competes where the bodies live (asset_assessment split study):
+#   warm 0-75 deg   = cones, cookies, doughnuts (80 % of body mass)
+#   cyan 172-202    = fluorescent-cyan scoop tops / cyan skin / cyan eyes
+#   pink 276-336    = violet & cerise scoop tops and accents
+# Stage keeps the muted slate-navy corridor (~210-265 deg, Oxford Blue) plus
+# all neutrals. (lo, hi, feather, strength):
+KEEPOUT_BANDS = [(0.0, 75.0, 15.0, 0.18),
+                 (172.0, 202.0, 12.0, 0.15),
+                 (276.0, 336.0, 14.0, 0.15)]
 SPLIT_MAX_SH = 0.16        # max shadow tint blend (warmest plate)
 SPLIT_MAX_HL = 0.10        # max highlight tint blend
 TEMP_COOL, TEMP_WARM = -60.0, 45.0   # temp range mapped 0..1 for split-tone
@@ -235,12 +247,17 @@ def grade_plate(img: Image.Image, m: dict, prm: dict) -> Image.Image:
     rgb *= (y2 / y)[..., None]
     rgb = np.clip(rgb, 0.0, 1.2)
 
-    # ---- 3. desaturation: global factor + body-hue-band squeeze ----
+    # ---- 3. desaturation: global factor + character-band keep-out ----
     y = luma(rgb)[..., None]
     hue = hue_deg(np.clip(rgb, 0, 1))
-    band = np.minimum(sstep(-15.0, 15.0, hue), 1 - sstep(60.0, 90.0, hue))
-    band = np.maximum(band, sstep(345.0, 360.0, hue))  # wrap below 0 deg
-    f_px = prm["f_sat"] * (1.0 - BODYBAND_SQUEEZE * band)
+    squeeze = np.zeros_like(hue)
+    for lo, hi, fth, strength in KEEPOUT_BANDS:
+        for shift in (-360.0, 0.0, 360.0):  # wrap-around membership
+            hsh = hue + shift
+            m = np.minimum(sstep(lo - fth, lo + fth, hsh),
+                           1.0 - sstep(hi - fth, hi + fth, hsh))
+            squeeze = np.maximum(squeeze, strength * m)
+    f_px = prm["f_sat"] * (1.0 - squeeze)
     rgb = y + (rgb - y) * f_px[..., None]
 
     # ---- 4. cool split-tone ----

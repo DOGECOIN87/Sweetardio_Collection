@@ -53,6 +53,32 @@ Two oddballs inside `backgroundz`:
   (Fluorescent Cyan skin: 37 % of its hue mass in the cyan band), stickers —
   and in the navy plates themselves.
 
+### 2b. Vertical split follow-up (`asset_assessment/analyze_split.py`)
+
+Per-character top-half vs bottom-half of the opaque bounding box, confirming
+that whole-image means hide structure in the cone-style characters:
+
+- **Cone-style bottoms (10 ice cream/churro/twinkie files): uniformly warm
+  cones** — L 99.9, S 0.81, temp **+95.9**, 87 % of hue mass in red-orange.
+- **Cone-style tops (scoops) carry the brand palette**: cyan sherbert top is
+  86 % cyan-band / **58 % within Fluorescent-Cyan distance** (temp −192);
+  zaffre sherbert top is 100 % violet-band (20 % Dark-Violet match); rainbow
+  top matches Cerise (17 %); pink sherbert top is 100 % pink-band; mint top
+  is 90 % yellow-green. Other scoops stay warm (vanilla, rocky road,
+  neopolitan, churro, twinkie).
+- Aggregate scoop-top hue mass: R 27 / O 18 / **C 12 / V 12 / P 15** % —
+  so characters occupy the warm band **plus** the cyan (~183°) and
+  violet–cerise–pink (~283–345°) accent bands.
+- Non-cone bodies are warm top and bottom (temp +63 / +57).
+
+**Consequence:** the stage keep-out cannot be just the 0–60° warm band. The
+graded stage also gets an extra saturation squeeze in cyan 172–202° and
+pink/violet 276–336°, leaving the stage only the **muted slate-navy corridor
+(~210–265°, Oxford Blue territory) plus neutrals** — the one region no
+character occupies in mass. (Known tradeoff: the gummy worm body sits in the
+240–270° blue band; it still separates by saturation — body S 0.76 vs stage
+≤ ~0.30 — and luminance.)
+
 ## 3. How varied are the active background plates (n = 34)
 
 | metric | min | p25 | median | p75 | max |
@@ -81,8 +107,10 @@ brand's Oxford-Blue world the navy plates already live in:
 
 1. **Desaturate** every plate toward mean S ≈ **0.30** (≈ half of body 0.63,
    below every colour body), continuous factor with a floor so nothing goes
-   fully gray; plus an extra saturation squeeze on pixels inside the bodies'
-   0–60° hue band so the stage never competes there.
+   fully gray; plus an extra saturation squeeze inside the three
+   character-owned hue bands (warm 0–75°, cyan 172–202°, pink/violet
+   276–336° — see §2b) so the stage never competes where bodies or their
+   palette scoop-tops live.
 2. **Mid-key normalization**: equal-headroom target = midpoint(darkest body
    54, brightest body 206) ≈ **L 130**; plates move *partially* toward it via
    a clamped power curve (no clipping), so crushed-dark plates lift and the
@@ -107,5 +135,6 @@ originals untouched; output to a separate folder. Scope: the 34 plates in
 80 % red-orange body band and is contraindicated by the measurements.
 
 Sample proof (engine run on the darkest, brightest, busiest and warmest
-plates, with real composited characters):
+plates, plus the two palette-collision cases — cyan scoop on the bluest
+plate, cerise scoop on the magenta plate — with real composited characters):
 `background_pop_studies/samples/phase1_*.png`.
