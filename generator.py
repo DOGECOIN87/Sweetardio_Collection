@@ -7,8 +7,10 @@ TRAITS_DIR = "traits"
 
 # Background overlays are NOT standalone plates: they ride on top of the
 # whole stack (placed last) whenever their parent plate is the background.
+# Whitehouse_Lawn_Overlay is the foreground figure for the Whitehouse_Lawn
+# scene (NOT Candy_Land / Sweetardio_11314, which was a mis-pairing).
 BG_OVERLAY_PAIRS = {
-    "Sweetardio_11314.png": "Whitehouse_Lawn_Overlay.png",
+    "Whitehouse_Lawn.png": "Whitehouse_Lawn_Overlay.png",
 }
 
 # Optional eye <-> background compatibility map built by
