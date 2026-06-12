@@ -63,6 +63,7 @@ EXCLUDE_WAT_CHARS = [
     "zaffre_sherbert_ice_cream",
     "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
+    "gummy_bear",
     "twinkie",
     "churro",
     "poptart",
@@ -315,10 +316,6 @@ def generate_random_combination():
 
     layers.extend(char_layers)
 
-    # 4. What Are Thosez OVERLAY
-    for overlay_path in wat_overlays:
-        layers.append({"path": overlay_path, "offset": False})
-    
     # 5. Skinz: ball on top, enlarged so the chosen eyes fit inside it
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
@@ -338,7 +335,11 @@ def generate_random_combination():
     if arm:
         layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust})
 
-    # 9. Gorbhouse special overlay
+    # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
+    for overlay_path in wat_overlays:
+        layers.append({"path": overlay_path, "offset": False})
+
+    # 10. Gorbhouse special overlay
     if gets_gorbhouse:
         gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_overlay.png")
         if not os.path.exists(gorbhouse_path):
@@ -346,11 +347,11 @@ def generate_random_combination():
         if os.path.exists(gorbhouse_path):
             layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust})
     
-    # 10. Sticker - DON'T MOVE DOWN
+    # 11. Sticker
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
 
-    # 11. Paired background overlay - always placed LAST, on top of everything
+    # 12. Paired background overlay - always placed LAST, on top of everything
     if bg in BG_OVERLAY_PAIRS:
         ov_path = os.path.join(TRAITS_DIR, bg_dir, BG_OVERLAY_PAIRS[bg])
         if os.path.exists(ov_path):
