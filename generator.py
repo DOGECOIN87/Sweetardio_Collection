@@ -287,12 +287,18 @@ def generate_random_combination():
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
 
-    # 3. Character
-    char_layers = []
+    # 3. Character layers split by z-order relative to the skin ball.
+    # before_skinz_ files sit BELOW the skin (ice-cream body, sugar cube, etc).
+    # after_skinz_ files sit ABOVE the skin (doughnut/brownie/cookie body with a
+    # face hole — the hole reveals the skin ball beneath). Plain-name files
+    # (Twinkie, Sweetardio) have no hole so they go below by default.
+    before_char_layers = []
+    after_char_layers = []
     char_found = False
+
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
+            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
             char_found = True
             break
 
@@ -301,7 +307,11 @@ def generate_random_combination():
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust}
+                if "after_skinz" in f.lower():
+                    after_char_layers.append(layer)
+                else:
+                    before_char_layers.append(layer)
                 main_found = True
                 char_found = True
                 break
@@ -311,13 +321,18 @@ def generate_random_combination():
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust}
+                if "after_skinz" in f.lower():
+                    after_char_layers.append(layer)
+                else:
+                    before_char_layers.append(layer)
                 char_found = True
                 break
 
-    layers.extend(char_layers)
+    # 3. Before-skinz body layers (below skin ball)
+    layers.extend(before_char_layers)
 
-    # 5. Skinz: ball on top, enlarged so the chosen eyes fit inside it
+    # 5. Skinz: ball sits above before-skinz body, below after-skinz body
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
     skin_layer = {"path": skin_path, "offset": apply_offset, "dy": y_adjust,
@@ -325,6 +340,9 @@ def generate_random_combination():
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
+
+    # 4. After-skinz body layers (above skin ball — face hole reveals skin)
+    layers.extend(after_char_layers)
 
     # 6. Eyez (original size and placement)
     layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust})
