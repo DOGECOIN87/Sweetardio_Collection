@@ -68,7 +68,7 @@ def resolves(char_name, char_files):
 def main():
     char_files = g.get_files(g.CHARACTERZ)
     names = base_names(char_files)
-    must_exclude = ("churro", "twinkie", "poptart", "ice_cream")
+    must_exclude = ("churro", "twinkie", "poptart", "ice_cream", "gummy_bear")
 
     print(f"{'character (base name)':<38}{'WAT?':<6}{'offset':<8}"
           f"{'gorb':<6}{'resolves':<9}rule check")
@@ -120,7 +120,33 @@ def main():
           f"footwear-on-excluded hits: {len(hits)}")
     for c, ps in hits[:10]:
         print(f"  {c}: {ps}")
-    if bad_rule or hits:
+
+    # phase 3: character-locked armz. A locked arm on a non-matching
+    # character is a violation; also report how often each locked arm
+    # showed up on its own character so we know the pairing actually fires.
+    random.seed(4321)
+    lock_hits, lock_ok = [], {k: 0 for k in g.ARMZ_CHAR_LOCK}
+    armz_dir = os.path.join(g.TRAITS_DIR, g.ARMZ)
+    for _ in range(trials):
+        layers, char_name = g.generate_random_combination()
+        arms = [os.path.basename(l["path"]) for l in layers
+                if os.path.normpath(l["path"]).startswith(
+                    os.path.normpath(armz_dir))]
+        for a in arms:
+            if a not in g.ARMZ_CHAR_LOCK:
+                continue
+            if g.armz_allowed(a, char_name):
+                lock_ok[a] += 1
+            else:
+                lock_hits.append((char_name, a))
+    print(f"\narmz lock audit: {trials} seeded combos, "
+          f"locked-arm-on-wrong-character hits: {len(lock_hits)}")
+    for c, a in lock_hits[:10]:
+        print(f"  {c}: {a}")
+    print("locked-arm appearances on their own character:")
+    for a, cnt in sorted(lock_ok.items()):
+        print(f"  {a}: {cnt}")
+    if bad_rule or hits or lock_hits:
         sys.exit(1)
 
 

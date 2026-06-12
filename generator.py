@@ -69,6 +69,26 @@ EXCLUDE_WAT_CHARS = [
     "poptart",
 ]
 
+# Character-specific armz: each file here may ONLY appear on characters
+# whose name contains one of the listed substrings (individuals or groups,
+# e.g. "ice_cream" covers every *_ice_cream character; "gummy_bear" covers
+# all bear color variants). Armz files NOT in this map are generic and can
+# pair with any character.
+ARMZ_CHAR_LOCK = {
+    "Armz_Gummy_Bear_Knives.png": ["gummy_bear"],
+    "Armz_Gummy_worms_katana.png": ["gummy_worm"],
+    "Armz_Katana_for_ice_cream_character.png": ["ice_cream"],
+    "Armz_Marshmallow_knives.png": ["marshmallow"],
+    "Armz_Oatmeal_Pie_Katana.png": ["oatmeal_cream_pie"],
+    "Armz_Twinkie_Katana.png": ["twinkie"],
+    "Armz_choc_cookie_katana.png": ["chocolate_chip_cookie"],
+}
+
+def armz_allowed(arm_file, char_name):
+    """Generic armz pair with anyone; locked armz only with their character."""
+    locks = ARMZ_CHAR_LOCK.get(arm_file)
+    return locks is None or any(k in char_name.lower() for k in locks)
+
 # Characters that keep the raised (non-offset) position even without
 # footwear. Kept separate from EXCLUDE_WAT_CHARS so making a character
 # footwear-ineligible (e.g. poptarts) does not change where it stands.
@@ -237,7 +257,8 @@ def generate_random_combination():
     eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
     mouth = random.choice(mouth_files)
     
-    arm_files = get_files(ARMZ)
+    # character-locked armz are filtered out of the pool for everyone else
+    arm_files = [f for f in get_files(ARMZ) if armz_allowed(f, char_name)]
     arm = random.choice(arm_files) if arm_files else None
     
     sticker_files = get_files(STICKERZ)
