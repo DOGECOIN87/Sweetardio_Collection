@@ -69,7 +69,13 @@ SPLIT_MAX_HL = 0.10        # max highlight tint blend
 TEMP_COOL, TEMP_WARM = -60.0, 45.0   # temp range mapped 0..1 for split-tone
 SHADOW_TINT = np.array([0.07, 0.13, 0.27])   # muted Oxford-blue slate
 HILITE_TINT = np.array([0.82, 0.90, 0.98])   # pale cool cyan
-EDGE_BUSY0, EDGE_BUSY1 = 11.0, 20.0  # edge-density ramp for the busy gate
+EDGE_BUSY0, EDGE_BUSY1 = 6.0, 25.0   # linear edge-density ramp (see below)
+# Depth blur "sweet spot" (owner-picked 2026-06): the Liberty_Cook_Dime
+# look, 3.42px at 1393px, applied uniformly to every plate with real
+# detail. Feathered in over the soft-gradient boundary (edge 5.5-7.5) so
+# already-smooth plates stay untouched; blur no longer scales with busy.
+BLUR_SWEET_PX = 3.42
+EDGE_BLUR0, EDGE_BLUR1 = 5.5, 7.5
 LC_MAX = 0.35              # max local-contrast (detail) reduction
 VIG_BASE, VIG_SPAN = 0.10, 0.08
 VIG_TINT = np.array([0.05, 0.09, 0.20])      # deep navy vignette tint
@@ -199,8 +205,14 @@ def derive_params(m: dict, min_side: int) -> dict:
     p_full = np.log(L_TARGET) / np.log(l)
     p = float(np.clip(p_full ** MIDKEY_STRENGTH, *P_CLAMP))
 
-    # busyness 0..1 from edge density; existing-contrast 0..1 from L std
-    busy = float(sstep(EDGE_BUSY0, EDGE_BUSY1, m["edge"]))
+    # busyness 0..1 from edge density. LINEAR ramp, not smoothstep: the old
+    # smoothstep(11, 20) start crushed the whole 6-11 detail band to zero
+    # blur. Ramp pinned so Liberty_Cook_Dime (edge 15.4) keeps the subtle
+    # depth blur the owner approved (busy 0.49 -> 3.4px), soft gradient
+    # plates (edge <= 6) stay untouched, and mid-detail plates now pick up
+    # a gentle 0.4-1.6px depth-of-field.
+    busy = float(np.clip((m["edge"] - EDGE_BUSY0)
+                         / (EDGE_BUSY1 - EDGE_BUSY0), 0.0, 1.0))
     contr = float(np.clip((m["Lstd"] - 40.0) / 35.0, 0.0, 1.0))
 
     # 2. S-curve blend, reduced when plate is busy or already contrasty
@@ -216,8 +228,10 @@ def derive_params(m: dict, min_side: int) -> dict:
     a_sh = SPLIT_MAX_SH * warm_n
     a_hl = SPLIT_MAX_HL * warm_n
 
-    # 5. spatial ops (busy plates only)
-    blur_px = busy * (min_side / 200.0)
+    # 5. spatial ops: uniform sweet-spot depth blur (resolution-scaled),
+    #    local-contrast reduction still proportional to busyness
+    blur_px = (BLUR_SWEET_PX * (min_side / 1393.0)
+               * float(sstep(EDGE_BLUR0, EDGE_BLUR1, m["edge"])))
     lc_cut = LC_MAX * busy
 
     # 6. vignette strength grows gently with plate brightness
