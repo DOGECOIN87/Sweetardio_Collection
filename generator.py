@@ -103,6 +103,9 @@ NO_OFFSET_CHARS = [
     "pink_sherbert_ice_cream",
     "twinkie",
     "churro",
+    # bears are drawn pre-placed (bottoms ~1123-1143, the churro/twinkie
+    # zone); the +150 drop left them standing ~180px below everyone else
+    "gummy_bear",
 ]
 
 CANVAS_SIZE = 1393
@@ -110,13 +113,34 @@ VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 
 # Per-character vertical trim in px (+down, -up), applied on top of the
 # offset rule to every character-anchored layer (body, skin, eyes, mouth,
-# arms). Measured 2026-06: poptarts bottomed at ~1154 and Twinkie floated
-# at 1083 vs the standing ground band 1084-1109. First pass (-45/+25) put
-# both exactly on the churro/marshmallow line (~1108); owner asked for
-# more movement, so current values overshoot the geometric line on purpose.
+# arms) — all layers share the same dy, so the face hole <-> skin ball
+# alignment is preserved exactly. Values are measured by
+# asset_assessment/audit_placement.py (main-body bottoms, sparkle-proof):
+# standing characters align to bottom 957 (-> 1107 with the footwear-less
+# drop, inside the approved 1084-1109 ground band), NO_OFFSET characters
+# to the churro line (1111), ice-cream cone tips to 1290.
+# poptart/twinkie keep their owner-tuned overshoot values (2026-06).
 CHAR_Y_ADJUST = {
     "poptart": -65,
     "twinkie": 45,
+    "pink_sherbert_ice_cream": -57,
+    "rainbow_sherbert_ice_cream": -57,
+    "chocolate_sandwich_cookie": 50,
+    "sugar_cube": 42,
+    "waffle": -38,
+    "ding_dong": 34,
+    "og_gummy_bear": -32,
+    "sugar_doughnut": -26,
+    "zaffre_sherbert_ice_cream": -25,
+    "brownie_bite": 22,
+    "zebra_cake": -22,
+    "cyan_gummy_bear": -20,
+    "chocolate_doughnut": -18,
+    "glazed_doughnut": -18,
+    "gummy_worm": 18,
+    "purple_gummy_bear": -16,
+    "oatmeal_cream_pie": 14,
+    "pink_gummy_bear": -12,
 }
 
 def char_y_adjust(char_name):
