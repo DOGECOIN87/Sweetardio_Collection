@@ -7,7 +7,11 @@ as production would. Outputs:
   /tmp/batch100_sheet.png     - 10x10 grid at 350px/cell, good for overview
   /tmp/batch100_strip_*.png   - 4 strips of 25 at 500px, easier to zoom
 
-Usage (from repo root): python3 asset_assessment/render_batch_sheet.py
+Usage (from repo root):
+  python3 asset_assessment/render_batch_sheet.py [backgrounds_dir]
+The optional backgrounds_dir (absolute or repo-relative) swaps the plate
+set for A/B testing - e.g. a regraded study folder - without touching
+traits/backgroundz. Same seed = same trait picks, only plates differ.
 """
 
 import os
@@ -18,7 +22,14 @@ import time
 from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import generator
 from generator import create_image, generate_random_combination  # noqa
+
+if len(sys.argv) > 1:
+    # os.path.join(TRAITS_DIR, <absolute path>) resolves to the absolute
+    # path, so this reroutes every background lookup in generator.py
+    generator.BACKGROUNDZ = os.path.abspath(sys.argv[1])
+    print(f"backgrounds dir override: {generator.BACKGROUNDZ}")
 
 SEED = 42   # deterministic run; change or remove for a different 100
 N = 100
