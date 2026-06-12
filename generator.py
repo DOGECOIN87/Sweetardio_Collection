@@ -287,7 +287,7 @@ def generate_random_combination():
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
 
-    # 3. Character (collected first: skin z-order depends on the body type)
+    # 3. Character
     char_layers = []
     char_found = False
     for f in char_files:
@@ -305,7 +305,8 @@ def generate_random_combination():
                 main_found = True
                 char_found = True
                 break
-        if main_found: break
+        if main_found:
+            break
 
     if not char_found:
         for f in char_files:
