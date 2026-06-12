@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 """Rebuild the lightsaber armz traits from scratch (owner reference 2026-06).
 
-Target look (owner's mockup): the collection's gloved fists hold a
-realistic chrome/black hilt, and the blade is a THIN laser beam — a
-white-hot core inside a saturated palette body with a strong neon bloom —
-instead of the original fat cartoon blade.
+Target look: the collection's gloved fists hold the owner's real chrome hilt
+(traits/saber_parts/vader_hilt.png) and the blade is a THIN laser beam — a
+white-hot core inside a saturated palette body with a strong neon bloom.
 
 For each of the three saber files the script:
-  1. fits each saber's axis from the original blade footprint (PCA) and
-     finds the emitter point + the old hilt's span along the axis
-  2. cuts the gloved fist (plus its keylines) out of the original art
-  3. draws an analytic hilt in (u,v) axis space: black emitter shroud,
-     clamp ring with side lever, chrome barrel with dots + control box,
-     black mid band, longitudinally-ridged grip, chrome pommel — outlined
-     near-black then Fluorescent Cyan, matching the collection keyline
-  4. draws the beam as distance-to-ray fields: white core, palette body,
+  1. fits each blade half's axis from the original blade footprint (PCA)
+  2. cuts the gloved fist (plus its keylines) from the original art
+  3. affine-warps the real chrome hilt PNG to align with the blade axis,
+     emitter end at the blade origin, pommel extending inward toward the glove
+  4. draws the beam as distance-to-ray fields: white core -> palette body ->
      deep rim, then a 3-radius gaussian bloom at full luminance
   5. stacks beam -> hilt -> glove and writes the trait
 
@@ -25,6 +21,7 @@ Usage:
   python3 asset_assessment/build_saber_assets.py --apply  # traits/armz
 """
 
+import math
 import os
 import sys
 
@@ -33,8 +30,8 @@ from PIL import Image, ImageFilter
 
 ARMZ = "traits/armz"
 BACKUP = "traits/armz_originals"
+HILT_PNG = "traits/saber_parts/vader_hilt.png"
 CANVAS = 1393
-CYAN_KEY = (0x34, 0xED, 0xF3)
 
 SABERS = {
     "Sweetardio_114 (4).png": (0x03, 0x13, 0xA6),   # Zaffre
@@ -42,15 +39,14 @@ SABERS = {
     "Sweetardio_114 (6).png": (0x34, 0xED, 0xF3),   # Fluorescent Cyan
 }
 
-# ---- beam profile (px, at 1393 canvas) --------------------------------
-CORE_W = 4.5        # white-hot core half-width
-BODY_W = 10.0       # saturated palette body half-width
-RIM_W = 13.5        # deep rim half-width (then bloom takes over)
-BLOOM = [(7, 0.85), (18, 0.50), (42, 0.28)]   # (sigma, opacity)
+# ---- beam profile (px, at 1393 canvas) -----------------------------------
+CORE_W  =  4.5        # white-hot core half-width
+BODY_W  = 10.0        # saturated palette body half-width
+RIM_W   = 13.5        # deep rim half-width (bloom takes over beyond this)
+BLOOM   = [(7, 0.85), (18, 0.50), (42, 0.28)]   # (sigma, opacity)
 
-# ---- hilt dimensions along u (0 = emitter tip -> pommel) --------------
-HILT_LEN = 360.0
-HILT_W = 92.0       # main barrel full width
+# ---- hilt placement -------------------------------------------------------
+HILT_LEN = 280.0      # desired hilt length in canvas px
 
 
 def src(fname):
@@ -59,12 +55,125 @@ def src(fname):
                       else os.path.join(ARMZ, fname)).convert("RGBA")
 
 
-# ======================= geometry from the original ====================
+# ======================= hilt PNG helpers ==================================
+
+def _detect_hilt():
+    """Return (padded_crop_image, emitter_xy, pommel_xy) in crop coords."""
+    im = Image.open(HILT_PNG).convert("RGBA")
+    arr = np.array(im)
+    alpha = arr[:, :, 3]
+
+    rows_hit = np.any(alpha > 0, axis=1)
+    cols_hit = np.any(alpha > 0, axis=0)
+    rmin, rmax = np.where(rows_hit)[0][[0, -1]]
+    cmin, cmax = np.where(cols_hit)[0][[0, -1]]
+
+    pad = 40
+    r0, r1 = max(0, rmin - pad), min(arr.shape[0], rmax + pad + 1)
+    c0, c1 = max(0, cmin - pad), min(arr.shape[1], cmax + pad + 1)
+    crop = Image.fromarray(arr[r0:r1, c0:c1])
+
+    ca = np.array(crop)[:, :, 3]
+    ys, xs = np.where(ca > 50)
+    pts = np.stack([xs, ys], axis=1).astype(np.float64)
+    cent = pts.mean(axis=0)
+    cov = np.cov((pts - cent).T)
+    evals, evecs = np.linalg.eigh(cov)
+    major = evecs[:, np.argmax(evals)]          # principal direction
+    perp  = evecs[:, np.argmin(evals)]
+
+    proj = (pts - cent) @ major
+    p_min, p_max = proj.min(), proj.max()
+
+    def perp_width(end_proj, window=35):
+        near = np.abs(proj - end_proj) < window
+        if near.sum() < 5:
+            return 9999.0
+        pp = (pts[near] - cent) @ perp
+        return float(pp.max() - pp.min())
+
+    w_min = perp_width(p_min)
+    w_max = perp_width(p_max)
+
+    end_min_xy = cent + major * p_min
+    end_max_xy = cent + major * p_max
+
+    if w_min < w_max:
+        emitter, pommel = end_min_xy, end_max_xy
+    else:
+        emitter, pommel = end_max_xy, end_min_xy
+
+    return crop, np.array(emitter), np.array(pommel)
+
+
+# cache so we only load once
+_HILT_CACHE = None
+
+def hilt_parts():
+    global _HILT_CACHE
+    if _HILT_CACHE is None:
+        _HILT_CACHE = _detect_hilt()
+    return _HILT_CACHE
+
+
+def place_hilt(tgt_emitter, tgt_blade_dir, flip_perp=False):
+    """Return a (CANVAS x CANVAS) RGBA with the hilt positioned.
+
+    tgt_emitter  – (x, y) canvas coords where the emitter tip lands
+    tgt_blade_dir – unit vector pointing outward along the blade
+    flip_perp    – mirror the hilt across its own long axis first
+                   (use for the second blade to create a symmetric look)
+    """
+    crop, src_e, src_p = hilt_parts()
+    if flip_perp:
+        crop = crop.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+        h_crop = crop.size[1]
+        src_e = np.array([src_e[0], h_crop - 1 - src_e[1]])
+        src_p = np.array([src_p[0], h_crop - 1 - src_p[1]])
+
+    h_ep  = src_p - src_e
+    h_len = np.linalg.norm(h_ep)
+    h_ep_dir = h_ep / h_len
+
+    # Hilt emitter-to-pommel must point opposite to blade
+    tgt_ep = -np.array(tgt_blade_dir, dtype=np.float64)
+    tgt_ep /= np.linalg.norm(tgt_ep)
+
+    angle_h = math.atan2(h_ep_dir[1], h_ep_dir[0])
+    angle_t = math.atan2(tgt_ep[1],   tgt_ep[0])
+    rot     = angle_t - angle_h
+
+    inv_s  = h_len / HILT_LEN   # inverse scale (src px per canvas px)
+    cos_r  = math.cos(rot)
+    sin_r  = math.sin(rot)
+
+    # PIL AFFINE: (x_src, y_src) = M @ (x_dst, y_dst, 1)
+    # Forward:  p_dst = (HILT_LEN/h_len) * R @ (p_src - src_e) + tgt_e
+    # Inverse:  p_src = inv_s * R^T @ (p_dst - tgt_e) + src_e
+    ex, ey = float(tgt_emitter[0]), float(tgt_emitter[1])
+
+    a = cos_r  * inv_s
+    b = sin_r  * inv_s
+    c = src_e[0] - a * ex - b * ey
+
+    d = -sin_r * inv_s
+    e =  cos_r * inv_s
+    f = src_e[1] - d * ex - e * ey
+
+    return crop.transform(
+        (CANVAS, CANVAS),
+        Image.Transform.AFFINE,
+        (a, b, c, d, e, f),
+        resample=Image.Resampling.BICUBIC,
+        fillcolor=(0, 0, 0, 0),
+    )
+
+
+# ======================= geometry from the original =======================
 
 def blade_footprint(arr):
-    """Colored blade pixels (the fat cartoon blade), keylines eroded."""
     alpha = arr[:, :, 3].astype(np.float32)
-    rgb = arr[:, :, :3].astype(np.float32)
+    rgb   = arr[:, :, :3].astype(np.float32)
     mx = rgb.max(axis=2)
     mn = rgb.min(axis=2)
     sat = np.where(mx > 0, (mx - mn) / np.maximum(mx, 1), 0)
@@ -76,48 +185,30 @@ def blade_footprint(arr):
 
 
 def glove_mask(arr):
-    """Big white fist blobs + their black/cyan keylines."""
     alpha = arr[:, :, 3]
     white = (alpha > 200) & (arr[:, :, :3].min(axis=2) > 150)
     m = Image.fromarray((white * 255).astype(np.uint8), "L")
-    # opening kills the blade's 18px white stripe + hilt highlights, the
-    # fat fingers survive
     m = m.filter(ImageFilter.MinFilter(21)).filter(ImageFilter.MaxFilter(21))
-    # reach over the fist's keylines
     m = m.filter(ImageFilter.MaxFilter(15))
     return (np.array(m) > 128) & (alpha > 4)
 
 
 def saber_geometry(arr, half):
-    """Per saber half: emitter point E (beam origin) + outward direction."""
     blade = blade_footprint(arr) & half
     ys, xs = np.where(blade)
     pts = np.stack([xs, ys], axis=1).astype(np.float64)
-    c = pts.mean(axis=0)
+    c   = pts.mean(axis=0)
     cov = np.cov((pts - c).T)
     evals, evecs = np.linalg.eigh(cov)
-    d = evecs[:, np.argmax(evals)]          # blade axis
-    # outward = away from canvas center
+    d = evecs[:, np.argmax(evals)]
     if np.dot(c - np.array([CANVAS / 2, CANVAS / 2]), d) < 0:
         d = -d
-    proj = (pts - c) @ d
-    inner = c + d * np.percentile(proj, 0.5)   # where the blade emerged
+    proj  = (pts - c) @ d
+    inner = c + d * np.percentile(proj, 0.5)
     return inner, d
 
 
-# ============================ painting =================================
-
-def axis_fields(E, d, ss):
-    """Along-axis s (outward from E) and signed perpendicular v, at
-    supersample factor ss."""
-    n = CANVAS * ss
-    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
-    px = xx / ss - E[0]
-    py = yy / ss - E[1]
-    s = px * d[0] + py * d[1]
-    v = -px * d[1] + py * d[0]
-    return s, v
-
+# ============================ beam painting ================================
 
 def smoothstep(e0, e1, x):
     t = np.clip((x - e0) / (e1 - e0), 0, 1)
@@ -125,33 +216,30 @@ def smoothstep(e0, e1, x):
 
 
 def draw_beam(E, d, pal):
-    """Thin neon beam: white core -> palette body -> rim, then bloom."""
-    s, v = axis_fields(E, d, 1)
-    # round start cap tucked 6px inside the hilt tip
+    yy, xx = np.mgrid[0:CANVAS, 0:CANVAS].astype(np.float32)
+    px = xx - float(E[0])
+    py = yy - float(E[1])
+    s  = px * float(d[0]) + py * float(d[1])
+    v  = -px * float(d[1]) + py * float(d[0])
+
+    # round start cap tucked 6 px inside the hilt tip
     deff = np.sqrt(v ** 2 + np.minimum(s + 6, 0) ** 2)
 
-    lift = np.array(pal, np.float32)
-    lift = lift / lift.max() * 255.0        # full-luminance palette
-    deep = lift * 0.62
+    lift  = np.array(pal, np.float32)
+    lift  = lift / lift.max() * 255.0
+    deep  = lift * 0.62
     white = np.array([255, 255, 255], np.float32)
 
-    rgb = np.zeros((CANVAS, CANVAS, 3), np.float32)
-    a = np.zeros((CANVAS, CANVAS), np.float32)
-
     body_a = 1 - smoothstep(RIM_W - 2.0, RIM_W, deff)
-    t_body = smoothstep(CORE_W, BODY_W, deff)        # 0 core -> 1 rim
-    col = white[None, None] * (1 - t_body[..., None]) \
-        + (lift * (1 - t_body[..., None] * 0) + 0)[None, None] * 0
-    # explicit three-stop ramp: white -> lift -> deep
-    t2 = smoothstep(BODY_W, RIM_W, deff)
-    col = (white[None, None] * (1 - t_body[..., None])
-           + lift[None, None] * t_body[..., None])
-    col = col * (1 - t2[..., None]) + deep[None, None] * t2[..., None]
+    t_body = smoothstep(CORE_W, BODY_W, deff)
+    t2     = smoothstep(BODY_W, RIM_W,  deff)
+    col    = (white[None, None] * (1 - t_body[..., None])
+              + lift[None,  None] * t_body[..., None])
+    col    = col * (1 - t2[..., None]) + deep[None, None] * t2[..., None]
 
-    rgb = col * body_a[..., None]
-    a = body_a * 255.0
+    rgb = col  * body_a[..., None]
+    a   = body_a * 255.0
 
-    # bloom: gaussian falloff of distance, tinted full-luminance
     bloom_a = np.zeros_like(a)
     for sigma, op in BLOOM:
         bloom_a = np.maximum(bloom_a,
@@ -159,112 +247,37 @@ def draw_beam(E, d, pal):
     bloom_rgb = np.broadcast_to(lift, (CANVAS, CANVAS, 3))
 
     out_a = np.maximum(a, bloom_a)
-    w = np.where(out_a > 0, a / np.maximum(out_a, 1e-3), 0)[..., None]
-    out_rgb = rgb * w + bloom_rgb * (1 - w) * (bloom_a[..., None] / 255.0) \
-        / np.maximum(out_a[..., None] / 255.0, 1e-3)
+    w_b   = np.where(out_a > 0, a / np.maximum(out_a, 1e-3), 0)[..., None]
+    out_rgb = rgb * w_b + bloom_rgb * (1 - w_b) * (bloom_a[..., None] / 255.0) \
+              / np.maximum(out_a[..., None] / 255.0, 1e-3)
     out = np.concatenate([np.clip(out_rgb, 0, 255),
                           np.clip(out_a, 0, 255)[..., None]], axis=2)
     return Image.fromarray(out.astype(np.uint8), "RGBA")
 
 
-def draw_hilt(E, d, ss=2):
-    """Analytic chrome/black hilt along the axis, emitter tip at E."""
-    s, v = axis_fields(E, d, ss)
-    u = -s                       # u grows from emitter tip toward pommel
-    n = CANVAS * ss
-
-    base = np.zeros((n, n, 3), np.float32)
-    inside = np.zeros((n, n), np.float32)
-
-    def cyl(shade_w):
-        """Cylinder shading across v for a section of half-width shade_w."""
-        x = np.clip(np.abs(v) / shade_w, 0, 1)
-        lam = 0.45 + 0.62 * np.sqrt(np.maximum(0, 1 - x ** 2))
-        spec = np.exp(-0.5 * ((v + shade_w * 0.34) / (shade_w * 0.16)) ** 2)
-        return np.clip(lam + spec * 0.5, 0, 1.35)
-
-    # (u0, u1, half_width, base RGB, is_chrome)
-    sections = [
-        (0,   16,  26, (24, 24, 28), False),     # emitter shroud nub
-        (16,  42,  40, (38, 38, 44), False),     # clamp ring
-        (42,  158, 46, (188, 192, 200), True),   # chrome barrel
-        (158, 204, 52, (30, 30, 36), False),     # mid band / activation
-        (204, 336, 48, (52, 52, 58), False),     # grip (ridged below)
-        (336, 360, 44, (180, 184, 192), True),   # pommel cap
-    ]
-    for u0, u1, hw, col, chrome in sections:
-        m = (u >= u0) & (u < u1) & (np.abs(v) <= hw)
-        sh = cyl(hw)
-        c = np.array(col, np.float32)
-        col_field = c[None, None] * sh[..., None]
-        if not chrome:
-            col_field = c[None, None] * (0.55 + 0.45 * sh[..., None])
-        base = np.where(m[..., None], col_field, base)
-        inside = np.maximum(inside, m.astype(np.float32))
-
-    # clamp side lever (small nub on one side of the clamp ring)
-    lever = (u >= 18) & (u < 40) & (v > 38) & (v < 56)
-    base = np.where(lever[..., None],
-                    np.array([30, 30, 36], np.float32)[None, None] *
-                    (0.6 + 0.4 * cyl(56)[..., None]), base)
-    inside = np.maximum(inside, lever.astype(np.float32))
-
-    # chrome barrel details: 3 dark dots + small side control box
-    for du in (70, 100, 130):
-        dot = ((u - du) ** 2 + (v + 12) ** 2) < 7 ** 2
-        base = np.where(dot[..., None],
-                        np.array([40, 40, 46], np.float32)[None, None], base)
-    box = (u >= 120) & (u < 152) & (v > 24) & (v < 44)
-    base = np.where(box[..., None],
-                    np.array([34, 34, 40], np.float32)[None, None] *
-                    (0.7 + 0.3 * cyl(44)[..., None]), base)
-    inside = np.maximum(inside, box.astype(np.float32))
-
-    # grip ridges: longitudinal chrome strips over the dark grip
-    grip = (u >= 208) & (u < 332)
-    ridge = grip & (np.abs((np.abs(v) % 16) - 8) < 3.4) & (np.abs(v) <= 44)
-    base = np.where(ridge[..., None],
-                    np.array([168, 172, 180], np.float32)[None, None] *
-                    cyl(48)[..., None], base)
-
-    # outline: near-black 3px, then cyan keyline 2.5px (collection style)
-    ins = Image.fromarray((inside * 255).astype(np.uint8), "L")
-    grow1 = np.array(ins.filter(ImageFilter.MaxFilter(7)),
-                     np.float32) / 255 > 0.5
-    grow2 = np.array(ins.filter(ImageFilter.MaxFilter(13)),
-                     np.float32) / 255 > 0.5
-    dark_line = grow1 & (inside < 0.5)
-    cyan_line = grow2 & ~grow1
-    base = np.where(dark_line[..., None],
-                    np.array([10, 12, 20], np.float32)[None, None], base)
-    base = np.where(cyan_line[..., None],
-                    np.array(CYAN_KEY, np.float32)[None, None], base)
-    alpha = (inside > 0.5) | dark_line | cyan_line
-
-    out = np.concatenate([np.clip(base, 0, 255),
-                          (alpha * 255)[..., None]], axis=2)
-    img = Image.fromarray(out.astype(np.uint8), "RGBA")
-    return img.resize((CANVAS, CANVAS), Image.Resampling.LANCZOS)
-
-
-# ============================ assembly =================================
+# ============================ assembly =====================================
 
 def build_file(fname, pal):
-    im = src(fname)
+    im  = src(fname)
     arr = np.array(im)
     yy, xx = np.mgrid[0:CANVAS, 0:CANVAS]
-    halves = [(xx + yy) >= CANVAS, (xx + yy) < CANVAS]   # B upper-right, A lower-left
+    halves = [
+        ((xx + yy) >= CANVAS, False),   # upper-right blade, no flip
+        ((xx + yy)  < CANVAS, True),    # lower-left  blade, flip hilt
+    ]
 
     glove = glove_mask(arr)
     glove_img = Image.fromarray(
         np.where(glove[..., None], arr, 0).astype(np.uint8), "RGBA")
 
-    out = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    hilts = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    for half in halves:
-        E, d = saber_geometry(arr, half)
-        out.alpha_composite(draw_beam(E, d, pal))
-        hilts.alpha_composite(draw_hilt(E, d))
+    beams  = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
+    hilts  = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
+    for half_mask, flip in halves:
+        E, d = saber_geometry(arr, half_mask)
+        beams.alpha_composite(draw_beam(E, d, pal))
+        hilts.alpha_composite(place_hilt(E, d, flip_perp=flip))
+
+    out = beams
     out.alpha_composite(hilts)
     out.alpha_composite(glove_img)
     return out
