@@ -87,6 +87,21 @@ NO_OFFSET_CHARS = [
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 
+# Per-character vertical trim in px (+down, -up), applied on top of the
+# offset rule to every character-anchored layer (body, skin, eyes, mouth,
+# arms). Measured 2026-06: poptarts bottomed at ~1154 and Twinkie floated
+# at 1083 vs the standing ground band 1084-1109. First pass (-45/+25) put
+# both exactly on the churro/marshmallow line (~1108); owner asked for
+# more movement, so current values overshoot the geometric line on purpose.
+CHAR_Y_ADJUST = {
+    "poptart": -65,
+    "twinkie": 45,
+}
+
+def char_y_adjust(char_name):
+    return next((dy for k, dy in CHAR_Y_ADJUST.items()
+                 if k in char_name.lower()), 0)
+
 def is_wat_excluded(char_name):
     """True when this character must never get what_are_thosez (footwear)."""
     return any(ex.lower() in char_name.lower() for ex in EXCLUDE_WAT_CHARS)
@@ -269,31 +284,32 @@ def generate_random_combination():
     no_offset_char = any(ex.lower() in char_name.lower()
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
-    
+    y_adjust = char_y_adjust(char_name)
+
     # 3. Character (collected first: skin z-order depends on the body type)
     char_layers = []
     char_found = False
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+            char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
             char_found = True
             break
-            
+
     main_found = False
     patterns = [f"{char_name}.png", f"after_skinz_{char_name}.png", f"layer-after_skinz_{char_name}.png"]
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
                 main_found = True
                 char_found = True
                 break
         if main_found: break
-        
+
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
                 char_found = True
                 break
 
@@ -306,29 +322,29 @@ def generate_random_combination():
     # 5. Skinz: ball on top, enlarged so the chosen eyes fit inside it
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
-    skin_layer = {"path": skin_path, "offset": apply_offset,
+    skin_layer = {"path": skin_path, "offset": apply_offset, "dy": y_adjust,
                   "fscale": bfit, "fcenter": bcenter}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
-    
+
     # 6. Eyez (original size and placement)
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset})
-    
+    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust})
+
     # 7. Mouthz
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset})
-    
+    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust})
+
     # 8. Armz
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset})
-        
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust})
+
     # 9. Gorbhouse special overlay
     if gets_gorbhouse:
         gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_overlay.png")
         if not os.path.exists(gorbhouse_path):
             gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
         if os.path.exists(gorbhouse_path):
-            layers.append({"path": gorbhouse_path, "offset": apply_offset})
+            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust})
     
     # 10. Sticker - DON'T MOVE DOWN
     if sticker:
@@ -370,11 +386,11 @@ def create_image(layers, output_name=None):
         if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
             img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
         
-        if should_offset:
-            # Create a new image for the offset layer
+        # vertical placement: footwear-less offset rule + per-character trim
+        dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
+        if dy:
             offset_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
-            # Paste the original image with vertical offset
-            offset_img.paste(img, (0, VERTICAL_OFFSET))
+            offset_img.paste(img, (0, dy))
             img = offset_img
             
         sh = layer_info.get("shadow")
