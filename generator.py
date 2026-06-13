@@ -293,12 +293,11 @@ def generate_random_combination():
     eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
     mouth = random.choice(mouth_files)
     
-    # Randomness uses only generic (unlocked) arms so locked traits don't
-    # affect probabilities. After the draw, if a locked arm exists for this
-    # character it replaces the generic selection.
+    # All arms are in the pool so any character can randomly get any arm
+    # (including katanas/knives). After the draw, if this character has a
+    # locked arm it overrides the pick with its own weapon.
     all_arm_files = get_files(ARMZ)
-    generic_arms = [f for f in all_arm_files if f not in ARMZ_CHAR_LOCK]
-    arm = random.choice(generic_arms) if generic_arms else None
+    arm = random.choice(all_arm_files) if all_arm_files else None
     locked_arms = [f for f in all_arm_files if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
     if locked_arms:
         arm = random.choice(locked_arms)
