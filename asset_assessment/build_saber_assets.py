@@ -186,74 +186,40 @@ def blade_footprint(arr):
     return (np.array(m) > 128) & (alpha > 128)
 
 
-def _label_components(mask, ds=4):
-    """4-connected components of a bool mask, computed on a ds-downsampled
-    copy (pure-python BFS; no scipy). Returns (labels_full_res, sizes)."""
-    from collections import deque
-    small = mask[::ds, ::ds]
-    H, W = small.shape
-    lbl = np.zeros((H, W), np.int32)
-    sizes = [0]
-    cur = 0
-    for sy, sx in zip(*np.where(small)):
-        if lbl[sy, sx]:
-            continue
-        cur += 1
-        n = 0
-        q = deque([(sy, sx)])
-        lbl[sy, sx] = cur
-        while q:
-            y, x = q.popleft()
-            n += 1
-            for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
-                if 0 <= ny < H and 0 <= nx < W and small[ny, nx] \
-                        and not lbl[ny, nx]:
-                    lbl[ny, nx] = cur
-                    q.append((ny, nx))
-        sizes.append(n)
-    full = np.repeat(np.repeat(lbl, ds, 0), ds, 1)[:mask.shape[0],
-                                                   :mask.shape[1]]
-    return full, sizes
 
+def glove_mask(arr, R=185):
+    """Pixel-perfect extraction of the two gloved fists.
 
-def glove_mask(arr):
-    """Mask of the two gloved fists, SOLID (no holes) but without the far
-    chrome hilt they grip, so our freshly placed hilt shows at both ends.
+    All previous morphological approaches failed because they were trying
+    to algorithmically separate "fist white" from "hilt specular white"
+    using erosion/dilation, which inevitably clipped the thumb (whose
+    connection to the main fist is only ~10px wide in the white seed).
 
-    Two stages, deliberately separated so neither compromises the other:
-
-    LOCATE the fists - seed from the bright mickey-glove white, OPEN to
-    erase the chrome's thin specular streaks (otherwise they bridge the
-    fist into the whole hilt and hide the new one), CLOSE to unify the
-    fingers, keep the two largest blobs. This yields a COMPACT fist core
-    that the placed hilt pokes out of.
-
-    KEEP the glove - dilate the core into a region and keep EVERY opaque
-    pixel inside it (white + shaded sides + dark keyline + finger creases).
-    Locating from white alone would drop the shaded thumb and undersides
-    (they fall below the white threshold); keeping all-opaque-in-region
-    restores them, so the fist comes out solid. The dilation is sized to
-    cover the glove's keyline without reaching the far hilt ends.
+    The correct approach: don't try to separate by color at all.
+      1. LOCATE each hand center via the white blob in each diagonal half.
+      2. Keep ALL opaque pixels within radius R of each center, minus blade.
+    R=185 covers the full glove (fist is ~130px, thumb extends to ~165px
+    from center) but doesn't reach the far hilt tips (~220-280px out), so
+    the new placed hilt still shows at both ends. Any old-hilt chrome that
+    falls within R sits under the fist and is hidden by the glove on top.
     """
     alpha = arr[:, :, 3]
     rgb = arr[:, :, :3]
     blade = blade_footprint(arr)
+    yy, xx = np.mgrid[0:CANVAS, 0:CANVAS]
+
     white = (alpha > 150) & (rgb.min(axis=2) > 140) & ~blade
+    wd = np.array(Image.fromarray((white * 255).astype(np.uint8), "L")
+                  .filter(ImageFilter.MaxFilter(25))) > 128
 
-    m = Image.fromarray((white * 255).astype(np.uint8), "L")
-    m = m.filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7))
-    m = m.filter(ImageFilter.MaxFilter(15)).filter(ImageFilter.MinFilter(15))
-    blob = np.array(m) > 128
+    mask = np.zeros((CANVAS, CANVAS), bool)
+    for half in [(xx + yy) < CANVAS, (xx + yy) >= CANVAS]:
+        m = wd & half
+        ys, xs = np.where(m)
+        cx, cy = int(xs.mean()), int(ys.mean())
+        mask |= (xx - cx) ** 2 + (yy - cy) ** 2 <= R * R
 
-    lbl, sizes = _label_components(blob)
-    if len(sizes) > 1:
-        keep = np.argsort(sizes[1:])[::-1][:2] + 1   # two largest labels
-        blob = np.isin(lbl, keep)
-
-    md = Image.fromarray((blob * 255).astype(np.uint8), "L")
-    md = md.filter(ImageFilter.MaxFilter(21))        # +10 px: cover keyline
-    region = (np.array(md) > 128) & (alpha > 60)     # keep ALL opaque glove
-    return region & ~blade
+    return mask & (alpha > 60) & ~blade
 
 
 def saber_geometry(arr, half):
