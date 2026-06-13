@@ -188,6 +188,20 @@ SKIN_ON_TOP_CHARS = ["churro"]
 def skin_on_top(char_name):
     return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
 
+# ---- per-arm intrinsic scale (about the hand line) ----
+# Some arm art was exported larger than the character family. ARM_SCALE
+# shrinks a specific arm file about ARM_SCALE_PIVOT (the held-weapon hand
+# line) so the fists stay attached to the body while the weapon scales down.
+# It composes on top of any character CHAR_SCALE, so a scaled character still
+# gets a proportionally adjusted arm.
+ARM_SCALE_PIVOT = (694, 1040)
+ARM_SCALE = {
+    "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
+}
+
+def arm_scale(arm_file):
+    return ARM_SCALE.get(arm_file, 1.0)
+
 def is_wat_excluded(char_name):
     """True when this character must never get what_are_thosez (footwear)."""
     return any(ex.lower() in char_name.lower() for ex in EXCLUDE_WAT_CHARS)
@@ -464,7 +478,7 @@ def generate_random_combination():
     # 9. Armz (after the footwear overlay; tracks the character's scale so a
     # bigger body gets a bigger arm)
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 10. Gorbhouse special overlay
     if gets_gorbhouse:
@@ -516,6 +530,9 @@ def create_image(layers, output_name=None):
         # per-character enlargement about the ball center (body + arms)
         if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
             img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
+        # per-arm intrinsic scale about the hand line (oversized arm art)
+        if abs(layer_info.get("ascale", 1.0) - 1.0) > 0.001:
+            img = scale_about(img, layer_info["ascale"], layer_info["acenter"])
 
         # vertical placement: footwear-less offset rule + per-character trim
         dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
