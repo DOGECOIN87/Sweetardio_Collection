@@ -1,0 +1,25 @@
+{
+ "mode": "anti-camouflage",
+ "src": "traits/backgroundz",
+ "blocked": {
+  "chocolate_sandwich_cookie": [
+   "Crumble_Trail.png",
+   "Nabisco.png",
+   "Sweetardio_116 (20).png"
+  ],
+  "ding_dong": [
+   "Sweetardio_116 (20).png"
+  ],
+  "gummy_worm": [
+   "Bubble_Trouble.png",
+   "Cookboy.png",
+   "Smuckers_Blue.png"
+  ],
+  "mint_chocolate_chip_ice_cream": [
+   "Candy_Land.png"
+  ],
+  "zaffre_sherbert_ice_cream": [
+   "Bubble_Trouble.png"
+  ]
+ }
+}

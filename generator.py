@@ -24,6 +24,18 @@ def load_eyez_blocklist():
     except (OSError, ValueError):
         return {}
 
+# Optional character <-> background compatibility map built by
+# asset_assessment/build_char_compat.py: blocks (character, plate) pairs the
+# measured figure-ground rule flags as camouflage. Missing file = no limits.
+CHAR_COMPAT_PATH = os.path.join(TRAITS_DIR, "char_compat.json")
+
+def load_char_blocklist():
+    try:
+        with open(CHAR_COMPAT_PATH) as f:
+            return json.load(f).get("blocked", {})
+    except (OSError, ValueError):
+        return {}
+
 # Asset Categories
 # traits/backgroundz holds the GRADED plates (sources preserved in
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
@@ -329,7 +341,12 @@ def generate_random_combination():
     bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
     if not bg_files:
         raise ValueError("No background assets found")
-    bg = random.choice(bg_files)
+    # character <-> background compatibility: drop plates this character would
+    # camouflage against (measured map; empty/missing entry = everything OK,
+    # and we never strand a character with zero plates)
+    char_blocked = load_char_blocklist().get(char_name, [])
+    allowed_bgs = [f for f in bg_files if f not in char_blocked]
+    bg = random.choice(allowed_bgs if allowed_bgs else bg_files)
     
     skin_files = get_files(SKINZ)
     if not skin_files:
