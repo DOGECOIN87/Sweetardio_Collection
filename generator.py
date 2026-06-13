@@ -106,7 +106,19 @@ NO_OFFSET_CHARS = [
     # bears are drawn pre-placed (bottoms ~1123-1143, the churro/twinkie
     # zone); the +150 drop left them standing ~180px below everyone else
     "gummy_bear",
+    # smores is a large square character pre-positioned at ~963; the +150
+    # drop makes it look too low / off-centre when footwear-less
+    "smores",
 ]
+
+# Extra y-offset (px, +down) added to character-anchored layers when the
+# background has a visible real-world floor that sits lower than the
+# standard 1107 ground band. Only applied when apply_offset=True (i.e.
+# footwear-less), so WAT footwear alignment is never disturbed.
+# Tune per-background after visual review.
+BG_CHAR_EXTRA_Y = {
+    "Psychedelics.png": 80,   # Oval Office: visible floor ~1190+
+}
 
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
@@ -298,11 +310,13 @@ def generate_random_combination():
 
     chosen_wat = None
     wat_overlays = []
-    if not should_exclude_wat:
+    # Gorbhouse characters get trash-can slippers via a separate code path;
+    # giving them regular WAT on top would produce a mismatched double pair.
+    if not should_exclude_wat and not gets_gorbhouse:
         wat_files = get_files(WHAT_ARE_THOSEZ)
         wat_bases = [wat_base_name(f) for f in wat_files]
         wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
-        
+
         # 70% chance to have footwear if not excluded
         if wat_bases and random.random() < 0.7:
             chosen_wat = random.choice(wat_bases)
@@ -331,6 +345,9 @@ def generate_random_combination():
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
+    # Background-aware extra drop: applied only when footwear-less so that
+    # WAT footwear (which has no dy) stays perfectly aligned.
+    bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
 
     # 3. Character layers split by z-order relative to the skin ball.
     # before_skinz_ files sit BELOW the skin (ice-cream body, sugar cube, etc).
@@ -343,7 +360,7 @@ def generate_random_combination():
 
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust})
+            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
             char_found = True
             break
 
@@ -352,7 +369,7 @@ def generate_random_combination():
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust}
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
                 if "after_skinz" in f.lower():
                     after_char_layers.append(layer)
                 else:
@@ -366,7 +383,7 @@ def generate_random_combination():
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust}
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
                 if "after_skinz" in f.lower():
                     after_char_layers.append(layer)
                 else:
@@ -380,7 +397,8 @@ def generate_random_combination():
     # 5. Skinz: ball sits above before-skinz body, below after-skinz body
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
-    skin_layer = {"path": skin_path, "offset": apply_offset, "dy": y_adjust,
+    skin_layer = {"path": skin_path, "offset": apply_offset,
+                  "dy": y_adjust + bg_extra_y,
                   "fscale": bfit, "fcenter": bcenter}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
@@ -390,14 +408,14 @@ def generate_random_combination():
     layers.extend(after_char_layers)
 
     # 6. Eyez (original size and placement)
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust})
+    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     # 7. Mouthz
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust})
+    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     # 8. Armz
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust})
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
     for overlay_path in wat_overlays:
@@ -409,7 +427,7 @@ def generate_random_combination():
         if not os.path.exists(gorbhouse_path):
             gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
         if os.path.exists(gorbhouse_path):
-            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust})
+            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust + bg_extra_y})
     
     # 11. Sticker
     if sticker:
