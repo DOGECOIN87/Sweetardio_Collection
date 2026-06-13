@@ -188,6 +188,28 @@ SKIN_ON_TOP_CHARS = ["churro"]
 def skin_on_top(char_name):
     return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
 
+# Characters whose BODY should draw ON TOP of the skin ball (skin placed
+# BEFORE the body, revealed through the body's face hole) even though their
+# art is authored as a before-skinz file. Gummy bears read better with the
+# bear body in front and the skin showing through the eye hole.
+BODY_OVER_SKIN_CHARS = ["gummy_bear"]
+
+def body_over_skin(char_name):
+    return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
+
+def body_after_skin(char_name, fname):
+    """True when the BODY draws AFTER (on top of) the skin ball — i.e. the
+    skin is placed first and shows through the body's face hole. Defaults to
+    the after_skinz_ filename marker; two per-character overrides win:
+      SKIN_ON_TOP_CHARS  (churro)      -> skin on top  -> body BEFORE skin
+      BODY_OVER_SKIN_CHARS (gummy bears) -> body on top -> body AFTER skin
+    """
+    if skin_on_top(char_name):
+        return False
+    if body_over_skin(char_name):
+        return True
+    return "after_skinz" in fname.lower()
+
 # ---- per-arm intrinsic scale (about the hand line) ----
 # Some arm art was exported larger than the character family. ARM_SCALE
 # shrinks a specific arm file about ARM_SCALE_PIVOT (the held-weapon hand
@@ -409,7 +431,11 @@ def generate_random_combination():
 
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+            layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+            if body_after_skin(char_name, f):
+                after_char_layers.append(layer)
+            else:
+                before_char_layers.append(layer)
             char_found = True
             break
 
@@ -419,7 +445,7 @@ def generate_random_combination():
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
                 layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if "after_skinz" in f.lower() and not skin_on_top(char_name):
+                if body_after_skin(char_name, f):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
@@ -433,7 +459,7 @@ def generate_random_combination():
         for f in char_files:
             if char_name.lower() in f.lower():
                 layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if "after_skinz" in f.lower() and not skin_on_top(char_name):
+                if body_after_skin(char_name, f):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
