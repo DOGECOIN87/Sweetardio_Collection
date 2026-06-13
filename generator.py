@@ -295,7 +295,11 @@ def generate_random_combination():
     
     # character-locked armz are filtered out of the pool for everyone else
     arm_files = [f for f in get_files(ARMZ) if armz_allowed(f, char_name)]
-    arm = random.choice(arm_files) if arm_files else None
+    # Character-specific arms always win: if a locked arm exists for this
+    # character, use it directly so katanas/knives are guaranteed on their
+    # character rather than competing with the ~13 generic arms.
+    locked_arms = [f for f in arm_files if f in ARMZ_CHAR_LOCK]
+    arm = random.choice(locked_arms) if locked_arms else (random.choice(arm_files) if arm_files else None)
     
     sticker_files = get_files(STICKERZ)
     sticker = random.choice(sticker_files) if sticker_files else None
