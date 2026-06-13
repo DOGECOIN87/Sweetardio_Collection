@@ -162,14 +162,13 @@ def char_y_adjust(char_name):
 # ---- per-character scale (about the face-hole / ball center) ----
 # A few characters were authored small relative to the family (gummy bears
 # measure ~660px wide vs the ice-cream bodies' ~785px). CHAR_SCALE enlarges
-# only the character's own ART layers (body + arms) about CHAR_SCALE_PIVOT,
-# which is the ball center: the face hole grows about the same point the eyes
-# sit on, so the (unscaled) eyes/mouth/skin ball stay registered inside the
-# enlarged hole and the face stays family-consistent ("eyes/mouth keep their
-# ORIGINAL size"). The extra foot-drop from enlarging is absorbed by
-# CHAR_Y_ADJUST, which audit_placement.py measures scale-aware so the feet
-# still land on the ground line. Keep factors <= ~1.169 for the bear hole so
-# the ball never under-fills the enlarged hole (236*f <= 276 -> no gap ring).
+# the character's body, arms AND skin ball about CHAR_SCALE_PIVOT (the ball
+# center): the face hole and the ball grow together about the same point the
+# eyes sit on, so the ball covers the enlarged hole exactly as at native size
+# for ANY skin (no gap ring), while the eyes/mouth stay native size so the
+# face style matches the rest of the collection. The extra foot-drop from
+# enlarging is absorbed by CHAR_Y_ADJUST, which audit_placement.py measures
+# scale-aware so the feet still land on the ground line.
 CHAR_SCALE_PIVOT = (690, 601)   # == audit_placement.BALL_CENTER
 CHAR_SCALE = {
     "gummy_bear": 1.16,   # -> ~766px wide, matching the ice-cream family
@@ -178,6 +177,16 @@ CHAR_SCALE = {
 def char_scale(char_name):
     return next((s for k, s in CHAR_SCALE.items()
                  if k in char_name.lower()), 1.0)
+
+# Characters whose face reads better with the skin ball drawn ON TOP of the
+# body (like the before-skinz ice creams), even though their art is authored
+# as an after-skinz "hole" file. The churro is a stack of pieces that
+# otherwise hide the face peeking through the hole; treating it as
+# skin-on-top draws the face cleanly over the dough.
+SKIN_ON_TOP_CHARS = ["churro"]
+
+def skin_on_top(char_name):
+    return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
 
 def is_wat_excluded(char_name):
     """True when this character must never get what_are_thosez (footwear)."""
@@ -396,7 +405,7 @@ def generate_random_combination():
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
                 layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if "after_skinz" in f.lower():
+                if "after_skinz" in f.lower() and not skin_on_top(char_name):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
@@ -410,7 +419,7 @@ def generate_random_combination():
         for f in char_files:
             if char_name.lower() in f.lower():
                 layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if "after_skinz" in f.lower():
+                if "after_skinz" in f.lower() and not skin_on_top(char_name):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
@@ -420,12 +429,19 @@ def generate_random_combination():
     # 3. Before-skinz body layers (below skin ball)
     layers.extend(before_char_layers)
 
-    # 5. Skinz: ball sits above before-skinz body, below after-skinz body
+    # 5. Skinz: ball sits above before-skinz body, below after-skinz body.
+    # The ball carries the per-character CHAR_SCALE too (cscale), so an
+    # enlarged character's face hole and its skin ball grow together — the
+    # ball always covers the hole exactly as it does at native size, for any
+    # skin (without this the alien skin's small 269px ball leaves a gap on a
+    # scaled bear). ball_fit (fscale) runs first about the ball center, then
+    # cscale about the shared pivot; eyes/mouth stay native size.
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
     skin_layer = {"path": skin_path, "offset": apply_offset,
                   "dy": y_adjust + bg_extra_y,
-                  "fscale": bfit, "fcenter": bcenter}
+                  "fscale": bfit, "fcenter": bcenter,
+                  "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
@@ -439,13 +455,16 @@ def generate_random_combination():
     # 7. Mouthz
     layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
-    # 8. Armz (track the character's scale so a bigger body gets a bigger arm)
-    if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
-
-    # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
+    # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
+    # so a held weapon (katana/knives) reads on top of the slippers instead
+    # of being hidden behind them.
     for overlay_path in wat_overlays:
         layers.append({"path": overlay_path, "offset": False})
+
+    # 9. Armz (after the footwear overlay; tracks the character's scale so a
+    # bigger body gets a bigger arm)
+    if arm:
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
 
     # 10. Gorbhouse special overlay
     if gets_gorbhouse:
