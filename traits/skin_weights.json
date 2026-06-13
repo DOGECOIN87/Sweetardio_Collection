@@ -1,0 +1,11 @@
+{
+ "comment": "Relative selection weights per skin (higher = more common). Matched by case-insensitive substring of the skin filename; 'default' applies to any skin with no tag match. Gold Foil is the very-rare legendary skin.",
+ "weights": {
+  "Gold": 1,
+  "Alien": 8,
+  "Cyan": 40,
+  "Black": 70,
+  "White": 70
+ },
+ "default": 40
+}

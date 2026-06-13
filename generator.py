@@ -36,6 +36,27 @@ def load_char_blocklist():
     except (OSError, ValueError):
         return {}
 
+# Data-driven skin rarity weights (traits/skin_weights.json): higher = more
+# common, matched by case-insensitive substring of the skin filename. Gold
+# Foil is the very-rare legendary. Missing file falls back to FALLBACK_*.
+SKIN_WEIGHTS_PATH = os.path.join(TRAITS_DIR, "skin_weights.json")
+_FALLBACK_SKIN_WEIGHTS = {"White": 70, "Black": 70, "Cyan": 40, "Alien": 8,
+                          "Gold": 1}
+_FALLBACK_SKIN_DEFAULT = 40
+
+def load_skin_weights():
+    try:
+        with open(SKIN_WEIGHTS_PATH) as f:
+            d = json.load(f)
+            return d.get("weights", {}), d.get("default", _FALLBACK_SKIN_DEFAULT)
+    except (OSError, ValueError):
+        return dict(_FALLBACK_SKIN_WEIGHTS), _FALLBACK_SKIN_DEFAULT
+
+def skin_weight(skin_file, weights, default):
+    """First tag whose (case-insensitive) text is in the filename wins."""
+    return next((w for tag, w in weights.items()
+                 if tag.lower() in skin_file.lower()), default)
+
 # Asset Categories
 # traits/backgroundz holds the GRADED plates (sources preserved in
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
@@ -352,14 +373,8 @@ def generate_random_combination():
     if not skin_files:
         raise ValueError("No skin assets found in traits/skinz")
     
-    weights = []
-    for f in skin_files:
-        if "White" in f or "Black" in f:
-            weights.append(10)
-        elif "Alien" in f or "Gold" in f:
-            weights.append(1)
-        else:
-            weights.append(5)
+    sw_weights, sw_default = load_skin_weights()
+    weights = [skin_weight(f, sw_weights, sw_default) for f in skin_files]
     skin = random.choices(skin_files, weights=weights, k=1)[0]
     
     eye_files = get_files(EYEZ)
