@@ -43,7 +43,9 @@ SABERS = {
 CORE_W  =  4.5        # white-hot core half-width
 BODY_W  = 10.0        # saturated palette body half-width
 RIM_W   = 13.5        # deep rim half-width (bloom takes over beyond this)
-BLOOM   = [(7, 0.85), (18, 0.50), (42, 0.28)]   # (sigma, opacity)
+# multi-radius neon bloom (sigma px, opacity). Stronger pass 2026-06:
+# brighter near-halo + a wide soft tier for more ambient glow.
+BLOOM   = [(7, 0.95), (18, 0.64), (42, 0.40), (80, 0.18)]
 
 # ---- hilt placement -------------------------------------------------------
 HILT_LEN = 280.0      # desired hilt length in canvas px
@@ -215,25 +217,32 @@ def _label_components(mask, ds=4):
 
 
 def glove_mask(arr):
-    """Silhouette of the two gloved fists, keeping the ORIGINAL pixels
-    (white + dark keyline + finger creases) so the hands stay authentic.
+    """Mask of the two gloved fists, SOLID (no holes) but without the far
+    chrome hilt they grip, so our freshly placed hilt shows at both ends.
 
-    1. seed from the bright mickey-glove white
-    2. CLOSE it so each fist becomes one solid blob (creases bridged)
-    3. keep the two largest blobs (the two hands; drops chrome speckle)
-    4. DILATE to recapture the dark keyline / glow ringing the glove
-    5. drop any saturated blade pixels the dilation grabbed
+    Two stages, deliberately separated so neither compromises the other:
+
+    LOCATE the fists - seed from the bright mickey-glove white, OPEN to
+    erase the chrome's thin specular streaks (otherwise they bridge the
+    fist into the whole hilt and hide the new one), CLOSE to unify the
+    fingers, keep the two largest blobs. This yields a COMPACT fist core
+    that the placed hilt pokes out of.
+
+    KEEP the glove - dilate the core into a region and keep EVERY opaque
+    pixel inside it (white + shaded sides + dark keyline + finger creases).
+    Locating from white alone would drop the shaded thumb and undersides
+    (they fall below the white threshold); keeping all-opaque-in-region
+    restores them, so the fist comes out solid. The dilation is sized to
+    cover the glove's keyline without reaching the far hilt ends.
     """
     alpha = arr[:, :, 3]
     rgb = arr[:, :, :3]
     blade = blade_footprint(arr)
-    # seed from glove white, but NOT the blade's white-hot core line
-    white = (alpha > 170) & (rgb.min(axis=2) > 135) & ~blade
+    white = (alpha > 150) & (rgb.min(axis=2) > 140) & ~blade
 
     m = Image.fromarray((white * 255).astype(np.uint8), "L")
-    # close (dilate then erode by the same radius): bridge inter-finger
-    # creases into one solid fist silhouette while preserving the outline
-    m = m.filter(ImageFilter.MaxFilter(21)).filter(ImageFilter.MinFilter(21))
+    m = m.filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7))
+    m = m.filter(ImageFilter.MaxFilter(15)).filter(ImageFilter.MinFilter(15))
     blob = np.array(m) > 128
 
     lbl, sizes = _label_components(blob)
@@ -242,8 +251,8 @@ def glove_mask(arr):
         blob = np.isin(lbl, keep)
 
     md = Image.fromarray((blob * 255).astype(np.uint8), "L")
-    md = md.filter(ImageFilter.MaxFilter(17))        # +8 px for the keyline
-    region = (np.array(md) > 128) & (alpha > 4)
+    md = md.filter(ImageFilter.MaxFilter(21))        # +10 px: cover keyline
+    region = (np.array(md) > 128) & (alpha > 60)     # keep ALL opaque glove
     return region & ~blade
 
 
