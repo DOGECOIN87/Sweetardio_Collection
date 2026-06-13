@@ -1,11 +1,11 @@
 {
- "comment": "Relative selection weights per skin (higher = more common). Matched by case-insensitive substring of the skin filename; 'default' applies to any skin with no tag match. Gold Foil is the very-rare legendary skin.",
+ "comment": "Skin rarity modeled on the reference collection's tiers: two dominant neutrals (White slightly > Black) then a sharp drop to rare specials, with Gold Foil the legendary. Weights are ~= target percent of the mint (they are normalised, so any positive scale works). Matched by case-insensitive substring of the skin filename; 'default' applies to an untagged skin.",
  "weights": {
-  "Gold": 1,
-  "Alien": 8,
-  "Cyan": 40,
-  "Black": 70,
-  "White": 70
+  "Gold": 0.7,
+  "Alien": 6,
+  "Cyan": 11,
+  "Black": 32,
+  "White": 49
  },
- "default": 40
+ "default": 11
 }
