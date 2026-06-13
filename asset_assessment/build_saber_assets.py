@@ -184,13 +184,67 @@ def blade_footprint(arr):
     return (np.array(m) > 128) & (alpha > 128)
 
 
+def _label_components(mask, ds=4):
+    """4-connected components of a bool mask, computed on a ds-downsampled
+    copy (pure-python BFS; no scipy). Returns (labels_full_res, sizes)."""
+    from collections import deque
+    small = mask[::ds, ::ds]
+    H, W = small.shape
+    lbl = np.zeros((H, W), np.int32)
+    sizes = [0]
+    cur = 0
+    for sy, sx in zip(*np.where(small)):
+        if lbl[sy, sx]:
+            continue
+        cur += 1
+        n = 0
+        q = deque([(sy, sx)])
+        lbl[sy, sx] = cur
+        while q:
+            y, x = q.popleft()
+            n += 1
+            for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+                if 0 <= ny < H and 0 <= nx < W and small[ny, nx] \
+                        and not lbl[ny, nx]:
+                    lbl[ny, nx] = cur
+                    q.append((ny, nx))
+        sizes.append(n)
+    full = np.repeat(np.repeat(lbl, ds, 0), ds, 1)[:mask.shape[0],
+                                                   :mask.shape[1]]
+    return full, sizes
+
+
 def glove_mask(arr):
+    """Silhouette of the two gloved fists, keeping the ORIGINAL pixels
+    (white + dark keyline + finger creases) so the hands stay authentic.
+
+    1. seed from the bright mickey-glove white
+    2. CLOSE it so each fist becomes one solid blob (creases bridged)
+    3. keep the two largest blobs (the two hands; drops chrome speckle)
+    4. DILATE to recapture the dark keyline / glow ringing the glove
+    5. drop any saturated blade pixels the dilation grabbed
+    """
     alpha = arr[:, :, 3]
-    white = (alpha > 200) & (arr[:, :, :3].min(axis=2) > 150)
+    rgb = arr[:, :, :3]
+    blade = blade_footprint(arr)
+    # seed from glove white, but NOT the blade's white-hot core line
+    white = (alpha > 170) & (rgb.min(axis=2) > 135) & ~blade
+
     m = Image.fromarray((white * 255).astype(np.uint8), "L")
-    m = m.filter(ImageFilter.MinFilter(21)).filter(ImageFilter.MaxFilter(21))
-    m = m.filter(ImageFilter.MaxFilter(15))
-    return (np.array(m) > 128) & (alpha > 4)
+    # close (dilate then erode by the same radius): bridge inter-finger
+    # creases into one solid fist silhouette while preserving the outline
+    m = m.filter(ImageFilter.MaxFilter(21)).filter(ImageFilter.MinFilter(21))
+    blob = np.array(m) > 128
+
+    lbl, sizes = _label_components(blob)
+    if len(sizes) > 1:
+        keep = np.argsort(sizes[1:])[::-1][:2] + 1   # two largest labels
+        blob = np.isin(lbl, keep)
+
+    md = Image.fromarray((blob * 255).astype(np.uint8), "L")
+    md = md.filter(ImageFilter.MaxFilter(17))        # +8 px for the keyline
+    region = (np.array(md) > 128) & (alpha > 4)
+    return region & ~blade
 
 
 def saber_geometry(arr, half):
