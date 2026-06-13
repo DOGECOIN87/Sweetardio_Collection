@@ -141,23 +141,43 @@ CHAR_Y_ADJUST = {
     "sugar_cube": 42,
     "waffle": -38,
     "ding_dong": 34,
-    "og_gummy_bear": -32,
+    "og_gummy_bear": -119,    # bears are CHAR_SCALE-enlarged; dy is measured
     "sugar_doughnut": -26,
     "zaffre_sherbert_ice_cream": -25,
     "brownie_bite": 22,
     "zebra_cake": -22,
-    "cyan_gummy_bear": -20,
+    "cyan_gummy_bear": -105,   # scale-aware (enlarged about the ball center)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
     "gummy_worm": 18,
-    "purple_gummy_bear": -16,
+    "purple_gummy_bear": -100,  # scale-aware (enlarged about the ball center)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": -12,
+    "pink_gummy_bear": -96,    # scale-aware (enlarged about the ball center)
 }
 
 def char_y_adjust(char_name):
     return next((dy for k, dy in CHAR_Y_ADJUST.items()
                  if k in char_name.lower()), 0)
+
+# ---- per-character scale (about the face-hole / ball center) ----
+# A few characters were authored small relative to the family (gummy bears
+# measure ~660px wide vs the ice-cream bodies' ~785px). CHAR_SCALE enlarges
+# only the character's own ART layers (body + arms) about CHAR_SCALE_PIVOT,
+# which is the ball center: the face hole grows about the same point the eyes
+# sit on, so the (unscaled) eyes/mouth/skin ball stay registered inside the
+# enlarged hole and the face stays family-consistent ("eyes/mouth keep their
+# ORIGINAL size"). The extra foot-drop from enlarging is absorbed by
+# CHAR_Y_ADJUST, which audit_placement.py measures scale-aware so the feet
+# still land on the ground line. Keep factors <= ~1.169 for the bear hole so
+# the ball never under-fills the enlarged hole (236*f <= 276 -> no gap ring).
+CHAR_SCALE_PIVOT = (690, 601)   # == audit_placement.BALL_CENTER
+CHAR_SCALE = {
+    "gummy_bear": 1.16,   # -> ~766px wide, matching the ice-cream family
+}
+
+def char_scale(char_name):
+    return next((s for k, s in CHAR_SCALE.items()
+                 if k in char_name.lower()), 1.0)
 
 def is_wat_excluded(char_name):
     """True when this character must never get what_are_thosez (footwear)."""
@@ -350,6 +370,7 @@ def generate_random_combination():
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
+    cscale = char_scale(char_name)
     # Background-aware extra drop: applied only when footwear-less so that
     # WAT footwear (which has no dy) stays perfectly aligned.
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
@@ -365,7 +386,7 @@ def generate_random_combination():
 
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
             char_found = True
             break
 
@@ -374,7 +395,7 @@ def generate_random_combination():
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
                 if "after_skinz" in f.lower():
                     after_char_layers.append(layer)
                 else:
@@ -388,7 +409,7 @@ def generate_random_combination():
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
                 if "after_skinz" in f.lower():
                     after_char_layers.append(layer)
                 else:
@@ -418,9 +439,9 @@ def generate_random_combination():
     # 7. Mouthz
     layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
-    # 8. Armz
+    # 8. Armz (track the character's scale so a bigger body gets a bigger arm)
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
 
     # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
     for overlay_path in wat_overlays:
@@ -473,7 +494,10 @@ def create_image(layers, output_name=None):
         
         if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
             img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
-        
+        # per-character enlargement about the ball center (body + arms)
+        if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
+            img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
+
         # vertical placement: footwear-less offset rule + per-character trim
         dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
         if dy:
