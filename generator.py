@@ -28,13 +28,25 @@ def load_eyez_blocklist():
 # asset_assessment/build_char_compat.py: blocks (character, plate) pairs the
 # measured figure-ground rule flags as camouflage. Missing file = no limits.
 CHAR_COMPAT_PATH = os.path.join(TRAITS_DIR, "char_compat.json")
+_char_compat_cache = None
+
+def _char_compat():
+    global _char_compat_cache
+    if _char_compat_cache is None:
+        try:
+            with open(CHAR_COMPAT_PATH) as f:
+                _char_compat_cache = json.load(f)
+        except (OSError, ValueError):
+            _char_compat_cache = {}
+    return _char_compat_cache
 
 def load_char_blocklist():
-    try:
-        with open(CHAR_COMPAT_PATH) as f:
-            return json.load(f).get("blocked", {})
-    except (OSError, ValueError):
-        return {}
+    return _char_compat().get("blocked", {})
+
+def load_char_weights():
+    """Per-character soft pairing weights over backgrounds (higher = preferred
+    pairing). Missing entry -> uniform (1.0)."""
+    return _char_compat().get("weights", {})
 
 # Data-driven skin rarity weights (traits/skin_weights.json): higher = more
 # common, matched by case-insensitive substring of the skin filename. Gold
@@ -368,12 +380,17 @@ def generate_random_combination(force_bg=None):
         bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
         if not bg_files:
             raise ValueError("No background assets found")
-        # character <-> background compatibility: drop plates this character
-        # would camouflage against (measured map; empty/missing entry =
-        # everything OK, and we never strand a character with zero plates)
+        # character <-> background pairing. Hard rule: drop plates this
+        # character would camouflage against (never stranding it). Soft rule:
+        # bias the remaining pick toward the best-looking pairings (measured
+        # weights), while keeping every non-camouflage plate possible so the
+        # background variety / combinatorial space stays large.
         char_blocked = load_char_blocklist().get(char_name, [])
-        allowed_bgs = [f for f in bg_files if f not in char_blocked]
-        bg = random.choice(allowed_bgs if allowed_bgs else bg_files)
+        allowed_bgs = [f for f in bg_files if f not in char_blocked] or bg_files
+        cw = load_char_weights().get(char_name, {})
+        bg = random.choices(allowed_bgs,
+                            weights=[cw.get(f, 1.0) for f in allowed_bgs],
+                            k=1)[0]
     
     skin_files = get_files(SKINZ)
     if not skin_files:

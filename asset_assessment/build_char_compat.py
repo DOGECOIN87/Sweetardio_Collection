@@ -29,10 +29,20 @@ import sys
 sys.path.insert(0, ".")
 sys.path.insert(0, "asset_assessment")
 import generator as g
-from verify_separation import at_risk, plate_stats   # noqa: E402
+from verify_separation import at_risk, hue_dist, plate_stats   # noqa: E402
 
 # overlays are foreground figures stored in the plates folder, never a plate
 SKIP_PLATES = set(g.BG_OVERLAY_PAIRS.values())
+
+
+def pair_score(c, p):
+    """Higher = the character pops more against the plate. Sum of the three
+    figure-ground channels (the strong-separation mirror of at_risk's weak
+    one): luminance contrast + how much more saturated the character is +
+    hue separation (toward complementary)."""
+    return (abs(c["L"] - p["L"]) / 100.0
+            + max(0.0, c["S"] - p["S"]) / 0.5
+            + hue_dist(c["hue"], p["hue"]) / 180.0)
 
 
 def base_name(fname):
@@ -56,6 +66,10 @@ def char_table():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default="traits/backgroundz")
+    ap.add_argument("--strength", type=float, default=0.8,
+                    help="how hard to favour the best pairings (0 = uniform, "
+                         "1 = linear in score). Kept gentle so every "
+                         "non-camouflage plate stays well represented.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -65,7 +79,7 @@ def main():
             plates[f] = plate_stats(os.path.join(args.src, f))
 
     chars = char_table()
-    blocked = {}
+    blocked, weights = {}, {}
     print(f"{'character':<30}{'blocked plates (camouflage)'}")
     for name in sorted(chars):
         # measure the character body in the SAME convention as the plates
@@ -74,6 +88,12 @@ def main():
                        if at_risk(cm["L"], cm["S"], cm["hue"], p))
         if risky:
             blocked[name] = risky
+        # soft pairing preference over the NON-blocked plates: weight rounded
+        # to 3 dp, gentle exponent so variety is preserved (not a hard filter)
+        wd = {f: round(pair_score(cm, p) ** args.strength, 3)
+              for f, p in plates.items() if f not in risky}
+        if wd:
+            weights[name] = wd
         short = ", ".join(os.path.splitext(r)[0][:18] for r in risky[:3])
         more = f" (+{len(risky)-3})" if len(risky) > 3 else ""
         print(f"{name:<30}{len(risky):>2}/{len(plates)}  {short}{more}")
@@ -81,6 +101,8 @@ def main():
     n_pairs = sum(len(v) for v in blocked.values())
     print(f"\nanti-camouflage: {n_pairs} blocked (char,plate) pairs across "
           f"{len(blocked)} characters; {len(plates)} plates, {len(chars)} chars")
+    print(f"pairing weights: strength={args.strength} over "
+          f"{sum(len(v) for v in weights.values())} (char,plate) pairs")
     # safety: never let a character lose ALL of its backgrounds
     for name, bad in blocked.items():
         if len(bad) >= len(plates):
@@ -90,7 +112,8 @@ def main():
         out = os.path.join(g.TRAITS_DIR, "char_compat.json")
         with open(out, "w") as f:
             json.dump({"mode": "anti-camouflage", "src": args.src,
-                       "blocked": blocked}, f, indent=1)
+                       "strength": args.strength,
+                       "blocked": blocked, "weights": weights}, f, indent=1)
         print(f"wrote {out}")
 
 
