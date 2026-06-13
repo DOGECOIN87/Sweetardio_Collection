@@ -37,7 +37,9 @@ WHAT_ARE_THOSEZ = "what_are_thosez"
 ARMZ = "armz"
 STICKERZ = "stickerz"
 
-# Characters that get Gorbhouse overlay
+# Characters that get Gorbhouse overlay. NOTE: the Gorbhouse trash-can
+# slippers are a what_are_thosez (footwear) trait, so EXCLUDE_WAT_CHARS
+# overrides this list — see gets_gorbhouse_overlay().
 GORBHOUSE_CHARS = [
     "Twinkie",
     "waffle",
@@ -61,10 +63,31 @@ EXCLUDE_WAT_CHARS = [
     "zaffre_sherbert_ice_cream",
     "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
+    "gummy_bear",
     "twinkie",
     "churro",
     "poptart",
 ]
+
+# Character-specific armz: each file here may ONLY appear on characters
+# whose name contains one of the listed substrings (individuals or groups,
+# e.g. "ice_cream" covers every *_ice_cream character; "gummy_bear" covers
+# all bear color variants). Armz files NOT in this map are generic and can
+# pair with any character.
+ARMZ_CHAR_LOCK = {
+    "Armz_Gummy_Bear_Knives.png": ["gummy_bear"],
+    "Armz_Gummy_worms_katana.png": ["gummy_worm"],
+    "Armz_Katana_for_ice_cream_character.png": ["ice_cream"],
+    "Armz_Marshmallow_knives.png": ["marshmallow"],
+    "Armz_Oatmeal_Pie_Katana.png": ["oatmeal_cream_pie"],
+    "Armz_Twinkie_Katana.png": ["twinkie"],
+    "Armz_choc_cookie_katana.png": ["chocolate_chip_cookie"],
+}
+
+def armz_allowed(arm_file, char_name):
+    """Generic armz pair with anyone; locked armz only with their character."""
+    locks = ARMZ_CHAR_LOCK.get(arm_file)
+    return locks is None or any(k in char_name.lower() for k in locks)
 
 # Characters that keep the raised (non-offset) position even without
 # footwear. Kept separate from EXCLUDE_WAT_CHARS so making a character
@@ -80,10 +103,71 @@ NO_OFFSET_CHARS = [
     "pink_sherbert_ice_cream",
     "twinkie",
     "churro",
+    # bears are drawn pre-placed (bottoms ~1123-1143, the churro/twinkie
+    # zone); the +150 drop left them standing ~180px below everyone else
+    "gummy_bear",
+    # smores is a large square character pre-positioned at ~963; the +150
+    # drop makes it look too low / off-centre when footwear-less
+    "smores",
 ]
+
+# Extra y-offset (px, +down) added to character-anchored layers when the
+# background has a visible real-world floor that sits lower than the
+# standard 1107 ground band. Only applied when apply_offset=True (i.e.
+# footwear-less), so WAT footwear alignment is never disturbed.
+# Tune per-background after visual review.
+BG_CHAR_EXTRA_Y = {
+    "Psychedelics.png": 80,   # Oval Office: visible floor ~1190+
+}
 
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
+
+# Per-character vertical trim in px (+down, -up), applied on top of the
+# offset rule to every character-anchored layer (body, skin, eyes, mouth,
+# arms) — all layers share the same dy, so the face hole <-> skin ball
+# alignment is preserved exactly. Values are measured by
+# asset_assessment/audit_placement.py (main-body bottoms, sparkle-proof):
+# standing characters align to bottom 957 (-> 1107 with the footwear-less
+# drop, inside the approved 1084-1109 ground band), NO_OFFSET characters
+# to the churro line (1111), ice-cream cone tips to 1290.
+# poptart/twinkie keep their owner-tuned overshoot values (2026-06).
+CHAR_Y_ADJUST = {
+    "poptart": -65,
+    "twinkie": 45,
+    "pink_sherbert_ice_cream": -57,
+    "rainbow_sherbert_ice_cream": -57,
+    "chocolate_sandwich_cookie": 50,
+    "sugar_cube": 42,
+    "waffle": -38,
+    "ding_dong": 34,
+    "og_gummy_bear": -32,
+    "sugar_doughnut": -26,
+    "zaffre_sherbert_ice_cream": -25,
+    "brownie_bite": 22,
+    "zebra_cake": -22,
+    "cyan_gummy_bear": -20,
+    "chocolate_doughnut": -18,
+    "glazed_doughnut": -18,
+    "gummy_worm": 18,
+    "purple_gummy_bear": -16,
+    "oatmeal_cream_pie": 14,
+    "pink_gummy_bear": -12,
+}
+
+def char_y_adjust(char_name):
+    return next((dy for k, dy in CHAR_Y_ADJUST.items()
+                 if k in char_name.lower()), 0)
+
+def is_wat_excluded(char_name):
+    """True when this character must never get what_are_thosez (footwear)."""
+    return any(ex.lower() in char_name.lower() for ex in EXCLUDE_WAT_CHARS)
+
+def gets_gorbhouse_overlay(char_name):
+    """Gorbhouse slippers are footwear, so the WAT exclusion wins over
+    GORBHOUSE_CHARS membership (twinkie/poptarts are in both lists)."""
+    return (any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
+            and not is_wat_excluded(char_name))
 
 # ---- face composition rule (from measured asset geometry) ----
 # The widest eyes (284-287px) are wider than the skin balls (268-303px).
@@ -135,7 +219,8 @@ def get_files(category):
     path = os.path.join(TRAITS_DIR, category)
     if not os.path.exists(path):
         return []
-    return [f for f in os.listdir(path) if f.endswith(".png")]
+    # sorted so seeded runs are reproducible across processes
+    return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
 def generate_random_combination():
     # 1. Select Character (MANDATORY)
@@ -157,18 +242,15 @@ def generate_random_combination():
     if not base_names:
         raise ValueError("No valid character names found")
     
-    char_name = random.choice(list(base_names))
+    # sorted: set iteration order varies per process (hash randomization),
+    # which silently breaks seeded reproducibility
+    char_name = random.choice(sorted(base_names))
     
     # Check if this character should be excluded from what_are_thosez
-    # Using lower() and checking for presence in char_name
-    should_exclude_wat = False
-    for ex in EXCLUDE_WAT_CHARS:
-        if ex.lower() in char_name.lower():
-            should_exclude_wat = True
-            break
-    
-    # Check if this character gets gorbhouse overlay
-    gets_gorbhouse = any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
+    should_exclude_wat = is_wat_excluded(char_name)
+
+    # Check if this character gets gorbhouse overlay (WAT exclusion wins)
+    gets_gorbhouse = gets_gorbhouse_overlay(char_name)
     
     # 2. Select Required Traits
     bg_dir = BACKGROUNDZ
@@ -211,8 +293,14 @@ def generate_random_combination():
     eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
     mouth = random.choice(mouth_files)
     
-    arm_files = get_files(ARMZ)
-    arm = random.choice(arm_files) if arm_files else None
+    # All arms are in the pool so any character can randomly get any arm
+    # (including katanas/knives). After the draw, if this character has a
+    # locked arm it overrides the pick with its own weapon.
+    all_arm_files = get_files(ARMZ)
+    arm = random.choice(all_arm_files) if all_arm_files else None
+    locked_arms = [f for f in all_arm_files if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
+    if locked_arms:
+        arm = random.choice(locked_arms)
     
     sticker_files = get_files(STICKERZ)
     sticker = random.choice(sticker_files) if sticker_files else None
@@ -227,11 +315,13 @@ def generate_random_combination():
 
     chosen_wat = None
     wat_overlays = []
-    if not should_exclude_wat:
+    # Gorbhouse characters get trash-can slippers via a separate code path;
+    # giving them regular WAT on top would produce a mismatched double pair.
+    if not should_exclude_wat and not gets_gorbhouse:
         wat_files = get_files(WHAT_ARE_THOSEZ)
         wat_bases = [wat_base_name(f) for f in wat_files]
         wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
-        
+
         # 70% chance to have footwear if not excluded
         if wat_bases and random.random() < 0.7:
             chosen_wat = random.choice(wat_bases)
@@ -259,72 +349,96 @@ def generate_random_combination():
     no_offset_char = any(ex.lower() in char_name.lower()
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
-    
-    # 3. Character (collected first: skin z-order depends on the body type)
-    char_layers = []
+    y_adjust = char_y_adjust(char_name)
+    # Background-aware extra drop: applied only when footwear-less so that
+    # WAT footwear (which has no dy) stays perfectly aligned.
+    bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
+
+    # 3. Character layers split by z-order relative to the skin ball.
+    # before_skinz_ files sit BELOW the skin (ice-cream body, sugar cube, etc).
+    # after_skinz_ files sit ABOVE the skin (doughnut/brownie/cookie body with a
+    # face hole — the hole reveals the skin ball beneath). Plain-name files
+    # (Twinkie, Sweetardio) have no hole so they go below by default.
+    before_char_layers = []
+    after_char_layers = []
     char_found = False
+
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
             char_found = True
             break
-            
+
     main_found = False
     patterns = [f"{char_name}.png", f"after_skinz_{char_name}.png", f"layer-after_skinz_{char_name}.png"]
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+                if "after_skinz" in f.lower():
+                    after_char_layers.append(layer)
+                else:
+                    before_char_layers.append(layer)
                 main_found = True
                 char_found = True
                 break
-        if main_found: break
-        
+        if main_found:
+            break
+
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset})
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+                if "after_skinz" in f.lower():
+                    after_char_layers.append(layer)
+                else:
+                    before_char_layers.append(layer)
                 char_found = True
                 break
 
-    layers.extend(char_layers)
+    # 3. Before-skinz body layers (below skin ball)
+    layers.extend(before_char_layers)
 
-    # 4. What Are Thosez OVERLAY
-    for overlay_path in wat_overlays:
-        layers.append({"path": overlay_path, "offset": False})
-    
-    # 5. Skinz: ball on top, enlarged so the chosen eyes fit inside it
+    # 5. Skinz: ball sits above before-skinz body, below after-skinz body
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
     skin_layer = {"path": skin_path, "offset": apply_offset,
+                  "dy": y_adjust + bg_extra_y,
                   "fscale": bfit, "fcenter": bcenter}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
-    
+
+    # 4. After-skinz body layers (above skin ball — face hole reveals skin)
+    layers.extend(after_char_layers)
+
     # 6. Eyez (original size and placement)
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset})
-    
+    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+
     # 7. Mouthz
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset})
-    
+    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+
     # 8. Armz
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset})
-        
-    # 9. Gorbhouse special overlay
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+
+    # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
+    for overlay_path in wat_overlays:
+        layers.append({"path": overlay_path, "offset": False})
+
+    # 10. Gorbhouse special overlay
     if gets_gorbhouse:
         gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_overlay.png")
         if not os.path.exists(gorbhouse_path):
             gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
         if os.path.exists(gorbhouse_path):
-            layers.append({"path": gorbhouse_path, "offset": apply_offset})
+            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust + bg_extra_y})
     
-    # 10. Sticker - DON'T MOVE DOWN
+    # 11. Sticker
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
 
-    # 11. Paired background overlay - always placed LAST, on top of everything
+    # 12. Paired background overlay - always placed LAST, on top of everything
     if bg in BG_OVERLAY_PAIRS:
         ov_path = os.path.join(TRAITS_DIR, bg_dir, BG_OVERLAY_PAIRS[bg])
         if os.path.exists(ov_path):
@@ -360,11 +474,11 @@ def create_image(layers, output_name=None):
         if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
             img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
         
-        if should_offset:
-            # Create a new image for the offset layer
+        # vertical placement: footwear-less offset rule + per-character trim
+        dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
+        if dy:
             offset_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
-            # Paste the original image with vertical offset
-            offset_img.paste(img, (0, VERTICAL_OFFSET))
+            offset_img.paste(img, (0, dy))
             img = offset_img
             
         sh = layer_info.get("shadow")

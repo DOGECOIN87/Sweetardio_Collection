@@ -21,8 +21,8 @@ import sys
 from PIL import Image, ImageDraw
 
 sys.path.insert(0, ".")
-from generator import (BG_OVERLAY_PAIRS, EXCLUDE_WAT_CHARS, GORBHOUSE_CHARS,
-                       NO_OFFSET_CHARS, ball_fit, create_image,
+from generator import (BG_OVERLAY_PAIRS, EXCLUDE_WAT_CHARS, NO_OFFSET_CHARS,
+                       ball_fit, create_image, gets_gorbhouse_overlay,
                        load_eyez_blocklist)
 
 BG = "traits/backgroundz"
@@ -69,11 +69,12 @@ COMBOS = [
      "before_skinz_pink_sherbert_ice_cream.png", None, WHITE,
      ["layer-Eyes_Cyan (1).png", "Cerise.png", "layer-Eyes_Side_Eye (1).png"],
      "layer-Mouth_Lollipop (1).png", SHY, None, False, []),
-    ("05_twinkie_gorbhouse_waffle", "Cookboy.png",
+    # Twinkie is footwear-excluded, so no Gorbhouse overlay (it is a
+    # what_are_thosez asset; the WAT exclusion wins - rule fixed 2026-06)
+    ("05_twinkie_cookboy", "Cookboy.png",
      "Twinkie.png", None, BLACK,
      ["layer-Eyes_Side_Eye (1).png"], "layer-Mouth_Flat (1).png", SHY,
-     "25_Zombieland_Twinkie.png", False,
-     [f"{WAT}/Gorbhouse_overlay.png"]),
+     "25_Zombieland_Twinkie.png", False, []),
     ("06_marshmallow_gum_corridor", "Bubble_Trouble.png",
      "after_skinz_marshmallow.png", PEPE, WHITE,
      ["Blue.png", "layer-Eyes_Cyan (1).png"], "layer-Mouth_Fang (1).png", NERF, None, False, []),
@@ -106,7 +107,10 @@ def check_rules(plate, char, foot, eye, offset, extras):
     blocked = load_eyez_blocklist().get(plate, [])
     assert eye not in blocked, f"{eye} blocked on {plate}"
     if any("Gorbhouse" in e for e in extras):
-        assert any(g.lower() in cl for g in GORBHOUSE_CHARS), char
+        # uses the generator's own decision, which makes the footwear
+        # exclusion win over GORBHOUSE_CHARS membership
+        assert gets_gorbhouse_overlay(char), \
+            f"{char} must not get the Gorbhouse overlay"
     if plate in BG_OVERLAY_PAIRS:
         assert any(BG_OVERLAY_PAIRS[plate] in e for e in extras), \
             f"{plate} requires its paired overlay"
