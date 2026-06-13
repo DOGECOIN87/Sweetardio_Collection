@@ -148,8 +148,9 @@ NO_OFFSET_CHARS = [
     "pink_sherbert_ice_cream",
     "twinkie",
     "churro",
-    # bears are drawn pre-placed (bottoms ~1123-1143, the churro/twinkie
-    # zone); the +150 drop left them standing ~180px below everyone else
+    # bears are CHAR_SCALE-enlarged and aligned to the ice-cream cone line
+    # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
+    # never disturbs that placement
     "gummy_bear",
     # smores is a large square character pre-positioned at ~963; the +150
     # drop makes it look too low / off-centre when footwear-less
@@ -186,18 +187,18 @@ CHAR_Y_ADJUST = {
     "sugar_cube": 42,
     "waffle": -38,
     "ding_dong": 34,
-    "og_gummy_bear": -119,    # bears are CHAR_SCALE-enlarged; dy is measured
+    "og_gummy_bear": 44,      # bears enlarged + aligned to the cone line (1290)
     "sugar_doughnut": -26,
     "zaffre_sherbert_ice_cream": -25,
     "brownie_bite": 22,
     "zebra_cake": -22,
-    "cyan_gummy_bear": -105,   # scale-aware (enlarged about the ball center)
+    "cyan_gummy_bear": 58,     # enlarged + aligned to the cone line (1290)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
     "gummy_worm": 18,
-    "purple_gummy_bear": -100,  # scale-aware (enlarged about the ball center)
+    "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": -96,    # scale-aware (enlarged about the ball center)
+    "pink_gummy_bear": 68,     # enlarged + aligned to the cone line (1290)
 }
 
 def char_y_adjust(char_name):
@@ -216,7 +217,7 @@ def char_y_adjust(char_name):
 # scale-aware so the feet still land on the ground line.
 CHAR_SCALE_PIVOT = (690, 601)   # == audit_placement.BALL_CENTER
 CHAR_SCALE = {
-    "gummy_bear": 1.16,   # -> ~766px wide, matching the ice-cream family
+    "gummy_bear": 1.19,   # -> ~789px wide, matching the ice-cream family
 }
 
 def char_scale(char_name):

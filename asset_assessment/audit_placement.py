@@ -142,7 +142,10 @@ def main():
                         round(py + f * (hole[1] - py)))
         bottom = round(bbox[3])
         no_off = any(k.lower() in name.lower() for k in g.NO_OFFSET_CHARS)
-        if "ice_cream" in name.lower():
+        # gummy bears are enlarged to the ice-cream size and share the same
+        # bottom line (the cone line ~1290), so they fill the frame like the
+        # ice creams rather than floating high at the churro line.
+        if "ice_cream" in name.lower() or "gummy_bear" in name.lower():
             target, mode = GROUND_CONE, "cone"
         elif no_off:
             target, mode = GROUND_FIXED, "fixed"
