@@ -320,7 +320,10 @@ def get_files(category):
     # sorted so seeded runs are reproducible across processes
     return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
-def generate_random_combination():
+def generate_random_combination(force_bg=None):
+    """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
+    plate from traits/backgrounds_pop); it bypasses the random plate pick,
+    the char<->bg compat filter and any paired overlay. Default = random."""
     # 1. Select Character (MANDATORY)
     char_files = get_files(CHARACTERZ)
     if not char_files:
@@ -351,23 +354,26 @@ def generate_random_combination():
     gets_gorbhouse = gets_gorbhouse_overlay(char_name)
     
     # 2. Select Required Traits
-    bg_dir = BACKGROUNDZ
-    bg_files = get_files(bg_dir)
-    if not bg_files:
-        print(f"Warning: traits/{BACKGROUNDZ} is empty; falling back to "
-              f"the ungraded traits/{BACKGROUNDZ_FALLBACK}")
-        bg_dir = BACKGROUNDZ_FALLBACK
+    if force_bg is not None:
+        bg_dir, bg = force_bg
+    else:
+        bg_dir = BACKGROUNDZ
         bg_files = get_files(bg_dir)
-    # overlays pair with their parent plate; they are never a background
-    bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
-    if not bg_files:
-        raise ValueError("No background assets found")
-    # character <-> background compatibility: drop plates this character would
-    # camouflage against (measured map; empty/missing entry = everything OK,
-    # and we never strand a character with zero plates)
-    char_blocked = load_char_blocklist().get(char_name, [])
-    allowed_bgs = [f for f in bg_files if f not in char_blocked]
-    bg = random.choice(allowed_bgs if allowed_bgs else bg_files)
+        if not bg_files:
+            print(f"Warning: traits/{BACKGROUNDZ} is empty; falling back to "
+                  f"the ungraded traits/{BACKGROUNDZ_FALLBACK}")
+            bg_dir = BACKGROUNDZ_FALLBACK
+            bg_files = get_files(bg_dir)
+        # overlays pair with their parent plate; they are never a background
+        bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
+        if not bg_files:
+            raise ValueError("No background assets found")
+        # character <-> background compatibility: drop plates this character
+        # would camouflage against (measured map; empty/missing entry =
+        # everything OK, and we never strand a character with zero plates)
+        char_blocked = load_char_blocklist().get(char_name, [])
+        allowed_bgs = [f for f in bg_files if f not in char_blocked]
+        bg = random.choice(allowed_bgs if allowed_bgs else bg_files)
     
     skin_files = get_files(SKINZ)
     if not skin_files:
