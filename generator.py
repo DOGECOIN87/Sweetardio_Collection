@@ -169,6 +169,24 @@ BG_CHAR_EXTRA_Y = {
 CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 
+# Characters with no base / standing point (round cookies, the gummy worm,
+# the round doughnuts) read better CENTERED than dropped to the ground: a
+# round shape lowered to the floor looks like it is resting awkwardly, not
+# standing. These skip the footwear-less drop AND any CHAR_Y_ADJUST trim, so
+# they sit at their natural (asset-native) centred position.
+CENTERED_CHARS = [
+    "chocolate_chip_cookie",
+    "chocolate_sandwich_cookie",
+    "oatmeal_cream_pie",
+    "gummy_worm",
+    "glazed_doughnut",
+    "chocolate_doughnut",
+    "sugar_doughnut",
+]
+
+def is_centered(char_name):
+    return any(k in char_name.lower() for k in CENTERED_CHARS)
+
 # Per-character vertical trim in px (+down, -up), applied on top of the
 # offset rule to every character-anchored layer (body, skin, eyes, mouth,
 # arms) — all layers share the same dy, so the face hole <-> skin ball
@@ -275,10 +293,19 @@ def is_wat_excluded(char_name):
     return any(ex.lower() in char_name.lower() for ex in EXCLUDE_WAT_CHARS)
 
 def gets_gorbhouse_overlay(char_name):
-    """Gorbhouse slippers are footwear, so the WAT exclusion wins over
-    GORBHOUSE_CHARS membership (twinkie/poptarts are in both lists)."""
+    """ELIGIBILITY for the gorbhouse overlay (deterministic). Gorbhouse
+    slippers are footwear, so the WAT exclusion wins over GORBHOUSE_CHARS
+    membership (twinkie/poptarts are in both lists). The overlay is then
+    APPLIED only on a GORBHOUSE_CHANCE roll, so eligible characters still get
+    plenty of generations with no what-are-thosez trait at all."""
     return (any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
             and not is_wat_excluded(char_name))
+
+# How often an eligible character actually wears the gorbhouse (rolled per
+# generation). < 1.0 so every eligible character also has footwear-less
+# generations. The rest of the time it falls through to the normal WAT path.
+GORBHOUSE_CHANCE = 0.4
+
 
 # ---- face composition rule (from measured asset geometry) ----
 # The widest eyes (284-287px) are wider than the skin balls (268-303px).
@@ -377,8 +404,11 @@ def generate_random_combination(force_bg=None):
     # Check if this character should be excluded from what_are_thosez
     should_exclude_wat = is_wat_excluded(char_name)
 
-    # Check if this character gets gorbhouse overlay (WAT exclusion wins)
-    gets_gorbhouse = gets_gorbhouse_overlay(char_name)
+    # Gorbhouse is now a ROLLED trait (not automatic) so eligible characters
+    # also generate with no what-are-thosez trait. When it doesn't roll, the
+    # character falls through to the normal WAT path below.
+    gets_gorbhouse = (gets_gorbhouse_overlay(char_name)
+                      and random.random() < GORBHOUSE_CHANCE)
     
     # 2. Select Required Traits
     if force_bg is not None:
@@ -486,6 +516,12 @@ def generate_random_combination(force_bg=None):
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
     cscale = char_scale(char_name)
+    # Baseless/round characters sit centred ONLY when they have nothing under
+    # them to stand on: no footwear (apply_offset) and no gorbhouse. With a
+    # shoe or trash-can they keep their normal grounded placement.
+    if is_centered(char_name) and apply_offset and not gets_gorbhouse:
+        apply_offset = False
+        y_adjust = 0
     # Background-aware extra drop: applied only when footwear-less so that
     # WAT footwear (which has no dy) stays perfectly aligned.
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
