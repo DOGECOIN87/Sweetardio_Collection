@@ -304,14 +304,28 @@ def _opaque_bbox(path, thresh=128):
         _bbox_cache[path] = mask.getbbox()
     return _bbox_cache[path]
 
+# Deepest face-hole vertical extent across the after-skinz characters
+# (measured: top 466 = brownie_bite, bottom 730 = rice_crispy_treat). A skin
+# ball must reach from the top to the bottom or it shows a background gap
+# through the hole — the short, low alien ball (center y 605, height 248) was
+# the failure case on tall holes like brownie_bite's.
+FACE_HOLE_TOP = 464
+FACE_HOLE_BOTTOM = 732
+
 def ball_fit(skin_path, eye_path):
-    """Enlargement factor + pivot so the skin ball contains the eyes."""
+    """Enlargement factor + pivot so the skin ball contains the eyes AND
+    covers the deepest character face hole (no gap through after-skinz holes)."""
     sx0, sy0, sx1, sy1 = _opaque_bbox(skin_path)
     ex0, _, ex1, _ = _opaque_bbox(eye_path)
     ball_w = max(sx1 - sx0, 1)
+    ball_h = max(sy1 - sy0, 1)
+    cy = (sy0 + sy1) / 2.0
     eye_w = max(ex1 - ex0, 1)
-    factor = max(1.0, eye_w / (BALL_FIT_MARGIN * ball_w))
-    return factor, ((sx0 + sx1) / 2.0, (sy0 + sy1) / 2.0)
+    # extra height needed so the ball reaches the hole top and bottom from its
+    # own center (depends per skin: the alien ball sits low, so it needs more)
+    need_h = 2.0 * max(cy - FACE_HOLE_TOP, FACE_HOLE_BOTTOM - cy)
+    factor = max(1.0, eye_w / (BALL_FIT_MARGIN * ball_w), need_h / ball_h)
+    return factor, ((sx0 + sx1) / 2.0, cy)
 
 def scale_about(img, factor, center):
     """Scale an RGBA canvas-sized layer about a fixed point."""
@@ -557,19 +571,20 @@ def generate_random_combination(force_bg=None):
     for overlay_path in wat_overlays:
         layers.append({"path": overlay_path, "offset": False})
 
-    # 9. Armz (after the footwear overlay; tracks the character's scale so a
-    # bigger body gets a bigger arm)
-    if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
-
-    # 10. Gorbhouse special overlay
+    # 9. Gorbhouse special overlay (a footwear-type trait) — placed BEFORE
+    # arms, like the WAT overlay, so a held weapon reads on top of it.
     if gets_gorbhouse:
         gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_overlay.png")
         if not os.path.exists(gorbhouse_path):
             gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
         if os.path.exists(gorbhouse_path):
             layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust + bg_extra_y})
-    
+
+    # 10. Armz (after ALL footwear overlays — WAT and gorbhouse — so a held
+    # katana/knife reads on top of the footwear; tracks the character's scale)
+    if arm:
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
+
     # 11. Sticker
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
