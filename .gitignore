@@ -1,3 +1,6 @@
 output/
 __pycache__/
 *.pyc
+background_pop_studies/grade1_out/
+background_pop_studies/samples/compare_*.png
+background_pop_studies/GRADE1_GRADE_LOG.md
