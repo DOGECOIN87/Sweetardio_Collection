@@ -24,6 +24,51 @@ def load_eyez_blocklist():
     except (OSError, ValueError):
         return {}
 
+# Optional character <-> background compatibility map built by
+# asset_assessment/build_char_compat.py: blocks (character, plate) pairs the
+# measured figure-ground rule flags as camouflage. Missing file = no limits.
+CHAR_COMPAT_PATH = os.path.join(TRAITS_DIR, "char_compat.json")
+_char_compat_cache = None
+
+def _char_compat():
+    global _char_compat_cache
+    if _char_compat_cache is None:
+        try:
+            with open(CHAR_COMPAT_PATH) as f:
+                _char_compat_cache = json.load(f)
+        except (OSError, ValueError):
+            _char_compat_cache = {}
+    return _char_compat_cache
+
+def load_char_blocklist():
+    return _char_compat().get("blocked", {})
+
+def load_char_weights():
+    """Per-character soft pairing weights over backgrounds (higher = preferred
+    pairing). Missing entry -> uniform (1.0)."""
+    return _char_compat().get("weights", {})
+
+# Data-driven skin rarity weights (traits/skin_weights.json): higher = more
+# common, matched by case-insensitive substring of the skin filename. Gold
+# Foil is the very-rare legendary. Missing file falls back to FALLBACK_*.
+SKIN_WEIGHTS_PATH = os.path.join(TRAITS_DIR, "skin_weights.json")
+_FALLBACK_SKIN_WEIGHTS = {"White": 70, "Black": 70, "Cyan": 40, "Alien": 8,
+                          "Gold": 1}
+_FALLBACK_SKIN_DEFAULT = 40
+
+def load_skin_weights():
+    try:
+        with open(SKIN_WEIGHTS_PATH) as f:
+            d = json.load(f)
+            return d.get("weights", {}), d.get("default", _FALLBACK_SKIN_DEFAULT)
+    except (OSError, ValueError):
+        return dict(_FALLBACK_SKIN_WEIGHTS), _FALLBACK_SKIN_DEFAULT
+
+def skin_weight(skin_file, weights, default):
+    """First tag whose (case-insensitive) text is in the filename wins."""
+    return next((w for tag, w in weights.items()
+                 if tag.lower() in skin_file.lower()), default)
+
 # Asset Categories
 # traits/backgroundz holds the GRADED plates (sources preserved in
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
@@ -103,8 +148,9 @@ NO_OFFSET_CHARS = [
     "pink_sherbert_ice_cream",
     "twinkie",
     "churro",
-    # bears are drawn pre-placed (bottoms ~1123-1143, the churro/twinkie
-    # zone); the +150 drop left them standing ~180px below everyone else
+    # bears are CHAR_SCALE-enlarged and aligned to the ice-cream cone line
+    # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
+    # never disturbs that placement
     "gummy_bear",
     # smores is a large square character pre-positioned at ~963; the +150
     # drop makes it look too low / off-centre when footwear-less
@@ -141,23 +187,88 @@ CHAR_Y_ADJUST = {
     "sugar_cube": 42,
     "waffle": -38,
     "ding_dong": 34,
-    "og_gummy_bear": -32,
+    "og_gummy_bear": 44,      # bears enlarged + aligned to the cone line (1290)
     "sugar_doughnut": -26,
     "zaffre_sherbert_ice_cream": -25,
     "brownie_bite": 22,
     "zebra_cake": -22,
-    "cyan_gummy_bear": -20,
+    "cyan_gummy_bear": 58,     # enlarged + aligned to the cone line (1290)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
     "gummy_worm": 18,
-    "purple_gummy_bear": -16,
+    "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": -12,
+    "pink_gummy_bear": 68,     # enlarged + aligned to the cone line (1290)
 }
 
 def char_y_adjust(char_name):
     return next((dy for k, dy in CHAR_Y_ADJUST.items()
                  if k in char_name.lower()), 0)
+
+# ---- per-character scale (about the face-hole / ball center) ----
+# A few characters were authored small relative to the family (gummy bears
+# measure ~660px wide vs the ice-cream bodies' ~785px). CHAR_SCALE enlarges
+# the character's body, arms AND skin ball about CHAR_SCALE_PIVOT (the ball
+# center): the face hole and the ball grow together about the same point the
+# eyes sit on, so the ball covers the enlarged hole exactly as at native size
+# for ANY skin (no gap ring), while the eyes/mouth stay native size so the
+# face style matches the rest of the collection. The extra foot-drop from
+# enlarging is absorbed by CHAR_Y_ADJUST, which audit_placement.py measures
+# scale-aware so the feet still land on the ground line.
+CHAR_SCALE_PIVOT = (690, 601)   # == audit_placement.BALL_CENTER
+CHAR_SCALE = {
+    "gummy_bear": 1.19,   # -> ~789px wide, matching the ice-cream family
+}
+
+def char_scale(char_name):
+    return next((s for k, s in CHAR_SCALE.items()
+                 if k in char_name.lower()), 1.0)
+
+# Characters whose face reads better with the skin ball drawn ON TOP of the
+# body (like the before-skinz ice creams), even though their art is authored
+# as an after-skinz "hole" file. The churro is a stack of pieces that
+# otherwise hide the face peeking through the hole; treating it as
+# skin-on-top draws the face cleanly over the dough.
+SKIN_ON_TOP_CHARS = ["churro"]
+
+def skin_on_top(char_name):
+    return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
+
+# Characters whose BODY should draw ON TOP of the skin ball (skin placed
+# BEFORE the body, revealed through the body's face hole) even though their
+# art is authored as a before-skinz file. Gummy bears read better with the
+# bear body in front and the skin showing through the eye hole.
+BODY_OVER_SKIN_CHARS = ["gummy_bear"]
+
+def body_over_skin(char_name):
+    return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
+
+def body_after_skin(char_name, fname):
+    """True when the BODY draws AFTER (on top of) the skin ball — i.e. the
+    skin is placed first and shows through the body's face hole. Defaults to
+    the after_skinz_ filename marker; two per-character overrides win:
+      SKIN_ON_TOP_CHARS  (churro)      -> skin on top  -> body BEFORE skin
+      BODY_OVER_SKIN_CHARS (gummy bears) -> body on top -> body AFTER skin
+    """
+    if skin_on_top(char_name):
+        return False
+    if body_over_skin(char_name):
+        return True
+    return "after_skinz" in fname.lower()
+
+# ---- per-arm intrinsic scale (about the hand line) ----
+# Some arm art was exported larger than the character family. ARM_SCALE
+# shrinks a specific arm file about ARM_SCALE_PIVOT (the held-weapon hand
+# line) so the fists stay attached to the body while the weapon scales down.
+# It composes on top of any character CHAR_SCALE, so a scaled character still
+# gets a proportionally adjusted arm.
+ARM_SCALE_PIVOT = (694, 1040)
+ARM_SCALE = {
+    "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
+}
+
+def arm_scale(arm_file):
+    return ARM_SCALE.get(arm_file, 1.0)
 
 def is_wat_excluded(char_name):
     """True when this character must never get what_are_thosez (footwear)."""
@@ -222,7 +333,10 @@ def get_files(category):
     # sorted so seeded runs are reproducible across processes
     return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
-def generate_random_combination():
+def generate_random_combination(force_bg=None):
+    """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
+    plate from traits/backgrounds_pop); it bypasses the random plate pick,
+    the char<->bg compat filter and any paired overlay. Default = random."""
     # 1. Select Character (MANDATORY)
     char_files = get_files(CHARACTERZ)
     if not char_files:
@@ -253,31 +367,38 @@ def generate_random_combination():
     gets_gorbhouse = gets_gorbhouse_overlay(char_name)
     
     # 2. Select Required Traits
-    bg_dir = BACKGROUNDZ
-    bg_files = get_files(bg_dir)
-    if not bg_files:
-        print(f"Warning: traits/{BACKGROUNDZ} is empty; falling back to "
-              f"the ungraded traits/{BACKGROUNDZ_FALLBACK}")
-        bg_dir = BACKGROUNDZ_FALLBACK
+    if force_bg is not None:
+        bg_dir, bg = force_bg
+    else:
+        bg_dir = BACKGROUNDZ
         bg_files = get_files(bg_dir)
-    # overlays pair with their parent plate; they are never a background
-    bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
-    if not bg_files:
-        raise ValueError("No background assets found")
-    bg = random.choice(bg_files)
+        if not bg_files:
+            print(f"Warning: traits/{BACKGROUNDZ} is empty; falling back to "
+                  f"the ungraded traits/{BACKGROUNDZ_FALLBACK}")
+            bg_dir = BACKGROUNDZ_FALLBACK
+            bg_files = get_files(bg_dir)
+        # overlays pair with their parent plate; they are never a background
+        bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
+        if not bg_files:
+            raise ValueError("No background assets found")
+        # character <-> background pairing. Hard rule: drop plates this
+        # character would camouflage against (never stranding it). Soft rule:
+        # bias the remaining pick toward the best-looking pairings (measured
+        # weights), while keeping every non-camouflage plate possible so the
+        # background variety / combinatorial space stays large.
+        char_blocked = load_char_blocklist().get(char_name, [])
+        allowed_bgs = [f for f in bg_files if f not in char_blocked] or bg_files
+        cw = load_char_weights().get(char_name, {})
+        bg = random.choices(allowed_bgs,
+                            weights=[cw.get(f, 1.0) for f in allowed_bgs],
+                            k=1)[0]
     
     skin_files = get_files(SKINZ)
     if not skin_files:
         raise ValueError("No skin assets found in traits/skinz")
     
-    weights = []
-    for f in skin_files:
-        if "White" in f or "Black" in f:
-            weights.append(10)
-        elif "Alien" in f or "Gold" in f:
-            weights.append(1)
-        else:
-            weights.append(5)
+    sw_weights, sw_default = load_skin_weights()
+    weights = [skin_weight(f, sw_weights, sw_default) for f in skin_files]
     skin = random.choices(skin_files, weights=weights, k=1)[0]
     
     eye_files = get_files(EYEZ)
@@ -350,6 +471,7 @@ def generate_random_combination():
                          for ex in NO_OFFSET_CHARS)
     apply_offset = not chosen_wat and not no_offset_char
     y_adjust = char_y_adjust(char_name)
+    cscale = char_scale(char_name)
     # Background-aware extra drop: applied only when footwear-less so that
     # WAT footwear (which has no dy) stays perfectly aligned.
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
@@ -365,7 +487,11 @@ def generate_random_combination():
 
     for f in char_files:
         if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            before_char_layers.append({"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+            layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+            if body_after_skin(char_name, f):
+                after_char_layers.append(layer)
+            else:
+                before_char_layers.append(layer)
             char_found = True
             break
 
@@ -374,8 +500,8 @@ def generate_random_combination():
     for p in patterns:
         for f in char_files:
             if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
-                if "after_skinz" in f.lower():
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+                if body_after_skin(char_name, f):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
@@ -388,8 +514,8 @@ def generate_random_combination():
     if not char_found:
         for f in char_files:
             if char_name.lower() in f.lower():
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y}
-                if "after_skinz" in f.lower():
+                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+                if body_after_skin(char_name, f):
                     after_char_layers.append(layer)
                 else:
                     before_char_layers.append(layer)
@@ -399,12 +525,19 @@ def generate_random_combination():
     # 3. Before-skinz body layers (below skin ball)
     layers.extend(before_char_layers)
 
-    # 5. Skinz: ball sits above before-skinz body, below after-skinz body
+    # 5. Skinz: ball sits above before-skinz body, below after-skinz body.
+    # The ball carries the per-character CHAR_SCALE too (cscale), so an
+    # enlarged character's face hole and its skin ball grow together — the
+    # ball always covers the hole exactly as it does at native size, for any
+    # skin (without this the alien skin's small 269px ball leaves a gap on a
+    # scaled bear). ball_fit (fscale) runs first about the ball center, then
+    # cscale about the shared pivot; eyes/mouth stay native size.
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
     skin_layer = {"path": skin_path, "offset": apply_offset,
                   "dy": y_adjust + bg_extra_y,
-                  "fscale": bfit, "fcenter": bcenter}
+                  "fscale": bfit, "fcenter": bcenter,
+                  "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
@@ -418,13 +551,16 @@ def generate_random_combination():
     # 7. Mouthz
     layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
-    # 8. Armz
-    if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
-
-    # 9. What Are Thosez OVERLAY (above arms, below gorbhouse/sticker)
+    # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
+    # so a held weapon (katana/knives) reads on top of the slippers instead
+    # of being hidden behind them.
     for overlay_path in wat_overlays:
         layers.append({"path": overlay_path, "offset": False})
+
+    # 9. Armz (after the footwear overlay; tracks the character's scale so a
+    # bigger body gets a bigger arm)
+    if arm:
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 10. Gorbhouse special overlay
     if gets_gorbhouse:
@@ -473,7 +609,13 @@ def create_image(layers, output_name=None):
         
         if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
             img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
-        
+        # per-character enlargement about the ball center (body + arms)
+        if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
+            img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
+        # per-arm intrinsic scale about the hand line (oversized arm art)
+        if abs(layer_info.get("ascale", 1.0) - 1.0) > 0.001:
+            img = scale_about(img, layer_info["ascale"], layer_info["acenter"])
+
         # vertical placement: footwear-less offset rule + per-character trim
         dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
         if dy:
