@@ -319,6 +319,44 @@ BALL_FIT_MARGIN = 0.92
 # and clipped to the foreground so it never falls on the background plate.
 SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 
+# ---- character grounding shadow (cast ONTO the background) ----
+# Soft shadow cast by the character's silhouette onto the background plate,
+# composited ABOVE the plate and BELOW the character, so each character sits
+# on top of its own shadow and reads as part of the scene instead of pasted
+# on. This is the OPPOSITE of SKIN_SHADOW (which clips to the foreground): the
+# grounding shadow is deliberately NOT clipped to the foreground, so it falls
+# on the background behind/under the subject. The character is drawn on top
+# afterwards, so the shadow can never show through or above the subject.
+#
+# Set to None to disable entirely. Tunables:
+#   mode        "ground" = squashed contact pool seated at the silhouette's
+#               lowest opaque row (for characters that stand on something);
+#               "drop"   = the whole silhouette, offset + blurred (for
+#               centred/portrait characters that float by design);
+#               "auto"   = pick per character from geometry: a contact pool
+#               when the silhouette reaches the ground band, else a soft drop.
+#   blur        Gaussian blur radius in px (softness of the shadow edge).
+#   opacity     peak shadow alpha, 0..1.
+#   dx, dy      shadow offset in px (+dy = down). Light is assumed slightly
+#               above, so a small +dy seats the shadow just below the feet.
+#   squash      "ground" mode only: vertical compression of the silhouette
+#               into a flat contact pool (smaller = flatter pool).
+#   exclude_arms  derive the silhouette from the body+skin mass only, dropping
+#               held weapons (e.g. a katana) so they don't throw a shadow
+#               spike across the scene.
+#   ground_line "auto" mode only: silhouette bottoms at/below this canvas row
+#               are treated as grounded (contact pool); higher = drop shadow.
+GROUND_SHADOW = {
+    "mode": "auto",
+    "blur": 26,
+    "opacity": 0.40,
+    "dx": 0,
+    "dy": 6,
+    "squash": 0.16,
+    "exclude_arms": True,
+    "ground_line": 1040,
+}
+
 _bbox_cache = {}
 
 def _opaque_bbox(path, thresh=128):
@@ -633,47 +671,134 @@ def generate_random_combination(force_bg=None):
 
     return layers, char_name
 
+def _render_layer(layer_info):
+    """Load a layer and apply all of its geometric transforms (fscale, cscale,
+    ascale, then the footwear-less offset + per-character dy). Returns a
+    full-canvas RGBA image, or None if the file is missing. No shadow is
+    applied here — shadows are handled by the compositor stages."""
+    layer_path = layer_info["path"]
+    if not os.path.exists(layer_path):
+        print(f"Warning: Layer not found: {layer_path}")
+        return None
+
+    img = Image.open(layer_path).convert("RGBA")
+    if img.size != (CANVAS_SIZE, CANVAS_SIZE):
+        img = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.Resampling.LANCZOS)
+
+    if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
+        img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
+    # per-character enlargement about the ball center (body + arms)
+    if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
+        img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
+    # per-arm intrinsic scale about the hand line (oversized arm art)
+    if abs(layer_info.get("ascale", 1.0) - 1.0) > 0.001:
+        img = scale_about(img, layer_info["ascale"], layer_info["acenter"])
+
+    # vertical placement: footwear-less offset rule + per-character trim
+    dy = (VERTICAL_OFFSET if layer_info["offset"] else 0) + layer_info.get("dy", 0)
+    if dy:
+        offset_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
+        offset_img.paste(img, (0, dy))
+        img = offset_img
+    return img
+
+
+def _ground_shadow(sil_alpha, cfg):
+    """Build the character grounding shadow from a silhouette alpha (L-mode,
+    full canvas). Returns a black RGBA layer to composite onto the background
+    BELOW the character, or None when the silhouette is empty.
+
+    The shadow is intentionally NOT clipped to the foreground: it falls on the
+    background, and the character (drawn afterwards) covers any overlap, so it
+    can never show through or above the subject."""
+    from PIL import ImageFilter
+    bbox = sil_alpha.getbbox()
+    if bbox is None:
+        return None
+    x0, y0, x1, y1 = bbox
+
+    mode = cfg.get("mode", "auto")
+    if mode == "auto":
+        # grounded characters reach the ground band; portrait/centred ones
+        # float well above it and get a soft drop instead of a contact pool.
+        mode = "ground" if y1 >= cfg.get("ground_line", 1040) else "drop"
+
+    dx = int(cfg.get("dx", 0))
+    dy = int(cfg.get("dy", 0))
+    moved = Image.new("L", sil_alpha.size, 0)
+
+    if mode == "ground":
+        # squash the silhouette into a flat contact pool seated at its lowest
+        # opaque row (the feet / footwear base / cone tip).
+        squash = cfg.get("squash", 0.16)
+        sub = sil_alpha.crop(bbox)
+        pool_w = max(1, x1 - x0)
+        pool_h = max(1, round((y1 - y0) * squash))
+        pool = sub.resize((pool_w, pool_h), Image.Resampling.LANCZOS)
+        moved.paste(pool, (x0 + dx, y1 - pool_h // 2 + dy))
+    else:  # drop: the whole silhouette, offset and blurred
+        moved.paste(sil_alpha.crop(bbox), (x0 + dx, y0 + dy))
+
+    shadow_a = moved.filter(ImageFilter.GaussianBlur(cfg.get("blur", 24)))
+    op = cfg.get("opacity", 0.4)
+    shadow_a = shadow_a.point(lambda v: int(v * op))
+    shadow = Image.new("RGBA", sil_alpha.size, (0, 0, 0, 255))
+    shadow.putalpha(shadow_a)
+    return shadow
+
+
 def create_image(layers, output_name=None):
     if output_name is None:
         import time
         if not os.path.exists("output"):
             os.makedirs("output")
         output_name = f"output/gen_{int(time.time())}_{random.randint(1000, 9999)}.png"
-    
-    base_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
-    from PIL import ImageChops, ImageFilter
-    fg_mask = Image.new("L", (CANVAS_SIZE, CANVAS_SIZE), 0)
-    layer_index = -1
-    
-    for layer_info in layers:
-        layer_index += 1
-        layer_path = layer_info["path"]
-        should_offset = layer_info["offset"]
-        
-        if not os.path.exists(layer_path):
-            print(f"Warning: Layer not found: {layer_path}")
-            continue
-            
-        img = Image.open(layer_path).convert("RGBA")
-        if img.size != (CANVAS_SIZE, CANVAS_SIZE):
-            img = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.Resampling.LANCZOS)
-        
-        if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
-            img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
-        # per-character enlargement about the ball center (body + arms)
-        if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
-            img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
-        # per-arm intrinsic scale about the hand line (oversized arm art)
-        if abs(layer_info.get("ascale", 1.0) - 1.0) > 0.001:
-            img = scale_about(img, layer_info["ascale"], layer_info["acenter"])
 
-        # vertical placement: footwear-less offset rule + per-character trim
-        dy = (VERTICAL_OFFSET if should_offset else 0) + layer_info.get("dy", 0)
-        if dy:
-            offset_img = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0, 0))
-            offset_img.paste(img, (0, dy))
-            img = offset_img
-            
+    from PIL import ImageChops, ImageFilter
+    canvas = (CANVAS_SIZE, CANVAS_SIZE)
+    base_img = Image.new("RGBA", canvas, (0, 0, 0, 0))
+
+    # Classify the layer stack. The first layer is always the background
+    # plate. The corner sticker and the paired background overlay ride on TOP
+    # of everything (and of the shadow); everything in between is
+    # character-anchored and casts the grounding shadow.
+    sticker_prefix = os.path.normpath(os.path.join(TRAITS_DIR, STICKERZ))
+    armz_prefix = os.path.normpath(os.path.join(TRAITS_DIR, ARMZ))
+    overlay_names = set(BG_OVERLAY_PAIRS.values())
+
+    def _is_top(layer_info):
+        p = os.path.normpath(layer_info["path"])
+        return (p.startswith(sticker_prefix + os.sep)
+                or os.path.basename(p) in overlay_names)
+
+    def _is_arm(layer_info):
+        return os.path.normpath(layer_info["path"]).startswith(
+            armz_prefix + os.sep)
+
+    bg_layer = layers[0] if layers else None
+    char_layers = [li for li in layers[1:] if not _is_top(li)]
+    top_layers = [li for li in layers[1:] if _is_top(li)]
+
+    # 1. Background plate(s).
+    if bg_layer is not None:
+        bg_img = _render_layer(bg_layer)
+        if bg_img is not None:
+            base_img.alpha_composite(bg_img)
+
+    # 2. Character composite on its own transparent canvas, with identical
+    #    per-layer transforms. fg_mask tracks the foreground built so far so a
+    #    per-layer SKIN_SHADOW still clips to the body (never the background).
+    #    sil_alpha accumulates the grounding silhouette (body+skin mass,
+    #    optionally excluding held-weapon arms).
+    char_img = Image.new("RGBA", canvas, (0, 0, 0, 0))
+    fg_mask = Image.new("L", canvas, 0)
+    sil_alpha = Image.new("L", canvas, 0)
+    exclude_arms = bool(GROUND_SHADOW and GROUND_SHADOW.get("exclude_arms"))
+
+    for layer_info in char_layers:
+        img = _render_layer(layer_info)
+        if img is None:
+            continue
         sh = layer_info.get("shadow")
         if sh:
             a = img.getchannel("A")
@@ -682,15 +807,32 @@ def create_image(layers, output_name=None):
             moved.paste(blurred, (sh.get("dx", 0), sh.get("dy", 0)))
             op = sh["opacity"]
             shadow_a = moved.point(lambda v: int(v * op))
-            # clip to what is already drawn above the background plate
+            # clip to the foreground built so far (never the background)
             shadow_a = ImageChops.multiply(shadow_a, fg_mask)
             shadow = Image.new("RGBA", a.size, (0, 0, 0, 255))
             shadow.putalpha(shadow_a)
+            char_img.alpha_composite(shadow)
+        char_img.alpha_composite(img)
+        alpha = img.getchannel("A")
+        fg_mask = ImageChops.lighter(fg_mask, alpha)
+        if not (exclude_arms and _is_arm(layer_info)):
+            sil_alpha = ImageChops.lighter(sil_alpha, alpha)
+
+    # 3. Grounding shadow derived from the silhouette, onto the background.
+    if GROUND_SHADOW:
+        shadow = _ground_shadow(sil_alpha, GROUND_SHADOW)
+        if shadow is not None:
             base_img.alpha_composite(shadow)
-        base_img.alpha_composite(img)
-        if layer_index > 0:  # everything except the background plate
-            fg_mask = ImageChops.lighter(fg_mask, img.getchannel("A"))
-    
+
+    # 4. Character composite, on top of its own shadow.
+    base_img.alpha_composite(char_img)
+
+    # 5. Sticker + paired background overlay, on top of everything.
+    for layer_info in top_layers:
+        img = _render_layer(layer_info)
+        if img is not None:
+            base_img.alpha_composite(img)
+
     base_img.save(output_name)
     return output_name
 
