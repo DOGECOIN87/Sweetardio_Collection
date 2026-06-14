@@ -8,14 +8,15 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Blue_Fur.png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
-  ],
   "Bubble_Trouble.png": [
    "Cerise.png"
+  ],
+  "Candy_Tundra.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-art_mattrick_011.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Celestial.png": [
    "Blue.png",
@@ -31,17 +32,16 @@
    "Blue.png",
    "Cerise.png"
   ],
-  "NFTs_Arent_Dead.png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  "Gummy_Bears.png": [
+   "Cerise.png"
   ],
-  "NFTs_Arent_Dead_2.png": [
+  "M&Ms.png": [
    "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+   "Cerise.png"
+  ],
+  "Pixie_Stix.png": [
+   "Blue.png",
+   "Cerise.png"
   ],
   "Smuckers_Blue.png": [
    "Blue.png",
@@ -49,13 +49,7 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
-  "Smuckers_Red.png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
-  ],
-  "Sweet_Castle.png": [
+  "Sugar.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
@@ -80,6 +74,11 @@
    "Cerise.png"
   ],
   "UAP_Taskforce.png": [
+   "Blue.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Whitehouse_Lawn_Overlay.png": [
    "Blue.png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
