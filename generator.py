@@ -9,12 +9,12 @@ TRAITS_DIR = "traits"
 # whole stack (placed last) whenever their parent plate is the background.
 # Whitehouse_Lawn_Overlay is the foreground figure for the Whitehouse_Lawn
 # scene (NOT Candy_Land / Sweetardio_11314, which was a mis-pairing).
-# mars_overlay is the foreground spectator for the Mars/SpaceX octagon plate
-# Sweetardio_116 (20).png (keyed transparent from the owner's Sweetardio_300
-# (3).png so only the figure rides in front, like the Whitehouse spectators).
+# Mars_Overlay is the foreground spectator for the Mars/SpaceX octagon plate
+# Sweetardio_116 (20).png (owner-provided transparent cutout), so only the
+# figure rides in front, like the Whitehouse spectators.
 BG_OVERLAY_PAIRS = {
     "Whitehouse_Lawn.png": "Whitehouse_Lawn_Overlay.png",
-    "Sweetardio_116 (20).png": "mars_overlay.png",
+    "Sweetardio_116 (20).png": "Mars_Overlay.png",
 }
 
 # Optional eye <-> background compatibility map built by
