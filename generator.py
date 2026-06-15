@@ -24,6 +24,41 @@ def load_eyez_blocklist():
     except (OSError, ValueError):
         return {}
 
+def load_eyez_weights():
+    """Per-background soft eye weights (plate -> {eye_file: weight}, higher =
+    better colour complement). Built by build_eyez_compat.py alongside the
+    blocklist. Missing file/entry -> uniform (1.0)."""
+    try:
+        with open(EYEZ_COMPAT_PATH) as f:
+            return json.load(f).get("weights", {})
+    except (OSError, ValueError):
+        return {}
+
+# Optional footwear (what_are_thosez) <-> background compatibility map built by
+# asset_assessment/build_wat_compat.py: blocks camouflaging/clashing
+# (footwear, plate) pairs and softly biases the rest. Keyed by plate (the
+# footwear is picked after the background). Missing file = no restrictions.
+WAT_COMPAT_PATH = os.path.join(TRAITS_DIR, "wat_compat.json")
+_wat_compat_cache = None
+
+def _wat_compat():
+    global _wat_compat_cache
+    if _wat_compat_cache is None:
+        try:
+            with open(WAT_COMPAT_PATH) as f:
+                _wat_compat_cache = json.load(f)
+        except (OSError, ValueError):
+            _wat_compat_cache = {}
+    return _wat_compat_cache
+
+def load_wat_blocklist():
+    """plate -> [footwear base-name, ...] blocked as camouflage/clash."""
+    return _wat_compat().get("blocked", {})
+
+def load_wat_weights():
+    """plate -> {footwear base-name: weight}. Missing entry -> uniform (1.0)."""
+    return _wat_compat().get("weights", {})
+
 # Optional character <-> background compatibility map built by
 # asset_assessment/build_char_compat.py: blocks (character, plate) pairs the
 # measured figure-ground rule flags as camouflage. Missing file = no limits.
@@ -170,10 +205,12 @@ CANVAS_SIZE = 1393
 VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
 
 # Characters with no base / standing point (round cookies, the gummy worm,
-# the round doughnuts) read better CENTERED than dropped to the ground: a
-# round shape lowered to the floor looks like it is resting awkwardly, not
-# standing. These skip the footwear-less drop AND any CHAR_Y_ADJUST trim, so
-# they sit at their natural (asset-native) centred position.
+# the round doughnuts, the ding dong ring) read better CENTERED than dropped to
+# the ground: a round shape lowered to the floor looks like it is resting
+# awkwardly, not standing. These skip the footwear-less drop AND any
+# CHAR_Y_ADJUST trim, so they sit at their natural (asset-native) centred
+# position. (ding_dong is a chocolate ring — geometrically a doughnut — so it
+# belongs here with the other rings, not in the standing set.)
 CENTERED_CHARS = [
     "chocolate_chip_cookie",
     "chocolate_sandwich_cookie",
@@ -182,6 +219,7 @@ CENTERED_CHARS = [
     "glazed_doughnut",
     "chocolate_doughnut",
     "sugar_doughnut",
+    "ding_dong",
 ]
 
 def is_centered(char_name):
@@ -302,9 +340,21 @@ def gets_gorbhouse_overlay(char_name):
             and not is_wat_excluded(char_name))
 
 # How often an eligible character actually wears the gorbhouse (rolled per
-# generation). < 1.0 so every eligible character also has footwear-less
-# generations. The rest of the time it falls through to the normal WAT path.
+# generation) WHEN its footwear slot is active. < 1.0 so eligible characters
+# still get regular slippers (and, via the tiers below, footwear-less runs).
 GORBHOUSE_CHANCE = 0.4
+
+# ---- minimal-traits-first selection (probability tiers) ----
+# The mandatory core of every NFT is background + body + skin + eyes + mouth.
+# Footwear (what_are_thosez / gorbhouse), arms and the corner sticker are
+# OPTIONAL. To guarantee every character can be generated CLEAN (minimal
+# traits) before extras are layered on, each generation first rolls HOW MANY of
+# its available optional slots to fill, weighted toward FEWER. Keys are the
+# optional-trait COUNT (0 = pure minimal: core only); values are relative
+# weights. Counts above the number of slots a given character actually has are
+# ignored, and the weights renormalise over what's left. Tune to taste:
+# raising the 0/1 weights makes minimal/near-minimal renders more common.
+OPTIONAL_TRAIT_COUNT_WEIGHTS = {0: 4, 1: 3, 2: 2, 3: 1}
 
 
 # ---- face composition rule (from measured asset geometry) ----
@@ -439,15 +489,11 @@ def generate_random_combination(force_bg=None):
     # which silently breaks seeded reproducibility
     char_name = random.choice(sorted(base_names))
     
-    # Check if this character should be excluded from what_are_thosez
+    # Check if this character should be excluded from what_are_thosez. The
+    # gorbhouse roll now happens INSIDE the footwear slot below, as part of the
+    # minimal-traits-first optional-trait selection.
     should_exclude_wat = is_wat_excluded(char_name)
 
-    # Gorbhouse is now a ROLLED trait (not automatic) so eligible characters
-    # also generate with no what-are-thosez trait. When it doesn't roll, the
-    # character falls through to the normal WAT path below.
-    gets_gorbhouse = (gets_gorbhouse_overlay(char_name)
-                      and random.random() < GORBHOUSE_CHANCE)
-    
     # 2. Select Required Traits
     if force_bg is not None:
         bg_dir, bg = force_bg
@@ -490,25 +536,26 @@ def generate_random_combination(force_bg=None):
     if not mouth_files:
         raise ValueError("No mouth assets found in traits/mouthz")
     
-    # eye <-> background compatibility (optional, measured blocklist)
+    # eye <-> background compatibility (measured): drop clashing eyes (hard
+    # block), then bias the remaining pick toward the best-complementing eyes
+    # (soft weights), mirroring the character<->background pairing rule.
     eyez_blocked = load_eyez_blocklist().get(bg, [])
-    allowed_eyes = [f for f in eye_files if f not in eyez_blocked]
-    eye = random.choice(allowed_eyes if allowed_eyes else eye_files)
+    allowed_eyes = [f for f in eye_files if f not in eyez_blocked] or eye_files
+    ew = load_eyez_weights().get(bg, {})
+    eye = random.choices(allowed_eyes,
+                         weights=[ew.get(f, 1.0) for f in allowed_eyes], k=1)[0]
     mouth = random.choice(mouth_files)
     
-    # All arms are in the pool so any character can randomly get any arm
-    # (including katanas/knives). After the draw, if this character has a
-    # locked arm it overrides the pick with its own weapon.
+    # ---- optional traits: minimal-traits-first via probability tiers ----
+    # The mandatory core (background + body + skin + eyes + mouth) is already
+    # chosen above. Footwear, arms and the corner sticker are OPTIONAL. First
+    # work out which optional slots are even available to THIS character, then
+    # roll how many to fill (weighted toward fewer) and which ones, so every
+    # character has a real chance of a clean minimal render.
     all_arm_files = get_files(ARMZ)
-    arm = random.choice(all_arm_files) if all_arm_files else None
-    locked_arms = [f for f in all_arm_files if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
-    if locked_arms:
-        arm = random.choice(locked_arms)
-    
     sticker_files = get_files(STICKERZ)
-    sticker = random.choice(sticker_files) if sticker_files else None
-    
-    # Optional "What are thosez"
+    wat_files = get_files(WHAT_ARE_THOSEZ)
+
     # base files look like "layer-Bunny_Slippers_Base (1).png": match the
     # "_base" marker with an optional " (n)" suffix, case-insensitively
     import re as _re
@@ -516,21 +563,60 @@ def generate_random_combination(force_bg=None):
         m = _re.match(r"(.+?)_base(?:\s*\(\d+\))?\.png$", f, _re.IGNORECASE)
         return m.group(1) if m else None
 
+    # regular wearable footwear bases (gorbhouse is handled as its own roll)
+    wat_bases = [wat_base_name(f) for f in wat_files]
+    wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
+
+    optional_slots = []
+    # footwear is available only when the character isn't WAT-excluded and has
+    # something to wear (regular slippers, or gorbhouse for eligible chars)
+    if not should_exclude_wat and (wat_bases or gets_gorbhouse_overlay(char_name)):
+        optional_slots.append("footwear")
+    if all_arm_files:
+        optional_slots.append("arms")
+    if sticker_files:
+        optional_slots.append("sticker")
+
+    # roll HOW MANY optional traits (weighted toward fewer), then WHICH slots
+    counts = list(range(len(optional_slots) + 1))
+    cw = [OPTIONAL_TRAIT_COUNT_WEIGHTS.get(k, 0) for k in counts]
+    if sum(cw) == 0:                      # no configured weights -> uniform
+        cw = [1] * len(counts)
+    n_optional = random.choices(counts, weights=cw, k=1)[0]
+    active = set(random.sample(optional_slots, n_optional)) if n_optional else set()
+
+    # --- footwear slot: gorbhouse trash-cans (eligible chars) or regular WAT,
+    # the latter biased by the measured footwear<->background compat table ---
     chosen_wat = None
     wat_overlays = []
-    # Gorbhouse characters get trash-can slippers via a separate code path;
-    # giving them regular WAT on top would produce a mismatched double pair.
-    if not should_exclude_wat and not gets_gorbhouse:
-        wat_files = get_files(WHAT_ARE_THOSEZ)
-        wat_bases = [wat_base_name(f) for f in wat_files]
-        wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
-
-        # 70% chance to have footwear if not excluded
-        if wat_bases and random.random() < 0.7:
-            chosen_wat = random.choice(wat_bases)
+    gets_gorbhouse = False
+    if "footwear" in active:
+        if gets_gorbhouse_overlay(char_name) and random.random() < GORBHOUSE_CHANCE:
+            gets_gorbhouse = True
+        elif wat_bases:
+            wat_blocked = load_wat_blocklist().get(bg, [])
+            allowed_wat = [b for b in wat_bases
+                           if b not in wat_blocked] or wat_bases
+            ww = load_wat_weights().get(bg, {})
+            chosen_wat = random.choices(
+                allowed_wat,
+                weights=[ww.get(b, 1.0) for b in allowed_wat], k=1)[0]
             for f in wat_files:
                 if f.lower().startswith(chosen_wat.lower()) and "overlay" in f.lower():
                     wat_overlays.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f))
+
+    # --- arms slot: any arm may be drawn (including katanas/knives); a
+    # character with a locked weapon overrides the draw with its own ---
+    arm = None
+    if "arms" in active and all_arm_files:
+        arm = random.choice(all_arm_files)
+        locked_arms = [f for f in all_arm_files
+                       if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
+        if locked_arms:
+            arm = random.choice(locked_arms)
+
+    # --- sticker slot: corner sticker ---
+    sticker = random.choice(sticker_files) if "sticker" in active else None
     
     # Layering Logic
     layers = []

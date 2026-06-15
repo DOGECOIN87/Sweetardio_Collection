@@ -1,0 +1,211 @@
+{
+ "mode": "anti-camouflage",
+ "src": "traits/backgroundz",
+ "strength": 0.8,
+ "blocked": {
+  "Coder_Chick.png": [
+   "layer-Bunny_Slippers"
+  ]
+ },
+ "weights": {
+  "Ayotollah.png": {
+   "layer-Bunny_Slippers": 0.72,
+   "layer-Pepe": 0.984,
+   "layer-Shiba": 0.882
+  },
+  "Baked.png": {
+   "layer-Bunny_Slippers": 0.603,
+   "layer-Pepe": 1.152,
+   "layer-Shiba": 0.841
+  },
+  "Ben_dot_Eth.png": {
+   "layer-Bunny_Slippers": 1.537,
+   "layer-Pepe": 1.094,
+   "layer-Shiba": 1.587
+  },
+  "Bubble_Trouble.png": {
+   "layer-Bunny_Slippers": 1.463,
+   "layer-Pepe": 1.203,
+   "layer-Shiba": 1.513
+  },
+  "Candy_Tundra.png": {
+   "layer-Bunny_Slippers": 1.147,
+   "layer-Pepe": 1.523,
+   "layer-Shiba": 1.219
+  },
+  "Celestial.png": {
+   "layer-Bunny_Slippers": 0.936,
+   "layer-Pepe": 1.719,
+   "layer-Shiba": 1.02
+  },
+  "Cereal_Killer.png": {
+   "layer-Bunny_Slippers": 1.283,
+   "layer-Pepe": 1.265,
+   "layer-Shiba": 1.335
+  },
+  "Choco_Falls.png": {
+   "layer-Bunny_Slippers": 0.593,
+   "layer-Pepe": 1.171,
+   "layer-Shiba": 0.842
+  },
+  "Coder_Chick.png": {
+   "layer-Pepe": 1.552,
+   "layer-Shiba": 0.743
+  },
+  "Cookboy.png": {
+   "layer-Bunny_Slippers": 1.762,
+   "layer-Pepe": 1.27,
+   "layer-Shiba": 1.81
+  },
+  "Crumble_Trail.png": {
+   "layer-Bunny_Slippers": 0.794,
+   "layer-Pepe": 1.04,
+   "layer-Shiba": 0.969
+  },
+  "Drained_The_Swamp.png": {
+   "layer-Bunny_Slippers": 0.763,
+   "layer-Pepe": 1.224,
+   "layer-Shiba": 1.153
+  },
+  "Druski.png": {
+   "layer-Bunny_Slippers": 0.705,
+   "layer-Pepe": 1.149,
+   "layer-Shiba": 1.024
+  },
+  "Flavor_Explosion.png": {
+   "layer-Bunny_Slippers": 0.5,
+   "layer-Pepe": 1.25,
+   "layer-Shiba": 0.761
+  },
+  "Goo_Lagoon.png": {
+   "layer-Bunny_Slippers": 0.994,
+   "layer-Pepe": 0.683,
+   "layer-Shiba": 1.049
+  },
+  "Gorlock.png": {
+   "layer-Bunny_Slippers": 1.499,
+   "layer-Pepe": 1.449,
+   "layer-Shiba": 1.742
+  },
+  "Gummy_Bears.png": {
+   "layer-Bunny_Slippers": 1.257,
+   "layer-Pepe": 1.042,
+   "layer-Shiba": 1.31
+  },
+  "He_Needs_Some_Milk.png": {
+   "layer-Bunny_Slippers": 1.242,
+   "layer-Pepe": 1.749,
+   "layer-Shiba": 1.595
+  },
+  "Im_Not_Sorry.png": {
+   "layer-Bunny_Slippers": 0.604,
+   "layer-Pepe": 1.283,
+   "layer-Shiba": 0.847
+  },
+  "M&Ms.png": {
+   "layer-Bunny_Slippers": 1.365,
+   "layer-Pepe": 1.101,
+   "layer-Shiba": 1.417
+  },
+  "Nabisco.png": {
+   "layer-Bunny_Slippers": 1.045,
+   "layer-Pepe": 1.333,
+   "layer-Shiba": 1.267
+  },
+  "Palm_Beach_Pete.png": {
+   "layer-Bunny_Slippers": 1.374,
+   "layer-Pepe": 1.455,
+   "layer-Shiba": 1.591
+  },
+  "Pink_Abyss.png": {
+   "layer-Bunny_Slippers": 0.841,
+   "layer-Pepe": 1.16,
+   "layer-Shiba": 0.899
+  },
+  "Pixie_Stix.png": {
+   "layer-Bunny_Slippers": 0.984,
+   "layer-Pepe": 0.985,
+   "layer-Shiba": 1.039
+  },
+  "Psychedelics.png": {
+   "layer-Bunny_Slippers": 0.68,
+   "layer-Pepe": 1.098,
+   "layer-Shiba": 0.926
+  },
+  "Smuckers_Blue.png": {
+   "layer-Bunny_Slippers": 1.532,
+   "layer-Pepe": 0.884,
+   "layer-Shiba": 1.582
+  },
+  "Sugar.png": {
+   "layer-Bunny_Slippers": 0.973,
+   "layer-Pepe": 1.677,
+   "layer-Shiba": 1.045
+  },
+  "Sweet_Castle_2.png": {
+   "layer-Bunny_Slippers": 1.167,
+   "layer-Pepe": 1.361,
+   "layer-Shiba": 1.22
+  },
+  "Sweet_Shop.png": {
+   "layer-Bunny_Slippers": 0.467,
+   "layer-Pepe": 1.22,
+   "layer-Shiba": 0.668
+  },
+  "Sweetardio.png": {
+   "layer-Bunny_Slippers": 0.462,
+   "layer-Pepe": 1.239,
+   "layer-Shiba": 0.68
+  },
+  "Sweetardio_116 (20).png": {
+   "layer-Bunny_Slippers": 0.838,
+   "layer-Pepe": 0.825,
+   "layer-Shiba": 0.895
+  },
+  "The_Set.png": {
+   "layer-Bunny_Slippers": 0.715,
+   "layer-Pepe": 1.04,
+   "layer-Shiba": 0.93
+  },
+  "Toasted.png": {
+   "layer-Bunny_Slippers": 1.214,
+   "layer-Pepe": 1.281,
+   "layer-Shiba": 1.266
+  },
+  "Tootsie_Blue.png": {
+   "layer-Bunny_Slippers": 1.543,
+   "layer-Pepe": 1.064,
+   "layer-Shiba": 1.593
+  },
+  "Tootsie_Cerise.png": {
+   "layer-Bunny_Slippers": 1.574,
+   "layer-Pepe": 1.325,
+   "layer-Shiba": 1.624
+  },
+  "UAP_Taskforce.png": {
+   "layer-Bunny_Slippers": 1.502,
+   "layer-Pepe": 1.251,
+   "layer-Shiba": 1.554
+  },
+  "Whitehouse_Lawn.png": {
+   "layer-Bunny_Slippers": 1.451,
+   "layer-Pepe": 1.381,
+   "layer-Shiba": 1.668
+  },
+  "Why_So_Cereal.png": {
+   "layer-Bunny_Slippers": 1.429,
+   "layer-Pepe": 1.017,
+   "layer-Shiba": 1.48
+  },
+  "Winning.png": {
+   "layer-Bunny_Slippers": 0.742,
+   "layer-Pepe": 1.061,
+   "layer-Shiba": 1.002
+  },
+  "soft_serve.png": {
+   "layer-Bunny_Slippers": 1.5,
+   "layer-Pepe": 1.283,
+   "layer-Shiba": 1.672
+  }
+ }
+}

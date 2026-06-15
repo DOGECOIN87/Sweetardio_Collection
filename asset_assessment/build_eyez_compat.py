@@ -11,13 +11,24 @@ degrees of each colored eye's dominant hue. Two rules are supported:
   match: ALLOW a colored eye ONLY on plates that wear a related colour
       (thematic echo); neutral eyes stay unrestricted
 
+Beyond the hard block, a SOFT curation weight is emitted for every colored eye
+on every non-blocked plate, so the generator biases toward the best-looking
+pairings (the same gentle, variety-preserving philosophy as char_compat's
+weights). A colored accent looks best when the plate is toward its complement
+AND isn't already wearing that colour, so:
+    harmony = 0.5 * (complementary hue separation) + 0.5 * (1 - in-band share)
+    weight  = max(harmony, 0.05) ** strength
+Neutral (black/white) eyes are omitted -> the generator treats them as uniform.
+
 Writes traits/eyez_compat.json:
-  {"mode": ..., "src": ..., "blocked": {bg_file: [eye_file, ...]}}
+  {"mode": ..., "src": ..., "strength": ...,
+   "blocked": {bg_file: [eye_file, ...]},
+   "weights": {bg_file: {eye_file: w, ...}}}
 generator.py treats a missing file or empty entry as "everything allowed".
 
 Usage:
   python3 asset_assessment/build_eyez_compat.py [--src traits/backgroundz]
-          [--mode anti-clash|match] [--dry-run]
+          [--mode anti-clash|match] [--strength 0.8] [--dry-run]
 """
 
 import argparse
@@ -82,11 +93,29 @@ def plate_band_share(px, hue0):
     return share, float(s.mean())
 
 
+def plate_dominant_hue(px):
+    """Saturation-weighted dominant hue of a plate's opaque pixels (deg)."""
+    h, s = hue_sat(px)
+    if s.sum() < 1e-6:
+        return 0.0
+    hist, _ = np.histogram(h, bins=24, range=(0, 360), weights=s)
+    return float((np.argmax(hist) + 0.5) * 15.0)
+
+
+def hue_dist(a, b):
+    d = abs(a - b) % 360.0
+    return min(d, 360.0 - d)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default="traits/backgroundz")  # graded set
     ap.add_argument("--mode", choices=["anti-clash", "match"],
                     default="anti-clash")
+    ap.add_argument("--strength", type=float, default=0.8,
+                    help="how hard to favour the best eye pairings (0 = "
+                         "uniform, 1 = linear in harmony). Gentle by default "
+                         "so every non-blocked eye stays well represented.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -100,14 +129,15 @@ def main():
     print("neutral (never restricted):",
           [f for f, p in eyes.items() if not p])
 
-    blocked = {}
+    blocked, weights = {}, {}
     plates = sorted(f for f in os.listdir(args.src)
                     if f.lower().endswith((".png", ".jpg")))
     print(f"\n{'plate':<46}" + "".join(f"{f.split('.')[0][:12]:>14}"
                                        for f in colored))
     for bg in plates:
         px = opaque_px(os.path.join(args.src, bg))
-        row, marks = [], []
+        dom = plate_dominant_hue(px)
+        row, marks, wrow = [], [], {}
         for f, p in colored.items():
             share, msat = plate_band_share(px, p["hue"])
             if args.mode == "anti-clash":
@@ -116,18 +146,28 @@ def main():
                 bad = share < SHARE_MATCH
             if bad:
                 row.append(f)
+            else:
+                # soft pairing preference: complementary + not self-coloured
+                harmony = 0.5 * (hue_dist(p["hue"], dom) / 180.0) \
+                    + 0.5 * (1.0 - min(share, 1.0))
+                wrow[f] = round(max(harmony, 0.05) ** args.strength, 3)
             marks.append("BLOCK" if bad else ".")
         if row:
             blocked[bg] = row
+        if wrow:
+            weights[bg] = wrow
         print(f"{bg[:45]:<46}" + "".join(f"{m:>14}" for m in marks))
 
     n_pairs = sum(len(v) for v in blocked.values())
     print(f"\nmode={args.mode}: {n_pairs} blocked (eye,plate) pairs "
           f"across {len(blocked)} plates")
+    print(f"pairing weights: strength={args.strength} over "
+          f"{sum(len(v) for v in weights.values())} (eye,plate) pairs")
     if not args.dry_run:
         with open(OUT, "w") as f:
             json.dump({"mode": args.mode, "src": args.src,
-                       "blocked": blocked}, f, indent=1)
+                       "strength": args.strength,
+                       "blocked": blocked, "weights": weights}, f, indent=1)
         print(f"wrote {OUT}")
 
 
