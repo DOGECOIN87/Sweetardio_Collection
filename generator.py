@@ -9,8 +9,12 @@ TRAITS_DIR = "traits"
 # whole stack (placed last) whenever their parent plate is the background.
 # Whitehouse_Lawn_Overlay is the foreground figure for the Whitehouse_Lawn
 # scene (NOT Candy_Land / Sweetardio_11314, which was a mis-pairing).
+# mars_overlay is the foreground spectator for the Mars/SpaceX octagon plate
+# Sweetardio_116 (20).png (keyed transparent from the owner's Sweetardio_300
+# (3).png so only the figure rides in front, like the Whitehouse spectators).
 BG_OVERLAY_PAIRS = {
     "Whitehouse_Lawn.png": "Whitehouse_Lawn_Overlay.png",
+    "Sweetardio_116 (20).png": "mars_overlay.png",
 }
 
 # Optional eye <-> background compatibility map built by
@@ -187,9 +191,9 @@ NO_OFFSET_CHARS = [
     # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
     # never disturbs that placement
     "gummy_bear",
-    # smores is a large square character pre-positioned at ~963; the +150
-    # drop makes it look too low / off-centre when footwear-less
-    "smores",
+    # NOTE: smores used to live here (full +150 drop was too low) but bare it
+    # then sat too HIGH. It is now offset-eligible with a SOFTENED footwear-less
+    # drop via FOOTWEARLESS_DY["smores"], landing between the two extremes.
 ]
 
 # Extra y-offset (px, +down) added to character-anchored layers when the
@@ -247,7 +251,8 @@ CHAR_Y_ADJUST = {
     "sugar_doughnut": -26,
     "zaffre_sherbert_ice_cream": -25,
     "brownie_bite": 22,
-    "zebra_cake": -22,
+    "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
+                               # stance is held put by FOOTWEARLESS_DY
     "cyan_gummy_bear": 58,     # enlarged + aligned to the cone line (1290)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
@@ -259,6 +264,41 @@ CHAR_Y_ADJUST = {
 
 def char_y_adjust(char_name):
     return next((dy for k, dy in CHAR_Y_ADJUST.items()
+                 if k in char_name.lower()), 0)
+
+# Per-character vertical trim (px, +down) for CENTERED characters in their
+# footwear-less CENTRED position (where the normal CHAR_Y_ADJUST is suppressed
+# so the round/baseless body sits at its natural centre). A round body's native
+# centre can still read slightly high in-frame (the face holes sit ~100px above
+# canvas centre), so this nudges it down WITHOUT touching the character's
+# footwear placement (CHAR_Y_ADJUST). Default 0; tuned by eye.
+CENTERED_FOOTWEARLESS_DY = {
+    "glazed_doughnut": 45,
+    "chocolate_doughnut": 38,
+    "sugar_doughnut": 38,
+    "chocolate_sandwich_cookie": 35,
+    "chocolate_chip_cookie": 32,
+    "gummy_worm": 24,
+}
+
+def centered_footwearless_dy(char_name):
+    return next((dy for k, dy in CENTERED_FOOTWEARLESS_DY.items()
+                 if k in char_name.lower()), 0)
+
+# Extra vertical trim (px, +down) applied ONLY in the footwear-less drop case
+# (apply_offset True: an offset-eligible character standing with no footwear).
+# This lets a character's grounded/footwear placement (CHAR_Y_ADJUST) stay
+# fixed while nudging only its footwear-less standing height — needed when a
+# character looks right with shoes but too low/high standing bare. Default 0.
+FOOTWEARLESS_DY = {
+    "sugar_cube": -45,   # the +150 bare drop bottomed it out; raise the stance
+    "smores": -75,       # softened bare drop (full +150 was too low; see below)
+    "zebra_cake": 15,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
+                         # raises only the with-footwear case
+}
+
+def footwearless_dy(char_name):
+    return next((dy for k, dy in FOOTWEARLESS_DY.items()
                  if k in char_name.lower()), 0)
 
 # ---- per-character scale (about the face-hole / ball center) ----
@@ -644,8 +684,14 @@ def generate_random_combination(force_bg=None):
     # them to stand on: no footwear (apply_offset) and no gorbhouse. With a
     # shoe or trash-can they keep their normal grounded placement.
     if is_centered(char_name) and apply_offset and not gets_gorbhouse:
+        # natural centre (suppress the standing CHAR_Y_ADJUST), plus an optional
+        # small per-character centre trim so a round body isn't left too high
         apply_offset = False
-        y_adjust = 0
+        y_adjust = centered_footwearless_dy(char_name)
+    elif apply_offset:
+        # offset-eligible body standing with no footwear: a footwear-less-only
+        # trim so its grounded (footwear) placement stays put
+        y_adjust += footwearless_dy(char_name)
     # Background-aware extra drop: applied only when footwear-less so that
     # WAT footwear (which has no dy) stays perfectly aligned.
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
