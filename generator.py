@@ -467,9 +467,26 @@ def _opaque_bbox(path, thresh=128):
 FACE_HOLE_TOP = 464
 FACE_HOLE_BOTTOM = 732
 
-def ball_fit(skin_path, eye_path):
+# A few after-skinz bodies have a face hole that sits lower/deeper than the
+# cast-wide FACE_HOLE_BOTTOM, so the standard skin ball stopped short of the
+# hole's bottom edge and a sliver of background showed under the face. Override
+# the hole bottom (px) for just those characters so their ball is enlarged
+# enough to cover it, without growing every other character's face. Substring
+# match on the character base-name.
+FACE_HOLE_BOTTOM_OVERRIDE = {
+    "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
+}
+
+def face_hole_bottom(char_name):
+    return next((v for k, v in FACE_HOLE_BOTTOM_OVERRIDE.items()
+                 if k in char_name.lower()), FACE_HOLE_BOTTOM)
+
+def ball_fit(skin_path, eye_path, hole_bottom=FACE_HOLE_BOTTOM,
+             hole_top=FACE_HOLE_TOP):
     """Enlargement factor + pivot so the skin ball contains the eyes AND
-    covers the deepest character face hole (no gap through after-skinz holes)."""
+    covers the deepest character face hole (no gap through after-skinz holes).
+    hole_bottom/hole_top default to the cast-wide values; pass a per-character
+    override for bodies whose hole sits deeper (see FACE_HOLE_BOTTOM_OVERRIDE)."""
     sx0, sy0, sx1, sy1 = _opaque_bbox(skin_path)
     ex0, _, ex1, _ = _opaque_bbox(eye_path)
     ball_w = max(sx1 - sx0, 1)
@@ -478,7 +495,7 @@ def ball_fit(skin_path, eye_path):
     eye_w = max(ex1 - ex0, 1)
     # extra height needed so the ball reaches the hole top and bottom from its
     # own center (depends per skin: the alien ball sits low, so it needs more)
-    need_h = 2.0 * max(cy - FACE_HOLE_TOP, FACE_HOLE_BOTTOM - cy)
+    need_h = 2.0 * max(cy - hole_top, hole_bottom - cy)
     factor = max(1.0, eye_w / (BALL_FIT_MARGIN * ball_w), need_h / ball_h)
     return factor, ((sx0 + sx1) / 2.0, cy)
 
@@ -753,7 +770,8 @@ def generate_random_combination(force_bg=None):
     # scaled bear). ball_fit (fscale) runs first about the ball center, then
     # cscale about the shared pivot; eyes/mouth stay native size.
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
-    bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye))
+    bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye),
+                             hole_bottom=face_hole_bottom(char_name))
     skin_layer = {"path": skin_path, "offset": apply_offset,
                   "dy": y_adjust + bg_extra_y,
                   "fscale": bfit, "fcenter": bcenter,
