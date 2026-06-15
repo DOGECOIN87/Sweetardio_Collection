@@ -119,6 +119,14 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.757,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.76
   },
+  "Cabaret_Alley.png": {
+   "Blue.png": 0.905,
+   "Cerise.png": 0.808,
+   "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-art_mattrick_011.png": 0.979,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
+  },
   "Candy_Tundra.png": {
    "Cerise.png": 0.59
   },
@@ -231,6 +239,22 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.661,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.674
   },
+  "Mars_Overlay.png": {
+   "Blue.png": 0.956,
+   "Cerise.png": 0.86,
+   "layer-Eyes_Cyan (1).png": 0.963,
+   "layer-art_mattrick_011.png": 0.927,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.964
+  },
+  "Midnight_Snack (1).png": {
+   "Blue.png": 0.934,
+   "Cerise.png": 0.844,
+   "layer-Eyes_Cyan (1).png": 0.956,
+   "layer-art_mattrick_011.png": 0.926,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.959,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.957
+  },
   "Nabisco.png": {
    "Blue.png": 0.876,
    "Cerise.png": 0.846,
@@ -269,9 +293,41 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.897,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.91
   },
+  "RIP_Gorbagana.png": {
+   "Blue.png": 0.928,
+   "Cerise.png": 0.961,
+   "layer-Eyes_Cyan (1).png": 0.846,
+   "layer-art_mattrick_011.png": 0.818,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.85,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.848
+  },
+  "Rick_the_D1ck.png": {
+   "Blue.png": 0.902,
+   "Cerise.png": 0.916,
+   "layer-Eyes_Cyan (1).png": 0.816,
+   "layer-art_mattrick_011.png": 0.773,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.82,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.817
+  },
   "Smuckers_Blue.png": {
    "Cerise.png": 0.568,
    "layer-art_mattrick_011.png": 0.689
+  },
+  "Snack_Pack.png": {
+   "Blue.png": 0.986,
+   "Cerise.png": 0.894,
+   "layer-Eyes_Cyan (1).png": 0.927,
+   "layer-art_mattrick_011.png": 0.893,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.931,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.929
+  },
+  "Straight_of_America (1).png": {
+   "Blue.png": 0.245,
+   "Cerise.png": 0.725,
+   "layer-Eyes_Cyan (1).png": 0.247,
+   "layer-art_mattrick_011.png": 0.616,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.239,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.244
   },
   "Sugar.png": {
    "Cerise.png": 0.69,
@@ -336,6 +392,22 @@
    "layer-Eyes_Cyan (1).png": 0.523,
    "layer-art_mattrick_011.png": 0.688
   },
+  "Vanilla_Lane (1).png": {
+   "Blue.png": 0.981,
+   "Cerise.png": 0.895,
+   "layer-Eyes_Cyan (1).png": 0.92,
+   "layer-art_mattrick_011.png": 0.884,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.924,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.922
+  },
+  "Wheres_My_$_B1tch (1).png": {
+   "Blue.png": 0.28,
+   "Cerise.png": 0.581,
+   "layer-Eyes_Cyan (1).png": 0.517,
+   "layer-art_mattrick_011.png": 0.687,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.482,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.504
+  },
   "Whitehouse_Lawn.png": {
    "Blue.png": 0.244,
    "Cerise.png": 0.666,
@@ -360,6 +432,22 @@
    "layer-art_mattrick_011.png": 0.878,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.906,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
+  },
+  "art_mattrick_001-1-2 (1).png": {
+   "Blue.png": 0.325,
+   "Cerise.png": 0.721,
+   "layer-Eyes_Cyan (1).png": 0.33,
+   "layer-art_mattrick_011.png": 0.535,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.316,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
+  },
+  "art_mattrick_001-15-2 (1).png": {
+   "Blue.png": 0.905,
+   "Cerise.png": 0.808,
+   "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-art_mattrick_011.png": 0.979,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
   },
   "soft_serve.png": {
    "Blue.png": 0.343,

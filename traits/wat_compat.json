@@ -5,6 +5,13 @@
  "blocked": {
   "Coder_Chick.png": [
    "layer-Bunny_Slippers"
+  ],
+  "Vanilla_Lane (1).png": [
+   "layer-Bunny_Slippers",
+   "layer-Shiba"
+  ],
+  "art_mattrick_001-15-2 (1).png": [
+   "layer-Bunny_Slippers"
   ]
  },
  "weights": {
@@ -27,6 +34,11 @@
    "layer-Bunny_Slippers": 1.463,
    "layer-Pepe": 1.203,
    "layer-Shiba": 1.513
+  },
+  "Cabaret_Alley.png": {
+   "layer-Bunny_Slippers": 1.372,
+   "layer-Pepe": 1.779,
+   "layer-Shiba": 1.717
   },
   "Candy_Tundra.png": {
    "layer-Bunny_Slippers": 1.147,
@@ -107,6 +119,11 @@
    "layer-Pepe": 1.101,
    "layer-Shiba": 1.417
   },
+  "Midnight_Snack (1).png": {
+   "layer-Bunny_Slippers": 0.846,
+   "layer-Pepe": 0.964,
+   "layer-Shiba": 0.903
+  },
   "Nabisco.png": {
    "layer-Bunny_Slippers": 1.045,
    "layer-Pepe": 1.333,
@@ -132,10 +149,30 @@
    "layer-Pepe": 1.098,
    "layer-Shiba": 0.926
   },
+  "RIP_Gorbagana.png": {
+   "layer-Bunny_Slippers": 0.706,
+   "layer-Pepe": 0.92,
+   "layer-Shiba": 0.788
+  },
+  "Rick_the_D1ck.png": {
+   "layer-Bunny_Slippers": 0.998,
+   "layer-Pepe": 1.246,
+   "layer-Shiba": 1.367
+  },
   "Smuckers_Blue.png": {
    "layer-Bunny_Slippers": 1.532,
    "layer-Pepe": 0.884,
    "layer-Shiba": 1.582
+  },
+  "Snack_Pack.png": {
+   "layer-Bunny_Slippers": 0.747,
+   "layer-Pepe": 0.666,
+   "layer-Shiba": 0.806
+  },
+  "Straight_of_America (1).png": {
+   "layer-Bunny_Slippers": 1.182,
+   "layer-Pepe": 1.683,
+   "layer-Shiba": 1.455
   },
   "Sugar.png": {
    "layer-Bunny_Slippers": 0.973,
@@ -187,6 +224,14 @@
    "layer-Pepe": 1.251,
    "layer-Shiba": 1.554
   },
+  "Vanilla_Lane (1).png": {
+   "layer-Pepe": 1.097
+  },
+  "Wheres_My_$_B1tch (1).png": {
+   "layer-Bunny_Slippers": 1.252,
+   "layer-Pepe": 1.763,
+   "layer-Shiba": 1.604
+  },
   "Whitehouse_Lawn.png": {
    "layer-Bunny_Slippers": 1.451,
    "layer-Pepe": 1.381,
@@ -201,6 +246,15 @@
    "layer-Bunny_Slippers": 0.742,
    "layer-Pepe": 1.061,
    "layer-Shiba": 1.002
+  },
+  "art_mattrick_001-1-2 (1).png": {
+   "layer-Bunny_Slippers": 1.031,
+   "layer-Pepe": 1.836,
+   "layer-Shiba": 1.331
+  },
+  "art_mattrick_001-15-2 (1).png": {
+   "layer-Pepe": 1.775,
+   "layer-Shiba": 1.004
   },
   "soft_serve.png": {
    "layer-Bunny_Slippers": 1.5,
