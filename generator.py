@@ -113,7 +113,6 @@ def skin_weight(skin_file, weights, default):
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
 BACKGROUNDZ = "backgroundz"
 BACKGROUNDZ_FALLBACK = "backgroundz_originals"
-BACKGROUNDS_POP = "backgrounds_pop"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -369,14 +368,12 @@ def extract_metadata(layers, char_name):
     eyez_prefix    = os.path.normpath(os.path.join(TRAITS_DIR, EYEZ))
     mouthz_prefix  = os.path.normpath(os.path.join(TRAITS_DIR, MOUTHZ))
     wat_prefix     = os.path.normpath(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ))
-    # backgroundz_originals is a valid fallback dir; backgrounds_pop holds
-    # legendary plates selectable via force_bg
+    # backgroundz_originals is a valid fallback dir
     bg_prefixes    = (
         os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDZ)),
         os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDZ_FALLBACK)),
-        os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDS_POP)),
     )
-    bg_categories  = (BACKGROUNDZ, BACKGROUNDZ, BACKGROUNDS_POP)  # parallel to bg_prefixes
+    bg_categories  = (BACKGROUNDZ, BACKGROUNDZ)  # parallel to bg_prefixes
 
     import re as _re
 
@@ -833,7 +830,7 @@ def get_files(category):
 
 def generate_random_combination(force_bg=None):
     """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
-    plate from traits/backgrounds_pop); it bypasses the random plate pick,
+    plate from traits/backgroundz); it bypasses the random plate pick,
     the char<->bg compat filter and any paired overlay. Default = random."""
     # 1. Select Character (MANDATORY)
     char_files = get_files(CHARACTERZ)
