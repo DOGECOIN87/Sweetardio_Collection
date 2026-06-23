@@ -589,6 +589,7 @@ CENTERED_FOOTWEARLESS_DY = {
     "chocolate_sandwich_cookie": 35,
     "chocolate_chip_cookie": 32,
     "gummy_worm": 24,
+    "oatmeal_cream_pie": 80,
 }
 
 def centered_footwearless_dy(char_name):
