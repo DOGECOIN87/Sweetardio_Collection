@@ -319,7 +319,7 @@ TRAIT_NAMES = {
         "26_Caroline_Ellison.png":          "Caroline Ellison",
         "28_opengotchi.png":                "Opengotchi",
         "Sweetardio_200 (27).png":          "Cookiebox",
-        "Sweetardio_200 (28).png":          "Cookie Bird",
+        "Sweetardio_200 (28).png":          "Morsel",
         "Sweetardio_200 (29).png":          "Cookie Grouch",
         "Sweetardio_200 (30).png":          "Pixel Pal",
     },
