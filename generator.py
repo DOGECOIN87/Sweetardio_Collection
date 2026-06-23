@@ -321,7 +321,7 @@ TRAIT_NAMES = {
         "Sweetardio_200 (27).png":          "Cookiebox",
         "Sweetardio_200 (28).png":          "Morsel",
         "Sweetardio_200 (29).png":          "Cookie Grouch",
-        "Sweetardio_200 (30).png":          "Pixel Pal",
+        "Sweetardio_200 (30).png":          "Cookboy",
     },
 }
 
