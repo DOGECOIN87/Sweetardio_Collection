@@ -270,9 +270,9 @@ TRAIT_NAMES = {
     },
     # Keyed by wat_base_name() result, plus "Gorbhouse" for trash-can slippers.
     WHAT_ARE_THOSEZ: {
-        "Cookie_Monster_Slippers":  "Cookie Monster Slippers",
+        "Cookie_Monster_Slippers":  "Monster",
         "Gorbhouse":                "Gorbhouse",
-        "layer-Bunny_Slippers":     "Bunny Slippers",
+        "layer-Bunny_Slippers":     "Bunny",
         "layer-Pepe":               "Pepe",
         "layer-Shiba":              "Shiba",
     },
