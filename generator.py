@@ -606,6 +606,7 @@ FOOTWEARLESS_DY = {
     "smores": -75,       # softened bare drop (full +150 was too low; see below)
     "zebra_cake": 15,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
                          # raises only the with-footwear case
+    "brownie_bite": -65, # raise bare stance to match visual placement with others
 }
 
 def footwearless_dy(char_name):
