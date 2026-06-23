@@ -318,7 +318,7 @@ TRAIT_NAMES = {
         "25_Zombieland_Twinkie.png":        "Zombieland Twinkie",
         "26_Caroline_Ellison.png":          "Caroline Ellison",
         "28_opengotchi.png":                "Opengotchi",
-        "Sweetardio_200 (27).png":          "Cookie Cube",
+        "Sweetardio_200 (27).png":          "Cookiebox",
         "Sweetardio_200 (28).png":          "Cookie Bird",
         "Sweetardio_200 (29).png":          "Cookie Grouch",
         "Sweetardio_200 (30).png":          "Pixel Pal",
