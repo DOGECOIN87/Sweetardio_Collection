@@ -113,6 +113,12 @@ def skin_weight(skin_file, weights, default):
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
 BACKGROUNDZ = "backgroundz"
 BACKGROUNDZ_FALLBACK = "backgroundz_originals"
+# Legendary_* plates live in backgroundz but are 1/1-style rares minted via a
+# fixed per-plate quota (build_mint.py), never the normal random pick.
+LEGENDARY_BG_PREFIX = "Legendary_"
+
+def is_legendary_bg(filename):
+    return os.path.basename(filename).startswith(LEGENDARY_BG_PREFIX)
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -184,6 +190,19 @@ TRAIT_NAMES = {
         "Gummy_Bears.png":                  "Gummy Bears",
         "He_Needs_Some_Milk.png":           "He Needs Some Milk",
         "Im_Not_Sorry.png":                 "I'm Not Sorry",
+        "Legendary_Cook_Oven.png":          "Legendary Cook Oven",
+        "Legendary_Emyr.png":               "Legendary Emyr",
+        "Legendary_Fairdevs.png":           "Legendary Fairdevs",
+        "Legendary_Gorbhouse.png":          "Legendary Gorbhouse",
+        "Legendary_Just_Aliens.png":        "Legendary Just Aliens",
+        "Legendary_Morsel.png":             "Legendary Morsel",
+        "Legendary_Sarv.png":               "Legendary Sarv",
+        "Legendary_Short_the_Banks.png":    "Legendary Short the Banks",
+        "Legendary_Shubbi.png":             "Legendary Shubbi",
+        "Legendary_Simplex.png":            "Legendary Simplex",
+        "Legendary_Tenders.png":            "Legendary Tenders",
+        "Legendary_Welder.png":             "Legendary Welder",
+        "Legendary_Yatrah.png":             "Legendary Yatrah",
         "M&Ms.png":                         "M&Ms",
         "Midnight_Snack (1).png":           "Midnight Snack",
         "Nabisco.png":                      "Nabisco",
@@ -273,21 +292,6 @@ TRAIT_NAMES = {
         "layer-Bunny_Slippers":     "Bunny",
         "layer-Pepe":               "Pepe",
         "layer-Shiba":              "Shiba",
-    },
-    BACKGROUNDS_POP: {
-        "Legendary_Cook_Oven.png":          "Legendary Cook Oven",
-        "Legendary_Emyr.png":               "Legendary Emyr",
-        "Legendary_Fairdevs.png":           "Legendary Fairdevs",
-        "Legendary_Gorbhouse.png":          "Legendary Gorbhouse",
-        "Legendary_Just_Aliens.png":        "Legendary Just Aliens",
-        "Legendary_Morsel.png":             "Legendary Morsel",
-        "Legendary_Sarv.png":               "Legendary Sarv",
-        "Legendary_Short_the_Banks.png":    "Legendary Short the Banks",
-        "Legendary_Shubbi.png":             "Legendary Shubbi",
-        "Legendary_Simplex.png":            "Legendary Simplex",
-        "Legendary_Tenders.png":            "Legendary Tenders",
-        "Legendary_Welder.png":             "Legendary Welder",
-        "Legendary_Yatrah.png":             "Legendary Yatrah",
     },
     STICKERZ: {
         "01_Peppermint_Butler.png":         "Peppermint Butler",
@@ -426,6 +430,32 @@ def extract_metadata(layers, char_name):
              "Footwear", "Arms", "Sticker"]
     return [{"trait_type": k, "value": attrs[k]}
             for k in order if k in attrs]
+
+
+# ---- OpenSea token metadata ----
+COLLECTION_NAME = "Sweetardio Collection"
+COLLECTION_DESCRIPTION = (
+    "Sweetardio Collection — 4,444 hand-crafted sweet degens. Every trait "
+    "is composited and graded for the cleanest, most collectible look on-chain."
+)
+
+
+def token_metadata(attributes, token_id=None, image=None,
+                   name=None, description=None):
+    """Wrap an attributes list (from extract_metadata) into a complete,
+    OpenSea-compatible token metadata object.
+
+    token_id : int  -> default name becomes "Sweetardio Collection #<id>".
+    image    : str  -> image URI/path (e.g. "ipfs://CID/123.png" or "123.png").
+    Keys are ordered name, description, image, attributes for clean files."""
+    meta = {}
+    meta["name"] = name or (f"{COLLECTION_NAME} #{token_id}"
+                            if token_id is not None else COLLECTION_NAME)
+    meta["description"] = description or COLLECTION_DESCRIPTION
+    if image is not None:
+        meta["image"] = image
+    meta["attributes"] = attributes
+    return meta
 
 
 # Characters that get Gorbhouse overlay. NOTE: the Gorbhouse trash-can
@@ -828,10 +858,22 @@ def get_files(category):
     # sorted so seeded runs are reproducible across processes
     return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
-def generate_random_combination(force_bg=None):
+def generate_random_combination(force_bg=None, force_arm="auto",
+                                force_wat="auto", force_sticker="auto"):
     """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
     plate from traits/backgroundz); it bypasses the random plate pick,
-    the char<->bg compat filter and any paired overlay. Default = random."""
+    the char<->bg compat filter and any paired overlay. Default = random.
+
+    force_arm / force_wat / force_sticker drive the optional slots for the
+    mint allocator (build_mint.py) so exact rarity counts can be hit:
+      * "auto" (default) -> roll the slot normally (minimal-traits-first).
+      * None             -> force the slot OFF (never drawn).
+      * <value>          -> force the slot ON with that specific trait:
+          force_arm     = an armz filename (e.g. "...-AK15.png")
+          force_wat     = a footwear base name (wat_base_name), or "gorbhouse"
+          force_sticker = a stickerz filename
+    A forced slot bypasses the count roll; only the remaining "auto" slots
+    take part in the minimal-traits-first weighting."""
     # 1. Select Character (MANDATORY)
     char_files = get_files(CHARACTERZ)
     if not char_files:
@@ -873,6 +915,10 @@ def generate_random_combination(force_bg=None):
             bg_files = get_files(bg_dir)
         # overlays pair with their parent plate; they are never a background
         bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
+        # Legendary_* plates are 1/1-style rares: they appear ONLY via the
+        # mint allocator's fixed per-plate quota (force_bg), never in the
+        # normal weighted random pick, so their hard caps stay exact.
+        bg_files = [f for f in bg_files if not is_legendary_bg(f)]
         if not bg_files:
             raise ValueError("No background assets found")
         # character <-> background pairing. Hard rule: drop plates this
@@ -933,14 +979,19 @@ def generate_random_combination(force_bg=None):
     wat_bases = [wat_base_name(f) for f in wat_files]
     wat_bases = [b for b in wat_bases if b and "gorbhouse" not in b.lower()]
 
-    optional_slots = []
     # footwear is available only when the character isn't WAT-excluded and has
     # something to wear (regular slippers, or gorbhouse for eligible chars)
-    if not should_exclude_wat and (wat_bases or gets_gorbhouse_overlay(char_name)):
+    footwear_available = (not should_exclude_wat
+                          and (wat_bases or gets_gorbhouse_overlay(char_name)))
+
+    # Only slots left on "auto" take part in the minimal-traits-first count
+    # roll; any force-driven slot (mint allocator) is decided explicitly below.
+    optional_slots = []
+    if force_wat == "auto" and footwear_available:
         optional_slots.append("footwear")
-    if all_arm_files:
+    if force_arm == "auto" and all_arm_files:
         optional_slots.append("arms")
-    if sticker_files:
+    if force_sticker == "auto" and sticker_files:
         optional_slots.append("sticker")
 
     # roll HOW MANY optional traits (weighted toward fewer), then WHICH slots
@@ -951,13 +1002,30 @@ def generate_random_combination(force_bg=None):
     n_optional = random.choices(counts, weights=cw, k=1)[0]
     active = set(random.sample(optional_slots, n_optional)) if n_optional else set()
 
+    # apply forced ON slots (a specific trait was requested by the allocator)
+    if force_wat not in ("auto", None):
+        active.add("footwear")
+    if force_arm not in ("auto", None):
+        active.add("arms")
+    if force_sticker not in ("auto", None):
+        active.add("sticker")
+
     # --- footwear slot: gorbhouse trash-cans (eligible chars) or regular WAT,
     # the latter biased by the measured footwear<->background compat table ---
     chosen_wat = None
     wat_overlays = []
     gets_gorbhouse = False
     if "footwear" in active:
-        if gets_gorbhouse_overlay(char_name) and random.random() < GORBHOUSE_CHANCE:
+        if force_wat not in ("auto", None):
+            # explicit footwear from the allocator, but honor character
+            # eligibility: if this char can't wear it, leave footwear OFF so
+            # the allocator re-rolls onto an eligible character.
+            if str(force_wat).lower() == "gorbhouse":
+                if gets_gorbhouse_overlay(char_name):
+                    gets_gorbhouse = True
+            elif footwear_available:
+                chosen_wat = force_wat
+        elif gets_gorbhouse_overlay(char_name) and random.random() < GORBHOUSE_CHANCE:
             gets_gorbhouse = True
         elif wat_bases:
             wat_blocked = load_wat_blocklist().get(bg, [])
@@ -967,6 +1035,7 @@ def generate_random_combination(force_bg=None):
             chosen_wat = random.choices(
                 allowed_wat,
                 weights=[ww.get(b, 1.0) for b in allowed_wat], k=1)[0]
+        if chosen_wat:
             for f in wat_files:
                 if f.lower().startswith(chosen_wat.lower()) and "overlay" in f.lower():
                     wat_overlays.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f))
@@ -975,14 +1044,25 @@ def generate_random_combination(force_bg=None):
     # character with a locked weapon overrides the draw with its own ---
     arm = None
     if "arms" in active and all_arm_files:
-        arm = random.choice(all_arm_files)
-        locked_arms = [f for f in all_arm_files
-                       if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
-        if locked_arms:
-            arm = random.choice(locked_arms)
+        if force_arm not in ("auto", None):
+            # explicit arm from the allocator; for a character-LOCKED weapon,
+            # only draw it on a character allowed to hold it (otherwise leave
+            # the slot empty so the allocator re-rolls onto a valid character).
+            if armz_allowed(force_arm, char_name):
+                arm = force_arm
+        else:
+            arm = random.choice(all_arm_files)
+            locked_arms = [f for f in all_arm_files
+                           if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
+            if locked_arms:
+                arm = random.choice(locked_arms)
 
     # --- sticker slot: corner sticker ---
-    sticker = random.choice(sticker_files) if "sticker" in active else None
+    if "sticker" in active:
+        sticker = (force_sticker if force_sticker not in ("auto", None)
+                   else random.choice(sticker_files))
+    else:
+        sticker = None
     
     # Layering Logic
     layers = []
@@ -1300,8 +1380,16 @@ def create_image(layers, output_name=None, metadata=None):
 
     if metadata is not None:
         json_path = os.path.splitext(output_name)[0] + ".json"
+        # Accept either a bare attributes list (legacy) or a full token object
+        # (from token_metadata()). A bare list is wrapped into a complete
+        # OpenSea token so the produced file is always drop-ready.
+        if isinstance(metadata, dict):
+            token = metadata
+        else:
+            token = token_metadata(metadata,
+                                   image=os.path.basename(output_name))
         with open(json_path, "w") as _jf:
-            json.dump({"attributes": metadata}, _jf, indent=2)
+            json.dump(token, _jf, indent=2, ensure_ascii=False)
 
     return output_name
 
