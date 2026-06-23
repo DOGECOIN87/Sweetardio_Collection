@@ -113,6 +113,7 @@ def skin_weight(skin_file, weights, default):
 # traits/backgroundz_originals; regrade with background_pop_studies/grade.py)
 BACKGROUNDZ = "backgroundz"
 BACKGROUNDZ_FALLBACK = "backgroundz_originals"
+BACKGROUNDS_POP = "backgrounds_pop"
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -120,6 +121,315 @@ MOUTHZ = "mouthz"
 WHAT_ARE_THOSEZ = "what_are_thosez"
 ARMZ = "armz"
 STICKERZ = "stickerz"
+
+# ---- Human-readable display names for every trait asset ----
+# Keys for CHARACTERZ: the internal char_name (prefix-stripped, no .png).
+# Keys for WHAT_ARE_THOSEZ: the base-name returned by wat_base_name()
+#   (e.g. "layer-Bunny_Slippers"), or the string "Gorbhouse" for the
+#   gorbhouse trash-can slippers.
+# Keys for all other categories: the bare filename (with .png).
+TRAIT_NAMES = {
+    CHARACTERZ: {
+        "Twinkie":                          "Twinkie",
+        "brownie_bite":                     "Brownie Bite",
+        "chocolate_chip_cookie":            "Chocolate Chip Cookie",
+        "chocolate_doughnut":               "Chocolate Doughnut",
+        "chocolate_frosted_poptart":        "Chocolate Frosted Pop Tart",
+        "chocolate_sandwich_cookie":        "Chocolate Sandwich Cookie",
+        "churro":                           "Churro",
+        "cyan_frosted_poptart":             "Cyan Frosted Pop Tart",
+        "cyan_gummy_bear":                  "Cyan Gummy Bear",
+        "cyan_sherbert_ice_cream":          "Cyan Sherbert Ice Cream",
+        "ding_dong":                        "Ding Dong",
+        "glazed_doughnut":                  "Glazed Doughnut",
+        "gold_waffle":                      "Gold Waffle",
+        "gummy_worm":                       "Gummy Worm",
+        "marshmallow":                      "Marshmallow",
+        "mint_chocolate_chip_ice_cream":    "Mint Choc Chip Ice Cream",
+        "neopolitan_ice_cream":             "Neapolitan Ice Cream",
+        "oatmeal_cream_pie":                "Oatmeal Cream Pie",
+        "og_gummy_bear":                    "OG Gummy Bear",
+        "og_poptart":                       "OG Pop Tart",
+        "pink_gummy_bear":                  "Pink Gummy Bear",
+        "pink_sherbert_ice_cream":          "Pink Sherbert Ice Cream",
+        "purple_gummy_bear":                "Purple Gummy Bear",
+        "rainbow_sherbert_ice_cream":       "Rainbow Sherbert Ice Cream",
+        "rice_crispy_treat":                "Rice Crispy Treat",
+        "rocky_road_ice_cream":             "Rocky Road Ice Cream",
+        "smores":                           "S'mores",
+        "sugar_cube":                       "Sugar Cube",
+        "sugar_doughnut":                   "Sugar Doughnut",
+        "vanilla_ice_cream":                "Vanilla Ice Cream",
+        "waffle":                           "Waffle",
+        "zaffre_sherbert_ice_cream":        "Zaffre Sherbert Ice Cream",
+        "zebra_cake":                       "Zebra Cake",
+    },
+    BACKGROUNDZ: {
+        "Ayotollah.png":                    "Ayotollah",
+        "Baked.png":                        "Baked",
+        "Ben_dot_Eth.png":                  "Ben dot Eth",
+        "Bubble_Trouble.png":               "Bubble Trouble",
+        "Cabaret_Alley.png":                "Cabaret Alley",
+        "Candy_Tundra.png":                 "Candy Tundra",
+        "Celestial.png":                    "Celestial",
+        "Cereal_Killer.png":                "Cereal Killer",
+        "Choco_Falls.png":                  "Choco Falls",
+        "Coder_Chick.png":                  "Coder Chick",
+        "Cookboy.png":                      "Cookboy",
+        "Crumble_Trail.png":                "Crumble Trail",
+        "Drained_The_Swamp.png":            "Drained The Swamp",
+        "Druski.png":                       "Druski",
+        "Flavor_Explosion.png":             "Flavor Explosion",
+        "Goo_Lagoon.png":                   "Goo Lagoon",
+        "Gorlock.png":                      "Gorlock",
+        "Gummy_Bears.png":                  "Gummy Bears",
+        "He_Needs_Some_Milk.png":           "He Needs Some Milk",
+        "Im_Not_Sorry.png":                 "I'm Not Sorry",
+        "M&Ms.png":                         "M&Ms",
+        "Midnight_Snack (1).png":           "Midnight Snack",
+        "Nabisco.png":                      "Nabisco",
+        "Palm_Beach_Pete.png":              "Palm Beach Pete",
+        "Pink_Abyss.png":                   "Pink Abyss",
+        "Pixie_Stix.png":                   "Pixie Stix",
+        "Psychedelics.png":                 "Psychedelics",
+        "RIP_Gorbagana.png":                "RIP Gorbagana",
+        "Rick_the_D1ck.png":                "Rick the D1ck",
+        "Smuckers_Blue.png":                "Smuckers Blue",
+        "Snack_Pack.png":                   "Snack Pack",
+        "Straight_of_America (1).png":      "Straight of America",
+        "Sugar.png":                        "Sugar",
+        "Sweet_Castle_2.png":               "Sweet Castle 2",
+        "Sweet_Shop.png":                   "Sweet Shop",
+        "Sweetardio (16).png":              "Sweetardio 16",
+        "Sweetardio (17).png":              "Sweetardio 17",
+        "Sweetardio.png":                   "Sweetardio",
+        "Sweetardio_116 (20).png":          "Mars",
+        "The_Set.png":                      "The Set",
+        "Toasted.png":                      "Toasted",
+        "Tootsie_Blue.png":                 "Tootsie Blue",
+        "Tootsie_Cerise.png":               "Tootsie Cerise",
+        "UAP_Taskforce.png":                "UAP Taskforce",
+        "Vanilla_Lane (1).png":             "Vanilla Lane",
+        "Wheres_My_$_B1tch (1).png":        "Where's My $ B1tch",
+        "Whitehouse_Lawn.png":              "Whitehouse Lawn",
+        "Why_So_Cereal.png":                "Why So Cereal",
+        "Winning.png":                      "Winning",
+        "art_mattrick_001-1-2 (1).png":     "Cookie Money",
+        "art_mattrick_001-15-2 (1).png":    "In Cook We Trust",
+        "soft_serve.png":                   "Soft Serve",
+    },
+    SKINZ: {
+        "layer-Skin_Alien (2).png":                 "Alien",
+        "layer-Skin_Black (3).png":                 "Black",
+        "layer-Skin_Fluorescent_Cyan (2).png":       "Fluorescent Cyan",
+        "layer-Skin_Gold_Foil (1).png":             "Gold Foil",
+        "layer-layer-layer-Skin_White (2).png":     "White",
+    },
+    EYEZ: {
+        "Blue.png":                                             "Blue",
+        "Cerise.png":                                           "Cerise",
+        "Sweetardio_nft (9).png":                               "Diamond",
+        "Sweetardio_nft (15).png":                              "Alien",
+        "Sweetardio_nft (18).png":                              "Anime",
+        "layer-Eyes_Cyan (1).png":                              "Cyan",
+        "layer-Eyes_Googly (1).png":                            "Googly",
+        "layer-Eyes_Side_Eye (1).png":                          "Side Eye",
+        "layer-art_mattrick_011.png":                           "Lowkey",
+        "layer-file_000000001e1c71fd9d410745ea63114e (1).png":  "Cyber Orbs",
+        "layer-file_0000000062b071f8b3d115704b04609c (1).png":  "Beady",
+        "layer-file_00000000a21871f894573a9d4ee67519 (2).png":  "Squint",
+    },
+    MOUTHZ: {
+        "Awkward_smile.png":                    "Awkward Smile",
+        "layer-Mouth_Diamond_Grill (1).png":    "Diamond Grill",
+        "layer-Mouth_Fang (1).png":             "Fang",
+        "layer-Mouth_Flat (1).png":             "Flat",
+        "layer-Mouth_Lollipop (1).png":         "Lollipop",
+        "layer-Mouth_Smirk (1).png":            "Smirk",
+        "layer-Mouth_Smoke (1).png":            "Smoke",
+        "layer-Mouth_Tasty-1.png":              "Tasty",
+        "layer-layer-layer-Mouth_Sad (1).png":  "Sad",
+    },
+    ARMZ: {
+        "Arms_Cash.png":                                "Cash",
+        "Armz_Gummy_Bear_Knives.png":                   "Gummy Bear Knives",
+        "Armz_Gummy_worms_katana.png":                  "Gummy Worm Katana",
+        "Armz_Katana_for_ice_cream_character.png":      "Ice Cream Katana",
+        "Armz_Marshmallow_knives.png":                  "Marshmallow Knives",
+        "Armz_Oatmeal_Pie_Katana.png":                  "Oatmeal Pie Katana",
+        "Armz_Twinkie_Katana.png":                      "Twinkie Katana",
+        "Armz_choc_cookie_katana.png":                  "Choc Cookie Katana",
+        "Sweetardio_114 (4).png":                       "Blue Saber",
+        "Sweetardio_114 (5).png":                       "Pink Saber",
+        "Sweetardio_114 (6).png":                       "Cyan Saber",
+        "Sweetardio_115 (11).png":                      "Dual Uzis",
+        "layer-layer-layer-layer-AK15.png":             "AK15",
+        "layer-layer-layer-layer-AR47.png":             "AR47",
+        "layer-layer-layer-layer-Military_Brat.png":    "Military Brat",
+        "layer-layer-layer-layer-Nerf_Blaster.png":     "Nerf Blaster",
+    },
+    # Keyed by wat_base_name() result, plus "Gorbhouse" for trash-can slippers.
+    WHAT_ARE_THOSEZ: {
+        "Gorbhouse":                "Gorbhouse",
+        "layer-Bunny_Slippers":     "Bunny Slippers",
+        "layer-Pepe":               "Pepe",
+        "layer-Shiba":              "Shiba",
+    },
+    BACKGROUNDS_POP: {
+        "Legendary_Cook_Oven.png":          "Legendary Cook Oven",
+        "Legendary_Emyr.png":               "Legendary Emyr",
+        "Legendary_Fairdevs.png":           "Legendary Fairdevs",
+        "Legendary_Gorbhouse.png":          "Legendary Gorbhouse",
+        "Legendary_Just_Aliens.png":        "Legendary Just Aliens",
+        "Legendary_Morsel.png":             "Legendary Morsel",
+        "Legendary_Sarv.png":               "Legendary Sarv",
+        "Legendary_Short_the_Banks.png":    "Legendary Short the Banks",
+        "Legendary_Shubbi.png":             "Legendary Shubbi",
+        "Legendary_Simplex.png":            "Legendary Simplex",
+        "Legendary_Tenders.png":            "Legendary Tenders",
+        "Legendary_Welder.png":             "Legendary Welder",
+        "Legendary_Yatrah.png":             "Legendary Yatrah",
+    },
+    STICKERZ: {
+        "01_Peppermint_Butler.png":         "Peppermint Butler",
+        "02_Mr_Owl.png":                    "Mr Owl",
+        "03_Benson.png":                    "Benson",
+        "04_Marshmallow_Man.png":           "Marshmallow Man",
+        "05_American_Pie.png":              "American Pie",
+        "06_Dude_Sweet.png":                "Dude Sweet",
+        "07_Rare_Candy.png":                "Rare Candy",
+        "08_Crying_Tomato.png":             "Crying Tomato",
+        "09_Chibi_Monster.png":             "Chibi Monster",
+        "10_Candy_Shop.png":                "Candy Shop",
+        "12_Candy_Land.png":                "Candy Land",
+        "13_Box_of_Chocolates.png":         "Box of Chocolates",
+        "14_Shorts_doggo.png":              "Shorts Doggo",
+        "15_Calvin_Candie.png":             "Calvin Candie",
+        "16_The_Bunny.png":                 "The Bunny",
+        "17_Hunny_Pot.png":                 "Hunny Pot",
+        "18_Pwease_Lollipop.png":           "Pwease Lollipop",
+        "19_Emyr.png":                      "Emyr",
+        "20_The_meme_is_the_tech.png":      "The Meme is the Tech",
+        "21_Straight_outta_Gulag.png":      "Straight Outta Gulag",
+        "22_Sweet_Tooth.png":               "Sweet Tooth",
+        "23_Robot_Chicken_Gummy_Bear.png":  "Robot Chicken Gummy Bear",
+        "24_Golden_Ticket.png":             "Golden Ticket",
+        "25_Zombieland_Twinkie.png":        "Zombieland Twinkie",
+        "26_Caroline_Ellison.png":          "Caroline Ellison",
+        "28_opengotchi.png":                "Opengotchi",
+        "Sweetardio_200 (27).png":          "Cookie Cube",
+        "Sweetardio_200 (28).png":          "Cookie Bird",
+        "Sweetardio_200 (29).png":          "Cookie Grouch",
+        "Sweetardio_200 (30).png":          "Pixel Pal",
+    },
+}
+
+
+def _fallback_display_name(filename):
+    """Derive a readable display name from a raw filename when no explicit
+    mapping exists: strip layer- prefixes, extension, numeric index suffixes,
+    and convert underscores to spaces."""
+    import re as _re
+    name = os.path.basename(filename)
+    name = _re.sub(r'\.png$', '', name, flags=_re.IGNORECASE)
+    name = _re.sub(r'^(layer-)+', '', name)
+    name = _re.sub(r'\s*\(\d+\)\s*', ' ', name).strip()
+    name = name.replace('_', ' ').strip()
+    return name
+
+
+def trait_name(category, key):
+    """Return the human-readable display name for a trait.
+    category: one of the BACKGROUNDZ / SKINZ / ... constants.
+    key: filename (with .png) for most categories; the internal char_name
+    for CHARACTERZ; the wat_base_name() result (or "Gorbhouse") for
+    WHAT_ARE_THOSEZ."""
+    return TRAIT_NAMES.get(category, {}).get(key) or _fallback_display_name(key)
+
+
+def extract_metadata(layers, char_name):
+    """Build an OpenSea-compatible metadata attributes list from the layer
+    stack returned by generate_random_combination().
+
+    Returns a list of {"trait_type": ..., "value": ...} dicts in the
+    canonical display order:
+      Character → Background → Skin → Eyes → Mouth → Footwear → Arms → Sticker
+    Optional traits that were not selected are omitted (no "None" entries)."""
+
+    overlay_filenames = set(BG_OVERLAY_PAIRS.values())
+
+    attrs = {}  # trait_type -> value, filled in order below
+
+    # Character (always present)
+    attrs["Character"] = trait_name(CHARACTERZ, char_name)
+
+    sticker_prefix = os.path.normpath(os.path.join(TRAITS_DIR, STICKERZ))
+    armz_prefix    = os.path.normpath(os.path.join(TRAITS_DIR, ARMZ))
+    skinz_prefix   = os.path.normpath(os.path.join(TRAITS_DIR, SKINZ))
+    eyez_prefix    = os.path.normpath(os.path.join(TRAITS_DIR, EYEZ))
+    mouthz_prefix  = os.path.normpath(os.path.join(TRAITS_DIR, MOUTHZ))
+    wat_prefix     = os.path.normpath(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ))
+    # backgroundz_originals is a valid fallback dir; backgrounds_pop holds
+    # legendary plates selectable via force_bg
+    bg_prefixes    = (
+        os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDZ)),
+        os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDZ_FALLBACK)),
+        os.path.normpath(os.path.join(TRAITS_DIR, BACKGROUNDS_POP)),
+    )
+    bg_categories  = (BACKGROUNDZ, BACKGROUNDZ, BACKGROUNDS_POP)  # parallel to bg_prefixes
+
+    import re as _re
+
+    for layer in layers:
+        p = os.path.normpath(layer["path"])
+        fname = os.path.basename(p)
+
+        # Background plate (not an overlay)
+        if any(p.startswith(bp + os.sep) for bp in bg_prefixes):
+            if fname not in overlay_filenames:
+                bg_cat = next(
+                    (c for bp, c in zip(bg_prefixes, bg_categories)
+                     if p.startswith(bp + os.sep)),
+                    BACKGROUNDZ,
+                )
+                attrs.setdefault("Background", trait_name(bg_cat, fname))
+
+        # Skin ball
+        elif p.startswith(skinz_prefix + os.sep):
+            attrs.setdefault("Skin", trait_name(SKINZ, fname))
+
+        # Eyes
+        elif p.startswith(eyez_prefix + os.sep):
+            attrs.setdefault("Eyes", trait_name(EYEZ, fname))
+
+        # Mouth
+        elif p.startswith(mouthz_prefix + os.sep):
+            attrs.setdefault("Mouth", trait_name(MOUTHZ, fname))
+
+        # Arms
+        elif p.startswith(armz_prefix + os.sep):
+            attrs.setdefault("Arms", trait_name(ARMZ, fname))
+
+        # Sticker
+        elif p.startswith(sticker_prefix + os.sep):
+            attrs.setdefault("Sticker", trait_name(STICKERZ, fname))
+
+        # Footwear (WAT base or gorbhouse overlay)
+        elif p.startswith(wat_prefix + os.sep):
+            if "gorbhouse" in fname.lower() and "overlay" in fname.lower():
+                attrs.setdefault("Footwear", trait_name(WHAT_ARE_THOSEZ, "Gorbhouse"))
+            else:
+                m = _re.match(r"(.+?)_base(?:\s*\(\d+\))?\.png$", fname, _re.IGNORECASE)
+                if m:
+                    base = m.group(1)
+                    attrs.setdefault("Footwear", trait_name(WHAT_ARE_THOSEZ, base))
+
+    # Return in canonical order; omit absent optional traits
+    order = ["Character", "Background", "Skin", "Eyes", "Mouth",
+             "Footwear", "Arms", "Sticker"]
+    return [{"trait_type": k, "value": attrs[k]}
+            for k in order if k in attrs]
+
 
 # Characters that get Gorbhouse overlay. NOTE: the Gorbhouse trash-can
 # slippers are a what_are_thosez (footwear) trait, so EXCLUDE_WAT_CHARS
@@ -897,7 +1207,11 @@ def _ground_shadow(sil_alpha, cfg):
     return shadow
 
 
-def create_image(layers, output_name=None):
+def create_image(layers, output_name=None, metadata=None):
+    """Composite all layers and write the PNG.
+    If metadata is provided (a list of {"trait_type", "value"} dicts as
+    returned by extract_metadata()), a matching .json sidecar is saved
+    next to the PNG with OpenSea-compatible attributes."""
     if output_name is None:
         import time
         if not os.path.exists("output"):
@@ -984,12 +1298,18 @@ def create_image(layers, output_name=None):
             base_img.alpha_composite(img)
 
     base_img.save(output_name)
+
+    if metadata is not None:
+        json_path = os.path.splitext(output_name)[0] + ".json"
+        with open(json_path, "w") as _jf:
+            json.dump({"attributes": metadata}, _jf, indent=2)
+
     return output_name
 
 if __name__ == "__main__":
     if not os.path.exists("output"):
         os.makedirs("output")
-    
+
     print("Starting generation with centering logic...")
     for i in range(10):
         try:
@@ -997,6 +1317,11 @@ if __name__ == "__main__":
             has_offset = any(l["offset"] for l in layers)
             status = "CENTERED" if has_offset else "NORMAL"
             print(f"Generating {i+1} for {char_name} ({status})...")
-            create_image(layers, f"output/test_{i+1}_{char_name}_{status}.png")
+            meta = extract_metadata(layers, char_name)
+            out = create_image(layers,
+                               f"output/test_{i+1}_{char_name}_{status}.png",
+                               metadata=meta)
+            attrs_str = ", ".join(f"{a['trait_type']}: {a['value']}" for a in meta)
+            print(f"  Metadata → {attrs_str}")
         except Exception as e:
             print(f"Error: {e}")

@@ -1,7 +1,7 @@
 import os
 import sys
 from flask import Flask, render_template, jsonify, send_file
-from generator import generate_random_combination, create_image
+from generator import generate_random_combination, create_image, extract_metadata
 import io
 from PIL import Image
 import base64
@@ -17,17 +17,19 @@ def index():
 def generate():
     try:
         layers, char_name = generate_random_combination()
-        output_path = create_image(layers)
-        
+        meta = extract_metadata(layers, char_name)
+        output_path = create_image(layers, metadata=meta)
+
         # Read the generated image and convert to base64
         with open(output_path, 'rb') as f:
             img_data = base64.b64encode(f.read()).decode()
-        
+
         return jsonify({
             'success': True,
             'character': char_name,
             'image': f'data:image/png;base64,{img_data}',
-            'output_path': output_path
+            'output_path': output_path,
+            'attributes': meta,
         })
     except Exception as e:
         return jsonify({
