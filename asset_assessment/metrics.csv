@@ -1,0 +1,217 @@
+folder,file,mode,w,h,opaque_frac,L_mean,L_std,S_mean,temp_RmB,pink_bias,edge_density,oxford_blue_070F34,zaffre_0313A6,dark_violet_9201CB,hollywood_cerise_F715AB,fluor_cyan_34EDF3,dom1,dom2,dom3
+armz,traits/armz/Sweetardio_114 (4).png,RGBA,1393,1393,0.0838,121.62,98.41,0.4194,-46.37,21.57,30.11,0.2191,0.1085,0.0001,0.0,0.0672,#F2F4F5,#211D34,#3B08A8
+armz,traits/armz/Sweetardio_114 (5).png,RGBA,1393,1393,0.0838,133.84,88.48,0.4333,2.82,49.99,29.74,0.1997,0.0,0.0,0.2877,0.0672,#F5F6F8,#F715AB,#1E1D2C
+armz,traits/armz/Sweetardio_114 (6).png,RGBA,1393,1393,0.0838,167.86,83.8,0.3962,-74.0,-29.85,29.93,0.1997,0.0,0.0,0.0,0.3549,#34EBF1,#F6F7F8,#161325
+armz,traits/armz/Sweetardio_115 (11).png,RGBA,1393,1393,0.0902,78.45,78.96,0.0643,1.66,0.03,15.26,0.5942,0.0,0.0,0.0,0.0,#313030,#111010,#EFEEED
+armz,traits/armz/layer-layer-layer-6-7.png,RGBA,1393,1393,0.0249,186.21,99.48,0.0289,0.11,0.25,36.52,0.2074,0.0,0.0,0.0,0.0,#FDFCFD,#090908,#828282
+armz,traits/armz/layer-layer-layer-layer-AK15.png,RGBA,1393,1393,0.0532,109.22,73.33,0.5848,64.0,-6.41,22.12,0.191,0.0,0.0,0.0,0.0,#6F470B,#221409,#E5DCC8
+armz,traits/armz/layer-layer-layer-layer-AR47.png,RGBA,1393,1393,0.0546,72.76,73.4,0.1588,13.31,0.27,15.73,0.5695,0.0,0.0,0.0,0.0,#141412,#A99E92,#DED8D0
+armz,traits/armz/layer-layer-layer-layer-Military_Brat.png,RGBA,1393,1393,0.0165,168.36,105.01,0.0521,-0.05,0.27,39.44,0.261,0.0,0.0,0.0,0.0,#FCFBFC,#080707,#383838
+armz,traits/armz/layer-layer-layer-layer-Nerf_Blaster.png,RGBA,1393,1393,0.0714,101.51,61.66,0.6235,36.98,23.73,16.74,0.1261,0.1919,0.0,0.0,0.0,#EC5C10,#0F319F,#2E212F
+armz,traits/armz/layer-layer-layer-layer-Shy-1.png,RGBA,1393,1393,0.0209,150.37,103.63,0.0558,0.37,0.16,36.61,0.2959,0.0,0.0,0.0,0.0,#FBFAFA,#080707,#929191
+background,traits/background/Artemis.png,RGBA,1343,1343,1.0,72.8,42.16,0.0689,1.08,0.32,17.94,0.3332,0.0,0.0,0.0,0.0,#727171,#353333,#555352
+background,traits/background/Ayotollah.png,RGBA,1343,1343,1.0,105.0,47.42,0.2237,24.63,4.56,21.66,0.1356,0.0,0.0,0.0,0.0,#7B6D65,#5D4A43,#A18C82
+background,traits/background/Baked.png,RGBA,1343,1343,1.0,97.25,44.26,0.386,40.48,-0.68,17.68,0.1029,0.0,0.0,0.0,0.0,#533F2A,#9D8870,#76624D
+background,traits/background/Ben_dot_Eth.png,RGBA,1343,1343,1.0,103.94,52.87,0.3077,-11.44,-2.97,22.98,0.2082,0.0,0.0,0.0,0.0,#222C31,#8396A0,#425A68
+background,traits/background/Bubble_Trouble.png,RGBA,1343,1343,1.0,85.06,45.66,0.3922,34.71,27.02,18.71,0.1617,0.0,0.0,0.0,0.0,#815860,#603039,#2B1417
+background,traits/background/Bubble_Trouble_before_after.png,RGB,2686,1403,1.0,91.25,59.59,0.3858,36.32,27.24,13.31,0.19,0.0,0.0,0.0,0.0,#673841,#9A5D6A,#2A1618
+background,traits/background/Bubble_Trouble_corrected.png,RGB,1254,1254,1.0,83.47,53.73,0.4132,41.18,29.89,14.01,0.2328,0.0,0.0,0.0,0.0,#5D353C,#221415,#9A4B5C
+background,traits/background/Candy_Land.png,RGBA,1393,1393,1.0,108.39,36.2,0.3148,35.43,2.52,14.63,0.0503,0.0,0.0,0.0,0.0,#704E30,#A19899,#706665
+background,traits/background/Candy_Tundra.png,RGBA,1343,1343,1.0,126.51,43.8,0.4182,-50.42,6.49,18.61,0.0271,0.0001,0.0,0.0,0.0002,#5F668D,#21506F,#9B8AAE
+background,traits/background/Candy_Tundra_before_after.png,RGB,2686,1403,1.0,125.55,55.52,0.4528,-47.44,7.72,13.39,0.0518,0.0065,0.0,0.0,0.0001,#A1A0BC,#16456E,#4C80A0
+background,traits/background/Candy_Tundra_corrected.png,RGB,1254,1254,1.0,113.68,53.75,0.5278,-48.7,9.64,13.65,0.0786,0.0136,0.0,0.0,0.0001,#0E3D6B,#968CAE,#357799
+background,traits/background/Celestial.png,RGBA,1254,1254,1.0,178.03,20.12,0.2052,-33.81,26.93,9.26,0.0,0.0,0.0,0.0,0.0,#9E95C2,#AEA5D0,#CCC3EF
+background,traits/background/Cereal_Killer.png,RGBA,1343,1343,1.0,116.39,52.9,0.2843,21.38,1.87,24.49,0.0962,0.0,0.0,0.0,0.0,#A59892,#7B7067,#5B4A3A
+background,traits/background/Choco_Falls.png,RGBA,1343,1343,1.0,83.31,46.02,0.3587,25.07,3.55,17.77,0.1872,0.0,0.0,0.0,0.0,#827269,#655247,#483126
+background,traits/background/Coder_Gurl.png,RGBA,1343,1343,1.0,184.48,37.69,0.063,6.96,7.09,17.6,0.0006,0.0,0.0,0.0,0.0,#9C9295,#F1E9EA,#B8AEB1
+background,traits/background/Cotton_Castle.png,RGBA,1343,1343,1.0,125.52,38.4,0.2923,9.88,15.52,16.48,0.0132,0.0,0.0,0.0,0.0,#845E63,#AA8586,#444964
+background,traits/background/Cotton_Castle_before_after.png,RGB,2686,1403,1.0,137.45,50.76,0.2927,20.52,15.22,12.03,0.023,0.0,0.0,0.0,0.0,#9A848D,#D3A79F,#845C60
+background,traits/background/Cotton_Castle_corrected.png,RGB,1254,1254,1.0,139.55,50.16,0.3193,32.99,16.29,13.37,0.0324,0.0,0.0,0.0,0.0,#CB9085,#EBC7B8,#915F61
+background,traits/background/Crumb_Country.png,RGBA,1343,1343,1.0,83.22,43.97,0.4007,36.46,4.28,19.51,0.1836,0.0,0.0,0.0,0.0,#776052,#543D2F,#2A1A11
+background,traits/background/Dispensary.png,RGBA,1343,1343,1.0,75.04,42.33,0.3907,32.56,4.65,18.57,0.2508,0.0,0.0,0.0,0.0,#23150E,#4A3429,#695549
+background,traits/background/Doughnut_Wasteland.png,RGBA,1343,1343,1.0,75.86,40.61,0.3074,25.5,2.76,17.92,0.2692,0.0,0.0,0.0,0.0,#43352C,#64544A,#1F1511
+background,traits/background/Druski.png,RGBA,1343,1343,1.0,118.63,47.01,0.0949,9.43,2.5,22.58,0.0901,0.0,0.0,0.0,0.0,#7E7876,#5B5452,#A69A95
+background,traits/background/Fafo.png,RGBA,1393,1393,1.0,56.9,27.38,0.2236,6.55,1.62,10.87,0.4434,0.0,0.0,0.0,0.0,#433F40,#2F2C2C,#19181A
+background,traits/background/Flavor_Explosion.png,RGBA,1393,1393,1.0,101.85,50.94,0.3365,41.35,3.01,14.81,0.1685,0.0,0.0,0.0,0.0,#30241E,#56473E,#846750
+background,traits/background/Frosting_Forest.png,RGBA,1343,1343,1.0,116.34,42.94,0.2862,28.3,2.81,19.59,0.0296,0.0,0.0,0.0,0.0,#8B7A6E,#685B53,#AD9A8C
+background,traits/background/Frosting_Forest_before_after.png,RGB,2686,1403,1.0,117.47,56.0,0.3072,28.95,3.67,13.52,0.0765,0.0,0.0,0.0,0.0,#7A665A,#45322A,#B89883
+background,traits/background/Frosting_Forest_corrected.png,RGB,1024,1024,1.0,106.98,54.12,0.3557,32.21,4.87,10.23,0.1278,0.0,0.0,0.0,0.0,#3B2A25,#70564A,#A7846D
+background,traits/background/Fruit_Rollup.png,RGBA,1343,1343,1.0,76.13,35.52,0.83,37.22,43.45,12.9,0.0289,0.0,0.0,0.0,0.0,#FF0000,#0A406C,#215B85
+background,traits/background/Fruit_Rollup_before_after.png,RGB,2686,1403,1.0,67.55,54.17,0.7479,36.32,35.44,9.36,0.2659,0.0,0.0,0.0,0.0,#191A2D,#245B84,#F70403
+background,traits/background/Fruit_Rollup_corrected.png,RGB,1254,1254,1.0,42.86,33.63,0.7318,38.67,30.6,9.06,0.5242,0.0,0.0,0.0,0.0,#11192D,#5E1921,#BD1415
+background,traits/background/Game_On.png,RGBA,1343,1343,1.0,68.09,41.3,0.3221,18.11,17.11,18.63,0.3191,0.0,0.0,0.0,0.0,#1A0F13,#442A30,#654B52
+background,traits/background/Goo_Lagoon.png,RGBA,1343,1343,1.0,94.88,42.89,0.5232,18.23,-39.9,16.53,0.1608,0.0,0.0,0.0,0.0,#526F41,#30551F,#709256
+background,traits/background/Goo_Lagoon_before_after.png,RGB,2686,1403,1.0,91.75,58.66,0.6254,23.94,-41.42,12.2,0.2399,0.0,0.0,0.0,0.0,#0D2609,#32591A,#5F803F
+background,traits/background/Goo_Lagoon_corrected.png,RGB,1254,1254,1.0,74.69,52.16,0.7839,31.81,-46.67,12.6,0.3379,0.0,0.0,0.0,0.0,#092006,#274F11,#547B1D
+background,traits/background/Gorlock.png,RGBA,1343,1343,0.9993,88.34,37.92,0.1116,5.28,-2.15,17.87,0.202,0.0,0.0,0.0,0.0,#7B7A76,#5F5E59,#42423D
+background,traits/background/He_Needs_Some_Milk.png,RGBA,1343,1343,1.0,110.94,58.74,0.131,7.45,-0.36,23.53,0.1862,0.0,0.0,0.0,0.0,#7F7B77,#55524E,#1C1C1C
+background,traits/background/Im_Blu3.png,RGB,1393,1393,1.0,75.37,43.23,0.8486,-129.62,13.72,20.83,0.0965,0.4353,0.0,0.0,0.0,#063F95,#03206F,#1C5FB0
+background,traits/background/Im_Not_Sorry.png,RGBA,1343,1343,1.0,96.33,32.06,0.2909,31.57,10.95,17.55,0.0318,0.0,0.0,0.0,0.0,#7A615C,#604944,#9A7973
+background,traits/background/Loops.png,RGBA,1343,1343,1.0,145.3,36.4,0.3261,38.66,-2.4,13.45,0.0022,0.0,0.0,0.0,0.0,#8C9589,#CCC1B1,#59675D
+background,traits/background/Midnight_Snack.png,RGBA,1343,1343,1.0,71.94,39.86,0.3311,25.44,6.31,16.18,0.2835,0.0001,0.0,0.0,0.0,#5F4F4A,#42302A,#1F1514
+background,traits/background/Monster_Fur.png,RGBA,1343,1343,1.0,135.9,35.7,0.5337,-97.18,-3.72,16.7,0.0,0.0,0.0,0.0,0.0,#4377A4,#2D6190,#8FC4EE
+background,traits/background/Nabisco.png,RGBA,1343,1343,1.0,103.19,44.76,0.1044,10.33,2.07,15.01,0.1241,0.0,0.0,0.0,0.0,#706865,#4C4644,#938A86
+background,traits/background/Palm_Beach_Pete.png,RGBA,1343,1343,1.0,100.45,55.77,0.0297,0.58,-0.25,18.39,0.2297,0.0,0.0,0.0,0.0,#4A4A4A,#1F1F1F,#717170
+background,traits/background/Pink_Abyss.png,RGBA,1343,1343,1.0,76.8,42.43,0.4834,41.1,31.66,17.7,0.1385,0.0,0.0,0.0,0.0,#7E4B56,#5D2933,#310F14
+background,traits/background/Psychedelics.png,RGBA,1343,1343,1.0,104.18,50.31,0.1725,10.08,3.41,20.94,0.1573,0.0,0.0,0.0,0.0,#7F7877,#5B514F,#282226
+background,traits/background/RIP_Gorbagana.png,RGBA,1343,1343,1.0,113.37,44.95,0.3109,28.42,-15.86,20.33,0.0696,0.0,0.0,0.0,0.0,#8B8D6F,#5B5C52,#32391F
+background,traits/background/Rick_the_D1ck.png,RGBA,1343,1343,1.0,97.4,60.21,0.0229,0.41,-0.23,22.51,0.2793,0.0,0.0,0.0,0.0,#727272,#181818,#464646
+background,traits/background/Snack_Pack.png,RGBA,1343,1343,1.0,91.95,42.74,0.4365,46.56,2.18,18.16,0.1174,0.0,0.0,0.0,0.0,#917964,#755B44,#583A21
+background,traits/background/Soft_Serve.png,RGBA,1343,1343,1.0,118.91,51.11,0.2494,4.69,0.8,18.53,0.0989,0.0,0.0,0.0,0.0,#636160,#9E897F,#2C3235
+background,traits/background/Soft_Serve_before_after.png,RGB,2686,1403,1.0,126.0,67.34,0.3055,3.19,0.85,13.82,0.1394,0.002,0.0,0.0,0.0,#745F57,#222A30,#B3998E
+background,traits/background/Soft_Serve_corrected.png,RGB,1254,1254,1.0,122.22,72.92,0.3888,1.99,0.98,14.26,0.1901,0.0041,0.0,0.0,0.0,#2A2725,#EAD9C9,#A67062
+background,traits/background/Straight_of_America.png,RGBA,1343,1343,1.0,129.76,51.97,0.1765,-10.87,-1.45,24.14,0.0597,0.0,0.0,0.0,0.0,#5D6263,#868D91,#ADB7BE
+background,traits/background/Sugar_Skulls.png,RGBA,1343,1343,1.0,76.22,45.35,0.3303,27.23,2.65,19.02,0.2845,0.0,0.0,0.0,0.0,#837165,#614F44,#3F2E25
+background,traits/background/Swamp_Drained.png,RGBA,1343,1343,1.0,130.26,45.43,0.0859,6.97,-0.4,16.48,0.0466,0.0,0.0,0.0,0.0,#827F7B,#605B54,#A7A49F
+background,traits/background/Sweet_Dreams.png,RGBA,1343,1343,1.0,65.1,41.59,0.3293,20.89,16.16,18.19,0.3439,0.0,0.0,0.0,0.0,#816168,#3C2428,#170C0E
+background,traits/background/Sweet_Shop.png,RGBA,1343,1343,1.0,108.95,48.91,0.4124,50.51,12.95,19.45,0.0299,0.0,0.0,0.0,0.0,#734A3B,#976F61,#BE9288
+background,traits/background/Sweetardio.png,RGBA,1393,1393,1.0,114.3,47.88,0.3281,41.42,2.09,17.76,0.0783,0.0,0.0,0.0,0.0,#8C6E55,#B2937A,#634F3D
+background,traits/background/The_Set.png,RGBA,1343,1343,1.0,106.5,45.62,0.209,24.46,2.64,15.83,0.1024,0.0,0.0,0.0,0.0,#5A4F48,#7D6F66,#A89182
+background,traits/background/This_Kitchen_Is_Bitchin.png,RGBA,1343,1343,1.0,102.72,47.98,0.3496,36.02,-1.78,18.43,0.1208,0.0,0.0,0.0,0.0,#9D8B75,#796854,#564532
+background,traits/background/Toasted.png,RGBA,1393,1393,1.0,88.54,47.53,0.3771,48.9,2.11,14.04,0.2116,0.0,0.0,0.0,0.0,#534239,#251D19,#7D675C
+background,traits/background/Tootsie.png,RGBA,1343,1343,1.0,134.61,43.6,0.4753,-87.8,9.39,20.21,0.0014,0.0124,0.0,0.0,0.0,#4A75BA,#6492D8,#2C569B
+background,traits/background/UAP_Taskforce.png,RGBA,1080,1080,1.0,119.77,46.14,0.1028,2.31,4.63,22.4,0.0889,0.0,0.0,0.0,0.0,#807C82,#5E585B,#A2999D
+background,traits/background/Vanilla_Lane.png,RGBA,1343,1343,1.0,129.04,45.71,0.3616,48.5,-0.03,20.01,0.0205,0.0,0.0,0.0,0.0,#79614B,#9A8169,#BCA287
+background,traits/background/Wafer_Abbey.png,RGBA,1343,1343,1.0,108.66,47.98,0.4221,29.59,4.07,18.83,0.0608,0.0,0.0,0.0,0.0,#7C5842,#AD876E,#442B1E
+background,traits/background/Wheres_My_$_B1tch.png,RGBA,1343,1343,1.0,116.82,47.7,0.0957,-3.48,2.6,23.37,0.1176,0.0,0.0,0.0,0.0,#919195,#717074,#B3B4BA
+background,traits/background/Whitehouse_Lawn.png,RGBA,1343,1343,1.0,114.17,50.61,0.1059,1.94,0.05,22.08,0.1394,0.0,0.0,0.0,0.0,#747372,#979595,#504C49
+background,traits/background/Whitehouse_Lawn_Overlay.png,RGBA,1393,1393,0.0149,98.13,54.34,0.5162,50.19,5.54,34.24,0.0628,0.0,0.0,0.0,0.0,#724927,#A67E5E,#47495A
+background,traits/background/Winning.png,RGBA,1393,1393,1.0,90.45,51.45,0.2155,8.07,-2.86,17.25,0.2523,0.0,0.0,0.0,0.0,#403B33,#666154,#858882
+background,traits/background/art_mattrick_001-1-2.png,RGBA,1393,1393,1.0,149.2,47.26,0.1632,-4.98,-2.36,17.9,0.0267,0.0002,0.0,0.0,0.0,#A4A8A6,#C5C8C5,#576C7D
+background,traits/background/art_mattrick_001-15-2.png,RGBA,1393,1393,1.0,132.69,57.3,0.0,0.0,0.0,20.31,0.1206,0.0,0.0,0.0,0.0,#A1A1A1,#C7C7C7,#7F7F7F
+backgrounds_pop,traits/backgrounds_pop/Legendary_Cook_Oven.png,RGBA,1393,1393,1.0,50.39,45.02,0.3296,-5.69,1.74,10.26,0.5922,0.0,0.0,0.0,0.0,#06080E,#1F2126,#454548
+backgrounds_pop,traits/backgrounds_pop/Legendary_Emyr.png,RGBA,1393,1393,1.0,37.15,41.42,0.4969,2.3,1.03,8.05,0.7153,0.0,0.0,0.0,0.0,#03040A,#1A181D,#3F3830
+backgrounds_pop,traits/backgrounds_pop/Legendary_Fairdevs.png,RGBA,1393,1393,1.0,28.78,26.15,0.5384,-13.06,-0.34,7.2,0.8756,0.0,0.0,0.0,0.0,#04080E,#141B22,#273038
+backgrounds_pop,traits/backgrounds_pop/Legendary_Gorbhouse.png,RGBA,1393,1393,1.0,34.78,24.54,0.2708,0.88,1.45,8.39,0.756,0.0,0.0,0.0,0.0,#171619,#2B2828,#04050A
+backgrounds_pop,traits/backgrounds_pop/Legendary_Just_Aliens.png,RGBA,1393,1393,1.0,44.08,34.8,0.3326,-8.56,1.54,5.65,0.605,0.0,0.0,0.0,0.0,#03050A,#4B4E54,#303339
+backgrounds_pop,traits/backgrounds_pop/Legendary_Morsel.png,RGBA,1393,1393,1.0,25.52,25.49,0.662,-22.79,2.89,5.94,0.8768,0.0,0.0,0.0,0.0,#03060D,#111826,#1F2D44
+backgrounds_pop,traits/backgrounds_pop/Legendary_Sarv.png,RGBA,1393,1393,1.0,30.65,27.56,0.6051,-22.63,4.68,9.08,0.8448,0.0,0.0,0.0,0.0,#040916,#151C2C,#2A3248
+backgrounds_pop,traits/backgrounds_pop/Legendary_Short_the_Banks.png,RGBA,1393,1393,1.0,30.87,36.27,0.4983,-1.14,1.26,9.84,0.7965,0.0,0.0,0.0,0.0,#03050B,#18191E,#3A3532
+backgrounds_pop,traits/backgrounds_pop/Legendary_Shubbi.png,RGBA,1393,1393,1.0,38.12,36.66,0.4659,3.88,4.13,8.6,0.6776,0.0,0.0,0.0,0.0,#05060D,#1F1C22,#423636
+backgrounds_pop,traits/backgrounds_pop/Legendary_Simplex.png,RGBA,1393,1393,1.0,28.04,27.31,0.6419,-22.45,9.13,6.97,0.8405,0.0,0.0,0.0,0.0,#030511,#14162C,#282B47
+backgrounds_pop,traits/backgrounds_pop/Legendary_Tenders.png,RGBA,1393,1393,1.0,28.74,31.19,0.4436,-8.88,1.59,11.24,0.8642,0.0,0.0,0.0,0.0,#05080E,#171A20,#2F3237
+backgrounds_pop,traits/backgrounds_pop/Legendary_Welder.png,RGBA,1393,1393,1.0,35.72,31.28,0.4276,-7.41,3.88,8.39,0.7493,0.0,0.0,0.0,0.0,#05070E,#1C1C25,#35333C
+backgrounds_pop,traits/backgrounds_pop/Legendary_Yatrah.png,RGBA,1393,1393,1.0,26.06,26.59,0.5418,-6.16,2.43,8.46,0.8431,0.0,0.0,0.0,0.0,#03050B,#15171F,#2D2C31
+backgroundz,traits/backgroundz/Sweetardio_ (2).png,RGBA,1393,1393,1.0,68.4,55.66,0.2447,13.13,1.77,9.04,0.4743,0.0,0.0,0.0,0.0,#332D2B,#121011,#65564B
+backgroundz,traits/backgroundz/Sweetardio_113 (24).png,RGBA,1393,1393,1.0,26.51,16.48,0.5054,11.99,26.89,6.87,0.7609,0.0,0.0,0.0087,0.0,#100E15,#201D2D,#940D43
+backgroundz,traits/backgroundz/Sweetardio_113 (31).png,RGBA,1393,1393,1.0,50.36,21.48,0.6209,-56.73,10.17,8.27,0.5117,0.0,0.0,0.0,0.0,#213560,#192744,#2B4579
+backgroundz,traits/backgroundz/Sweetardio_11314.png,RGBA,1393,1393,1.0,116.54,57.35,0.4359,31.02,-6.98,12.74,0.104,0.0,0.0,0.0,0.0,#6E5027,#C6CBC7,#6E8A9F
+backgroundz,traits/backgroundz/Sweetardio_11315.png,RGBA,1393,1393,1.0,61.69,56.35,0.4118,33.99,1.52,14.06,0.4764,0.0,0.0,0.0,0.0,#130E0B,#3A2B21,#6A4F3E
+backgroundz,traits/backgroundz/Sweetardio_11317.png,RGBA,1393,1393,1.0,144.35,34.39,0.3191,-47.64,37.1,9.17,0.0,0.0,0.0,0.0,0.0,#7266A8,#8B7FC0,#AEA0DD
+backgroundz,traits/backgroundz/Sweetardio_11318.png,RGBA,1393,1393,1.0,61.05,41.04,0.1774,6.56,2.75,7.53,0.484,0.0,0.0,0.0,0.0,#171315,#352F2F,#6F6865
+backgroundz,traits/backgroundz/Sweetardio_11319.png,RGBA,1393,1393,1.0,51.37,46.5,0.5405,-8.84,-2.36,15.49,0.6204,0.0,0.0,0.0,0.0,#0B151C,#21445C,#4E3D2C
+backgroundz,traits/backgroundz/Sweetardio_11325.png,RGBA,1393,1393,1.0,109.78,43.54,0.3189,43.54,4.86,16.67,0.0665,0.0,0.0,0.0,0.0,#67564C,#857973,#3C2E24
+backgroundz,traits/backgroundz/Sweetardio_11327.png,RGBA,1393,1393,1.0,28.64,24.01,0.7674,-41.38,10.91,9.0,0.82,0.0,0.0,0.0,0.0,#030A24,#091432,#182342
+backgroundz,traits/backgroundz/Sweetardio_11329.png,RGBA,1393,1393,1.0,45.68,35.91,0.1855,2.49,-0.24,10.34,0.7077,0.0,0.0,0.0,0.0,#282929,#0E1011,#454340
+backgroundz,traits/backgroundz/Sweetardio_114 (10).png,RGBA,1393,1393,1.0,13.25,23.7,0.772,-12.54,2.48,7.07,0.9371,0.0,0.0,0.0,0.0,#010208,#0C1320,#232F40
+backgroundz,traits/backgroundz/Sweetardio_114 (15).png,RGBA,1393,1393,1.0,51.72,37.62,0.4375,-20.46,1.53,6.31,0.6495,0.0,0.0,0.0,0.0,#1E2A38,#090E18,#3B4653
+backgroundz,traits/backgroundz/Sweetardio_114 (17).png,RGBA,1393,1393,1.0,68.63,37.91,0.1419,5.43,-0.38,5.22,0.3665,0.0,0.0,0.0,0.0,#494541,#2C2A26,#656260
+backgroundz,traits/backgroundz/Sweetardio_114 (18).png,RGBA,1393,1393,1.0,47.29,40.68,0.5814,30.85,2.69,6.94,0.5364,0.0,0.0,0.0,0.0,#130A06,#311F15,#543B2A
+backgroundz,traits/backgroundz/Sweetardio_114 (21).png,RGBA,1393,1393,1.0,57.39,44.27,0.2063,-0.13,0.95,8.52,0.5675,0.0,0.0,0.0,0.0,#111214,#2D2C2F,#515052
+backgroundz,traits/backgroundz/Sweetardio_114 (24).png,RGBA,1254,1254,1.0,43.37,43.99,0.5264,-29.91,4.67,13.41,0.7383,0.001,0.0,0.0,0.0,#171E2D,#040710,#2D4062
+backgroundz,traits/backgroundz/Sweetardio_114 (29).png,RGBA,1393,1393,0.9388,133.99,77.02,0.0,0.0,0.0,15.43,0.2347,0.0,0.0,0.0,0.0,#B3B3B3,#DBDBDB,#101010
+backgroundz,traits/backgroundz/Sweetardio_114.png,RGBA,1393,1393,1.0,60.81,51.52,0.7391,-57.87,6.08,18.01,0.4821,0.0321,0.0,0.0,0.0,#081127,#123A6C,#4572A8
+backgroundz,traits/backgroundz/Sweetardio_1141.png,RGBA,1393,1393,1.0,107.4,42.25,0.5877,-51.55,14.72,7.24,0.0289,0.0053,0.0,0.0,0.0107,#1F497D,#3B80BC,#7D4862
+backgroundz,traits/backgroundz/Sweetardio_1142.png,RGBA,1393,1393,1.0,118.07,48.48,0.5442,-84.04,29.47,8.39,0.0649,0.0508,0.0001,0.0,0.0004,#828EDC,#2D65BF,#17306C
+backgroundz,traits/backgroundz/Sweetardio_115 (1).png,RGBA,1393,1393,1.0,41.11,45.14,0.8452,-62.13,10.69,6.29,0.7077,0.0003,0.0,0.0,0.0,#010A2E,#031E4F,#1D4372
+backgroundz,traits/backgroundz/Sweetardio_115 (10).png,RGBA,1393,1393,1.0,94.77,66.27,0.62,6.54,27.41,11.83,0.262,0.0429,0.0,0.0,0.0,#0E1A4D,#EEB89D,#66335F
+backgroundz,traits/backgroundz/Sweetardio_115 (2).png,RGBA,1393,1393,1.0,52.07,51.32,0.8515,-29.41,33.8,6.05,0.5382,0.0001,0.0,0.0147,0.0,#070C34,#032D61,#AD256B
+backgroundz,traits/backgroundz/Sweetardio_115 (4).png,RGBA,1393,1393,1.0,62.15,48.42,0.4334,30.47,0.71,8.73,0.4634,0.0,0.0,0.0,0.0,#140F0A,#715945,#97765B
+backgroundz,traits/backgroundz/Whitehouse_Lawn_Overlay.png,RGBA,1393,1393,0.0149,98.13,54.34,0.5162,50.19,5.54,34.24,0.0628,0.0,0.0,0.0,0.0,#724927,#A67E5E,#47495A
+backgroundz,traits/backgroundz/file_000000000ab071f88c33e547c218c472.png,RGB,1254,1254,1.0,26.31,35.61,0.7634,32.3,32.87,6.46,0.5936,0.0,0.0,0.002,0.0,#090307,#3B091A,#7A102F
+backgroundz,traits/backgroundz/file_000000002bb471fdac3ce6f00e2304bd.png,RGB,1254,1254,1.0,27.73,28.33,0.9298,-14.63,65.79,6.74,0.5184,0.031,0.0513,0.0386,0.0,#0E0120,#3E044E,#A60880
+backgroundz,traits/backgroundz/file_0000000090b071f88a2c21454904df25.png,RGB,1254,1254,1.0,19.82,25.26,0.3906,6.82,0.3,5.83,0.9022,0.0,0.0,0.0,0.0,#060503,#17120F,#2F2721
+backgroundz,traits/backgroundz/file_00000000947471fd9e567111688f30a3.png,RGB,1254,1254,1.0,38.4,43.3,0.5802,-29.21,4.59,12.37,0.7718,0.0021,0.0,0.0,0.0,#060911,#141D2E,#2C3F62
+backgroundz,traits/backgroundz/file_00000000c78071f8bca305176ffecb04.png,RGB,1254,1254,1.0,70.94,59.35,0.4136,25.17,-2.82,14.13,0.418,0.0,0.0,0.0,0.0,#110D07,#3A3122,#5E584C
+backgroundz,traits/backgroundz/grok_image_1780963139249.jpg,RGB,1024,1024,1.0,137.89,51.74,0.1504,20.89,4.65,7.39,0.0095,0.0,0.0,0.0,0.0,#594E53,#7F706C,#A6938A
+backgroundz,traits/backgroundz/multiple_faces_grid.png,RGB,1254,1254,1.0,62.44,53.95,0.1877,-4.73,1.03,11.99,0.5314,0.0,0.0,0.0,0.0,#0B0C10,#2C2E32,#535458
+backgroundz,traits/backgroundz/podium_speech_press.png,RGB,1254,1254,1.0,49.32,48.87,0.3508,3.58,2.31,12.12,0.6483,0.0,0.0,0.0,0.0,#090A0F,#252327,#554B45
+characterz,traits/characterz/Twinkie.png,RGBA,1393,1393,0.1805,166.79,33.43,0.8118,186.44,-20.94,7.14,0.0008,0.0,0.0,0.0,0.0,#FBBA3E,#F4A41A,#D17E15
+characterz,traits/characterz/after_skinz_brownie_bite.png,RGBA,1393,1393,0.1939,54.18,35.63,0.647,46.74,9.52,13.98,0.2813,0.0,0.0,0.0,0.0,#432113,#1E0C06,#633A28
+characterz,traits/characterz/after_skinz_chocolate_chip_cookie.png,RGBA,1393,1393,0.1629,82.06,47.74,0.7093,82.86,5.04,11.86,0.1329,0.0,0.0,0.0,0.0,#58260D,#85471B,#A86C34
+characterz,traits/characterz/after_skinz_chocolate_doughnut.png,RGBA,1393,1393,0.2057,54.84,45.94,0.7093,48.57,10.33,6.54,0.1947,0.0,0.0,0.0,0.0,#2B0E03,#4F2413,#6D4635
+characterz,traits/characterz/after_skinz_ding_dong.png,RGBA,1393,1393,0.1477,54.59,56.99,0.5192,24.07,3.44,6.54,0.6436,0.0,0.0,0.0,0.0,#22130B,#38251C,#59483F
+characterz,traits/characterz/after_skinz_glazed_doughnut.png,RGBA,1393,1393,0.2126,127.91,38.86,0.7649,143.09,3.46,6.56,0.0022,0.0,0.0,0.0,0.0,#B66116,#CF7D2F,#88440F
+characterz,traits/characterz/after_skinz_marshmallow.png,RGBA,1393,1393,0.1897,206.44,34.67,0.1572,33.83,1.63,2.91,0.0,0.0,0.0,0.0,0.0,#EDE6E0,#C8BDB1,#DC7628
+characterz,traits/characterz/after_skinz_oatmeal_cream_pie.png,RGBA,1393,1393,0.1814,68.98,58.42,0.8308,77.86,5.78,15.51,0.1463,0.0,0.0,0.0,0.0,#2E1202,#68320E,#AA6229
+characterz,traits/characterz/after_skinz_rice_crispy_treat.png,RGBA,1393,1393,0.2257,151.09,45.04,0.6113,111.58,-10.05,17.32,0.0,0.0,0.0,0.0,0.0,#BF8C44,#DBAF6A,#9F6926
+characterz,traits/characterz/after_skinz_smores.png,RGBA,1393,1393,0.2479,115.91,46.53,0.8373,145.04,-0.92,14.2,0.0219,0.0,0.0,0.0,0.0,#BE6A17,#DD8D2E,#8E470D
+characterz,traits/characterz/after_skinz_sugar_doughnut.png,RGBA,1393,1393,0.2097,139.25,40.71,0.6671,129.69,7.93,14.02,0.0,0.0,0.0,0.0,0.0,#E29C60,#9A4812,#D07122
+characterz,traits/characterz/after_skinz_waffle.png,RGBA,1393,1393,0.2147,103.05,56.24,0.8671,139.0,6.57,13.49,0.0415,0.0,0.0,0.0,0.0,#C16111,#E68F32,#843606
+characterz,traits/characterz/before_skinz_chocolate_frosted_poptart.png,RGBA,1393,1393,0.2516,66.14,65.64,0.779,60.88,7.79,15.99,0.1561,0.0,0.0,0.0,0.0,#321304,#6D3817,#AF7043
+characterz,traits/characterz/before_skinz_cyan_frosted_poptart.png,RGBA,1393,1393,0.2463,166.66,42.32,0.473,-40.22,-22.05,9.11,0.0,0.0,0.0,0.0,0.0,#70C2D2,#4C8A93,#D3E2E9
+characterz,traits/characterz/before_skinz_cyan_sherbert_ice_cream.png,RGBA,1393,1393,0.3089,141.15,58.84,0.8931,-94.88,-62.09,12.84,0.0246,0.0,0.0,0.0,0.368,#0DEAED,#542C08,#049899
+characterz,traits/characterz/before_skinz_gummy_bear.png,RGBA,1393,1393,0.2333,98.95,43.2,0.6283,-23.59,46.71,11.5,0.0272,0.0248,0.0,0.0414,0.0081,#BA3276,#2880AD,#765092
+characterz,traits/characterz/before_skinz_mint_chocolate_chip_ice_cream.png,RGBA,1393,1393,0.2988,143.58,60.12,0.4344,44.48,-20.36,12.07,0.0133,0.0,0.0,0.0,0.0,#A3B88D,#CEDFC3,#738553
+characterz,traits/characterz/before_skinz_neopolitan_ice_cream.png,RGBA,1393,1393,0.2974,116.7,67.06,0.5786,73.22,9.76,13.85,0.0278,0.0,0.0,0.0,0.0,#431E08,#EDCEBF,#77411C
+characterz,traits/characterz/before_skinz_og_poptart.png,RGBA,1393,1393,0.2465,179.0,38.78,0.5411,118.69,-4.57,8.8,0.0037,0.0,0.0,0.0,0.0,#E6A960,#F4C283,#C57C31
+characterz,traits/characterz/before_skinz_pink_sherbert_ice_cream.png,RGBA,1393,1393,0.3064,109.96,42.4,0.7061,113.84,53.28,13.27,0.0001,0.0,0.0,0.0,0.0,#ED718C,#D13A54,#742C06
+characterz,traits/characterz/before_skinz_rainbow_sherbert_ice_cream.png,RGBA,1393,1393,0.3074,105.98,43.61,0.7519,36.59,54.09,12.08,0.0052,0.0007,0.0229,0.1003,0.0466,#92400B,#E13A81,#7C42B9
+characterz,traits/characterz/before_skinz_rocky_road_ice_cream.png,RGBA,1393,1393,0.3011,83.27,54.25,0.7499,87.11,9.51,17.17,0.0608,0.0,0.0,0.0,0.0,#743712,#3C1707,#AA612A
+characterz,traits/characterz/before_skinz_sugar_cube.png,RGBA,1393,1393,0.1711,184.28,34.86,0.0981,17.38,-0.55,8.7,0.0073,0.0,0.0,0.0,0.0,#C7BFB6,#E4DFDA,#AEA498
+characterz,traits/characterz/before_skinz_vanilla_ice_cream.png,RGBA,1393,1393,0.2527,159.43,68.9,0.5206,83.96,-4.25,11.51,0.0018,0.0,0.0,0.0,0.0,#F5E9D1,#DFC79B,#C09351
+characterz,traits/characterz/before_skinz_zaffre_sherbert_ice_cream.png,RGBA,1393,1393,0.2715,77.15,38.9,0.7861,21.48,61.8,13.15,0.0493,0.0,0.1164,0.0,0.0,#8030AB,#692903,#481269
+characterz,traits/characterz/before_skinz_zebra_cake.png,RGBA,1393,1393,0.2255,172.15,77.76,0.3474,46.52,3.57,12.35,0.0,0.0,0.0,0.0,0.0,#F2E7DB,#551F05,#D5BDA5
+characterz,traits/characterz/layer-Sweetardio_115 (22).png,RGBA,1393,1393,0.1481,44.48,54.33,0.2294,3.23,-0.34,24.61,0.6838,0.0,0.0,0.0,0.0,#070604,#292724,#514F4D
+characterz,traits/characterz/layer-after_skinz_churro (1) (1).png,RGBA,1393,1393,0.243,111.39,43.58,0.8111,140.85,8.6,17.93,0.0133,0.0,0.0,0.0,0.0,#C06216,#8E3F0B,#D8853B
+characterz,traits/characterz/layer-after_skinz_gummy_worm (1).png,RGBA,1393,1393,0.2316,65.94,61.37,0.7784,-51.43,47.67,14.08,0.2507,0.1259,0.0181,0.0057,0.0006,#110A48,#9D1F70,#2F1895
+eyez,traits/eyez/Blue.png,RGBA,1393,1393,0.0067,23.43,46.15,0.4653,-40.8,12.71,15.14,0.6952,0.2105,0.0,0.0,0.0,#020304,#0417A3,#162635
+eyez,traits/eyez/Cerise.png,RGBA,1393,1393,0.0067,34.19,51.95,0.431,6.92,35.43,18.36,0.6911,0.0,0.0,0.1806,0.0,#020405,#E819A5,#243749
+eyez,traits/eyez/layer-Eyes_Alien (1).png,RGBA,1393,1393,0.0061,19.75,46.46,0.0804,0.3,0.02,13.43,0.9134,0.0,0.0,0.0,0.0,#030303,#171717,#414141
+eyez,traits/eyez/layer-Eyes_Cyan (1).png,RGBA,1393,1393,0.0069,54.19,79.4,0.4645,-58.25,-25.1,27.85,0.6899,0.0,0.0,0.0,0.1593,#010404,#01E7F6,#1C5255
+eyez,traits/eyez/layer-Eyes_Googly (1).png,RGBA,1393,1393,0.0063,137.53,119.75,0.0211,-0.06,-0.06,29.79,0.4194,0.0,0.0,0.0,0.0,#FDFEFE,#020202,#383838
+eyez,traits/eyez/layer-Eyes_Lowkey (1).png,RGBA,1393,1393,0.0033,21.13,45.5,0.0276,0.03,-0.15,19.68,0.8583,0.0,0.0,0.0,0.0,#020202,#222322,#AAABAA
+eyez,traits/eyez/layer-Eyes_Side_Eye (1).png,RGBA,1393,1393,0.0064,133.3,117.02,0.072,0.33,0.15,30.55,0.4349,0.0,0.0,0.0,0.0,#FBFBFB,#050505,#C4C3C3
+eyez,traits/eyez/layer-art_mattrick_011.png,RGBA,1393,1393,0.0041,17.69,39.88,0.137,-0.17,-0.32,14.76,0.9099,0.0,0.0,0.0,0.0,#030403,#191A19,#4F504F
+eyez,traits/eyez/layer-file_000000001e1c71fd9d410745ea63114e (1).png,RGBA,1393,1393,0.0078,96.07,59.47,0.5515,-76.53,-31.09,20.44,0.3378,0.0,0.0,0.0,0.1139,#15272C,#495D61,#01A0B1
+eyez,traits/eyez/layer-file_0000000062b071f8b3d115704b04609c (1).png,RGBA,1393,1393,0.0054,136.24,120.59,0.0586,-0.47,-0.06,34.1,0.4407,0.0,0.0,0.0,0.0,#FDFDFD,#040404,#393A3A
+eyez,traits/eyez/layer-file_00000000a21871f894573a9d4ee67519 (2).png,RGBA,1393,1393,0.0033,13.01,32.5,0.1698,-0.36,-0.22,12.34,0.9285,0.0,0.0,0.0,0.0,#030303,#202121,#484949
+mouthz,traits/mouthz/Awkward_smile.png,RGBA,1393,1393,0.0014,114.29,111.85,0.2497,3.89,2.94,57.53,0.5134,0.0,0.0,0.0,0.0,#120A0B,#FCFDFD,#C0BEBF
+mouthz,traits/mouthz/layer-Mouth_Blunt (1).png,RGBA,1393,1393,0.0009,96.36,45.98,0.3156,26.24,-1.28,18.21,0.1381,0.0,0.0,0.0,0.0,#787060,#98917D,#664C3E
+mouthz,traits/mouthz/layer-Mouth_Fang (1).png,RGBA,1393,1393,0.001,12.97,48.29,0.0168,0.01,0.01,12.84,0.938,0.0,0.0,0.0,0.0,#010000,#0D0D0D,#F2F2F2
+mouthz,traits/mouthz/layer-Mouth_Flat (1).png,RGBA,1393,1393,0.0001,22.18,22.11,0.0164,0.2,-0.01,13.28,0.8834,0.0,0.0,0.0,0.0,#030303,#141414,#262626
+mouthz,traits/mouthz/layer-Mouth_Lollipop (1).png,RGBA,1393,1393,0.0004,62.74,56.74,0.1414,5.76,-1.43,37.82,0.594,0.0,0.0,0.0,0.0,#13120F,#2B2925,#4D4B45
+mouthz,traits/mouthz/layer-Mouth_Tasty-1.png,RGBA,1393,1393,0.0006,49.55,25.25,0.8136,61.1,144.43,13.44,0.2471,0.0,0.0,0.6374,0.0,#FD01A5,#070406,#7D1258
+mouthz,traits/mouthz/layer-layer-layer-Mouth_Sad (1).png,RGBA,1393,1393,0.0003,12.98,2.27,0.042,-0.06,-0.11,2.59,1.0,0.0,0.0,0.0,0.0,#0F0F0F,#0E0E0E,#0D0D0C
+skinz,traits/skinz/layer-Skin_Alien (2).png,RGBA,1393,1393,0.0269,163.99,20.67,0.0728,-12.35,-0.32,2.0,0.0,0.0,0.0,0.0,0.0,#ADB4BB,#A5ABB2,#9AA0A5
+skinz,traits/skinz/layer-Skin_Black (3).png,RGBA,1393,1393,0.0292,58.46,10.63,0.5112,39.54,3.96,1.03,0.0866,0.0,0.0,0.0,0.0,#553B2B,#4D3626,#5B4130
+skinz,traits/skinz/layer-Skin_Fluorescent_Cyan (2).png,RGBA,1393,1393,0.0325,151.54,32.01,0.8708,-176.78,-64.87,11.69,0.0165,0.0,0.0,0.0,0.243,#03A8C2,#13BFDA,#53D7EB
+skinz,traits/skinz/layer-Skin_Gold_Foil (1).png,RGBA,1393,1393,0.0304,120.43,49.42,0.8612,136.79,-16.7,12.89,0.0002,0.0,0.0,0.0,0.0,#9B6208,#693E02,#C6861A
+skinz,traits/skinz/layer-layer-layer-Skin_White (2).png,RGBA,1393,1393,0.0284,153.75,29.79,0.435,79.36,-1.87,2.29,0.0,0.0,0.0,0.0,0.0,#C49D71,#D3AD82,#B1895F
+stickerz,traits/stickerz/01_Peppermint_Butler.png,RGBA,1343,1343,0.0111,175.74,81.25,0.2074,1.14,13.09,34.95,0.0412,0.0,0.0,0.0,0.0,#F8F6F6,#353D6B,#CCBEC7
+stickerz,traits/stickerz/02_Mr_Owl.png,RGBA,1343,1343,0.0116,187.3,72.42,0.2839,0.84,-2.46,29.1,0.0143,0.0,0.0,0.0,0.0015,#FAF8F7,#5A342A,#1FABDD
+stickerz,traits/stickerz/03_Benson.png,RGBA,1343,1343,0.0055,174.03,65.51,0.1551,15.9,8.2,37.21,0.0241,0.0,0.0,0.0,0.0,#F4F7F7,#A2838F,#946254
+stickerz,traits/stickerz/04_Marshmallow_Man.png,RGBA,1343,1343,0.0079,187.34,56.64,0.0526,-2.48,1.7,28.37,0.0521,0.0,0.0,0.0,0.0,#CFCED1,#ABAEB4,#F7F7F7
+stickerz,traits/stickerz/05_American_Pie.png,RGBA,1343,1343,0.0134,171.37,50.06,0.4297,90.96,9.56,24.1,0.0263,0.0,0.0,0.0,0.0,#EDB78F,#E39764,#F9F7F4
+stickerz,traits/stickerz/06_Dude_Sweet.png,RGBA,1343,1343,0.0088,127.31,67.24,0.3708,45.37,7.37,29.81,0.0392,0.0,0.0,0.0,0.0,#A67562,#6B4D3D,#402A18
+stickerz,traits/stickerz/07_Rare_Candy.png,RGBA,1343,1343,0.0092,129.33,72.69,0.3416,-51.89,9.31,41.76,0.1671,0.0701,0.0,0.0,0.0,#88A0CE,#191C22,#ECF0F4
+stickerz,traits/stickerz/08_Crying_Tomato.png,RGBA,1343,1343,0.0106,85.69,59.63,0.7759,119.88,52.11,22.56,0.0464,0.0,0.0,0.0,0.0022,#E5171E,#AC0610,#568A36
+stickerz,traits/stickerz/09_Chibi_Monster.png,RGBA,1343,1343,0.0105,112.07,67.68,0.2536,-28.05,7.55,29.7,0.1626,0.004,0.0,0.0,0.0,#3D4768,#646D8A,#E6E8EC
+stickerz,traits/stickerz/10_Candy_Shop.png,RGBA,1343,1343,0.0176,133.17,60.92,0.3587,47.76,-0.39,24.44,0.0805,0.0,0.0,0.0,0.0,#C5B599,#A18363,#755137
+stickerz,traits/stickerz/12_Candy_Land.png,RGBA,1343,1343,0.0097,169.9,71.73,0.2612,24.6,32.92,52.31,0.0157,0.0,0.0,0.0087,0.0,#F9F0F6,#7A547C,#D13B63
+stickerz,traits/stickerz/13_Box_of_Chocolates.png,RGBA,1343,1343,0.0078,160.15,55.79,0.1512,13.35,3.88,31.6,0.0169,0.0,0.0,0.0,0.0,#9F9595,#F6F4F1,#816E69
+stickerz,traits/stickerz/14_Shorts_doggo.png,RGBA,1343,1343,0.0133,122.63,78.06,0.2091,11.26,2.86,25.28,0.2606,0.0,0.0,0.0,0.0,#928076,#16141C,#B7AEA3
+stickerz,traits/stickerz/15_Calvin_Candie.png,RGBA,1343,1343,0.0131,94.41,76.29,0.5638,58.69,7.81,29.99,0.2435,0.0,0.0,0.0,0.0,#27150C,#A95120,#61361F
+stickerz,traits/stickerz/16_The_Bunny.png,RGBA,1343,1343,0.0051,104.53,75.39,0.3285,28.17,7.92,38.85,0.0763,0.0,0.0,0.0,0.0,#432722,#644337,#F5F3F1
+stickerz,traits/stickerz/17_Hunny_Pot.png,RGBA,1343,1343,0.0117,150.23,54.35,0.4901,81.16,-5.04,25.49,0.0113,0.0,0.0,0.0,0.0,#97582B,#C79E51,#F2F0E9
+stickerz,traits/stickerz/18_Pwease_Lollipop.png,RGBA,1343,1343,0.0051,115.48,86.0,0.4619,41.55,3.52,41.1,0.2079,0.0,0.0,0.0,0.0,#311A11,#F6F5F1,#C66719
+stickerz,traits/stickerz/19_Emyr.png,RGBA,1343,1343,0.0128,181.16,80.29,0.5003,51.28,7.78,22.73,0.0413,0.0017,0.0694,0.0168,0.0,#EEE571,#F7F5EF,#9703F0
+stickerz,traits/stickerz/20_The_meme_is_the_tech.png,RGBA,1343,1343,0.0156,123.63,110.24,0.0321,0.02,0.0,58.74,0.4242,0.0,0.0,0.0,0.0,#050505,#F9F9F9,#525252
+stickerz,traits/stickerz/21_Straight_outta_Gulag.png,RGBA,1343,1343,0.0156,117.39,107.98,0.0238,0.03,0.02,64.95,0.4311,0.0,0.0,0.0,0.0,#040404,#F6F6F6,#3C3C3C
+stickerz,traits/stickerz/22_Sweet_Tooth.png,RGBA,1343,1343,0.0104,137.76,75.95,0.1465,14.05,-0.11,38.48,0.1434,0.0,0.0,0.0,0.0,#322B24,#F6F5F2,#95897E
+stickerz,traits/stickerz/23_Robot_Chicken_Gummy_Bear.png,RGBA,1343,1343,0.009,128.22,77.14,0.4249,53.1,42.97,35.43,0.0613,0.0,0.0,0.0,0.0,#AC2A44,#F6F2F3,#DD83A4
+stickerz,traits/stickerz/24_Golden_Ticket.png,RGBA,1343,1343,0.008,173.58,55.68,0.2671,44.78,-11.55,30.95,0.0164,0.0,0.0,0.0,0.0,#CABC89,#948762,#FAF9F5
+stickerz,traits/stickerz/25_Zombieland_Twinkie.png,RGBA,1343,1343,0.0079,98.08,87.43,0.2756,4.24,3.13,37.7,0.4402,0.0,0.0,0.0,0.0,#111215,#353339,#F5F5F5
+stickerz,traits/stickerz/26_Caroline_Ellison.png,RGBA,1343,1343,0.0114,67.54,72.52,0.3424,21.25,1.05,24.59,0.6019,0.0,0.0,0.0,0.0,#0E0C0A,#2A221C,#866244
+stickerz,traits/stickerz/28_opengotchi.png,RGBA,1343,1343,0.0132,50.62,69.22,0.3435,-32.75,9.46,20.34,0.561,0.1765,0.0,0.0,0.0,#04050C,#1F3C87,#E8E9EC
+what_are_thosez,traits/what_are_thosez/Gorbhouse_base.png,RGBA,1393,1393,0.0732,129.38,50.95,0.1207,15.89,1.02,14.95,0.0854,0.0,0.0,0.0,0.0,#A89F98,#847A73,#625A54
+what_are_thosez,traits/what_are_thosez/Gorbhouse_overlay.png,RGBA,1393,1393,0.0703,133.17,48.06,0.124,16.56,1.05,15.17,0.0596,0.0,0.0,0.0,0.0,#A59B94,#7D736C,#D1C5BB
+what_are_thosez,traits/what_are_thosez/Sweetardio_115 (26).png,RGBA,1393,1393,0.0915,100.72,69.62,0.6782,-104.88,0.4,16.0,0.196,0.1774,0.0,0.0,0.0011,#054792,#2289DB,#0A1836
+what_are_thosez,traits/what_are_thosez/Sweetardio_115 (27).png,RGBA,1393,1393,0.0876,103.32,70.03,0.7075,-109.51,0.35,15.84,0.1762,0.1844,0.0,0.0,0.0014,#044693,#2288DA,#03163A
+what_are_thosez,traits/what_are_thosez/layer-Bunny_Slippers_Base (1).png,RGBA,1393,1393,0.0583,153.04,73.42,0.1184,18.13,4.57,15.11,0.1517,0.0,0.0,0.0,0.0,#ECE1DC,#CBB6B1,#9C857F
+what_are_thosez,traits/what_are_thosez/layer-Bunny_Slippers_Overlay (1).png,RGBA,1393,1393,0.0479,169.78,62.6,0.1542,22.84,5.35,12.12,0.0447,0.0,0.0,0.0,0.0,#EEE4DE,#CEBAB4,#6D5951
+what_are_thosez,traits/what_are_thosez/layer-Pepe_Base (1).png,RGBA,1393,1393,0.0704,84.89,42.27,0.5771,39.14,-31.12,11.3,0.1533,0.0,0.0,0.0,0.0,#5C5A1F,#212A0E,#6A8B3C
+what_are_thosez,traits/what_are_thosez/layer-Pepe_Overlay (1).png,RGBA,1393,1393,0.062,92.02,38.91,0.6475,45.02,-35.76,11.77,0.0663,0.0,0.0,0.0,0.0,#4B6A27,#28340C,#6D9040
+what_are_thosez,traits/what_are_thosez/layer-Shiba_Base (1).png,RGBA,1393,1393,0.0698,159.99,56.99,0.3241,60.75,2.78,9.67,0.065,0.0,0.0,0.0,0.0,#E3AF82,#B69173,#E5DDD7
+what_are_thosez,traits/what_are_thosez/layer-Shiba_Overlay_Left (1).png,RGBA,1393,1393,0.0372,169.68,44.31,0.3543,67.61,3.14,9.23,0.0007,0.0,0.0,0.0,0.0,#E5AC7A,#E6DED7,#AF7F57
+what_are_thosez,traits/what_are_thosez/layer-Shiba_Overlay_Right (1).png,RGBA,1393,1393,0.0269,172.33,43.28,0.3313,63.99,2.85,10.02,0.003,0.0,0.0,0.0,0.0,#E5AE7D,#B59881,#E5DDD7

@@ -1,0 +1,461 @@
+{
+ "mode": "anti-clash",
+ "src": "traits/backgroundz",
+ "strength": 0.8,
+ "blocked": {
+  "Ben_dot_Eth.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Bubble_Trouble.png": [
+   "Cerise.png"
+  ],
+  "Candy_Tundra.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-art_mattrick_011.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Celestial.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Cereal_Killer.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Cookboy.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Gummy_Bears.png": [
+   "Cerise.png"
+  ],
+  "M&Ms.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Pixie_Stix.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Smuckers_Blue.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sugar.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweet_Castle_2.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Toasted.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "Tootsie_Blue.png": [
+   "Blue.png"
+  ],
+  "Tootsie_Cerise.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
+  "UAP_Taskforce.png": [
+   "Blue.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Whitehouse_Lawn_Overlay.png": [
+   "Blue.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Why_So_Cereal.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ]
+ },
+ "weights": {
+  "Ayotollah.png": {
+   "Blue.png": 0.906,
+   "Cerise.png": 0.846,
+   "layer-Eyes_Cyan (1).png": 0.945,
+   "layer-art_mattrick_011.png": 0.923,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.934,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.946
+  },
+  "Baked.png": {
+   "Blue.png": 0.987,
+   "Cerise.png": 0.894,
+   "layer-Eyes_Cyan (1).png": 0.929,
+   "layer-art_mattrick_011.png": 0.894,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.93
+  },
+  "Ben_dot_Eth.png": {
+   "Cerise.png": 0.72,
+   "layer-art_mattrick_011.png": 0.562
+  },
+  "Bubble_Trouble.png": {
+   "Blue.png": 0.549,
+   "layer-Eyes_Cyan (1).png": 0.761,
+   "layer-art_mattrick_011.png": 0.799,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.757,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.76
+  },
+  "Cabaret_Alley.png": {
+   "Blue.png": 0.905,
+   "Cerise.png": 0.808,
+   "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-art_mattrick_011.png": 0.979,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
+  },
+  "Candy_Tundra.png": {
+   "Cerise.png": 0.59
+  },
+  "Celestial.png": {
+   "layer-Eyes_Cyan (1).png": 0.726,
+   "layer-art_mattrick_011.png": 0.764,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.722,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.724
+  },
+  "Cereal_Killer.png": {
+   "Cerise.png": 0.684,
+   "layer-art_mattrick_011.png": 0.53
+  },
+  "Choco_Falls.png": {
+   "Blue.png": 0.93,
+   "Cerise.png": 0.86,
+   "layer-Eyes_Cyan (1).png": 0.938,
+   "layer-art_mattrick_011.png": 0.902,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.941,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.939
+  },
+  "Coder_Chick.png": {
+   "Blue.png": 0.933,
+   "Cerise.png": 0.789,
+   "layer-Eyes_Cyan (1).png": 0.959,
+   "layer-art_mattrick_011.png": 0.928,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.962,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.96
+  },
+  "Cookboy.png": {
+   "layer-Eyes_Cyan (1).png": 0.607,
+   "layer-art_mattrick_011.png": 0.727,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.572,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.592
+  },
+  "Crumble_Trail.png": {
+   "Blue.png": 0.951,
+   "Cerise.png": 0.859,
+   "layer-Eyes_Cyan (1).png": 0.96,
+   "layer-art_mattrick_011.png": 0.926,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.964,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.961
+  },
+  "Drained_The_Swamp.png": {
+   "Blue.png": 0.861,
+   "Cerise.png": 0.871,
+   "layer-Eyes_Cyan (1).png": 0.85,
+   "layer-art_mattrick_011.png": 0.875,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.843,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.85
+  },
+  "Druski.png": {
+   "Blue.png": 0.805,
+   "Cerise.png": 0.724,
+   "layer-Eyes_Cyan (1).png": 0.941,
+   "layer-art_mattrick_011.png": 0.926,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.94,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.941
+  },
+  "Flavor_Explosion.png": {
+   "Blue.png": 0.949,
+   "Cerise.png": 0.85,
+   "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-art_mattrick_011.png": 0.928,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
+  },
+  "Goo_Lagoon.png": {
+   "Blue.png": 0.874,
+   "Cerise.png": 0.97,
+   "layer-Eyes_Cyan (1).png": 0.769,
+   "layer-art_mattrick_011.png": 0.681,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.776,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.77
+  },
+  "Gorlock.png": {
+   "Blue.png": 0.216,
+   "Cerise.png": 0.667,
+   "layer-Eyes_Cyan (1).png": 0.332,
+   "layer-art_mattrick_011.png": 0.573,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.315,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
+  },
+  "Gummy_Bears.png": {
+   "Blue.png": 0.609,
+   "layer-Eyes_Cyan (1).png": 0.709,
+   "layer-art_mattrick_011.png": 0.768,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.704,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.707
+  },
+  "He_Needs_Some_Milk.png": {
+   "Blue.png": 0.403,
+   "Cerise.png": 0.654,
+   "layer-Eyes_Cyan (1).png": 0.558,
+   "layer-art_mattrick_011.png": 0.669,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.533,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.553
+  },
+  "Im_Not_Sorry.png": {
+   "Blue.png": 0.919,
+   "Cerise.png": 0.819,
+   "layer-Eyes_Cyan (1).png": 0.997,
+   "layer-art_mattrick_011.png": 0.962,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.999,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.998
+  },
+  "M&Ms.png": {
+   "layer-Eyes_Cyan (1).png": 0.679,
+   "layer-art_mattrick_011.png": 0.747,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.661,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.674
+  },
+  "Mars_Overlay.png": {
+   "Blue.png": 0.956,
+   "Cerise.png": 0.86,
+   "layer-Eyes_Cyan (1).png": 0.963,
+   "layer-art_mattrick_011.png": 0.927,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.964
+  },
+  "Midnight_Snack (1).png": {
+   "Blue.png": 0.934,
+   "Cerise.png": 0.844,
+   "layer-Eyes_Cyan (1).png": 0.956,
+   "layer-art_mattrick_011.png": 0.926,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.959,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.957
+  },
+  "Nabisco.png": {
+   "Blue.png": 0.876,
+   "Cerise.png": 0.846,
+   "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-art_mattrick_011.png": 0.906,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.896,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
+  },
+  "Palm_Beach_Pete.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.483,
+   "layer-Eyes_Cyan (1).png": 0.534,
+   "layer-art_mattrick_011.png": 0.705,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
+  },
+  "Pink_Abyss.png": {
+   "Blue.png": 0.854,
+   "Cerise.png": 0.755,
+   "layer-Eyes_Cyan (1).png": 0.936,
+   "layer-art_mattrick_011.png": 0.971,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.932,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.934
+  },
+  "Pixie_Stix.png": {
+   "layer-Eyes_Cyan (1).png": 0.799,
+   "layer-art_mattrick_011.png": 0.889,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.792,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.797
+  },
+  "Psychedelics.png": {
+   "Blue.png": 0.797,
+   "Cerise.png": 0.815,
+   "layer-Eyes_Cyan (1).png": 0.913,
+   "layer-art_mattrick_011.png": 0.922,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.897,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.91
+  },
+  "RIP_Gorbagana.png": {
+   "Blue.png": 0.928,
+   "Cerise.png": 0.961,
+   "layer-Eyes_Cyan (1).png": 0.846,
+   "layer-art_mattrick_011.png": 0.818,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.85,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.848
+  },
+  "Rick_the_D1ck.png": {
+   "Blue.png": 0.902,
+   "Cerise.png": 0.916,
+   "layer-Eyes_Cyan (1).png": 0.816,
+   "layer-art_mattrick_011.png": 0.773,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.82,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.817
+  },
+  "Smuckers_Blue.png": {
+   "Cerise.png": 0.568,
+   "layer-art_mattrick_011.png": 0.689
+  },
+  "Snack_Pack.png": {
+   "Blue.png": 0.986,
+   "Cerise.png": 0.894,
+   "layer-Eyes_Cyan (1).png": 0.927,
+   "layer-art_mattrick_011.png": 0.893,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.931,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.929
+  },
+  "Straight_of_America (1).png": {
+   "Blue.png": 0.245,
+   "Cerise.png": 0.725,
+   "layer-Eyes_Cyan (1).png": 0.247,
+   "layer-art_mattrick_011.png": 0.616,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.239,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.244
+  },
+  "Sugar.png": {
+   "Cerise.png": 0.69,
+   "layer-art_mattrick_011.png": 0.69
+  },
+  "Sweet_Castle_2.png": {
+   "layer-art_mattrick_011.png": 0.675
+  },
+  "Sweet_Shop.png": {
+   "Blue.png": 0.956,
+   "Cerise.png": 0.86,
+   "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-art_mattrick_011.png": 0.928,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
+  },
+  "Sweetardio.png": {
+   "Blue.png": 0.928,
+   "Cerise.png": 0.857,
+   "layer-Eyes_Cyan (1).png": 0.941,
+   "layer-art_mattrick_011.png": 0.923,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.943,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.942
+  },
+  "Sweetardio_116 (20).png": {
+   "Blue.png": 0.88,
+   "Cerise.png": 0.855,
+   "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-art_mattrick_011.png": 0.926,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.903,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.904
+  },
+  "The_Set.png": {
+   "Blue.png": 0.926,
+   "Cerise.png": 0.853,
+   "layer-Eyes_Cyan (1).png": 0.939,
+   "layer-art_mattrick_011.png": 0.913,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.939,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.941
+  },
+  "Toasted.png": {
+   "layer-Eyes_Cyan (1).png": 0.622,
+   "layer-art_mattrick_011.png": 0.727,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.6,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.615
+  },
+  "Tootsie_Blue.png": {
+   "Cerise.png": 0.586,
+   "layer-Eyes_Cyan (1).png": 0.65,
+   "layer-art_mattrick_011.png": 0.728,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.619,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.643
+  },
+  "Tootsie_Cerise.png": {
+   "layer-Eyes_Cyan (1).png": 0.672,
+   "layer-art_mattrick_011.png": 0.728,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.659,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.668
+  },
+  "UAP_Taskforce.png": {
+   "Cerise.png": 0.6,
+   "layer-Eyes_Cyan (1).png": 0.523,
+   "layer-art_mattrick_011.png": 0.688
+  },
+  "Vanilla_Lane (1).png": {
+   "Blue.png": 0.981,
+   "Cerise.png": 0.895,
+   "layer-Eyes_Cyan (1).png": 0.92,
+   "layer-art_mattrick_011.png": 0.884,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.924,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.922
+  },
+  "Wheres_My_$_B1tch (1).png": {
+   "Blue.png": 0.28,
+   "Cerise.png": 0.581,
+   "layer-Eyes_Cyan (1).png": 0.517,
+   "layer-art_mattrick_011.png": 0.687,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.482,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.504
+  },
+  "Whitehouse_Lawn.png": {
+   "Blue.png": 0.244,
+   "Cerise.png": 0.666,
+   "layer-Eyes_Cyan (1).png": 0.404,
+   "layer-art_mattrick_011.png": 0.643,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.378,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.395
+  },
+  "Whitehouse_Lawn_Overlay.png": {
+   "Cerise.png": 0.674,
+   "layer-Eyes_Cyan (1).png": 0.52,
+   "layer-art_mattrick_011.png": 0.69
+  },
+  "Why_So_Cereal.png": {
+   "Cerise.png": 0.675,
+   "layer-art_mattrick_011.png": 0.683
+  },
+  "Winning.png": {
+   "Blue.png": 0.947,
+   "Cerise.png": 0.878,
+   "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-art_mattrick_011.png": 0.878,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.906,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
+  },
+  "art_mattrick_001-1-2 (1).png": {
+   "Blue.png": 0.325,
+   "Cerise.png": 0.721,
+   "layer-Eyes_Cyan (1).png": 0.33,
+   "layer-art_mattrick_011.png": 0.535,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.316,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
+  },
+  "art_mattrick_001-15-2 (1).png": {
+   "Blue.png": 0.905,
+   "Cerise.png": 0.808,
+   "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-art_mattrick_011.png": 0.979,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
+  },
+  "soft_serve.png": {
+   "Blue.png": 0.343,
+   "Cerise.png": 0.719,
+   "layer-Eyes_Cyan (1).png": 0.358,
+   "layer-art_mattrick_011.png": 0.565,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.347,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.356
+  }
+ }
+}
