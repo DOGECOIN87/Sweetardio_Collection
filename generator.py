@@ -227,8 +227,8 @@ TRAIT_NAMES = {
     EYEZ: {
         "Blue.png":                                             "Blue",
         "Cerise.png":                                           "Cerise",
-        "Sweetardio_nft (9).png":                               "Retardio",
-        "Sweetardio_nft (15).png":                              "Alien",
+        "layer-Sweetardio_nft (9) (1).png":                     "Retardio",
+        "layer-Sweetardio_nft (15).png":                        "Alien",
         "Sweetardio_nft (18).png":                              "Anime Cyan",
         "layer-Eyes_Cyan (1).png":                              "Cyan",
         "layer-Eyes_Googly (1).png":                            "Googly",
