@@ -129,8 +129,14 @@ def main():
     ap.add_argument("--n", type=int, default=4444)
     ap.add_argument("--leg-each", type=int, default=50)
     ap.add_argument("--seed", type=int, default=4444)
+    ap.add_argument("--render", action="store_true",
+                    help="also render every token PNG to output/mint/images/")
     args = ap.parse_args()
     random.seed(args.seed)
+
+    img_dir = "output/mint/images"
+    if args.render:
+        os.makedirs(img_dir, exist_ok=True)
 
     bg_dir = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ)
     legs = sorted(f for f in os.listdir(bg_dir)
@@ -139,6 +145,11 @@ def main():
     if leg_total > args.n:
         sys.exit(f"{len(legs)} legendaries x {args.leg_each} = {leg_total} "
                  f"exceeds n={args.n}")
+
+    # 1/1 secret rares: one standalone token each, never composited
+    sr_dir = os.path.join(g.TRAITS_DIR, g.SECRET_RAREZ)
+    secrets = sorted(f for f in os.listdir(sr_dir)
+                     if f.endswith(".png") and g.is_secret_rare(f))
 
     # measure each legendary plate + each character body for the camo check
     leg_stats = {f: plate_stats(os.path.join(bg_dir, f)) for f in legs}
@@ -155,10 +166,19 @@ def main():
     forced_wat  = [None] * N    # footwear base / "gorbhouse" or None
     forced_stk  = [None] * N    # sticker filename or None
 
+    forced_sr   = [None] * N    # secret-rare filename or None
     all_slots = list(range(N))
 
+    # 0) secret rares -> one fixed slot each; excluded from every other pool so
+    #    they mint as pure standalone 1/1s.
+    sr_slots = random.sample(all_slots, len(secrets))
+    for s, srf in zip(sr_slots, secrets):
+        forced_sr[s] = srf
+    sr_set = set(sr_slots)
+    avail = [s for s in all_slots if s not in sr_set]   # composable slots
+
     # 1) legendary backgrounds -> 50 each
-    leg_slots = random.sample(all_slots, leg_total)
+    leg_slots = random.sample(avail, leg_total)
     leg_picks = [leg for leg in legs for _ in range(args.leg_each)]
     random.shuffle(leg_picks)
     for s, leg in zip(leg_slots, leg_picks):
@@ -166,7 +186,7 @@ def main():
     is_leg = set(leg_slots)
 
     # 2) signature arms -> NON-legendary slots (owner-locked, footwear-free)
-    nonleg = [s for s in all_slots if s not in is_leg]
+    nonleg = [s for s in avail if s not in is_leg]
     random.shuffle(nonleg)
     sig_slots = []
     cur = 0
@@ -178,8 +198,8 @@ def main():
         sig_slots.extend(chunk)
     sig_set = set(sig_slots)
 
-    # 3) generic arms -> any slot without an arm yet
-    free_for_arm = [s for s in all_slots if forced_arm[s] is None]
+    # 3) generic arms -> any composable slot without an arm yet
+    free_for_arm = [s for s in avail if forced_arm[s] is None]
     random.shuffle(free_for_arm)
     cur = 0
     for arm, cnt in GENERIC_ARM_COUNTS.items():
@@ -188,7 +208,7 @@ def main():
         cur += cnt
 
     # 4) footwear -> non-legendary, non-signature slots (one footwear per token)
-    free_for_wat = [s for s in all_slots
+    free_for_wat = [s for s in avail
                     if s not in is_leg and s not in sig_set]
     random.shuffle(free_for_wat)
     cur = 0
@@ -197,15 +217,33 @@ def main():
             forced_wat[s] = wat
         cur += cnt
 
-    # 5) stickers -> any slot, spread evenly across every sticker asset
+    # 5) stickers -> any composable slot, spread evenly across every sticker
     sticker_files = g.get_files(g.STICKERZ)
-    stk_slots = random.sample(all_slots, min(STICKER_TOTAL, N))
+    stk_slots = random.sample(avail, min(STICKER_TOTAL, len(avail)))
     for i, s in enumerate(stk_slots):
         forced_stk[s] = sticker_files[i % len(sticker_files)]
 
     # ---- compose every token ----
     manifest, seen = {}, set()
     for i in range(N):
+        if args.render and i and i % 250 == 0:
+            print(f"  composed {i}/{N}…", flush=True)
+        # secret rare: standalone 1/1, no other traits, guaranteed unique
+        if forced_sr[i] is not None:
+            srf = forced_sr[i]
+            layers, char = g.secret_rare_combination(srf)
+            meta = g.extract_metadata(layers, char)
+            t = {k: None for k in TRAIT_KEYS}
+            t["character"] = char
+            t["bg"] = srf
+            t["legendary"] = False
+            t["secret_rare"] = srf
+            t["attributes"] = meta
+            manifest[i + 1] = t
+            if args.render:
+                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
+            continue
+
         leg = forced_bg[i]
         fb  = (g.BACKGROUNDZ, leg) if leg is not None else None
         farm = forced_arm[i] if forced_arm[i] is not None else None
@@ -240,6 +278,8 @@ def main():
             t["legendary"] = leg is not None
             t["attributes"] = meta
             manifest[i + 1] = t
+            if args.render:
+                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
             break
         else:
             sys.exit(f"token {i+1}: no unique combo for arm={farm} wat={fwat} "
@@ -248,13 +288,21 @@ def main():
     # ---- write OpenSea token metadata + manifest ----
     os.makedirs("output/mint/metadata", exist_ok=True)
     for tid, t in manifest.items():
+        name = None
+        if t.get("secret_rare"):
+            name = (f"{g.COLLECTION_NAME} #{tid} — "
+                    f"{t['character']} (1 of 1)")
         token = g.token_metadata(t["attributes"], token_id=tid,
-                                 image=f"{tid}.png")
+                                 image=f"{tid}.png", name=name)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)
     # compact manifest (drop the embedded attributes to keep it small)
-    slim = {tid: {k: t[k] for k in TRAIT_KEYS + ("legendary",)}
-            for tid, t in manifest.items()}
+    slim = {}
+    for tid, t in manifest.items():
+        row = {k: t[k] for k in TRAIT_KEYS + ("legendary",)}
+        if t.get("secret_rare"):
+            row["secret_rare"] = t["secret_rare"]
+        slim[tid] = row
     with open("output/mint_manifest.json", "w") as f:
         json.dump(slim, f)
 
@@ -268,6 +316,16 @@ def main():
         print(s)
 
     p(f"minted {len(manifest)}/{N} unique tokens (seed {args.seed})\n")
+
+    sr_d = {srf: [tid for tid, t in manifest.items()
+                  if t.get("secret_rare") == srf] for srf in secrets}
+    p(f"SECRET RARES (1/1 standalone, {len(secrets)} total):")
+    for srf in secrets:
+        ids = sr_d[srf]
+        p(f"  {g.trait_name(g.SECRET_RAREZ, srf):20} x{len(ids):<2} "
+          f"-> token {ids[0] if ids else '?'}")
+    sr_bad = {srf: len(ids) for srf, ids in sr_d.items() if len(ids) != 1}
+    p(f"  -> each exactly once? {'YES' if not sr_bad else 'NO ' + str(sr_bad)}\n")
 
     leg_d = {f: sum(1 for t in manifest.values() if t["bg"] == f) for f in legs}
     bad = {f: c for f, c in leg_d.items() if c != args.leg_each}

@@ -127,6 +127,23 @@ WHAT_ARE_THOSEZ = "what_are_thosez"
 ARMZ = "armz"
 STICKERZ = "stickerz"
 
+# Secret rares are finished, full-canvas 1/1 artworks. They are NOT composited
+# with any other trait: each is minted exactly once as a standalone token via a
+# fixed slot in build_mint.py, never the normal random pipeline.
+SECRET_RAREZ = "secret_rarez"
+SECRET_RARE_PREFIX = "Secret_"
+
+def is_secret_rare(path):
+    return os.path.basename(path).startswith(SECRET_RARE_PREFIX)
+
+def secret_rare_combination(filename):
+    """Return a (layers, char_name) pair for a single 1/1 secret rare so it
+    flows through create_image()/extract_metadata() like any other token. The
+    art is a complete scene, so it is the sole (background) layer."""
+    path = os.path.join(TRAITS_DIR, SECRET_RAREZ, filename)
+    name = trait_name(SECRET_RAREZ, filename)
+    return [{"path": path, "offset": False}], name
+
 # ---- Human-readable display names for every trait asset ----
 # Keys for CHARACTERZ: the internal char_name (prefix-stripped, no .png).
 # Keys for WHAT_ARE_THOSEZ: the base-name returned by wat_base_name()
@@ -324,6 +341,18 @@ TRAIT_NAMES = {
         "Sweetardio_200 (29).png":          "Cookie Grouch",
         "Sweetardio_200 (30).png":          "Cookboy",
     },
+    # 1/1 secret rares (standalone full-canvas artworks, never composited).
+    SECRET_RAREZ: {
+        "Secret_Milk_Dunk.png":         "Milk Dunk",
+        "Secret_Churro_Cantina.png":    "Churro Cantina",
+        "Secret_Cold_Served.png":       "Cold Served",
+        "Secret_Off_The_Line.png":      "Off The Line",
+        "Secret_Hooded_Scoop.png":      "Hooded Scoop",
+        "Secret_Last_Bite.png":         "Last Bite",
+        "Secret_High_Voltage.png":      "High Voltage",
+        "Secret_Golden_Waffle.png":     "Golden Waffle",
+        "Secret_Cookie_Bro.png":        "Cookie Bro",
+    },
 }
 
 
@@ -357,6 +386,13 @@ def extract_metadata(layers, char_name):
     canonical display order:
       Character → Background → Skin → Eyes → Mouth → Footwear → Arms → Sticker
     Optional traits that were not selected are omitted (no "None" entries)."""
+
+    # 1/1 secret rare: standalone artwork, no composited traits. Report it as a
+    # single distinguishing attribute rather than the normal trait breakdown.
+    if any(is_secret_rare(layer["path"]) for layer in layers):
+        sr = next(layer for layer in layers if is_secret_rare(layer["path"]))
+        name = trait_name(SECRET_RAREZ, os.path.basename(sr["path"]))
+        return [{"trait_type": "1 of 1", "value": name}]
 
     overlay_filenames = set(BG_OVERLAY_PAIRS.values())
 
