@@ -290,8 +290,7 @@ def main():
     for tid, t in manifest.items():
         name = None
         if t.get("secret_rare"):
-            name = (f"{g.COLLECTION_NAME} #{tid} — "
-                    f"{t['character']} (1 of 1)")
+            name = g.secret_rare_token_name(t["secret_rare"])
         token = g.token_metadata(t["attributes"], token_id=tid,
                                  image=f"{tid}.png", name=name)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
