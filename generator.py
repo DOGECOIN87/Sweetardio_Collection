@@ -144,6 +144,18 @@ def secret_rare_combination(filename):
     name = trait_name(SECRET_RAREZ, filename)
     return [{"path": path, "offset": False}], name
 
+def secret_rare_number(filename):
+    """Stable 1-based index (#1..#N) of a secret rare within the set, ordered
+    by filename so it never shifts run to run."""
+    keys = sorted(TRAIT_NAMES.get(SECRET_RAREZ, {}).keys())
+    base = os.path.basename(filename)
+    return keys.index(base) + 1 if base in keys else 0
+
+def secret_rare_token_name(filename):
+    """Drop-ready token name, e.g. 'Secret Rarez #1 — Milk Dunk'."""
+    return (f"Secret Rarez #{secret_rare_number(filename)} — "
+            f"{trait_name(SECRET_RAREZ, os.path.basename(filename))}")
+
 # ---- Human-readable display names for every trait asset ----
 # Keys for CHARACTERZ: the internal char_name (prefix-stripped, no .png).
 # Keys for WHAT_ARE_THOSEZ: the base-name returned by wat_base_name()
@@ -387,12 +399,14 @@ def extract_metadata(layers, char_name):
       Character → Background → Skin → Eyes → Mouth → Footwear → Arms → Sticker
     Optional traits that were not selected are omitted (no "None" entries)."""
 
-    # 1/1 secret rare: standalone artwork, no composited traits. Report it as a
-    # single distinguishing attribute rather than the normal trait breakdown.
+    # 1/1 secret rare: standalone artwork, no composited traits. Report it under
+    # the "Secret Rarez" trait, numbered #1..#N, rather than the normal breakdown.
     if any(is_secret_rare(layer["path"]) for layer in layers):
         sr = next(layer for layer in layers if is_secret_rare(layer["path"]))
-        name = trait_name(SECRET_RAREZ, os.path.basename(sr["path"]))
-        return [{"trait_type": "1 of 1", "value": name}]
+        fn = os.path.basename(sr["path"])
+        name = trait_name(SECRET_RAREZ, fn)
+        return [{"trait_type": "Secret Rarez",
+                 "value": f"#{secret_rare_number(fn)} {name}"}]
 
     overlay_filenames = set(BG_OVERLAY_PAIRS.values())
 

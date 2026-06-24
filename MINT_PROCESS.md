@@ -63,15 +63,15 @@ The `image` field is the bare filename (`<id>.png`). launchmynft.io pairs each
 JSON with the matching image by name; if your launchpad needs an `ipfs://CID/`
 prefix instead, it is added at upload time — no need to change the files.
 
-**Secret-rare 1/1 tokens** carry a single distinguishing attribute and a
-special name, e.g.:
+**Secret-rare 1/1 tokens** carry a single `Secret Rarez` attribute and a
+special numbered name (#1…#9), e.g.:
 
 ```json
 {
-  "name": "Sweetardio Collection #343 — Milk Dunk (1 of 1)",
+  "name": "Secret Rarez #8 — Milk Dunk",
   "description": "...",
   "image": "343.png",
-  "attributes": [ { "trait_type": "1 of 1", "value": "Milk Dunk" } ]
+  "attributes": [ { "trait_type": "Secret Rarez", "value": "#8 Milk Dunk" } ]
 }
 ```
 
