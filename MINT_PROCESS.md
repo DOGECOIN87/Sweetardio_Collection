@@ -64,7 +64,7 @@ JSON with the matching image by name; if your launchpad needs an `ipfs://CID/`
 prefix instead, it is added at upload time — no need to change the files.
 
 **Secret-rare 1/1 tokens** carry a single `Secret Rarez` attribute and a
-special numbered name (#1…#9), e.g.:
+special numbered name (#1…#26), e.g.:
 
 ```json
 {
@@ -79,7 +79,7 @@ special numbered name (#1…#9), e.g.:
 
 All counts are hit exactly by pre-allocating token slots before composition.
 
-- **Secret rares (1/1):** the 9 finished artworks in `traits/secret_rarez/`
+- **Secret rares (1/1):** the 26 finished artworks in `traits/secret_rarez/`
   are minted **exactly once each** as standalone tokens — never composited with
   any other trait.
 - **Legendary backgrounds:** each `Legendary_*` plate appears **exactly 50×**
