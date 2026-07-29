@@ -79,19 +79,10 @@ background,traits/background/Whitehouse_Lawn_Overlay.png,RGBA,1393,1393,0.0149,9
 background,traits/background/Winning.png,RGBA,1393,1393,1.0,90.45,51.45,0.2155,8.07,-2.86,17.25,0.2523,0.0,0.0,0.0,0.0,#403B33,#666154,#858882
 background,traits/background/art_mattrick_001-1-2.png,RGBA,1393,1393,1.0,149.2,47.26,0.1632,-4.98,-2.36,17.9,0.0267,0.0002,0.0,0.0,0.0,#A4A8A6,#C5C8C5,#576C7D
 background,traits/background/art_mattrick_001-15-2.png,RGBA,1393,1393,1.0,132.69,57.3,0.0,0.0,0.0,20.31,0.1206,0.0,0.0,0.0,0.0,#A1A1A1,#C7C7C7,#7F7F7F
-backgrounds_pop,traits/backgrounds_pop/Legendary_Cook_Oven.png,RGBA,1393,1393,1.0,50.39,45.02,0.3296,-5.69,1.74,10.26,0.5922,0.0,0.0,0.0,0.0,#06080E,#1F2126,#454548
-backgrounds_pop,traits/backgrounds_pop/Legendary_Emyr.png,RGBA,1393,1393,1.0,37.15,41.42,0.4969,2.3,1.03,8.05,0.7153,0.0,0.0,0.0,0.0,#03040A,#1A181D,#3F3830
-backgrounds_pop,traits/backgrounds_pop/Legendary_Fairdevs.png,RGBA,1393,1393,1.0,28.78,26.15,0.5384,-13.06,-0.34,7.2,0.8756,0.0,0.0,0.0,0.0,#04080E,#141B22,#273038
-backgrounds_pop,traits/backgrounds_pop/Legendary_Gorbhouse.png,RGBA,1393,1393,1.0,34.78,24.54,0.2708,0.88,1.45,8.39,0.756,0.0,0.0,0.0,0.0,#171619,#2B2828,#04050A
 backgrounds_pop,traits/backgrounds_pop/Legendary_Just_Aliens.png,RGBA,1393,1393,1.0,44.08,34.8,0.3326,-8.56,1.54,5.65,0.605,0.0,0.0,0.0,0.0,#03050A,#4B4E54,#303339
-backgrounds_pop,traits/backgrounds_pop/Legendary_Morsel.png,RGBA,1393,1393,1.0,25.52,25.49,0.662,-22.79,2.89,5.94,0.8768,0.0,0.0,0.0,0.0,#03060D,#111826,#1F2D44
-backgrounds_pop,traits/backgrounds_pop/Legendary_Sarv.png,RGBA,1393,1393,1.0,30.65,27.56,0.6051,-22.63,4.68,9.08,0.8448,0.0,0.0,0.0,0.0,#040916,#151C2C,#2A3248
-backgrounds_pop,traits/backgrounds_pop/Legendary_Short_the_Banks.png,RGBA,1393,1393,1.0,30.87,36.27,0.4983,-1.14,1.26,9.84,0.7965,0.0,0.0,0.0,0.0,#03050B,#18191E,#3A3532
-backgrounds_pop,traits/backgrounds_pop/Legendary_Shubbi.png,RGBA,1393,1393,1.0,38.12,36.66,0.4659,3.88,4.13,8.6,0.6776,0.0,0.0,0.0,0.0,#05060D,#1F1C22,#423636
+backgrounds_pop,traits/backgrounds_pop/Legendary_Opengotchi.png,RGBA,1393,1393,1.0,30.65,27.56,0.6051,-22.63,4.68,9.08,0.8448,0.0,0.0,0.0,0.0,#040916,#151C2C,#2A3248
 backgrounds_pop,traits/backgrounds_pop/Legendary_Simplex.png,RGBA,1393,1393,1.0,28.04,27.31,0.6419,-22.45,9.13,6.97,0.8405,0.0,0.0,0.0,0.0,#030511,#14162C,#282B47
 backgrounds_pop,traits/backgrounds_pop/Legendary_Tenders.png,RGBA,1393,1393,1.0,28.74,31.19,0.4436,-8.88,1.59,11.24,0.8642,0.0,0.0,0.0,0.0,#05080E,#171A20,#2F3237
-backgrounds_pop,traits/backgrounds_pop/Legendary_Welder.png,RGBA,1393,1393,1.0,35.72,31.28,0.4276,-7.41,3.88,8.39,0.7493,0.0,0.0,0.0,0.0,#05070E,#1C1C25,#35333C
-backgrounds_pop,traits/backgrounds_pop/Legendary_Yatrah.png,RGBA,1393,1393,1.0,26.06,26.59,0.5418,-6.16,2.43,8.46,0.8431,0.0,0.0,0.0,0.0,#03050B,#15171F,#2D2C31
 backgroundz,traits/backgroundz/Sweetardio_ (2).png,RGBA,1393,1393,1.0,68.4,55.66,0.2447,13.13,1.77,9.04,0.4743,0.0,0.0,0.0,0.0,#332D2B,#121011,#65564B
 backgroundz,traits/backgroundz/Sweetardio_113 (24).png,RGBA,1393,1393,1.0,26.51,16.48,0.5054,11.99,26.89,6.87,0.7609,0.0,0.0,0.0087,0.0,#100E15,#201D2D,#940D43
 backgroundz,traits/backgroundz/Sweetardio_113 (31).png,RGBA,1393,1393,1.0,50.36,21.48,0.6209,-56.73,10.17,8.27,0.5117,0.0,0.0,0.0,0.0,#213560,#192744,#2B4579

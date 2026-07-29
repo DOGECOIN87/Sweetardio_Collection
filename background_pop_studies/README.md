@@ -5,7 +5,7 @@ the dessert characters own the colour contrast.
 
 Layout: **`traits/backgroundz/` holds the 34 GRADED plates** the generator
 uses (ungraded sources preserved in `traits/backgroundz_originals/`), and
-**`traits/backgrounds_pop/` holds the 13 graded Legendary plates** (sources
+**`traits/backgrounds_pop/` holds the 4 graded Legendary plates** (sources
 in `traits/backgrounds_pop_originals/`). Originals are never modified —
 every operation is a deterministic, reversible tone/colour transform,
 nothing generated or repainted; regrade anytime with the commands below.
