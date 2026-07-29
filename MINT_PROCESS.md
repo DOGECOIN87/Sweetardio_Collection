@@ -83,7 +83,7 @@ All counts are hit exactly by pre-allocating token slots before composition.
   are minted **exactly once each** as standalone tokens — never composited with
   any other trait.
 - **Legendary backgrounds:** each `Legendary_*` plate appears **exactly 50×**
-  (13 × 50 = 650). They never appear via the normal random background pick.
+  (4 × 50 = 200). They never appear via the normal random background pick.
 - **Arms (~16% armed, ~84% empty-handed):**
   AK15 / Golden AK **20** (rarest) · Blue/Pink/Cyan Saber **25 each** ·
   Dual Uzis **40** · AR47 **55** · Military Brat **85** · Nerf Blaster **110** ·

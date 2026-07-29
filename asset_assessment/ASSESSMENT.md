@@ -13,7 +13,7 @@ Full per-image numbers: `asset_assessment/metrics.csv` / `metrics.json`.
 |---|---|---|---|---|---|---|---|
 | `backgroundz` | 34 | **ACTIVE background plates** (used by `generator.py`) | 25× 1393² RGBA, 7× 1254² RGB, 1× 1254² RGBA, 1× 1024² JPG | 66.1 | 43.9 | 0.473 | −5.8 |
 | `background` | 70 | legacy backgrounds, **not used** by generator (incl. `_corrected` / `_before_after` variants from an earlier grading pass; mixed 1024–2686 px) | mixed RGB/RGBA | 104.9 | 46.9 | 0.330 | +12.9 |
-| `backgrounds_pop` | 13 | `Legendary_*` full plates (legendary 1/1 art), not in the standard generator path | 1393² RGBA | 33.8 | 31.9 | 0.481 | −8.6 |
+| `backgrounds_pop` | 4 | `Legendary_*` full plates (legendary 1/1 art), not in the standard generator path | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
 | `characterz` | 29 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 115.6 | 49.5 | 0.629 | **+62.3** |
 | `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 129.6 | 28.5 | 0.550 | +13.3 |
 | `eyez` | 11 | eyes | 1393² RGBA, 0.6 % opaque | 62.4 | 69.0 | 0.225 | −15.4 |
