@@ -691,6 +691,9 @@ CENTERED_FOOTWEARLESS_DY = {
     "chocolate_chip_cookie": 32,
     "gummy_worm": 24,
     "oatmeal_cream_pie": 80,
+    "ding_dong": 94,       # was the only CENTERED character with no entry, so
+                           # it floated ~94px above its ring/disc peers when
+                           # bare; 94 puts its bottom on their median (1016)
 }
 
 def centered_footwearless_dy(char_name):
