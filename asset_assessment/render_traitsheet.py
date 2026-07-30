@@ -32,6 +32,7 @@ FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 SHEETS = {
     "backgroundz":           (g.BACKGROUNDZ, "Backgrounds",
                               lambda f: not g.is_legendary_bg(f)),
+    "backgroundz_all":       (g.BACKGROUNDZ, "Backgrounds — All", None),
     "backgroundz_legendary": (g.BACKGROUNDZ, "Backgrounds — Legendary",
                               g.is_legendary_bg),
     "characterz":            (g.CHARACTERZ, "Characters", None),
@@ -59,6 +60,15 @@ def tile_image(path, size, matte):
     tile = Image.new("RGB", (size, size), matte if transparent else PAGE_BG)
     tile.paste(im, ((size - im.width) // 2, (size - im.height) // 2), im)
     return tile
+
+
+def _fit(draw, text, font, max_px):
+    """Ellipsize a label so it never runs into the next tile's caption."""
+    if draw.textlength(text, font=font) <= max_px:
+        return text
+    while text and draw.textlength(text + "…", font=font) > max_px:
+        text = text[:-1]
+    return text.rstrip() + "…"
 
 
 def render(sheet_key, cols, tile_px, out_path):
@@ -92,8 +102,8 @@ def render(sheet_key, cols, tile_px, out_path):
         sheet.paste(tile_image(os.path.join(g.TRAITS_DIR, trait_dir, f),
                                tile_px, matte or MATTE), (x, y))
         dr.text((x + 2, y + tile_px + LABEL_BAND // 2),
-                g.trait_name(trait_dir, f), font=label_font, fill=LABEL_RGB,
-                anchor="lm")
+                _fit(dr, g.trait_name(trait_dir, f), label_font, tile_px - 8),
+                font=label_font, fill=LABEL_RGB, anchor="lm")
 
     sheet.save(out_path)
     print(f"{out_path}  {W}x{H}  {len(files)} traits")
