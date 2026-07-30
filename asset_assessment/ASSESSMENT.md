@@ -17,7 +17,6 @@ assets have since been added or retired.
 |---|---|---|---|---|---|---|---|
 | `backgroundz` | 57 | **ACTIVE background plates** (used by `generator.py`), incl. 4 `Legendary_*` | mixed 1393² / 1254² / 1024², RGBA + RGB | 90.5 | 46.7 | 0.325 | −2.5 |
 | `backgroundz_originals` | 47 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
-| `background` | 70 | legacy backgrounds, **not used** by generator (incl. `_corrected` / `_before_after` variants from an earlier grading pass; mixed 1024–2686 px) | mixed RGB/RGBA | 104.9 | 46.9 | 0.330 | +12.9 |
 | `backgrounds_pop_originals` | 4 | ungraded sources for the `Legendary_*` plates | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
 | `characterz` | 32 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
 | `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 118.3 | 30.5 | 0.551 | +25.3 |
@@ -136,8 +135,10 @@ brand's Oxford-Blue world the navy plates already live in:
 
 Everything is a deterministic, parameter-logged tone/colour transform;
 originals untouched; output to a separate folder. Scope: the 34 plates in
-`traits/backgroundz/` only (legacy `background/` and the Legendary
-`backgrounds_pop/` plates are measured above but excluded unless requested).
+`traits/backgroundz/` only (the Legendary `backgrounds_pop/` plates are
+measured above but excluded unless requested). The legacy `background/`
+folder referenced by this pass was pruned in 2026-07; it was never read by
+the generator.
 
 **Alternative rejected:** a warm/neutral-dark stage would sit inside the
 80 % red-orange body band and is contraindicated by the measurements.
