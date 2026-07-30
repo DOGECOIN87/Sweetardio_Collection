@@ -254,6 +254,22 @@ TRAIT_NAMES = {
         "art_mattrick_001-1-2 (1).png":     "Cookie Money",
         "art_mattrick_001-15-2 (1).png":    "In Cook We Trust",
         "soft_serve.png":                   "Soft Serve",
+        "Abduction_Beam.png":               "Abduction Beam",
+        "Bored_Apes.png":                   "Bored Apes",
+        "Bouquet_Drip.png":                 "Bouquet Drip",
+        "Empty_Fridge.png":                 "Empty Fridge",
+        "Graham_Cracker.png":               "Graham Cracker",
+        "Graham_Cracker_Tan.png":           "Graham Cracker Tan",
+        "Hersheys.png":                     "Hersheys",
+        "Neon_Backroom.png":                "Neon Backroom",
+        "Neon_Strip.png":                   "Neon Strip",
+        "Smiley_Foil_Bronze.png":           "Smiley Foil Bronze",
+        "Smiley_Foil_Gold.png":             "Smiley Foil Gold",
+        "Smiley_Foil_Onyx.png":             "Smiley Foil Onyx",
+        "Smiley_Foil_Silver.png":           "Smiley Foil Silver",
+        "Starburst.png":                    "Starburst",
+        "Sweetardio_Badge.png":             "Sweetardio Badge",
+        "Sweetardio_Storefront.png":        "Sweetardio Storefront",
     },
     SKINZ: {
         "layer-Skin_Alien (2).png":                 "Alien",
@@ -632,6 +648,9 @@ CHAR_Y_ADJUST = {
     "rainbow_sherbert_ice_cream": -57,
     "chocolate_sandwich_cookie": 50,
     "sugar_cube": 42,
+    "gold_waffle": -18,        # measured separately from the plain waffle; the
+                               # key must stay distinct or the "waffle" substring
+                               # claims it and lifts it 20px too high
     "waffle": -38,
     "ding_dong": 34,
     "og_gummy_bear": 44,      # bears enlarged + aligned to the cone line (1290)
@@ -650,8 +669,13 @@ CHAR_Y_ADJUST = {
 }
 
 def char_y_adjust(char_name):
-    return next((dy for k, dy in CHAR_Y_ADJUST.items()
-                 if k in char_name.lower()), 0)
+    # Longest key wins: several characters contain a shorter character's name
+    # ("gold_waffle" contains "waffle"), and a first-match lookup silently
+    # hands them the wrong trim. Shared keys that are deliberately generic
+    # ("poptart" for all three poptarts) are unaffected.
+    name = char_name.lower()
+    hits = [k for k in CHAR_Y_ADJUST if k in name]
+    return CHAR_Y_ADJUST[max(hits, key=len)] if hits else 0
 
 # Per-character vertical trim (px, +down) for CENTERED characters in their
 # footwear-less CENTRED position (where the normal CHAR_Y_ADJUST is suppressed
@@ -667,6 +691,9 @@ CENTERED_FOOTWEARLESS_DY = {
     "chocolate_chip_cookie": 32,
     "gummy_worm": 24,
     "oatmeal_cream_pie": 80,
+    "ding_dong": 94,       # was the only CENTERED character with no entry, so
+                           # it floated ~94px above its ring/disc peers when
+                           # bare; 94 puts its bottom on their median (1016)
 }
 
 def centered_footwearless_dy(char_name):
