@@ -55,7 +55,10 @@ def kmeans(pixels: np.ndarray, k: int, rng: np.random.Generator, iters: int = 25
     centers = [pixels[rng.integers(n)]]
     for _ in range(k - 1):
         d2 = np.min([np.sum((pixels - c) ** 2, axis=1) for c in centers], axis=0)
-        probs = d2 / max(d2.sum(), 1e-9)
+        # every remaining pixel can coincide with a chosen centre (tiny, flat
+        # layers); d2 then sums to 0 and the ratio is not a distribution.
+        total = d2.sum()
+        probs = d2 / total if total > 0 else np.full(n, 1.0 / n)
         centers.append(pixels[rng.choice(n, p=probs)])
     centers = np.array(centers, dtype=np.float64)
     for _ in range(iters):

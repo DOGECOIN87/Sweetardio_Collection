@@ -9,19 +9,27 @@ Full per-image numbers: `asset_assessment/metrics.csv` / `metrics.json`.
 
 ## 1. Inventory
 
+Inventory below is a **current** re-measurement (`analyze.py`); the analysis in
+§2–§4 is the original Phase-1 pass and its per-folder figures may differ where
+assets have since been added or retired.
+
 | folder | files | role | sizes / modes | mean L | L std | mean S | temp R−B |
 |---|---|---|---|---|---|---|---|
-| `backgroundz` | 34 | **ACTIVE background plates** (used by `generator.py`) | 25× 1393² RGBA, 7× 1254² RGB, 1× 1254² RGBA, 1× 1024² JPG | 66.1 | 43.9 | 0.473 | −5.8 |
+| `backgroundz` | 57 | **ACTIVE background plates** (used by `generator.py`), incl. 4 `Legendary_*` | mixed 1393² / 1254² / 1024², RGBA + RGB | 90.5 | 46.7 | 0.325 | −2.5 |
+| `backgroundz_originals` | 47 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
 | `background` | 70 | legacy backgrounds, **not used** by generator (incl. `_corrected` / `_before_after` variants from an earlier grading pass; mixed 1024–2686 px) | mixed RGB/RGBA | 104.9 | 46.9 | 0.330 | +12.9 |
-| `backgrounds_pop` | 13 | `Legendary_*` full plates (legendary 1/1 art), not in the standard generator path | 1393² RGBA | 33.8 | 31.9 | 0.481 | −8.6 |
-| `characterz` | 29 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 115.6 | 49.5 | 0.629 | **+62.3** |
-| `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 129.6 | 28.5 | 0.550 | +13.3 |
-| `eyez` | 11 | eyes | 1393² RGBA, 0.6 % opaque | 62.4 | 69.0 | 0.225 | −15.4 |
-| `mouthz` | 7 | mouths | 1393² RGBA | 53.0 | 44.6 | 0.228 | +13.9 |
-| `armz` | 10 | arms / held items | 1393² RGBA, 6 % opaque | 129.0 | 86.6 | 0.282 | −0.1 |
+| `backgrounds_pop_originals` | 4 | ungraded sources for the `Legendary_*` plates | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
+| `characterz` | 32 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
+| `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 118.3 | 30.5 | 0.551 | +25.3 |
+| `eyez` | 11 | eyes | 1393² RGBA, 0.6 % opaque | 63.0 | 68.8 | 0.267 | −22.3 |
+| `mouthz` | 9 | mouths | 1393² RGBA | 60.7 | 44.6 | 0.166 | +8.6 |
+| `armz` | 16 | arms / held items | 1393² RGBA, 5 % opaque | 132.4 | 80.0 | 0.164 | +5.4 |
+| `armz_originals` | 3 | ungraded saber sources | 1393² RGBA | 141.1 | 90.2 | 0.416 | −39.2 |
+| `saber_parts` | 1 | lightsaber build asset | 1393² RGBA | 99.2 | 66.5 | 0.120 | −6.8 |
 | `what_are_thosez` | 11 | footwear base+overlay pairs | 1393² RGBA | 133.5 | 54.6 | 0.376 | +12.3 |
-| `stickerz` | 26 | corner stickers | 1343² RGBA, 1 % opaque | 133.8 | 72.6 | 0.310 | +25.2 |
-| `legendaryz`, `secret_rarez` | 0 | empty (`.gitkeep`) | — | — | — | — | — |
+| `stickerz` | 23 | corner stickers | 1343² RGBA, 1 % opaque | 133.6 | 73.4 | 0.295 | +17.5 |
+| `secret_rarez` | 26 | 1/1 standalone artworks, never composited | 1393² RGBA | 82.8 | 56.9 | 0.407 | +15.8 |
+| `legendaryz` | 0 | empty (`.gitkeep`) | — | — | — | — | — |
 
 Layer order (from `generator.py`): backgroundz → footwear base → characterz →
 footwear overlay → skinz → eyez → mouthz → armz → stickerz, on a 1393² canvas.

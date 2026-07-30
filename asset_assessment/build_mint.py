@@ -6,7 +6,7 @@ Rarity model (all counts are EXACT, hit by pre-allocating token slots):
 
   Backgrounds
     * Legendary_* plates (in traits/backgroundz) are 1/1-style rares: each one
-      appears EXACTLY --leg-each times (default 50). 13 x 50 = 650.
+      appears EXACTLY --leg-each times (default 50). 4 x 50 = 200.
     * every other token gets a normal weighted/compat plate; Legendary plates
       never appear via the random pick (generator excludes the prefix).
 
