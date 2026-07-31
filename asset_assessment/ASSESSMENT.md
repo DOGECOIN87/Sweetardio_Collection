@@ -18,7 +18,7 @@ assets have since been added or retired.
 | `backgroundz` | 57 | **ACTIVE background plates** (used by `generator.py`), incl. 4 `Legendary_*` | mixed 1393² / 1254² / 1024², RGBA + RGB | 90.5 | 46.7 | 0.325 | −2.5 |
 | `backgroundz_originals` | 53 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
 | `backgrounds_pop_originals` | 4 | ungraded sources for the `Legendary_*` plates | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
-| `characterz` | 32 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
+| `characterz` | 33 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
 | `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 118.3 | 30.5 | 0.551 | +25.3 |
 | `eyez` | 11 | eyes | 1393² RGBA, 0.6 % opaque | 63.0 | 68.8 | 0.267 | −22.3 |
 | `mouthz` | 9 | mouths | 1393² RGBA | 60.7 | 44.6 | 0.166 | +8.6 |
