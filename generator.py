@@ -259,7 +259,6 @@ TRAIT_NAMES = {
         "Bouquet_Drip.png":                 "Bouquet Drip",
         "Empty_Fridge.png":                 "Empty Fridge",
         "Graham.png":                       "Graham",
-        "Graham_Cracker_Tan.png":           "Graham Cracker Tan",
         "Hurshey.png":                      "Hurshey",
         "Neon_Backroom.png":                "Neon Backroom",
         "Neon_Strip.png":                   "Neon Strip",
