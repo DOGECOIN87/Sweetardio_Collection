@@ -1,6 +1,6 @@
 # ULTIMATE GRADE LOG - Sweetardio background pop
 
-Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 49 plates
+Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 48 plates
 
 Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of darkest body 54 / brightest body 206), stage saturation 0.30 (body mean 0.629), split-tone COOL (bodies measure +62.3 warm). Every parameter below is a continuous function of the plate's measured L/S/busyness/temperature.
 
@@ -24,7 +24,6 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 | Empty_Fridge.png | 89.0 | 51.0 | 0.209 | +19.6 | 10.3 | 100 | 0.782 | 0.239 | 1.000 | 0.853 | 0.136 | 0.085 | 0.224 | 2.51 | 0.078 | 0.133 | 0.100 |  | 105.2 | 0.172 | +14.8 |
 | Gorlock.png | 45.7 | 35.9 | 0.186 | +2.5 | 10.3 | 100 | 0.597 | 0.320 | 1.000 | 0.641 | 0.103 | 0.064 | 0.000 | 0.00 | 0.000 | 0.101 | 0.100 |  | 78.8 | 0.188 | -2.0 |
 | Graham.png | 104.9 | 44.6 | 0.450 | +52.1 | 16.4 | 100 | 0.859 | 0.217 | 0.738 | 1.000 | 0.160 | 0.100 | 0.548 | 3.42 | 0.192 | 0.150 | 0.100 |  | 112.9 | 0.236 | +29.5 |
-| Graham_Cracker_Tan.png | 132.6 | 45.1 | 0.449 | +65.3 | 21.5 | 100 | 1.017 | 0.176 | 0.739 | 1.000 | 0.160 | 0.100 | 0.814 | 3.08 | 0.285 | 0.173 | 0.100 |  | 126.4 | 0.243 | +32.5 |
 | Hurshey.png | 54.0 | 33.6 | 0.479 | +31.9 | 12.9 | 100 | 0.632 | 0.262 | 0.704 | 0.957 | 0.153 | 0.096 | 0.366 | 3.08 | 0.128 | 0.104 | 0.100 |  | 84.6 | 0.253 | +25.5 |
 | Liberty_Cook_Dime.png | 134.0 | 77.0 | 0.000 | +0.0 | 15.4 | 94 | 1.026 | 0.121 | 1.000 | 0.606 | 0.097 | 0.061 | 0.489 | 3.41 | 0.171 | 0.174 | 0.100 |  | 134.0 | 0.060 | -2.9 |
 | Nabisco.png | 19.8 | 25.3 | 0.391 | +6.8 | 5.8 | 100 | 0.550 | 0.320 | 0.820 | 0.699 | 0.112 | 0.070 | 0.000 | 0.00 | 0.000 | 0.100 | 0.100 |  | 47.4 | 0.215 | +7.5 |
@@ -67,7 +66,7 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 L spread (std) 34.8 -> 24.0; S spread 0.23 -> 0.16; temp spread 33.0 -> 27.8.
 
 Note: the 16 plates added 2026-07 (Abduction, Bored_Apes, Bouquet_Drip,
-Empty_Fridge, Graham, Graham_Cracker_Tan, Hurshey, Neon_Backroom,
+Empty_Fridge, Graham, Hurshey, Neon_Backroom,
 Neon_Strip, the four Cookboy foil colourways, Starburst, Emblem and Store) were graded in a later run and their rows merged into
 the table above; the cohesion summary describes the original batch only.
 
