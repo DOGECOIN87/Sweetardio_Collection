@@ -14,7 +14,7 @@ for the full list of sheet keys).
 | `traitsheet_backgroundz.png` | Backgroundz (plates + overlays) | 66 |
 | `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 70 |
 | `traitsheet_backgroundz_legendary.png` | Backgroundz — Legendary | 4 |
-| `traitsheet_characterz.png` | Characterz | 32 |
+| `traitsheet_characterz.png` | Characterz | 33 |
 | `traitsheet_skinz.png` | Skinz | 5 |
 | `traitsheet_eyez.png` | Eyez | 11 |
 | `traitsheet_mouthz.png` | Mouthz | 9 |

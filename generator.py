@@ -165,6 +165,7 @@ def secret_rare_token_name(filename):
 TRAIT_NAMES = {
     CHARACTERZ: {
         "Twinkie":                          "Twinkie",
+        "Nutty_Bar":                         "Nutty Bar",
         "brownie_bite":                     "Brownie Bite",
         "chocolate_chip_cookie":            "Chocolate Chip Cookie",
         "chocolate_doughnut":               "Chocolate Doughnut",
@@ -545,6 +546,7 @@ EXCLUDE_WAT_CHARS = [
     "pink_sherbert_ice_cream",
     "gummy_bear",
     "twinkie",
+    "nutty_bar",
     "churro",
     "poptart",
 ]
@@ -582,6 +584,7 @@ NO_OFFSET_CHARS = [
     "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "twinkie",
+    "nutty_bar",
     "churro",
     # bears are CHAR_SCALE-enlarged and aligned to the ice-cream cone line
     # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
@@ -658,7 +661,8 @@ CHAR_Y_ADJUST = {
     "gummy_worm": 18,
     "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": 68,     # enlarged + aligned to the cone line (1290)
+    "pink_gummy_bear": 68,
+    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # enlarged + aligned to the cone line (1290)
 }
 
 def char_y_adjust(char_name):
@@ -743,7 +747,7 @@ def skin_on_top(char_name):
 # BEFORE the body, revealed through the body's face hole) even though their
 # art is authored as a before-skinz file. Gummy bears read better with the
 # bear body in front and the skin showing through the eye hole.
-BODY_OVER_SKIN_CHARS = ["gummy_bear"]
+BODY_OVER_SKIN_CHARS = ["gummy_bear", "nutty_bar"]
 
 def body_over_skin(char_name):
     return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
