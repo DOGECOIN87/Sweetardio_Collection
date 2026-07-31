@@ -16,7 +16,7 @@ assets have since been added or retired.
 | folder | files | role | sizes / modes | mean L | L std | mean S | temp R−B |
 |---|---|---|---|---|---|---|---|
 | `backgroundz` | 57 | **ACTIVE background plates** (used by `generator.py`), incl. 4 `Legendary_*` | mixed 1393² / 1254² / 1024², RGBA + RGB | 90.5 | 46.7 | 0.325 | −2.5 |
-| `backgroundz_originals` | 47 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
+| `backgroundz_originals` | 53 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
 | `backgrounds_pop_originals` | 4 | ungraded sources for the `Legendary_*` plates | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
 | `characterz` | 32 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
 | `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 118.3 | 30.5 | 0.551 | +25.3 |
@@ -28,7 +28,6 @@ assets have since been added or retired.
 | `what_are_thosez` | 11 | footwear base+overlay pairs | 1393² RGBA | 133.5 | 54.6 | 0.376 | +12.3 |
 | `stickerz` | 23 | corner stickers | 1343² RGBA, 1 % opaque | 133.6 | 73.4 | 0.295 | +17.5 |
 | `secret_rarez` | 26 | 1/1 standalone artworks, never composited | 1393² RGBA | 82.8 | 56.9 | 0.407 | +15.8 |
-| `legendaryz` | 0 | empty (`.gitkeep`) | — | — | — | — | — |
 
 Layer order (from `generator.py`): backgroundz → footwear base → characterz →
 footwear overlay → skinz → eyez → mouthz → armz → stickerz, on a 1393² canvas.
