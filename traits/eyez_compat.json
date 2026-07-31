@@ -3,12 +3,6 @@
  "src": "traits/backgroundz",
  "strength": 0.8,
  "blocked": {
-  "Ben_dot_Eth.png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
-  ],
   "Bubble_Trouble.png": [
    "Cerise.png"
   ],
@@ -107,10 +101,6 @@
    "layer-art_mattrick_011.png": 0.894,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.93
-  },
-  "Ben_dot_Eth.png": {
-   "Cerise.png": 0.72,
-   "layer-art_mattrick_011.png": 0.562
   },
   "Bubble_Trouble.png": {
    "Blue.png": 0.549,

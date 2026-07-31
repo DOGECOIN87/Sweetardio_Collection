@@ -201,7 +201,6 @@ TRAIT_NAMES = {
     BACKGROUNDZ: {
         "Ayotollah.png":                    "Ayotollah",
         "Baked.png":                        "Baked",
-        "Ben_dot_Eth.png":                  "Ben dot Eth",
         "Bubble_Trouble.png":               "Bubble Trouble",
         "Cabaret_Alley.png":                "Cabaret Alley",
         "Candy_Tundra.png":                 "Candy Tundra",
@@ -930,10 +929,17 @@ def get_files(category):
     return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
 def generate_random_combination(force_bg=None, force_arm="auto",
-                                force_wat="auto", force_sticker="auto"):
+                                force_wat="auto", force_sticker="auto",
+                                force_char=None):
     """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
     plate from traits/backgroundz); it bypasses the random plate pick,
     the char<->bg compat filter and any paired overlay. Default = random.
+
+    force_char pins the character (a base character name as returned by
+    build_char_compat.base_name, e.g. "sugar_cube"); it bypasses the uniform
+    character pick so the mint allocator can hit exact per-character counts.
+    Everything downstream — compat filtering, placement, skin/eye/mouth —
+    behaves exactly as it would had the pick landed there naturally.
 
     force_arm / force_wat / force_sticker drive the optional slots for the
     mint allocator (build_mint.py) so exact rarity counts can be hit:
@@ -966,7 +972,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     
     # sorted: set iteration order varies per process (hash randomization),
     # which silently breaks seeded reproducibility
-    char_name = random.choice(sorted(base_names))
+    if force_char is not None:
+        if force_char not in base_names:
+            raise ValueError(f"force_char {force_char!r} is not a character "
+                             f"in traits/{CHARACTERZ}")
+        char_name = force_char
+    else:
+        char_name = random.choice(sorted(base_names))
     
     # Check if this character should be excluded from what_are_thosez. The
     # gorbhouse roll now happens INSIDE the footwear slot below, as part of the

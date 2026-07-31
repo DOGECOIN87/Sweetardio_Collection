@@ -24,7 +24,6 @@ backgrounds_pop_originals,traits/backgrounds_pop_originals/Legendary_Simplex.png
 backgrounds_pop_originals,traits/backgrounds_pop_originals/Legendary_Tenders.png,RGBA,1393,1393,1.0,28.74,31.19,0.4436,-8.88,1.59,11.24,0.8642,0.0,0.0,0.0,0.0,#05080E,#171A20,#2F3237
 backgroundz,traits/backgroundz/Ayotollah.png,RGBA,1393,1393,1.0,86.74,55.62,0.2632,25.54,2.95,7.56,0.2712,0.0,0.0,0.0,0.0,#50433C,#242023,#7B6257
 backgroundz,traits/backgroundz/Baked.png,RGBA,1343,1343,1.0,108.21,34.23,0.2218,26.51,0.16,2.54,0.0435,0.0,0.0,0.0,0.0,#605448,#968777,#7B6B5C
-backgroundz,traits/backgroundz/Ben_dot_Eth.png,RGBA,1393,1393,1.0,81.88,41.8,0.3664,-17.64,-1.73,4.6,0.2984,0.0,0.0,0.0,0.0,#2D4355,#1F2730,#43657F
 backgroundz,traits/backgroundz/Bubble_Trouble.png,RGBA,1254,1254,1.0,58.85,37.75,0.6715,-25.54,58.63,9.28,0.3101,0.0179,0.0,0.0,0.0,#1E0E3F,#461F6A,#7E3589
 backgroundz,traits/backgroundz/Cabaret_Alley.png,RGBA,1393,1393,1.0,36.55,35.96,0.0,0.0,0.0,6.72,0.746,0.0,0.0,0.0,0.0,#050505,#1D1D1D,#383838
 backgroundz,traits/backgroundz/Candy_Tundra.png,RGBA,1343,1343,1.0,126.0,33.26,0.3117,-37.34,4.79,3.05,0.021,0.0,0.0,0.0,0.0,#6D7A94,#8995AB,#51647C
@@ -79,7 +78,6 @@ backgroundz,traits/backgroundz/art_mattrick_001-15-2 (1).png,RGBA,1393,1393,1.0,
 backgroundz,traits/backgroundz/soft_serve.png,RGBA,1393,1393,1.0,87.02,73.08,0.2382,3.91,3.07,6.58,0.4953,0.0,0.0,0.0,0.0,#191E23,#4E403F,#877372
 backgroundz_originals,traits/backgroundz_originals/Ayotollah.png,RGBA,1393,1393,1.0,61.69,56.35,0.4118,33.99,1.52,14.06,0.4764,0.0,0.0,0.0,0.0,#130E0B,#3A2B21,#6A4F3E
 backgroundz_originals,traits/backgroundz_originals/Baked.png,RGBA,1343,1343,1.0,97.25,44.26,0.386,40.48,-0.68,17.68,0.1029,0.0,0.0,0.0,0.0,#533F2A,#9D8870,#76624D
-backgroundz_originals,traits/backgroundz_originals/Ben_dot_Eth.png,RGBA,1393,1393,1.0,51.37,46.5,0.5405,-8.84,-2.36,15.49,0.6204,0.0,0.0,0.0,0.0,#0B151C,#21445C,#4E3D2C
 backgroundz_originals,traits/backgroundz_originals/Blue_Fur.png,RGBA,1393,1393,1.0,50.36,21.48,0.6209,-56.73,10.17,8.27,0.5117,0.0,0.0,0.0,0.0,#213560,#192744,#2B4579
 backgroundz_originals,traits/backgroundz_originals/Bubble_Trouble.png,RGB,1254,1254,1.0,27.73,28.33,0.9298,-14.63,65.79,6.74,0.5184,0.031,0.0513,0.0386,0.0,#0E0120,#3E044E,#A60880
 backgroundz_originals,traits/backgroundz_originals/Candy_Land.png,RGBA,1393,1393,1.0,116.54,57.35,0.4359,31.02,-6.98,12.74,0.104,0.0,0.0,0.0,0.0,#6E5027,#C6CBC7,#6E8A9F

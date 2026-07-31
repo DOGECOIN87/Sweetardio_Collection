@@ -89,6 +89,17 @@ FOOTWEAR_COUNTS = {
 
 STICKER_TOTAL = 800   # ~18%, spread evenly across all sticker assets
 
+# ---- per-character rarity (base character name -> EXACT mint count) ----
+# Characters are otherwise drawn uniformly, so every unlisted character shares
+# the remaining supply evenly (~139 each at n=4444). Listing a character here
+# pins it to an exact count instead, the same way the arm and footwear tiers
+# work. Pinned characters are kept off legendary-background slots so the
+# legendary camouflage re-roll can never fight a forced character.
+#
+#   "sugar_cube": 20,        # <- would make sugar cube the rarest in the set
+CHARACTER_COUNTS = {
+}
+
 
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
@@ -165,6 +176,7 @@ def main():
     forced_arm  = [None] * N    # armz filename or None (None == no arm)
     forced_wat  = [None] * N    # footwear base / "gorbhouse" or None
     forced_stk  = [None] * N    # sticker filename or None
+    forced_char = [None] * N    # base character name or None
 
     forced_sr   = [None] * N    # secret-rare filename or None
     all_slots = list(range(N))
@@ -185,8 +197,28 @@ def main():
         forced_bg[s] = leg
     is_leg = set(leg_slots)
 
+    # 1b) rare characters -> exact counts on NON-legendary slots. Legendary
+    #     slots re-roll the character when it camouflages against the plate,
+    #     which a forced character could never satisfy, so they are excluded.
+    char_free = [s for s in avail if s not in is_leg]
+    random.shuffle(char_free)
+    char_total = sum(CHARACTER_COUNTS.values())
+    if char_total > len(char_free):
+        sys.exit(f"CHARACTER_COUNTS total {char_total} exceeds the "
+                 f"{len(char_free)} non-legendary slots available")
+    cur = 0
+    for cname, cnt in CHARACTER_COUNTS.items():
+        for s in char_free[cur:cur + cnt]:
+            forced_char[s] = cname
+        cur += cnt
+    # A pinned character cannot also carry a character-locked signature arm,
+    # and some characters are footwear-excluded (is_wat_excluded, e.g. churro),
+    # so a forced footwear on such a slot is unsatisfiable. Keep pinned slots
+    # out of both pools, exactly as legendary-background slots are.
+    is_rarechar = {s for s in range(N) if forced_char[s] is not None}
+
     # 2) signature arms -> NON-legendary slots (owner-locked, footwear-free)
-    nonleg = [s for s in avail if s not in is_leg]
+    nonleg = [s for s in avail if s not in is_leg and s not in is_rarechar]
     random.shuffle(nonleg)
     sig_slots = []
     cur = 0
@@ -209,7 +241,8 @@ def main():
 
     # 4) footwear -> non-legendary, non-signature slots (one footwear per token)
     free_for_wat = [s for s in avail
-                    if s not in is_leg and s not in sig_set]
+                    if s not in is_leg and s not in sig_set
+                    and s not in is_rarechar]
     random.shuffle(free_for_wat)
     cur = 0
     for wat, cnt in FOOTWEAR_COUNTS.items():
@@ -256,6 +289,7 @@ def main():
         for _attempt in range(4000):
             layers, char = g.generate_random_combination(
                 force_bg=fb,
+                force_char=forced_char[i],
                 force_arm=farm if farm is not None else None,
                 force_wat=fwat if fwat is not None else None,
                 force_sticker=fstk if fstk is not None else None,
@@ -334,6 +368,24 @@ def main():
     p(f"  -> all exactly {args.leg_each}? {'YES' if not bad else 'NO ' + str(bad)}")
     p(f"  legendary tokens: {sum(leg_d.values())} "
       f"({100*sum(leg_d.values())/N:.1f}%)\n")
+
+    char_d = dist("character")
+    if CHARACTER_COUNTS:
+        cbad = {c: char_d.get(c, 0) for c, want in CHARACTER_COUNTS.items()
+                if char_d.get(c, 0) != want}
+        p("RARE CHARACTERS (pinned to exact counts):")
+        for c, want in CHARACTER_COUNTS.items():
+            p(f"  {g.trait_name(g.CHARACTERZ, c):28} {char_d.get(c, 0)}  "
+              f"(target {want})")
+        p(f"  -> all exact? {'YES' if not cbad else 'NO ' + str(cbad)}\n")
+    # composited tokens only: secret rares are standalone and carry no character
+    cast = set(char_table())
+    unpinned = {c: n for c, n in char_d.items()
+                if c in cast and c not in CHARACTER_COUNTS}
+    if unpinned:
+        lo, hi = min(unpinned.values()), max(unpinned.values())
+        p(f"OTHER CHARACTERS ({len(unpinned)} sharing the rest, "
+          f"{lo}-{hi} each)\n")
 
     arm_d = dist("arm")
     armed = sum(c for a, c in arm_d.items() if a is not None)
