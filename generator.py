@@ -231,7 +231,6 @@ TRAIT_NAMES = {
         "Pixie_Stix.png":                   "Pixie Stix",
         "Psychedelics.png":                 "Psychedelics",
         "RIP_Gorbagana.png":                "RIP Gorbagana",
-        "Rick_the_D1ck.png":                "Rick the D1ck",
         "Smuckers_Blue.png":                "Smuckers Blue",
         "Snack_Pack.png":                   "Snack Pack",
         "Straight_of_America (1).png":      "Straight of America",
