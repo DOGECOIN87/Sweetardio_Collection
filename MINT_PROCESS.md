@@ -54,7 +54,7 @@ Each `<id>.json` is a standard token object:
     { "trait_type": "Eyes",       "value": "Cyborg" },
     { "trait_type": "Mouth",      "value": "Fang" },
     { "trait_type": "Arms",       "value": "Oatmeal Pie Katana" },
-    { "trait_type": "Sticker",    "value": "Crying Tomato" }
+    { "trait_type": "Sticker",    "value": "Golden Ticket" }
   ]
 }
 ```
@@ -64,7 +64,7 @@ JSON with the matching image by name; if your launchpad needs an `ipfs://CID/`
 prefix instead, it is added at upload time — no need to change the files.
 
 **Secret-rare 1/1 tokens** carry a single `Secret Rarez` attribute and a
-special numbered name (#1…#26), e.g.:
+special numbered name (#1…#23), e.g.:
 
 ```json
 {
@@ -79,7 +79,7 @@ special numbered name (#1…#26), e.g.:
 
 All counts are hit exactly by pre-allocating token slots before composition.
 
-- **Secret rares (1/1):** the 26 finished artworks in `traits/secret_rarez/`
+- **Secret rares (1/1):** the 23 finished artworks in `traits/secret_rarez/`
   are minted **exactly once each** as standalone tokens — never composited with
   any other trait.
 - **Legendary backgrounds:** each `Legendary_*` plate appears **exactly 50×**

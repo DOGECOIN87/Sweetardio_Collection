@@ -21,4 +21,4 @@ for the full list of sheet keys).
 | `traitsheet_armz.png` | Armz | 16 |
 | `traitsheet_what_are_thosez.png` | What_are_thosez (footwear) | 11 |
 | `traitsheet_stickerz.png` | Stickerz | 23 |
-| `traitsheet_secret_rarez.png` | Secret Rarez (1/1s) | 26 |
+| `traitsheet_secret_rarez.png` | Secret Rarez (1/1s) | 23 |
