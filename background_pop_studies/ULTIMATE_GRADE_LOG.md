@@ -1,6 +1,6 @@
 # ULTIMATE GRADE LOG - Sweetardio background pop
 
-Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 47 plates
+Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 46 plates
 
 Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of darkest body 54 / brightest body 206), stage saturation 0.30 (body mean 0.629), split-tone COOL (bodies measure +62.3 warm). Every parameter below is a continuous function of the plate's measured L/S/busyness/temperature.
 
@@ -8,7 +8,6 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Abduction.png | 48.1 | 33.1 | 0.618 | -56.0 | 10.0 | 100 | 0.607 | 0.287 | 0.581 | 0.004 | 0.001 | 0.000 | 0.208 | 3.08 | 0.073 | 0.102 | 0.100 |  | 82.9 | 0.443 | -56.8 |
 | Ayotollah.png | 61.7 | 56.4 | 0.412 | +34.0 | 14.1 | 100 | 0.664 | 0.212 | 0.789 | 0.969 | 0.155 | 0.097 | 0.268 | 1.87 | 0.094 | 0.109 | 0.100 |  | 86.7 | 0.263 | +25.5 |
-| Ben_dot_Eth.png | 51.4 | 46.5 | 0.541 | -8.8 | 15.5 | 100 | 0.621 | 0.218 | 0.643 | 0.481 | 0.077 | 0.048 | 0.499 | 3.47 | 0.174 | 0.103 | 0.100 |  | 81.9 | 0.366 | -17.6 |
 | Blue_Fur.png | 50.4 | 21.5 | 0.621 | -56.7 | 8.3 | 100 | 0.617 | 0.320 | 0.580 | 0.003 | 0.000 | 0.000 | 0.000 | 0.00 | 0.000 | 0.102 | 0.100 |  | 86.3 | 0.447 | -56.9 |
 | Bored_Apes.png | 68.1 | 37.0 | 0.385 | -8.1 | 10.7 | 100 | 0.691 | 0.281 | 0.829 | 0.491 | 0.079 | 0.049 | 0.245 | 3.08 | 0.086 | 0.113 | 0.100 |  | 94.2 | 0.289 | -13.4 |
 | Bouquet_Drip.png | 107.0 | 46.6 | 0.305 | -23.3 | 10.5 | 100 | 0.869 | 0.255 | 0.987 | 0.281 | 0.045 | 0.028 | 0.237 | 3.08 | 0.083 | 0.152 | 0.100 |  | 116.1 | 0.273 | -24.5 |

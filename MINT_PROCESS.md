@@ -89,6 +89,13 @@ All counts are hit exactly by pre-allocating token slots before composition.
   Dual Uzis **40** · AR47 **55** · Military Brat **85** · Nerf Blaster **110** ·
   Cash **130** · 6 character-locked signature katanas **32 each**.
 - **Footwear (~12%):** Gorbhouse / Cookie Monster / Bunny / Pepe / Shiba.
+- **Characters:** drawn uniformly by default, so every character lands at
+  roughly the same count (~139 each). To make one rare, pin it to an exact
+  count in `CHARACTER_COUNTS` in `asset_assessment/build_mint.py`; unlisted
+  characters keep sharing the remaining supply evenly. Pinned characters are
+  kept off legendary-background slots, signature weapons and forced footwear,
+  since those are character-locked or character-excluded and could not be
+  satisfied on a forced-character slot.
 - **Stickers (~18%):** spread evenly across every sticker asset.
 
 Every composited token is a **unique** trait combination, with no
