@@ -202,14 +202,6 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.776,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.77
   },
-  "Gorlock.png": {
-   "Blue.png": 0.216,
-   "Cerise.png": 0.667,
-   "layer-Eyes_Cyan (1).png": 0.332,
-   "layer-art_mattrick_011.png": 0.573,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.315,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
-  },
   "Gummy_Bears.png": {
    "Blue.png": 0.609,
    "layer-Eyes_Cyan (1).png": 0.709,
@@ -262,14 +254,6 @@
    "layer-art_mattrick_011.png": 0.906,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.896,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
-  },
-  "Palm_Beach_Pete.png": {
-   "Blue.png": 0.091,
-   "Cerise.png": 0.483,
-   "layer-Eyes_Cyan (1).png": 0.534,
-   "layer-art_mattrick_011.png": 0.705,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
   },
   "Pink_Abyss.png": {
    "Blue.png": 0.854,
@@ -448,6 +432,14 @@
    "layer-art_mattrick_011.png": 0.565,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.347,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.356
+  },
+  "Tampa_Bay_Pete.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.483,
+   "layer-Eyes_Cyan (1).png": 0.534,
+   "layer-art_mattrick_011.png": 0.705,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
   }
  }
 }

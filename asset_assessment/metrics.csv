@@ -38,7 +38,6 @@ backgroundz,traits/backgroundz/Drained_The_Swamp.png,RGBA,1393,1393,1.0,93.43,44
 backgroundz,traits/backgroundz/Druski.png,RGBA,1393,1393,1.0,88.43,48.54,0.1668,4.81,4.58,8.74,0.3109,0.0,0.0,0.0,0.0,#615857,#221E27,#3C3338
 backgroundz,traits/backgroundz/Flavor_Explosion.png,RGBA,1393,1393,1.0,111.03,48.16,0.2134,29.37,3.09,2.21,0.0352,0.0,0.0,0.0,0.0,#433B3A,#B1937B,#605551
 backgroundz,traits/backgroundz/Goo_Lagoon.png,RGBA,1254,1254,1.0,95.5,48.7,0.3613,13.12,-27.5,4.23,0.2773,0.0,0.0,0.0,0.0,#1E3022,#3C5536,#5F7A4C
-backgroundz,traits/backgroundz/Gorlock.png,RGBA,1393,1393,1.0,78.85,43.15,0.1877,-2.0,0.03,13.05,0.3142,0.0,0.0,0.0,0.0,#3D4043,#5A5C5C,#1B2229
 backgroundz,traits/backgroundz/Gummy_Bears.png,RGBA,1393,1393,1.0,78.22,39.22,0.5424,-17.97,35.72,5.83,0.1371,0.0,0.0,0.0,0.0,#39204B,#6A316C,#9B5589
 backgroundz,traits/backgroundz/He_Needs_Some_Milk.png,RGBA,1343,1343,1.0,116.44,43.36,0.1042,2.98,0.28,4.12,0.0724,0.0,0.0,0.0,0.0,#757473,#9A9491,#505151
 backgroundz,traits/backgroundz/Im_Not_Sorry.png,RGBA,1343,1343,1.0,108.13,24.98,0.2189,26.27,10.89,3.57,0.0001,0.0,0.0,0.0,0.0,#725D5A,#856E6A,#5D4C4B
@@ -50,7 +49,7 @@ backgroundz,traits/backgroundz/M&Ms.png,RGBA,1393,1393,1.0,72.11,51.4,0.6029,-29
 backgroundz,traits/backgroundz/Mars_Overlay.png,RGBA,1393,1393,0.0443,16.87,25.98,0.5525,14.98,1.7,6.3,0.8253,0.0,0.0,0.0,0.0,#050302,#23140C,#452B1C
 backgroundz,traits/backgroundz/Midnight_Snack (1).png,RGBA,1343,1343,1.0,71.94,39.86,0.3311,25.44,6.31,16.18,0.2835,0.0001,0.0,0.0,0.0,#5F4F4A,#42302A,#1F1514
 backgroundz,traits/backgroundz/Nabisco.png,RGBA,1254,1254,1.0,47.35,36.17,0.2152,7.55,1.26,8.77,0.6544,0.0,0.0,0.0,0.0,#151414,#312B29,#524843
-backgroundz,traits/backgroundz/Palm_Beach_Pete.png,RGBA,1254,1254,1.0,87.68,59.18,0.2087,-10.83,2.54,13.53,0.3579,0.0,0.0,0.0,0.0,#161926,#40434C,#6C6E74
+backgroundz,traits/backgroundz/Tampa_Bay_Pete.png,RGBA,1254,1254,1.0,87.68,59.18,0.2087,-10.83,2.54,13.53,0.3579,0.0,0.0,0.0,0.0,#161926,#40434C,#6C6E74
 backgroundz,traits/backgroundz/Pink_Abyss.png,RGBA,1343,1343,1.0,97.48,32.41,0.33,30.6,26.8,3.49,0.0349,0.0,0.0,0.0,0.0,#855D68,#6C4651,#A97180
 backgroundz,traits/backgroundz/Pixie_Stix.png,RGBA,1393,1393,1.0,88.37,46.65,0.437,-11.71,27.43,7.41,0.1898,0.0,0.0,0.0,0.0,#553E61,#2B1D36,#995A88
 backgroundz,traits/backgroundz/Psychedelics.png,RGBA,1393,1393,1.0,91.24,58.06,0.2137,9.98,3.08,10.49,0.2669,0.0002,0.0,0.0,0.0,#433E3F,#786A63,#1B1B21
@@ -95,7 +94,6 @@ backgroundz_originals,traits/backgroundz_originals/Drained_The_Swamp.png,RGBA,13
 backgroundz_originals,traits/backgroundz_originals/Druski.png,RGBA,1393,1393,1.0,61.05,41.04,0.1774,6.56,2.75,7.53,0.484,0.0,0.0,0.0,0.0,#171315,#352F2F,#6F6865
 backgroundz_originals,traits/backgroundz_originals/Flavor_Explosion.png,RGBA,1393,1393,1.0,101.85,50.94,0.3365,41.35,3.01,14.81,0.1685,0.0,0.0,0.0,0.0,#30241E,#56473E,#846750
 backgroundz_originals,traits/backgroundz_originals/Goo_Lagoon.png,RGB,1254,1254,1.0,74.69,52.16,0.7839,31.81,-46.67,12.6,0.3379,0.0,0.0,0.0,0.0,#092006,#274F11,#547B1D
-backgroundz_originals,traits/backgroundz_originals/Gorlock.png,RGBA,1393,1393,1.0,45.68,35.91,0.1855,2.49,-0.24,10.34,0.7077,0.0,0.0,0.0,0.0,#282929,#0E1011,#454340
 backgroundz_originals,traits/backgroundz_originals/Gummy_Bears.png,RGBA,1393,1393,1.0,44.23,36.37,0.8644,-21.25,43.11,8.7,0.3893,0.0006,0.0084,0.0096,0.0015,#280634,#73105E,#0D405D
 backgroundz_originals,traits/backgroundz_originals/He_Needs_Some_Milk.png,RGBA,1343,1343,1.0,110.94,58.74,0.131,7.45,-0.36,23.53,0.1862,0.0,0.0,0.0,0.0,#7F7B77,#55524E,#1C1C1C
 backgroundz_originals,traits/backgroundz_originals/Im_Not_Sorry.png,RGBA,1343,1343,1.0,96.33,32.06,0.2909,31.57,10.95,17.55,0.0318,0.0,0.0,0.0,0.0,#7A615C,#604944,#9A7973
@@ -104,7 +102,7 @@ backgroundz_originals,traits/backgroundz_originals/M&Ms.png,RGBA,1393,1393,1.0,4
 backgroundz_originals,traits/backgroundz_originals/NFTs_Arent_Dead.png,RGBA,1254,1254,1.0,43.37,43.99,0.5264,-29.91,4.67,13.41,0.7383,0.001,0.0,0.0,0.0,#171E2D,#040710,#2D4062
 backgroundz_originals,traits/backgroundz_originals/NFTs_Arent_Dead_2.png,RGB,1254,1254,1.0,38.4,43.3,0.5802,-29.21,4.59,12.37,0.7718,0.0021,0.0,0.0,0.0,#060911,#141D2E,#2C3F62
 backgroundz_originals,traits/backgroundz_originals/Nabisco.png,RGB,1254,1254,1.0,19.82,25.26,0.3906,6.82,0.3,5.83,0.9022,0.0,0.0,0.0,0.0,#060503,#17120F,#2F2721
-backgroundz_originals,traits/backgroundz_originals/Palm_Beach_Pete.png,RGB,1254,1254,1.0,62.44,53.95,0.1877,-4.73,1.03,11.99,0.5314,0.0,0.0,0.0,0.0,#0B0C10,#2C2E32,#535458
+backgroundz_originals,traits/backgroundz_originals/Tampa_Bay_Pete.png,RGB,1254,1254,1.0,62.44,53.95,0.1877,-4.73,1.03,11.99,0.5314,0.0,0.0,0.0,0.0,#0B0C10,#2C2E32,#535458
 backgroundz_originals,traits/backgroundz_originals/Pink_Abyss.png,RGBA,1343,1343,1.0,76.8,42.43,0.4834,41.1,31.66,17.7,0.1385,0.0,0.0,0.0,0.0,#7E4B56,#5D2933,#310F14
 backgroundz_originals,traits/backgroundz_originals/Pixie_Stix.png,RGBA,1393,1393,1.0,61.12,46.84,0.6889,-11.3,36.99,11.59,0.3418,0.0009,0.0035,0.0263,0.0005,#1A0E27,#582553,#AE307E
 backgroundz_originals,traits/backgroundz_originals/Psychedelics.png,RGBA,1393,1393,1.0,68.4,55.66,0.2447,13.13,1.77,9.04,0.4743,0.0,0.0,0.0,0.0,#332D2B,#121011,#65564B

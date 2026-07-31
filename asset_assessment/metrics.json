@@ -3198,88 +3198,6 @@
     "folder": "backgroundz"
   },
   {
-    "file": "traits/backgroundz/Gorlock.png",
-    "mode": "RGBA",
-    "w": 1393,
-    "h": 1393,
-    "opaque_frac": 1.0,
-    "L_mean": 78.85,
-    "L_std": 43.15,
-    "S_mean": 0.1877,
-    "temp_RmB": -2.0,
-    "pink_bias": 0.03,
-    "edge_density": 13.05,
-    "dominant": [
-      {
-        "rgb": [
-          61,
-          64,
-          67
-        ],
-        "hex": "#3D4043",
-        "w": 0.2892
-      },
-      {
-        "rgb": [
-          90,
-          92,
-          92
-        ],
-        "hex": "#5A5C5C",
-        "w": 0.269
-      },
-      {
-        "rgb": [
-          27,
-          34,
-          41
-        ],
-        "hex": "#1B2229",
-        "w": 0.2541
-      },
-      {
-        "rgb": [
-          136,
-          127,
-          121
-        ],
-        "hex": "#887F79",
-        "w": 0.1274
-      },
-      {
-        "rgb": [
-          208,
-          188,
-          174
-        ],
-        "hex": "#D0BCAE",
-        "w": 0.0603
-      }
-    ],
-    "brand_fracs": {
-      "oxford_blue_070F34": 0.3142,
-      "zaffre_0313A6": 0.0,
-      "dark_violet_9201CB": 0.0,
-      "hollywood_cerise_F715AB": 0.0,
-      "fluor_cyan_34EDF3": 0.0
-    },
-    "hue_hist": [
-      0.1471,
-      0.052,
-      0.0075,
-      0.0029,
-      0.008,
-      0.0367,
-      0.3992,
-      0.3308,
-      0.0079,
-      0.0017,
-      0.0017,
-      0.0045
-    ],
-    "folder": "backgroundz"
-  },
-  {
     "file": "traits/backgroundz/Gummy_Bears.png",
     "mode": "RGBA",
     "w": 1393,
@@ -4182,7 +4100,7 @@
     "folder": "backgroundz"
   },
   {
-    "file": "traits/backgroundz/Palm_Beach_Pete.png",
+    "file": "traits/backgroundz/Tampa_Bay_Pete.png",
     "mode": "RGBA",
     "w": 1254,
     "h": 1254,
@@ -7872,88 +7790,6 @@
     "folder": "backgroundz_originals"
   },
   {
-    "file": "traits/backgroundz_originals/Gorlock.png",
-    "mode": "RGBA",
-    "w": 1393,
-    "h": 1393,
-    "opaque_frac": 1.0,
-    "L_mean": 45.68,
-    "L_std": 35.91,
-    "S_mean": 0.1855,
-    "temp_RmB": 2.49,
-    "pink_bias": -0.24,
-    "edge_density": 10.34,
-    "dominant": [
-      {
-        "rgb": [
-          40,
-          41,
-          41
-        ],
-        "hex": "#282929",
-        "w": 0.3709
-      },
-      {
-        "rgb": [
-          14,
-          16,
-          17
-        ],
-        "hex": "#0E1011",
-        "w": 0.3466
-      },
-      {
-        "rgb": [
-          69,
-          67,
-          64
-        ],
-        "hex": "#454340",
-        "w": 0.1849
-      },
-      {
-        "rgb": [
-          128,
-          108,
-          95
-        ],
-        "hex": "#806C5F",
-        "w": 0.0686
-      },
-      {
-        "rgb": [
-          186,
-          170,
-          156
-        ],
-        "hex": "#BAAA9C",
-        "w": 0.029
-      }
-    ],
-    "brand_fracs": {
-      "oxford_blue_070F34": 0.7077,
-      "zaffre_0313A6": 0.0,
-      "dark_violet_9201CB": 0.0,
-      "hollywood_cerise_F715AB": 0.0,
-      "fluor_cyan_34EDF3": 0.0
-    },
-    "hue_hist": [
-      0.1943,
-      0.1,
-      0.012,
-      0.0025,
-      0.0182,
-      0.0842,
-      0.4189,
-      0.119,
-      0.0451,
-      0.002,
-      0.0013,
-      0.0023
-    ],
-    "folder": "backgroundz_originals"
-  },
-  {
     "file": "traits/backgroundz_originals/Gummy_Bears.png",
     "mode": "RGBA",
     "w": 1393,
@@ -8610,7 +8446,7 @@
     "folder": "backgroundz_originals"
   },
   {
-    "file": "traits/backgroundz_originals/Palm_Beach_Pete.png",
+    "file": "traits/backgroundz_originals/Tampa_Bay_Pete.png",
     "mode": "RGB",
     "w": 1254,
     "h": 1254,
