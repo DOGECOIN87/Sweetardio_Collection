@@ -53,7 +53,7 @@ Each `<id>.json` is a standard token object:
     { "trait_type": "Skin",       "value": "Black" },
     { "trait_type": "Eyes",       "value": "Cyborg" },
     { "trait_type": "Mouth",      "value": "Fang" },
-    { "trait_type": "Arms",       "value": "Oatmeal Pie Katana" },
+    { "trait_type": "Arms",       "value": "Katana" },
     { "trait_type": "Sticker",    "value": "Golden Ticket" }
   ]
 }
@@ -87,7 +87,10 @@ All counts are hit exactly by pre-allocating token slots before composition.
 - **Arms (~16% armed, ~84% empty-handed):**
   AK15 / Golden AK **20** (rarest) · Blue/Pink/Cyan Saber **25 each** ·
   Dual Uzis **40** · AR47 **55** · Military Brat **85** · Nerf Blaster **110** ·
-  Cash **130** · 6 character-locked signature katanas **32 each**.
+  Cash **130** · 6 character-locked signature blades **32 each**.
+  Each character's blade is a different artwork, but they all read as plain
+  **Katana** (or **Knives**) in the metadata — the token says what it is
+  holding, not which character's version of it.
 - **Footwear (~12%):** Gorbhouse / Cookie Monster / Bunny / Pepe / Shiba.
 - **Characters:** drawn uniformly by default, so every character lands at
   roughly the same count (~139 each). To make one rare, pin it to an exact
