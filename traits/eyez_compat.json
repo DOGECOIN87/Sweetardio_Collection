@@ -3,12 +3,6 @@
  "src": "traits/backgroundz",
  "strength": 0.8,
  "blocked": {
-  "Ben_dot_Eth.png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
-  ],
   "Bubble_Trouble.png": [
    "Cerise.png"
   ],
@@ -108,10 +102,6 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.93
   },
-  "Ben_dot_Eth.png": {
-   "Cerise.png": 0.72,
-   "layer-art_mattrick_011.png": 0.562
-  },
   "Bubble_Trouble.png": {
    "Blue.png": 0.549,
    "layer-Eyes_Cyan (1).png": 0.761,
@@ -202,14 +192,6 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.776,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.77
   },
-  "Gorlock.png": {
-   "Blue.png": 0.216,
-   "Cerise.png": 0.667,
-   "layer-Eyes_Cyan (1).png": 0.332,
-   "layer-art_mattrick_011.png": 0.573,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.315,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
-  },
   "Gummy_Bears.png": {
    "Blue.png": 0.609,
    "layer-Eyes_Cyan (1).png": 0.709,
@@ -263,14 +245,6 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.896,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
   },
-  "Palm_Beach_Pete.png": {
-   "Blue.png": 0.091,
-   "Cerise.png": 0.483,
-   "layer-Eyes_Cyan (1).png": 0.534,
-   "layer-art_mattrick_011.png": 0.705,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
-  },
   "Pink_Abyss.png": {
    "Blue.png": 0.854,
    "Cerise.png": 0.755,
@@ -300,14 +274,6 @@
    "layer-art_mattrick_011.png": 0.818,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.85,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.848
-  },
-  "Rick_the_D1ck.png": {
-   "Blue.png": 0.902,
-   "Cerise.png": 0.916,
-   "layer-Eyes_Cyan (1).png": 0.816,
-   "layer-art_mattrick_011.png": 0.773,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.82,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.817
   },
   "Smuckers_Blue.png": {
    "Cerise.png": 0.568,
@@ -456,6 +422,14 @@
    "layer-art_mattrick_011.png": 0.565,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.347,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.356
+  },
+  "Tampa_Bay_Pete.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.483,
+   "layer-Eyes_Cyan (1).png": 0.534,
+   "layer-art_mattrick_011.png": 0.705,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
   }
  }
 }

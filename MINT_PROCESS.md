@@ -53,8 +53,8 @@ Each `<id>.json` is a standard token object:
     { "trait_type": "Skin",       "value": "Black" },
     { "trait_type": "Eyes",       "value": "Cyborg" },
     { "trait_type": "Mouth",      "value": "Fang" },
-    { "trait_type": "Arms",       "value": "Oatmeal Pie Katana" },
-    { "trait_type": "Sticker",    "value": "Crying Tomato" }
+    { "trait_type": "Arms",       "value": "Katana" },
+    { "trait_type": "Sticker",    "value": "Golden Ticket" }
   ]
 }
 ```
@@ -64,7 +64,7 @@ JSON with the matching image by name; if your launchpad needs an `ipfs://CID/`
 prefix instead, it is added at upload time — no need to change the files.
 
 **Secret-rare 1/1 tokens** carry a single `Secret Rarez` attribute and a
-special numbered name (#1…#26), e.g.:
+special numbered name (#1…#23), e.g.:
 
 ```json
 {
@@ -79,7 +79,7 @@ special numbered name (#1…#26), e.g.:
 
 All counts are hit exactly by pre-allocating token slots before composition.
 
-- **Secret rares (1/1):** the 26 finished artworks in `traits/secret_rarez/`
+- **Secret rares (1/1):** the 23 finished artworks in `traits/secret_rarez/`
   are minted **exactly once each** as standalone tokens — never composited with
   any other trait.
 - **Legendary backgrounds:** each `Legendary_*` plate appears **exactly 50×**
@@ -87,8 +87,18 @@ All counts are hit exactly by pre-allocating token slots before composition.
 - **Arms (~16% armed, ~84% empty-handed):**
   AK15 / Golden AK **20** (rarest) · Blue/Pink/Cyan Saber **25 each** ·
   Dual Uzis **40** · AR47 **55** · Military Brat **85** · Nerf Blaster **110** ·
-  Cash **130** · 6 character-locked signature katanas **32 each**.
+  Cash **130** · 6 character-locked signature blades **32 each**.
+  Each character's blade is a different artwork, but they all read as plain
+  **Katana** (or **Knives**) in the metadata — the token says what it is
+  holding, not which character's version of it.
 - **Footwear (~12%):** Gorbhouse / Cookie Monster / Bunny / Pepe / Shiba.
+- **Characters:** drawn uniformly by default, so every character lands at
+  roughly the same count (~139 each). To make one rare, pin it to an exact
+  count in `CHARACTER_COUNTS` in `asset_assessment/build_mint.py`; unlisted
+  characters keep sharing the remaining supply evenly. Pinned characters are
+  kept off legendary-background slots, signature weapons and forced footwear,
+  since those are character-locked or character-excluded and could not be
+  satisfied on a forced-character slot.
 - **Stickers (~18%):** spread evenly across every sticker asset.
 
 Every composited token is a **unique** trait combination, with no

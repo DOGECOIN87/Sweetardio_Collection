@@ -16,10 +16,9 @@ assets have since been added or retired.
 | folder | files | role | sizes / modes | mean L | L std | mean S | temp R−B |
 |---|---|---|---|---|---|---|---|
 | `backgroundz` | 57 | **ACTIVE background plates** (used by `generator.py`), incl. 4 `Legendary_*` | mixed 1393² / 1254² / 1024², RGBA + RGB | 90.5 | 46.7 | 0.325 | −2.5 |
-| `backgroundz_originals` | 47 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
-| `background` | 70 | legacy backgrounds, **not used** by generator (incl. `_corrected` / `_before_after` variants from an earlier grading pass; mixed 1024–2686 px) | mixed RGB/RGBA | 104.9 | 46.9 | 0.330 | +12.9 |
+| `backgroundz_originals` | 53 | ungraded sources for `backgroundz` | mixed | 73.6 | 45.9 | 0.469 | −1.8 |
 | `backgrounds_pop_originals` | 4 | ungraded sources for the `Legendary_*` plates | 1393² RGBA | 32.9 | 30.2 | 0.506 | −15.6 |
-| `characterz` | 32 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
+| `characterz` | 33 | **character bodies** (before_/after_skinz) | 1393² RGBA, 23 % opaque | 116.5 | 48.3 | 0.656 | **+58.5** |
 | `skinz` | 5 | skin/texture overlays (White, Black, Alien, Gold Foil, Fluorescent Cyan) | 1393² RGBA, 3 % opaque | 118.3 | 30.5 | 0.551 | +25.3 |
 | `eyez` | 11 | eyes | 1393² RGBA, 0.6 % opaque | 63.0 | 68.8 | 0.267 | −22.3 |
 | `mouthz` | 9 | mouths | 1393² RGBA | 60.7 | 44.6 | 0.166 | +8.6 |
@@ -29,7 +28,6 @@ assets have since been added or retired.
 | `what_are_thosez` | 11 | footwear base+overlay pairs | 1393² RGBA | 133.5 | 54.6 | 0.376 | +12.3 |
 | `stickerz` | 23 | corner stickers | 1343² RGBA, 1 % opaque | 133.6 | 73.4 | 0.295 | +17.5 |
 | `secret_rarez` | 26 | 1/1 standalone artworks, never composited | 1393² RGBA | 82.8 | 56.9 | 0.407 | +15.8 |
-| `legendaryz` | 0 | empty (`.gitkeep`) | — | — | — | — | — |
 
 Layer order (from `generator.py`): backgroundz → footwear base → characterz →
 footwear overlay → skinz → eyez → mouthz → armz → stickerz, on a 1393² canvas.
@@ -136,8 +134,10 @@ brand's Oxford-Blue world the navy plates already live in:
 
 Everything is a deterministic, parameter-logged tone/colour transform;
 originals untouched; output to a separate folder. Scope: the 34 plates in
-`traits/backgroundz/` only (legacy `background/` and the Legendary
-`backgrounds_pop/` plates are measured above but excluded unless requested).
+`traits/backgroundz/` only (the Legendary `backgrounds_pop/` plates are
+measured above but excluded unless requested). The legacy `background/`
+folder referenced by this pass was pruned in 2026-07; it was never read by
+the generator.
 
 **Alternative rejected:** a warm/neutral-dark stage would sit inside the
 80 % red-orange body band and is contraindicated by the measurements.

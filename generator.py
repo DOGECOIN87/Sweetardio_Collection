@@ -165,6 +165,7 @@ def secret_rare_token_name(filename):
 TRAIT_NAMES = {
     CHARACTERZ: {
         "Twinkie":                          "Twinkie",
+        "Nutty_Bar":                         "Nutty Bar",
         "brownie_bite":                     "Brownie Bite",
         "chocolate_chip_cookie":            "Chocolate Chip Cookie",
         "chocolate_doughnut":               "Chocolate Doughnut",
@@ -201,7 +202,6 @@ TRAIT_NAMES = {
     BACKGROUNDZ: {
         "Ayotollah.png":                    "Ayotollah",
         "Baked.png":                        "Baked",
-        "Ben_dot_Eth.png":                  "Ben dot Eth",
         "Bubble_Trouble.png":               "Bubble Trouble",
         "Cabaret_Alley.png":                "Cabaret Alley",
         "Candy_Tundra.png":                 "Candy Tundra",
@@ -215,7 +215,6 @@ TRAIT_NAMES = {
         "Druski.png":                       "Druski",
         "Flavor_Explosion.png":             "Flavor Explosion",
         "Goo_Lagoon.png":                   "Goo Lagoon",
-        "Gorlock.png":                      "Gorlock",
         "Gummy_Bears.png":                  "Gummy Bears",
         "He_Needs_Some_Milk.png":           "He Needs Some Milk",
         "Im_Not_Sorry.png":                 "I'm Not Sorry",
@@ -226,12 +225,11 @@ TRAIT_NAMES = {
         "M&Ms.png":                         "M&Ms",
         "Midnight_Snack (1).png":           "Midnight Snack",
         "Nabisco.png":                      "Nabisco",
-        "Palm_Beach_Pete.png":              "Palm Beach Pete",
+        "Tampa_Bay_Pete.png":               "Tampa Bay Pete",
         "Pink_Abyss.png":                   "Pink Abyss",
         "Pixie_Stix.png":                   "Pixie Stix",
         "Psychedelics.png":                 "Psychedelics",
         "RIP_Gorbagana.png":                "RIP Gorbagana",
-        "Rick_the_D1ck.png":                "Rick the D1ck",
         "Smuckers_Blue.png":                "Smuckers Blue",
         "Snack_Pack.png":                   "Snack Pack",
         "Straight_of_America (1).png":      "Straight of America",
@@ -254,22 +252,21 @@ TRAIT_NAMES = {
         "art_mattrick_001-1-2 (1).png":     "Cookie Money",
         "art_mattrick_001-15-2 (1).png":    "In Cook We Trust",
         "soft_serve.png":                   "Soft Serve",
-        "Abduction_Beam.png":               "Abduction Beam",
+        "Abduction.png":                    "Abduction",
         "Bored_Apes.png":                   "Bored Apes",
         "Bouquet_Drip.png":                 "Bouquet Drip",
         "Empty_Fridge.png":                 "Empty Fridge",
-        "Graham_Cracker.png":               "Graham Cracker",
-        "Graham_Cracker_Tan.png":           "Graham Cracker Tan",
-        "Hersheys.png":                     "Hersheys",
+        "Graham.png":                       "Graham",
+        "Hurshey.png":                      "Hurshey",
         "Neon_Backroom.png":                "Neon Backroom",
         "Neon_Strip.png":                   "Neon Strip",
-        "Smiley_Foil_Bronze.png":           "Smiley Foil Bronze",
-        "Smiley_Foil_Gold.png":             "Smiley Foil Gold",
-        "Smiley_Foil_Onyx.png":             "Smiley Foil Onyx",
-        "Smiley_Foil_Silver.png":           "Smiley Foil Silver",
+        "Cookboy_Chocolate.png":            "Cookboy Chocolate",
+        "Cookboy_Gold.png":                 "Cookboy Gold",
+        "Cookboy_Black_Enamel.png":         "Cookboy Black Enamel",
+        "Cookboy_Silver.png":               "Cookboy Silver",
         "Starburst.png":                    "Starburst",
-        "Sweetardio_Badge.png":             "Sweetardio Badge",
-        "Sweetardio_Storefront.png":        "Sweetardio Storefront",
+        "Emblem.png":                       "Emblem",
+        "Store.png":                        "Store",
     },
     SKINZ: {
         "layer-Skin_Alien (2).png":                 "Alien",
@@ -304,13 +301,13 @@ TRAIT_NAMES = {
     },
     ARMZ: {
         "Arms_Cash.png":                                "Cash",
-        "Armz_Gummy_Bear_Knives.png":                   "Gummy Bear Knives",
-        "Armz_Gummy_worms_katana.png":                  "Gummy Worm Katana",
-        "Armz_Katana_for_ice_cream_character.png":      "Ice Cream Katana",
-        "Armz_Marshmallow_knives.png":                  "Marshmallow Knives",
-        "Armz_Oatmeal_Pie_Katana.png":                  "Oatmeal Pie Katana",
-        "Armz_Twinkie_Katana.png":                      "Twinkie Katana",
-        "Armz_choc_cookie_katana.png":                  "Choc Cookie Katana",
+        "Armz_Gummy_Bear_Knives.png":                   "Knives",
+        "Armz_Gummy_worms_katana.png":                  "Katana",
+        "Armz_Katana_for_ice_cream_character.png":      "Katana",
+        "Armz_Marshmallow_knives.png":                  "Knives",
+        "Armz_Oatmeal_Pie_Katana.png":                  "Katana",
+        "Armz_Twinkie_Katana.png":                      "Katana",
+        "Armz_choc_cookie_katana.png":                  "Katana",
         "Sweetardio_114 (4).png":                       "Blue Saber",
         "Sweetardio_114 (5).png":                       "Pink Saber",
         "Sweetardio_114 (6).png":                       "Cyan Saber",
@@ -359,8 +356,6 @@ TRAIT_NAMES = {
         "Secret_Churro_Cantina.png":    "Churro Cantina",
         "Secret_Cold_Served.png":       "Cold Served",
         "Secret_Off_The_Line.png":      "Off The Line",
-        "Secret_Hooded_Scoop.png":      "Hooded Scoop",
-        "Secret_Last_Bite.png":         "Last Bite",
         "Secret_High_Voltage.png":      "High Voltage",
         "Secret_Golden_Waffle.png":     "Golden Waffle",
         "Secret_Cookie_Bro.png":        "Cookie Bro",
@@ -371,7 +366,6 @@ TRAIT_NAMES = {
         "Secret_Bubble_Gum_Rules.png":    "Bubble Gum Rules",
         "Secret_Smokey_Marshmallow.png":  "Smokey Marshmallow",
         "Secret_Liberty_Churro.png":      "Liberty Churro",
-        "Secret_Devastator_Cookie.png":   "Devastator Cookie",
         "Secret_Frosted_Crate.png":       "Frosted Crate",
         "Secret_Jackpot_Waffle.png":      "Jackpot Waffle",
         "Secret_Stadium_Marshmallow.png": "Stadium Marshmallow",
@@ -552,6 +546,7 @@ EXCLUDE_WAT_CHARS = [
     "pink_sherbert_ice_cream",
     "gummy_bear",
     "twinkie",
+    "nutty_bar",
     "churro",
     "poptart",
 ]
@@ -589,6 +584,7 @@ NO_OFFSET_CHARS = [
     "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "twinkie",
+    "nutty_bar",
     "churro",
     # bears are CHAR_SCALE-enlarged and aligned to the ice-cream cone line
     # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
@@ -665,7 +661,8 @@ CHAR_Y_ADJUST = {
     "gummy_worm": 18,
     "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": 68,     # enlarged + aligned to the cone line (1290)
+    "pink_gummy_bear": 68,
+    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # enlarged + aligned to the cone line (1290)
 }
 
 def char_y_adjust(char_name):
@@ -750,7 +747,7 @@ def skin_on_top(char_name):
 # BEFORE the body, revealed through the body's face hole) even though their
 # art is authored as a before-skinz file. Gummy bears read better with the
 # bear body in front and the skin showing through the eye hole.
-BODY_OVER_SKIN_CHARS = ["gummy_bear"]
+BODY_OVER_SKIN_CHARS = ["gummy_bear", "nutty_bar"]
 
 def body_over_skin(char_name):
     return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
@@ -936,10 +933,17 @@ def get_files(category):
     return sorted(f for f in os.listdir(path) if f.endswith(".png"))
 
 def generate_random_combination(force_bg=None, force_arm="auto",
-                                force_wat="auto", force_sticker="auto"):
+                                force_wat="auto", force_sticker="auto",
+                                force_char=None):
     """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
     plate from traits/backgroundz); it bypasses the random plate pick,
     the char<->bg compat filter and any paired overlay. Default = random.
+
+    force_char pins the character (a base character name as returned by
+    build_char_compat.base_name, e.g. "sugar_cube"); it bypasses the uniform
+    character pick so the mint allocator can hit exact per-character counts.
+    Everything downstream — compat filtering, placement, skin/eye/mouth —
+    behaves exactly as it would had the pick landed there naturally.
 
     force_arm / force_wat / force_sticker drive the optional slots for the
     mint allocator (build_mint.py) so exact rarity counts can be hit:
@@ -972,7 +976,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     
     # sorted: set iteration order varies per process (hash randomization),
     # which silently breaks seeded reproducibility
-    char_name = random.choice(sorted(base_names))
+    if force_char is not None:
+        if force_char not in base_names:
+            raise ValueError(f"force_char {force_char!r} is not a character "
+                             f"in traits/{CHARACTERZ}")
+        char_name = force_char
+    else:
+        char_name = random.choice(sorted(base_names))
     
     # Check if this character should be excluded from what_are_thosez. The
     # gorbhouse roll now happens INSIDE the footwear slot below, as part of the
