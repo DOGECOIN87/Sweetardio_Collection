@@ -62,6 +62,21 @@ def tile_image(path, size, matte):
     return tile
 
 
+def _label(trait_dir, filename):
+    """The name the mint metadata would show for this asset.
+
+    TRAIT_NAMES is keyed by filename for every class except characterz, which
+    is keyed by CHARACTER name — generator.extract_metadata passes the
+    character, not the file. Passing the filename here silently fell back to
+    the prettified filename ("after skinz brownie bite"), so the sheet
+    disagreed with the metadata.
+    """
+    if trait_dir == g.CHARACTERZ:
+        from build_char_compat import base_name   # the generator's own mapping
+        filename = base_name(filename)
+    return g.trait_name(trait_dir, filename)
+
+
 def _fit(draw, text, font, max_px):
     """Ellipsize a label so it never runs into the next tile's caption."""
     if draw.textlength(text, font=font) <= max_px:
@@ -102,7 +117,7 @@ def render(sheet_key, cols, tile_px, out_path):
         sheet.paste(tile_image(os.path.join(g.TRAITS_DIR, trait_dir, f),
                                tile_px, matte or MATTE), (x, y))
         dr.text((x + 2, y + tile_px + LABEL_BAND // 2),
-                _fit(dr, g.trait_name(trait_dir, f), label_font, tile_px - 8),
+                _fit(dr, _label(trait_dir, f), label_font, tile_px - 8),
                 font=label_font, fill=LABEL_RGB, anchor="lm")
 
     sheet.save(out_path)
