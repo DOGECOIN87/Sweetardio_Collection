@@ -94,11 +94,6 @@
    "layer-Pepe": 0.683,
    "layer-Shiba": 1.049
   },
-  "Gorlock.png": {
-   "layer-Bunny_Slippers": 1.499,
-   "layer-Pepe": 1.449,
-   "layer-Shiba": 1.742
-  },
   "Gummy_Bears.png": {
    "layer-Bunny_Slippers": 1.257,
    "layer-Pepe": 1.042,
@@ -128,11 +123,6 @@
    "layer-Bunny_Slippers": 1.045,
    "layer-Pepe": 1.333,
    "layer-Shiba": 1.267
-  },
-  "Palm_Beach_Pete.png": {
-   "layer-Bunny_Slippers": 1.374,
-   "layer-Pepe": 1.455,
-   "layer-Shiba": 1.591
   },
   "Pink_Abyss.png": {
    "layer-Bunny_Slippers": 0.841,
@@ -255,6 +245,11 @@
    "layer-Bunny_Slippers": 1.5,
    "layer-Pepe": 1.283,
    "layer-Shiba": 1.672
+  },
+  "Tampa_Bay_Pete.png": {
+   "layer-Bunny_Slippers": 1.374,
+   "layer-Pepe": 1.455,
+   "layer-Shiba": 1.591
   }
  }
 }

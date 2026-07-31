@@ -11,8 +11,8 @@ for the full list of sheet keys).
 
 | Sheet | Class | Items |
 |-------|-------|------:|
-| `traitsheet_backgroundz.png` | Backgroundz (plates + overlays) | 67 |
-| `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 71 |
+| `traitsheet_backgroundz.png` | Backgroundz (plates + overlays) | 66 |
+| `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 70 |
 | `traitsheet_backgroundz_legendary.png` | Backgroundz — Legendary | 4 |
 | `traitsheet_characterz.png` | Characterz | 32 |
 | `traitsheet_skinz.png` | Skinz | 5 |
