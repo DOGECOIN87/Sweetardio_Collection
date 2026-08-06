@@ -6,6 +6,9 @@ shadow, occlusion, rim light and micro-surface — instead of flat painted balls
 
 **One skin per prompt. Attach that skin's original PNG with the prompt.**
 
+Companion sheet: `catalog/skinz_reference_sheet.png` (all five at 1:1).
+Companion docs: `EYEZ_ENHANCE_PROMPTS.md`, `MOUTHZ_ENHANCE_PROMPTS.md`.
+
 ---
 
 ## 1. What a "skin" actually is (why the prompts are shaped this way)
@@ -325,9 +328,9 @@ colour spill onto the green.
 
 ### 4.6 — All five at once (hand off the reference sheet)
 
-`catalog/skin_reference_sheet.png` shows all five balls **at 1:1**, so their
+`catalog/skinz_reference_sheet.png` shows all five balls **at 1:1**, so their
 real size differences and their non-circular proportions survive the handoff.
-Regenerate it with `python3 asset_assessment/render_skin_ref_sheet.py`.
+Regenerate it with `python3 asset_assessment/render_ref_sheet.py skinz`.
 
 **Attach the sheet, paste this, and let it work through the list.** Ask for one
 image per ball — a generator asked to return all five in one picture gives back
@@ -459,10 +462,10 @@ Append to the original prompt when an output misses:
 
 The generator's output will not be canvas-ready — expect ~1024×1024, and a
 green/magenta field instead of real transparency.
-`asset_assessment/register_skin.py` does the conversion:
+`asset_assessment/register_trait.py` does the conversion:
 
 ```bash
-python3 asset_assessment/register_skin.py enhanced.png "layer-Skin_Black (3).png" \
+python3 asset_assessment/register_trait.py enhanced.png "layer-Skin_Black (3).png" \
     --preview /tmp/black_ab.png
 ```
 
