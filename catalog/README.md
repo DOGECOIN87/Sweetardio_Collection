@@ -22,3 +22,19 @@ for the full list of sheet keys).
 | `traitsheet_what_are_thosez.png` | What_are_thosez (footwear) | 11 |
 | `traitsheet_stickerz.png` | Stickerz | 23 |
 | `traitsheet_secret_rarez.png` | Secret Rarez (1/1s) | 23 |
+
+## Sample batch sheet
+
+`sample_batch_100.png` is an inspection sheet: 100 random tokens straight off
+the production pipeline, 10×10 at 700px per cell, each cell captioned with its
+index and character. The seed used is stamped in the bottom-right corner —
+current sheet is **seed 340731559**.
+
+```bash
+python3 asset_assessment/render_sample_sheet.py                   # fresh 100
+python3 asset_assessment/render_sample_sheet.py --seed 340731559  # re-render this one
+```
+
+The run prints a manifest listing every trait of every cell, so anything that
+looks off on the sheet can be traced to the traits behind it. Full-size token
+PNGs are written to `output/sample_batch/` (git-ignored).
