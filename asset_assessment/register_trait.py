@@ -326,7 +326,11 @@ def main():
 
     canvas = Image.new("RGBA", (generator.CANVAS_SIZE, generator.CANVAS_SIZE),
                        (0, 0, 0, 0))
-    canvas.paste(ball, (px, py), ball)
+    # no mask argument: paste(im, box, im) composites the alpha against itself,
+    # squaring it — a 128 edge pixel becomes 64, which eats the anti-aliased
+    # edge and can shrink the footprint by a pixel. The canvas is empty here,
+    # so a straight block copy is both correct and exact.
+    canvas.paste(ball, (px, py))
 
     out = args.out or (target_path if args.replace else os.path.join(
         "output", f"{trait_class}_registered", args.target))

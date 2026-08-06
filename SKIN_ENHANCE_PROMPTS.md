@@ -501,3 +501,26 @@ Two things the script will not do for you:
    Check the faces across characters — especially an `after_skinz` body like
    `brownie_bite` or `rice_crispy_treat`, whose face hole is deepest and will
    expose any gap, halo, or off-centre ball immediately.
+
+### If the generator returns the whole SHEET instead of separate images
+
+It usually will, when handed the reference sheet. The result is flat RGB with
+the matte and chrome baked in, reflowed to whatever aspect ratio the model
+outputs. `asset_assessment/extract_sheet.py` recovers canvas-ready assets:
+
+```bash
+python3 asset_assessment/extract_sheet.py returned_sheet.png skinz --debug
+cp output/skinz_enhanced/*.png traits/skinz/
+```
+
+It takes the **shape** from the original asset's alpha and the **texture**
+from the enhanced art, which is what the pipeline needs: exact footprint and
+position, no matte fringe, and any drift in the model's outline corrected
+rather than inherited. Keying the matte out instead does not work here — a
+mid-gray backdrop sits inside the tonal range of the skin balls' shadow side
+and the Cyborg eye's metal bezel, and punches holes straight through them.
+
+The run prints how far each asset's aspect drifted. Under about 10%, the
+transplant is invisible. Past roughly 15–20%, correcting the proportion pulls
+hard internal detail out of register with its own silhouette — regenerate
+those individually rather than salvaging them.

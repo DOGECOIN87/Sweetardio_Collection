@@ -333,3 +333,26 @@ python3 asset_assessment/render_sample_sheet.py --n 25 --cols 5 --cell 500 \
 
 Check the enhanced eyes against a **dark** skin and a **pale** skin in the same
 sheet — that is where a weakened keyline shows up first.
+
+### If the generator returns the whole SHEET instead of separate images
+
+It usually will, when handed the reference sheet. The result is flat RGB with
+the matte and chrome baked in, reflowed to whatever aspect ratio the model
+outputs. `asset_assessment/extract_sheet.py` recovers canvas-ready assets:
+
+```bash
+python3 asset_assessment/extract_sheet.py returned_sheet.png eyez --debug
+cp output/eyez_enhanced/*.png traits/eyez/
+```
+
+It takes the **shape** from the original asset's alpha and the **texture**
+from the enhanced art, which is what the pipeline needs: exact footprint and
+position, no matte fringe, and any drift in the model's outline corrected
+rather than inherited. Keying the matte out instead does not work here — a
+mid-gray backdrop sits inside the tonal range of the skin balls' shadow side
+and the Cyborg eye's metal bezel, and punches holes straight through them.
+
+The run prints how far each asset's aspect drifted. Under about 10%, the
+transplant is invisible. Past roughly 15–20%, correcting the proportion pulls
+hard internal detail out of register with its own silhouette — regenerate
+those individually rather than salvaging them.
