@@ -371,21 +371,40 @@ Append to the original prompt when an output misses:
 
 ## 7. Getting the result back into the pipeline
 
-The generator's output will not be canvas-ready. Before it can replace a file
-in `traits/skinz/`:
+The generator's output will not be canvas-ready — expect ~1024×1024, and a
+green/magenta field instead of real transparency.
+`asset_assessment/register_skin.py` does the conversion:
 
-1. **Key out the backdrop** if the green/magenta fallback was used, and clean
-   the anti-aliased edge so no backdrop colour survives in the fringe.
-2. **Auto-crop to the opaque bounds**, then **resize and paste onto a
-   1393×1393 transparent canvas** so the ball's width, height and centre match
-   its row in the §2 table. The centre position matters more than anything
-   else — the eyes and mouth are drawn at fixed canvas coordinates and will not
-   move to meet a ball that has drifted.
-3. **Keep the filename identical.** `traits/skin_weights.json` matches rarity
-   by case-insensitive substring of the filename, and `TRAIT_NAMES` in
+```bash
+python3 asset_assessment/register_skin.py enhanced.png "layer-Skin_Black (3).png" \
+    --preview /tmp/black_ab.png
+```
+
+It keys out the backdrop (auto-detecting green vs magenta), despills the colour
+that bled into the edge pixels, drops stray specks, crops to the ball, then
+resizes and pastes it onto a 1393×1393 transparent canvas at the target's exact
+footprint and centre — measured live from the file being replaced, so the table
+in §2 can never go stale. It writes to `output/skinz_registered/` and prints the
+result's size, centre drift and new `ball_fit` upscale. Pass `--replace` to
+write straight into `traits/skinz/`.
+
+Useful flags:
+
+| Flag | When |
+|------|------|
+| `--key green\|magenta\|none` | auto-detection guessed wrong |
+| `--tol` / `--soft` | backdrop survives (raise `--tol`) or the edge is eaten (lower it) |
+| `--fit contain` | the ball came back a different aspect and you would rather not stretch it — watch the reported `ball_fit`, a narrower ball gets blown up harder at composite |
+| `--shrink 1` | a one-pixel halo survives keying |
+| `--preview PATH` | before/after side by side on neutral gray |
+
+Two things the script will not do for you:
+
+1. **Keep the filename identical.** `traits/skin_weights.json` matches rarity by
+   case-insensitive substring of the filename, and `TRAIT_NAMES` in
    `generator.py` maps the filename to the display name in token metadata.
-   Renaming a skin silently changes its rarity and its metadata value.
-4. **Verify before committing:**
+   Renaming a skin silently changes both its rarity and its metadata value.
+2. **Verify in a real render before committing:**
    ```bash
    python3 asset_assessment/render_sample_sheet.py --n 25 --cols 5 --cell 500 \
        --out /tmp/skin_check.png
