@@ -56,7 +56,8 @@ Canvas is **1393 × 1393, fully transparent** outside the ball.
 
 ## 3. How to run these
 
-1. Open a **fresh chat per skin** — mixing them makes the model blend materials.
+1. Open a **fresh chat per skin** — mixing them makes the model blend
+   materials. (To hand off all five in one go instead, use §4.6.)
 2. Attach **only** that skin's original PNG.
 3. Paste the prompt for that skin verbatim.
 4. Check the result against the acceptance list in §5 before keeping it.
@@ -321,6 +322,91 @@ or matte line. If you cannot output true transparency, render it on a flat,
 uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
 colour spill onto the green.
 ```
+
+### 4.6 — All five at once (hand off the reference sheet)
+
+`catalog/skin_reference_sheet.png` shows all five balls **at 1:1**, so their
+real size differences and their non-circular proportions survive the handoff.
+Regenerate it with `python3 asset_assessment/render_skin_ref_sheet.py`.
+
+**Attach the sheet, paste this, and let it work through the list.** Ask for one
+image per ball — a generator asked to return all five in one picture gives back
+balls around 340px each, well under the ~292px native detail you already have,
+and then they have to be cut apart by hand.
+
+```
+The attached sheet shows five trait layers from a 3D-rendered collectible
+series. Each one is a "face ball" that gets composited into a hole in a
+character's body. I want each of them re-rendered as a photorealistic 3D
+object.
+
+Work through them ONE AT A TIME and return each as its own separate,
+full-size image — do not return a grid, sheet, or contact sheet.
+
+RULES THAT APPLY TO ALL FIVE:
+- Keep the SAME object: same silhouette, same proportion, same colour
+  identity. This is a quality upgrade, not a redesign.
+- The balls are NOT circles and they are NOT all the same size. The sheet is
+  1:1 — match each one's width-to-height proportion exactly as shown.
+- Light: one soft key from the upper left at about 45 degrees, cooler dimmer
+  fill from the lower right. Same lighting for all five so they read as a set.
+- Put the strongest modelling at the RIM, the TOP BAND and the LOWER THIRD:
+  soft terminator, real ambient occlusion at the lower and outer rim, and a
+  rim light on the lower-right edge. Keep the upper-middle smooth and evenly
+  lit with no blown-out specular hotspot — a separate layer is composited over
+  that area later.
+- No eyes, no mouth, no nose, no face of any kind. These stay featureless.
+- No background, no surface, no scene, no cast shadow, no outer glow or halo,
+  no text, no watermark, no added sparkles.
+- Output each ball alone, centred, on a fully transparent background, with a
+  crisp anti-aliased edge and no colour fringe. If you cannot do true
+  transparency, use a flat pure green (#00FF00) field for balls 1, 2, 4 and 5,
+  and a flat pure magenta (#FF00FF) field for ball 3 — with no shadow,
+  gradient, or spill onto it.
+
+THE FIVE:
+
+1. ALIEN — cool grey-blue, smooth matte silicone or soft vinyl, like a
+   high-end designer toy. Base #A8B0B6, lit #B2B8BF, shadow #9BA1A6, occluded
+   bottom #646A6E. Faint waxy sheen, a whisper of translucency at the rim.
+   Not metallic, not reflective, and must not drift green or purple.
+
+2. BLACK — rich dark milk chocolate, tempered and freshly moulded. Base
+   #553C2B, lit #5D4332, shadow #4A3323, occluded bottom #2D1D11. Semi-matte
+   cocoa with a faint satin sheen, fine cocoa pitting. Hold detail in the
+   darks — do not crush the shadow side to black. Stays warm brown, not grey.
+
+3. FLUORESCENT CYAN — translucent blue gel, a gummy/jelly ball with real
+   subsurface scattering and light glowing out of the shadow side. Core
+   #006489, deepening to #01536E at the bottom. Keep the existing soft
+   highlight in the UPPER LEFT (#C7E3EF) exactly where it is and add no second
+   highlight. Preserve the trapped air bubbles and make them read as genuinely
+   internal — refracting, at varying depths, softer the deeper they sit — not
+   dots painted on the surface. Wet glossy exterior, bottom rim glowing with
+   transmitted light rather than going flatly dark.
+
+4. GOLD FOIL — crumpled gold foil pressed tight over a ball, like a premium
+   chocolate truffle. Highlights #FCE194, mids #AE7416, deep creases #5B3600
+   to #623501. Real anisotropic metal: sharp specular breakup following the
+   crease lines, warm bounce filling the shallow folds, tiny catch-lights
+   where facets meet. Keep the crease layout and density roughly as shown —
+   refine and deepen it, do not re-scatter it. Warm yellow gold, not rose
+   gold, brass, bronze or silver. Do not smooth it into polished metal. This
+   is the rarest of the five, so make it the most impressive render.
+
+5. WHITE — warm cream-beige confectionery, soft matte fondant or marzipan.
+   Base #C9A176, lit #DAB68B, shadow #B68E63, occluded bottom #6A4C2E. Gentle
+   subsurface warmth bleeding under the surface at the rim, very fine
+   powdered-sugar micro-grain, a soft broad sheen and never a glossy plastic
+   highlight.
+
+Start with number 1.
+```
+
+Even with the sheet attached, the single-skin prompts in §4.1–4.5 produce
+better results — they carry more direction per ball and give the model nothing
+else to dilute its attention. Use the sheet when you want all five to feel like
+one consistent set, or the single prompts when a particular skin needs work.
 
 ---
 

@@ -23,6 +23,20 @@ for the full list of sheet keys).
 | `traitsheet_stickerz.png` | Stickerz | 23 |
 | `traitsheet_secret_rarez.png` | Secret Rarez (1/1s) | 23 |
 
+## Skin reference sheet
+
+`skin_reference_sheet.png` is the hand-off sheet for AI skin enhancement: all
+five skin balls drawn **at 1:1** on a common grid, so their real size
+differences and non-circular proportions survive — unlike
+`traitsheet_skinz.png`, which scales each ball to fill its tile. Each cell is
+labeled with the ball's pixel size and its canvas centre.
+
+```bash
+python3 asset_assessment/render_skin_ref_sheet.py
+```
+
+See `SKIN_ENHANCE_PROMPTS.md` for the prompts it accompanies.
+
 ## Sample batch sheet
 
 `sample_batch_100.png` is an inspection sheet: 100 random tokens straight off
