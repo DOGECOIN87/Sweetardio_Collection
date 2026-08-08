@@ -15,7 +15,7 @@ for the full list of sheet keys).
 | `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 70 |
 | `traitsheet_backgroundz_legendary.png` | Backgroundz — Legendary | 4 |
 | `traitsheet_characterz.png` | Characterz | 33 |
-| `traitsheet_skinz.png` | Skinz | 5 |
+| `traitsheet_skinz.png` | Skinz | 3 |
 | `traitsheet_eyez.png` | Eyez | 11 |
 | `traitsheet_mouthz.png` | Mouthz | 9 |
 | `traitsheet_armz.png` | Armz | 16 |
@@ -44,7 +44,7 @@ true native size.
 
 | Sheet | Class | Items | Shown |
 |-------|-------|------:|-------|
-| `skinz_reference_sheet.png` | Skins | 5 | 1:1 |
+| `skinz_reference_sheet.png` | Skins | 3 | 1.03× |
 | `eyez_reference_sheet.png` | Eyes | 11 | 1:1 |
 | `mouthz_reference_sheet.png` | Mouths | 9 | 1.48× |
 

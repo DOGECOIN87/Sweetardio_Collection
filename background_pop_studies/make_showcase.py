@@ -37,8 +37,7 @@ OUT = "background_pop_studies/showcase"
 
 WHITE = f"{SK}/layer-layer-layer-Skin_White (2).png"
 BLACK = f"{SK}/layer-Skin_Black (3).png"
-GOLD = f"{SK}/layer-Skin_Gold_Foil (1).png"
-CYANSKIN = f"{SK}/layer-Skin_Fluorescent_Cyan (2).png"
+ALIEN = f"{SK}/layer-Skin_Alien (2).png"
 SHY = f"{AR}/layer-layer-layer-layer-Shy-1.png"
 NERF = f"{AR}/layer-layer-layer-layer-Nerf_Blaster.png"
 AK = f"{AR}/layer-layer-layer-layer-AK15.png"
@@ -62,7 +61,7 @@ COMBOS = [
      "before_skinz_cyan_sherbert_ice_cream.png", None, WHITE,
      ["Cerise.png", "Blue.png"], "layer-Mouth_Tasty-1.png", SHY, None, False, []),
     ("03_brownie_on_spotlight_stage", "Smuckers_Blue.png",
-     "after_skinz_brownie_bite.png", SHIBA, GOLD,
+     "after_skinz_brownie_bite.png", SHIBA, ALIEN,
      ["layer-Eyes_Cyan (1).png", "Cerise.png", "layer-Eyes_Googly (1).png"],
      "layer-Mouth_Blunt (1).png", SHY, "07_Rare_Candy.png", False, []),
     ("04_pink_sherbert_at_castle", "Sweet_Castle.png",
@@ -87,7 +86,7 @@ COMBOS = [
      ["layer-Eyes_Googly (1).png"], "layer-Mouth_Tasty-1.png", SHY,
      None, False, []),
     ("09_churro_liberty_coin", "Liberty_Cook_Dime.png",
-     "layer-after_skinz_churro (1) (1).png", None, CYANSKIN,
+     "layer-after_skinz_churro (1) (1).png", None, BLACK,
      ["layer-Eyes_Lowkey (1).png"], "layer-Mouth_Blunt (1).png", AK,
      "24_Golden_Ticket.png", False, []),
     ("10_gummy_worm_money_bed", "Winning.png",

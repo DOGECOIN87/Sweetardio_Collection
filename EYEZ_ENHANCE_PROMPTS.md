@@ -29,11 +29,11 @@ curved surface under the outline.
    into the original footprint, so it cannot happen by accident — but generate
    at the right proportion anyway, because the alternative is the art getting
    squeezed to fit.
-2. **The black keyline is not decoration.** These eyes composite over five very
-   different skins — near-white Alien, dark chocolate Black, mid-tan White,
-   saturated Cyan gel, bright Gold Foil. The heavy dark outline is the only
-   reason they stay readable on all five. Thin it or soften it into a
-   render-style edge and the eyes disappear on the dark skins.
+2. **The black keyline is not decoration.** These eyes composite over three very
+   different skins — near-white Alien, dark chocolate Black and mid-tan
+   White. The heavy dark outline is the only reason they stay readable on all
+   three. Thin it or soften it into a render-style edge and the eyes disappear
+   on the dark skin.
 3. **Position is fixed.** Eyes are pasted at exact canvas coordinates and the
    skin ball is sized around them. Nothing moves to meet a drifted layer.
 
@@ -101,7 +101,7 @@ KEEP EXACTLY AS THEY ARE:
 - The overall width and height proportion. Do not make the eyes rounder,
   larger, wider apart, or more symmetrical than they already are.
 - The heavy black keyline. It must stay solid, opaque and the same weight —
-  this artwork sits on backgrounds ranging from near-white to near-black, and
+  this artwork sits on skins ranging from near-white to dark chocolate, and
   that outline is the only thing keeping it readable. Do not thin it, blur it,
   soften it into a shadow, or replace it with a rendered edge.
 - The colour of every filled area.

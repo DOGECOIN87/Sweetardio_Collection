@@ -29,10 +29,10 @@ thumbnail size. For the small assets, restraint is the brief.
    x 695–760 against a ball centre near x 690). That offset is intentional
    character, not an error to correct. Nothing else moves to meet a drifted
    layer.
-2. **The black keyline carries the read.** Mouths composite over five very
-   different skins — near-white Alien, dark chocolate Black, mid-tan White,
-   saturated Cyan gel, bright Gold Foil. The heavy dark line is what keeps them
-   visible on all five. Do not thin it or soften it into a rendered edge.
+2. **The black keyline carries the read.** Mouths composite over three very
+   different skins — near-white Alien, dark chocolate Black and mid-tan White.
+   The heavy dark line is what keeps them visible on all three. Do not thin it
+   or soften it into a rendered edge.
 
 Unlike the eyes, mouths have **no compat file and no `ball_fit` coupling** —
 `generator.py` never measures them. Colour and width changes are therefore safe
@@ -96,7 +96,7 @@ KEEP EXACTLY AS IT IS:
 - The width and height proportion. Do not make it larger, wider, more centred,
   or more symmetrical than it already is.
 - The heavy black keyline, at the same weight and full opacity. This artwork
-  sits on backgrounds ranging from near-white to near-black and that outline
+  sits on skins ranging from near-white to dark chocolate and that outline
   is the only thing keeping it readable. Do not thin it, blur it, soften it
   into a shadow, or replace it with a rendered edge.
 - The colour of every filled area.

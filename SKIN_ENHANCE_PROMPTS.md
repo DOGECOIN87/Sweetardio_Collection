@@ -1,12 +1,12 @@
 # Skin Trait — AI Enhancement Prompts
 
-Paste-ready prompts for re-rendering each of the five **Skinz** assets in an AI
+Paste-ready prompts for re-rendering each of the three **Skinz** assets in an AI
 image generator (ChatGPT / GPT Image) so they read as photoreal 3D — real form
 shadow, occlusion, rim light and micro-surface — instead of flat painted balls.
 
 **One skin per prompt. Attach that skin's original PNG with the prompt.**
 
-Companion sheet: `catalog/skinz_reference_sheet.png` (all five at 1:1).
+Companion sheet: `catalog/skinz_reference_sheet.png` (all three at 1:1).
 Companion docs: `EYEZ_ENHANCE_PROMPTS.md`, `MOUTHZ_ENHANCE_PROMPTS.md`.
 
 ---
@@ -49,9 +49,7 @@ will not line up with the eyes and the character's face hole.
 |-----------|--------------:|-------------------:|------------------:|
 | `layer-layer-layer-Skin_White (2).png` | 276 × 253 | (691, 598) | 1.134× |
 | `layer-Skin_Black (3).png` | 281 × 257 | (691, 599) | 1.114× |
-| `layer-Skin_Fluorescent_Cyan (2).png` | 281 × 244 | (690, 598) | 1.114× |
 | `layer-Skin_Alien (2).png` | 269 × 248 | (689, 605) | 1.164× |
-| `layer-Skin_Gold_Foil (1).png` | 292 × 258 | (690, 603) | 1.078× |
 
 Canvas is **1393 × 1393, fully transparent** outside the ball.
 
@@ -60,7 +58,7 @@ Canvas is **1393 × 1393, fully transparent** outside the ball.
 ## 3. How to run these
 
 1. Open a **fresh chat per skin** — mixing them makes the model blend
-   materials. (To hand off all five in one go instead, use §4.6.)
+   materials. (To hand off all three in one go instead, use §4.4.)
 2. Attach **only** that skin's original PNG.
 3. Paste the prompt for that skin verbatim.
 4. Check the result against the acceptance list in §5 before keeping it.
@@ -220,125 +218,20 @@ uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
 colour spill onto the green.
 ```
 
-### 4.4 — Fluorescent Cyan (translucent blue gel)
+### 4.4 — All three at once (hand off the reference sheet)
 
-```
-Re-render the attached image as a photorealistic 3D asset. It is a single
-trait layer from a 3D-rendered collectible series: a rounded "face ball" that
-gets composited into a hole in a character's body.
-
-Keep it the SAME object — same shape, same silhouette, same colour identity.
-This is a quality upgrade, not a redesign. Someone comparing before and after
-must see the same ball, rendered properly.
-
-MATERIAL: translucent blue gel — a gummy-candy / jelly ball with real
-subsurface scattering, light passing through the body of the material and
-glowing out of the shadow side. Core tone #006489, deeper toward #01536E at
-the occluded bottom edge. Keep the existing soft bright highlight in the UPPER
-LEFT around #C7E3EF and keep it exactly there. Preserve the small trapped air
-bubbles suspended inside the gel and make them read as genuinely internal —
-refracting, at varying depths, slightly out of focus the deeper they sit —
-rather than as dots painted on the surface. Wet, glossy exterior.
-
-FORM AND LIGHT:
-- Read as a slightly flattened sphere / domed disc, not a flat circle.
-- One soft key light from the upper left at about 45 degrees, with a cooler,
-  dimmer fill from the lower right.
-- The bottom rim should glow with transmitted light rather than going flatly
-  dark — that internal bounce is what sells gel.
-- Crisp caustic-style brightening where light exits the lower-right rim, plus
-  real ambient occlusion where the form meets its own edge.
-- The strongest modelling must be at the RIM, the TOP BAND and the LOWER
-  THIRD of the ball. Keep the upper-middle area readable and free of busy
-  texture.
-
-DO NOT:
-- Do not add a second specular hotspot in the middle or upper-middle of the
-  ball — one highlight only, in the upper left, exactly where it already is.
-- Do not add eyes, a mouth, a nose, eyebrows, or any face. It must stay a
-  featureless ball — the face is composited on top later.
-- Do not add a background, backdrop, surface, table, or scene.
-- Do not add a cast shadow or drop shadow.
-- Do not add glow, bloom, or any halo outside the ball's outline.
-- Do not add text, logos, watermarks, or sparkles.
-- Do not change the hue family — it must stay saturated cyan-blue and must not
-  drift teal-green or navy.
-- Do not change the outline shape or the width-to-height proportion.
-
-OUTPUT: the ball alone, centred, on a fully transparent background, square
-canvas, highest resolution available. Crisp anti-aliased edge with no fringe
-or matte line. If you cannot output true transparency, render it on a flat,
-uniform pure magenta (#FF00FF) field with absolutely no shadow, gradient, or
-colour spill onto the magenta.
-```
-
-> Cyan uses a **magenta** key field, not green — a green backdrop contaminates
-> the translucent blue edge and the bubbles pick it up.
-
-### 4.5 — Gold Foil (crumpled foil, legendary)
-
-```
-Re-render the attached image as a photorealistic 3D asset. It is a single
-trait layer from a 3D-rendered collectible series: a rounded "face ball" that
-gets composited into a hole in a character's body. This is the rarest variant
-in the set, so it should be the most impressive render of the group.
-
-Keep it the SAME object — same shape, same silhouette, same colour identity.
-This is a quality upgrade, not a redesign. Someone comparing before and after
-must see the same ball, rendered properly.
-
-MATERIAL: crumpled gold foil wrapped tightly over a ball, like the foil on a
-premium chocolate truffle. Bright specular highlights around #FCE194, mid
-tones around #AE7416, deep creases and occluded folds around #5B3600 to
-#623501. Real metal: anisotropic, sharp specular breakup that follows the
-crease lines, warm golden bounce light filling the shallow folds, tiny bright
-catch-lights where two facets meet at an edge. The foil should look thin and
-pressed — you can feel the sphere underneath it.
-
-FORM AND LIGHT:
-- Read as a slightly flattened sphere / domed disc, not a flat circle.
-- One soft key light from the upper left at about 45 degrees, with a cooler,
-  dimmer fill from the lower right.
-- Real ambient occlusion in the depth of every crease and along the lower and
-  outer rim, and a bright rim catch along the lower-right edge.
-- Keep the crease pattern in roughly the same layout and density as the
-  attached original — refine and deepen it, do not re-scatter it.
-- Concentrate the finest crease detail and the brightest facet hits at the
-  RIM, the TOP BAND and the LOWER THIRD. Keep the upper-middle area calmer,
-  with larger, smoother foil facets and no single blown-out white hotspot.
-
-DO NOT:
-- Do not add eyes, a mouth, a nose, eyebrows, or any face. It must stay a
-  featureless ball — the face is composited on top later.
-- Do not add a background, backdrop, surface, table, or scene.
-- Do not add a cast shadow or drop shadow.
-- Do not add glow, bloom, lens flare, or any halo outside the ball's outline.
-- Do not add text, logos, watermarks, or sparkle overlays.
-- Do not change the hue family — warm yellow gold, not rose gold, brass,
-  bronze, or silver.
-- Do not turn the crumpled foil into smooth polished metal.
-- Do not change the outline shape or the width-to-height proportion.
-
-OUTPUT: the ball alone, centred, on a fully transparent background, square
-canvas, highest resolution available. Crisp anti-aliased edge with no fringe
-or matte line. If you cannot output true transparency, render it on a flat,
-uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
-colour spill onto the green.
-```
-
-### 4.6 — All five at once (hand off the reference sheet)
-
-`catalog/skinz_reference_sheet.png` shows all five balls **at 1:1**, so their
+`catalog/skinz_reference_sheet.png` shows all three balls **at 1:1**, so their
 real size differences and their non-circular proportions survive the handoff.
 Regenerate it with `python3 asset_assessment/render_ref_sheet.py skinz`.
 
 **Attach the sheet, paste this, and let it work through the list.** Ask for one
-image per ball — a generator asked to return all five in one picture gives back
-balls around 340px each, well under the ~292px native detail you already have,
-and then they have to be cut apart by hand.
+image per ball — a generator asked to return all three in one picture gives
+back balls well under the ~292px native detail you already have, and then they
+have to be cut apart by hand. (If it returns a sheet anyway, see the extraction
+note at the end of this doc.)
 
 ```
-The attached sheet shows five trait layers from a 3D-rendered collectible
+The attached sheet shows three trait layers from a 3D-rendered collectible
 series. Each one is a "face ball" that gets composited into a hole in a
 character's body. I want each of them re-rendered as a photorealistic 3D
 object.
@@ -346,13 +239,13 @@ object.
 Work through them ONE AT A TIME and return each as its own separate,
 full-size image — do not return a grid, sheet, or contact sheet.
 
-RULES THAT APPLY TO ALL FIVE:
+RULES THAT APPLY TO ALL THREE:
 - Keep the SAME object: same silhouette, same proportion, same colour
   identity. This is a quality upgrade, not a redesign.
 - The balls are NOT circles and they are NOT all the same size. The sheet is
   1:1 — match each one's width-to-height proportion exactly as shown.
 - Light: one soft key from the upper left at about 45 degrees, cooler dimmer
-  fill from the lower right. Same lighting for all five so they read as a set.
+  fill from the lower right. Same lighting for all three so they read as a set.
 - Put the strongest modelling at the RIM, the TOP BAND and the LOWER THIRD:
   soft terminator, real ambient occlusion at the lower and outer rim, and a
   rim light on the lower-right edge. Keep the upper-middle smooth and evenly
@@ -363,41 +256,23 @@ RULES THAT APPLY TO ALL FIVE:
   no text, no watermark, no added sparkles.
 - Output each ball alone, centred, on a fully transparent background, with a
   crisp anti-aliased edge and no colour fringe. If you cannot do true
-  transparency, use a flat pure green (#00FF00) field for balls 1, 2, 4 and 5,
-  and a flat pure magenta (#FF00FF) field for ball 3 — with no shadow,
+  transparency, use a flat pure green (#00FF00) field with no shadow,
   gradient, or spill onto it.
 
-THE FIVE:
+THE THREE:
 
 1. ALIEN — cool grey-blue, smooth matte silicone or soft vinyl, like a
    high-end designer toy. Base #A8B0B6, lit #B2B8BF, shadow #9BA1A6, occluded
    bottom #646A6E. Faint waxy sheen, a whisper of translucency at the rim.
-   Not metallic, not reflective, and must not drift green or purple.
+   Not metallic, not reflective, and must not drift green or purple. This is
+   the rarest of the three, so make it the most impressive render.
 
 2. BLACK — rich dark milk chocolate, tempered and freshly moulded. Base
    #553C2B, lit #5D4332, shadow #4A3323, occluded bottom #2D1D11. Semi-matte
    cocoa with a faint satin sheen, fine cocoa pitting. Hold detail in the
    darks — do not crush the shadow side to black. Stays warm brown, not grey.
 
-3. FLUORESCENT CYAN — translucent blue gel, a gummy/jelly ball with real
-   subsurface scattering and light glowing out of the shadow side. Core
-   #006489, deepening to #01536E at the bottom. Keep the existing soft
-   highlight in the UPPER LEFT (#C7E3EF) exactly where it is and add no second
-   highlight. Preserve the trapped air bubbles and make them read as genuinely
-   internal — refracting, at varying depths, softer the deeper they sit — not
-   dots painted on the surface. Wet glossy exterior, bottom rim glowing with
-   transmitted light rather than going flatly dark.
-
-4. GOLD FOIL — crumpled gold foil pressed tight over a ball, like a premium
-   chocolate truffle. Highlights #FCE194, mids #AE7416, deep creases #5B3600
-   to #623501. Real anisotropic metal: sharp specular breakup following the
-   crease lines, warm bounce filling the shallow folds, tiny catch-lights
-   where facets meet. Keep the crease layout and density roughly as shown —
-   refine and deepen it, do not re-scatter it. Warm yellow gold, not rose
-   gold, brass, bronze or silver. Do not smooth it into polished metal. This
-   is the rarest of the five, so make it the most impressive render.
-
-5. WHITE — warm cream-beige confectionery, soft matte fondant or marzipan.
+3. WHITE — warm cream-beige confectionery, soft matte fondant or marzipan.
    Base #C9A176, lit #DAB68B, shadow #B68E63, occluded bottom #6A4C2E. Gentle
    subsurface warmth bleeding under the surface at the rim, very fine
    powdered-sugar micro-grain, a soft broad sheen and never a glossy plastic
@@ -406,10 +281,11 @@ THE FIVE:
 Start with number 1.
 ```
 
-Even with the sheet attached, the single-skin prompts in §4.1–4.5 produce
+Even with the sheet attached, the single-skin prompts in §4.1–4.3 produce
 better results — they carry more direction per ball and give the model nothing
-else to dilute its attention. Use the sheet when you want all five to feel like
-one consistent set, or the single prompts when a particular skin needs work.
+else to dilute its attention. Use the sheet when you want all three to feel
+like one consistent set, or the single prompts when a particular skin needs
+work.
 
 ---
 
@@ -422,7 +298,7 @@ Reject and retry if any of these fail:
       become rounder, taller, or narrower. Lay it over the original at 50%
       opacity — the edges should track.
 - [ ] **Same colour identity.** Still reads as the trait its metadata name
-      claims (White / Black / Alien / Fluorescent Cyan / Gold Foil).
+      claims (White / Black / Alien).
 - [ ] **Clean edge.** No baked drop shadow, no outer glow, no dark matte
       fringe, no leftover backdrop colour in the anti-aliased pixels — any of
       these show as a visible ring inside the character's face hole.

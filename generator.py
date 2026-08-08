@@ -271,8 +271,6 @@ TRAIT_NAMES = {
     SKINZ: {
         "layer-Skin_Alien (2).png":                 "Alien",
         "layer-Skin_Black (3).png":                 "Black",
-        "layer-Skin_Fluorescent_Cyan (2).png":       "Fluorescent Cyan",
-        "layer-Skin_Gold_Foil (1).png":             "Gold Foil",
         "layer-layer-layer-Skin_White (2).png":     "White",
     },
     EYEZ: {
