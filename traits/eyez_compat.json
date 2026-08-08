@@ -3,36 +3,102 @@
  "src": "traits/backgroundz",
  "strength": 0.8,
  "blocked": {
+  "Abduction.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Bored_Apes.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Bouquet_Drip.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-art_mattrick_011.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
   "Bubble_Trouble.png": [
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Candy_Tundra.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-art_mattrick_011.png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Celestial.png": [
    "Blue.png",
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Cereal_Killer.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Cookboy.png": [
    "Blue.png",
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Gummy_Bears.png": [
    "Cerise.png"
   ],
+  "Legendary_Just_Aliens.png": [
+   "Blue.png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Legendary_Opengotchi.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Legendary_Simplex.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
+  ],
+  "Legendary_Tenders.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
   "M&Ms.png": [
    "Blue.png",
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
+  ],
+  "Neon_Backroom.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Neon_Strip.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Pixie_Stix.png": [
    "Blue.png",
@@ -41,12 +107,19 @@
   "Smuckers_Blue.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Store.png": [
+   "Blue.png",
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Sugar.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
@@ -54,42 +127,61 @@
    "Blue.png",
    "Cerise.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
+  ],
+  "Sweetardio (16).png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Toasted.png": [
    "Blue.png",
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Tootsie_Blue.png": [
-   "Blue.png"
+   "Blue.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "Tootsie_Cerise.png": [
    "Blue.png",
-   "Cerise.png"
+   "Cerise.png",
+   "layer-Sweetardio_nft (9) (1).png"
   ],
   "UAP_Taskforce.png": [
    "Blue.png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Whitehouse_Lawn_Overlay.png": [
    "Blue.png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ],
   "Why_So_Cereal.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
+   "layer-Sweetardio_nft (9) (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png",
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png"
   ]
  },
  "weights": {
+  "Abduction.png": {
+   "Cerise.png": 0.639,
+   "layer-art_mattrick_011.png": 0.67
+  },
   "Ayotollah.png": {
    "Blue.png": 0.906,
    "Cerise.png": 0.846,
    "layer-Eyes_Cyan (1).png": 0.945,
+   "layer-Sweetardio_nft (9) (1).png": 0.86,
    "layer-art_mattrick_011.png": 0.923,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.934,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.946
@@ -98,9 +190,17 @@
    "Blue.png": 0.987,
    "Cerise.png": 0.894,
    "layer-Eyes_Cyan (1).png": 0.929,
+   "layer-Sweetardio_nft (9) (1).png": 0.943,
    "layer-art_mattrick_011.png": 0.894,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.93
+  },
+  "Bored_Apes.png": {
+   "Cerise.png": 0.727,
+   "layer-art_mattrick_011.png": 0.612
+  },
+  "Bouquet_Drip.png": {
+   "Cerise.png": 0.709
   },
   "Bubble_Trouble.png": {
    "Blue.png": 0.549,
@@ -113,6 +213,7 @@
    "Blue.png": 0.905,
    "Cerise.png": 0.808,
    "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-Sweetardio_nft (9) (1).png": 0.861,
    "layer-art_mattrick_011.png": 0.979,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
@@ -134,14 +235,16 @@
    "Blue.png": 0.93,
    "Cerise.png": 0.86,
    "layer-Eyes_Cyan (1).png": 0.938,
+   "layer-Sweetardio_nft (9) (1).png": 0.912,
    "layer-art_mattrick_011.png": 0.902,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.941,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.939
   },
   "Coder_Chick.png": {
-   "Blue.png": 0.933,
+   "Blue.png": 0.934,
    "Cerise.png": 0.789,
    "layer-Eyes_Cyan (1).png": 0.959,
+   "layer-Sweetardio_nft (9) (1).png": 0.862,
    "layer-art_mattrick_011.png": 0.928,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.962,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.96
@@ -152,10 +255,47 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.572,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.592
   },
+  "Cookboy_Black_Enamel.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.668,
+   "layer-Eyes_Cyan (1).png": 0.309,
+   "layer-Sweetardio_nft (9) (1).png": 0.181,
+   "layer-art_mattrick_011.png": 0.647,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.271,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.308
+  },
+  "Cookboy_Chocolate.png": {
+   "Blue.png": 0.956,
+   "Cerise.png": 0.861,
+   "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-Sweetardio_nft (9) (1).png": 0.913,
+   "layer-art_mattrick_011.png": 0.928,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
+  },
+  "Cookboy_Gold.png": {
+   "Blue.png": 0.99,
+   "Cerise.png": 0.895,
+   "layer-Eyes_Cyan (1).png": 0.93,
+   "layer-Sweetardio_nft (9) (1).png": 0.947,
+   "layer-art_mattrick_011.png": 0.894,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.934,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.931
+  },
+  "Cookboy_Silver.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.638,
+   "layer-Eyes_Cyan (1).png": 0.295,
+   "layer-Sweetardio_nft (9) (1).png": 0.177,
+   "layer-art_mattrick_011.png": 0.649,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.29,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.294
+  },
   "Crumble_Trail.png": {
    "Blue.png": 0.951,
    "Cerise.png": 0.859,
    "layer-Eyes_Cyan (1).png": 0.96,
+   "layer-Sweetardio_nft (9) (1).png": 0.908,
    "layer-art_mattrick_011.png": 0.926,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.964,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.961
@@ -164,6 +304,7 @@
    "Blue.png": 0.861,
    "Cerise.png": 0.871,
    "layer-Eyes_Cyan (1).png": 0.85,
+   "layer-Sweetardio_nft (9) (1).png": 0.823,
    "layer-art_mattrick_011.png": 0.875,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.843,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.85
@@ -172,14 +313,34 @@
    "Blue.png": 0.805,
    "Cerise.png": 0.724,
    "layer-Eyes_Cyan (1).png": 0.941,
+   "layer-Sweetardio_nft (9) (1).png": 0.736,
    "layer-art_mattrick_011.png": 0.926,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.94,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.941
+  },
+  "Emblem.png": {
+   "Blue.png": 0.168,
+   "Cerise.png": 0.685,
+   "layer-Eyes_Cyan (1).png": 0.504,
+   "layer-Sweetardio_nft (9) (1).png": 0.235,
+   "layer-art_mattrick_011.png": 0.691,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.475,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.498
+  },
+  "Empty_Fridge.png": {
+   "Blue.png": 0.971,
+   "Cerise.png": 0.89,
+   "layer-Eyes_Cyan (1).png": 0.915,
+   "layer-Sweetardio_nft (9) (1).png": 0.93,
+   "layer-art_mattrick_011.png": 0.89,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.918,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.916
   },
   "Flavor_Explosion.png": {
    "Blue.png": 0.949,
    "Cerise.png": 0.85,
    "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-Sweetardio_nft (9) (1).png": 0.902,
    "layer-art_mattrick_011.png": 0.928,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
@@ -188,13 +349,24 @@
    "Blue.png": 0.874,
    "Cerise.png": 0.97,
    "layer-Eyes_Cyan (1).png": 0.769,
+   "layer-Sweetardio_nft (9) (1).png": 0.918,
    "layer-art_mattrick_011.png": 0.681,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.776,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.77
   },
+  "Graham.png": {
+   "Blue.png": 0.99,
+   "Cerise.png": 0.895,
+   "layer-Eyes_Cyan (1).png": 0.93,
+   "layer-Sweetardio_nft (9) (1).png": 0.947,
+   "layer-art_mattrick_011.png": 0.894,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.934,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.931
+  },
   "Gummy_Bears.png": {
    "Blue.png": 0.609,
    "layer-Eyes_Cyan (1).png": 0.709,
+   "layer-Sweetardio_nft (9) (1).png": 0.534,
    "layer-art_mattrick_011.png": 0.768,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.704,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.707
@@ -203,17 +375,47 @@
    "Blue.png": 0.403,
    "Cerise.png": 0.654,
    "layer-Eyes_Cyan (1).png": 0.558,
+   "layer-Sweetardio_nft (9) (1).png": 0.46,
    "layer-art_mattrick_011.png": 0.669,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.533,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.553
+  },
+  "Hurshey.png": {
+   "Blue.png": 0.956,
+   "Cerise.png": 0.858,
+   "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-Sweetardio_nft (9) (1).png": 0.911,
+   "layer-art_mattrick_011.png": 0.928,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
   },
   "Im_Not_Sorry.png": {
    "Blue.png": 0.919,
    "Cerise.png": 0.819,
    "layer-Eyes_Cyan (1).png": 0.997,
+   "layer-Sweetardio_nft (9) (1).png": 0.873,
    "layer-art_mattrick_011.png": 0.962,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.999,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.998
+  },
+  "Legendary_Just_Aliens.png": {
+   "Cerise.png": 0.608,
+   "layer-Eyes_Cyan (1).png": 0.523,
+   "layer-art_mattrick_011.png": 0.689
+  },
+  "Legendary_Opengotchi.png": {
+   "Cerise.png": 0.63,
+   "layer-art_mattrick_011.png": 0.692
+  },
+  "Legendary_Simplex.png": {
+   "layer-Eyes_Cyan (1).png": 0.665,
+   "layer-art_mattrick_011.png": 0.759,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.645,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.658
+  },
+  "Legendary_Tenders.png": {
+   "Cerise.png": 0.622,
+   "layer-art_mattrick_011.png": 0.692
   },
   "M&Ms.png": {
    "layer-Eyes_Cyan (1).png": 0.679,
@@ -225,6 +427,7 @@
    "Blue.png": 0.956,
    "Cerise.png": 0.86,
    "layer-Eyes_Cyan (1).png": 0.963,
+   "layer-Sweetardio_nft (9) (1).png": 0.912,
    "layer-art_mattrick_011.png": 0.927,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.964
@@ -233,6 +436,7 @@
    "Blue.png": 0.934,
    "Cerise.png": 0.844,
    "layer-Eyes_Cyan (1).png": 0.956,
+   "layer-Sweetardio_nft (9) (1).png": 0.89,
    "layer-art_mattrick_011.png": 0.926,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.959,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.957
@@ -241,20 +445,32 @@
    "Blue.png": 0.876,
    "Cerise.png": 0.846,
    "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-Sweetardio_nft (9) (1).png": 0.833,
    "layer-art_mattrick_011.png": 0.906,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.896,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
+  },
+  "Neon_Backroom.png": {
+   "layer-art_mattrick_011.png": 0.621
+  },
+  "Neon_Strip.png": {
+   "layer-Eyes_Cyan (1).png": 0.645,
+   "layer-art_mattrick_011.png": 0.724,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.632,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.641
   },
   "Pink_Abyss.png": {
    "Blue.png": 0.854,
    "Cerise.png": 0.755,
    "layer-Eyes_Cyan (1).png": 0.936,
+   "layer-Sweetardio_nft (9) (1).png": 0.809,
    "layer-art_mattrick_011.png": 0.971,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.932,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.934
   },
   "Pixie_Stix.png": {
    "layer-Eyes_Cyan (1).png": 0.799,
+   "layer-Sweetardio_nft (9) (1).png": 0.644,
    "layer-art_mattrick_011.png": 0.889,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.792,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.797
@@ -263,6 +479,7 @@
    "Blue.png": 0.797,
    "Cerise.png": 0.815,
    "layer-Eyes_Cyan (1).png": 0.913,
+   "layer-Sweetardio_nft (9) (1).png": 0.751,
    "layer-art_mattrick_011.png": 0.922,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.897,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.91
@@ -271,6 +488,7 @@
    "Blue.png": 0.928,
    "Cerise.png": 0.961,
    "layer-Eyes_Cyan (1).png": 0.846,
+   "layer-Sweetardio_nft (9) (1).png": 0.976,
    "layer-art_mattrick_011.png": 0.818,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.85,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.848
@@ -283,14 +501,31 @@
    "Blue.png": 0.986,
    "Cerise.png": 0.894,
    "layer-Eyes_Cyan (1).png": 0.927,
+   "layer-Sweetardio_nft (9) (1).png": 0.943,
    "layer-art_mattrick_011.png": 0.893,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.931,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.929
+  },
+  "Starburst.png": {
+   "Blue.png": 0.819,
+   "Cerise.png": 0.719,
+   "layer-Eyes_Cyan (1).png": 0.902,
+   "layer-Sweetardio_nft (9) (1).png": 0.773,
+   "layer-art_mattrick_011.png": 0.937,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.898,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.9
+  },
+  "Store.png": {
+   "layer-Eyes_Cyan (1).png": 0.664,
+   "layer-art_mattrick_011.png": 0.725,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.634,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.656
   },
   "Straight_of_America (1).png": {
    "Blue.png": 0.245,
    "Cerise.png": 0.725,
    "layer-Eyes_Cyan (1).png": 0.247,
+   "layer-Sweetardio_nft (9) (1).png": 0.449,
    "layer-art_mattrick_011.png": 0.616,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.239,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.244
@@ -306,14 +541,20 @@
    "Blue.png": 0.956,
    "Cerise.png": 0.86,
    "layer-Eyes_Cyan (1).png": 0.964,
+   "layer-Sweetardio_nft (9) (1).png": 0.913,
    "layer-art_mattrick_011.png": 0.928,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.965
+  },
+  "Sweetardio (16).png": {
+   "Cerise.png": 0.585,
+   "layer-art_mattrick_011.png": 0.685
   },
   "Sweetardio.png": {
    "Blue.png": 0.928,
    "Cerise.png": 0.857,
    "layer-Eyes_Cyan (1).png": 0.941,
+   "layer-Sweetardio_nft (9) (1).png": 0.887,
    "layer-art_mattrick_011.png": 0.923,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.943,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.942
@@ -322,14 +563,25 @@
    "Blue.png": 0.88,
    "Cerise.png": 0.855,
    "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-Sweetardio_nft (9) (1).png": 0.838,
    "layer-art_mattrick_011.png": 0.926,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.903,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.904
+  },
+  "Tampa_Bay_Pete.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.483,
+   "layer-Eyes_Cyan (1).png": 0.534,
+   "layer-Sweetardio_nft (9) (1).png": 0.099,
+   "layer-art_mattrick_011.png": 0.705,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
+   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
   },
   "The_Set.png": {
    "Blue.png": 0.926,
    "Cerise.png": 0.853,
    "layer-Eyes_Cyan (1).png": 0.939,
+   "layer-Sweetardio_nft (9) (1).png": 0.888,
    "layer-art_mattrick_011.png": 0.913,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.939,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.941
@@ -362,6 +614,7 @@
    "Blue.png": 0.981,
    "Cerise.png": 0.895,
    "layer-Eyes_Cyan (1).png": 0.92,
+   "layer-Sweetardio_nft (9) (1).png": 0.947,
    "layer-art_mattrick_011.png": 0.884,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.924,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.922
@@ -370,6 +623,7 @@
    "Blue.png": 0.28,
    "Cerise.png": 0.581,
    "layer-Eyes_Cyan (1).png": 0.517,
+   "layer-Sweetardio_nft (9) (1).png": 0.318,
    "layer-art_mattrick_011.png": 0.687,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.482,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.504
@@ -378,6 +632,7 @@
    "Blue.png": 0.244,
    "Cerise.png": 0.666,
    "layer-Eyes_Cyan (1).png": 0.404,
+   "layer-Sweetardio_nft (9) (1).png": 0.341,
    "layer-art_mattrick_011.png": 0.643,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.378,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.395
@@ -395,6 +650,7 @@
    "Blue.png": 0.947,
    "Cerise.png": 0.878,
    "layer-Eyes_Cyan (1).png": 0.905,
+   "layer-Sweetardio_nft (9) (1).png": 0.902,
    "layer-art_mattrick_011.png": 0.878,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.906,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.906
@@ -403,6 +659,7 @@
    "Blue.png": 0.325,
    "Cerise.png": 0.721,
    "layer-Eyes_Cyan (1).png": 0.33,
+   "layer-Sweetardio_nft (9) (1).png": 0.501,
    "layer-art_mattrick_011.png": 0.535,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.316,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.325
@@ -411,6 +668,7 @@
    "Blue.png": 0.905,
    "Cerise.png": 0.808,
    "layer-Eyes_Cyan (1).png": 0.986,
+   "layer-Sweetardio_nft (9) (1).png": 0.861,
    "layer-art_mattrick_011.png": 0.979,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.982,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.985
@@ -419,17 +677,10 @@
    "Blue.png": 0.343,
    "Cerise.png": 0.719,
    "layer-Eyes_Cyan (1).png": 0.358,
+   "layer-Sweetardio_nft (9) (1).png": 0.519,
    "layer-art_mattrick_011.png": 0.565,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.347,
    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.356
-  },
-  "Tampa_Bay_Pete.png": {
-   "Blue.png": 0.091,
-   "Cerise.png": 0.483,
-   "layer-Eyes_Cyan (1).png": 0.534,
-   "layer-art_mattrick_011.png": 0.705,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.496,
-   "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.519
   }
  }
 }

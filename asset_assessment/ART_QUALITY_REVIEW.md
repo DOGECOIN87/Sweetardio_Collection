@@ -14,33 +14,60 @@ art hold together as one collection?**
 
 The composited art is in good shape. Geometry, lighting and edge quality are
 consistent across the cast, and the defects that exist are concentrated in one
-place: **background plates, half of which are below canvas resolution**. That
-is also the highest-impact place to have them, because the plate fills the
-entire frame behind every token.
+place: **background plates**, which is also the highest-impact place to have
+them, since the plate fills the entire frame behind every token.
 
-Nothing here blocks a mint. One finding is worth fixing before one.
+The two worst offenders — the only plates below 1254² — have been rebuilt
+(§1a). Nothing outstanding blocks a mint.
 
 ---
 
-## 1. Backgrounds are the weak layer — 49% are upscaled
+## 1. Backgrounds are the weak layer — 46% are upscaled
+
+*(The two 1024 plates below have since been fixed — see §1a.)*
 
 | Native size | Plates | At composite |
 |-------------|-------:|--------------|
-| 1393 × 1393 | 35 | native |
+| 1393 × 1393 | 37 | native |
 | 1343 × 1343 | 13 | upscaled 1.04× |
 | 1254 × 1254 | 19 | upscaled 1.11× |
-| **1024 × 1024** | **2** | **upscaled 1.36×** |
 
-`_render_layer()` resizes any non-1393 layer up to the canvas, so 34 of 69
-plates are interpolated at render time. At 1.04× that is invisible; at 1.11× it
-is a slight softening; at **1.36× it is visible softness across the whole
-frame**.
+`_render_layer()` resizes any non-1393 layer up to the canvas, so 32 of 69
+plates are still interpolated at render time. At 1.04× that is invisible; at
+1.11× it is a slight softening. Neither is worth acting on without better
+sources — the 1254 group is the only one that would repay a re-export.
 
-The two worst are **`Coder_Chick.png`** and **`Empty_Fridge.png`** (1024²).
-Both appear in the sample sheet, and both read softer than their neighbours.
+## 1a. The two 1024 plates — fixed
 
-**Recommendation:** re-export or re-upscale those two from source at 1393².
-The 1254 group is worth revisiting if sources exist; the 1343 group is fine.
+Both were upscaled 1.36× at render time. Neither had a higher-resolution
+original in `backgroundz_originals/`, so both were rebuilt through EDSR ×2
+super-resolution and resampled down to 1393, which reconstructs detail at 2×
+before losing any — materially better than the single Lanczos step the runtime
+was doing.
+
+They turned out to be **different problems**, which the original measurement
+missed:
+
+- **`Coder_Chick.png`** was genuinely detailed art — embroidered patches on
+  woven fabric, measuring **267% of the median plate's detail** at native
+  resolution. It was the upscale that hurt it, and the rebuild removes the
+  Lanczos ringing. A modest but real gain.
+- **`Empty_Fridge.png`** was not "soft by design" as first assumed. It was a
+  **degraded copy** — 25% of the median plate's detail, the 4th softest of 69.
+  A sharp 1254² source was supplied and is now kept in
+  `backgroundz_originals/`. Rebuilt from that, the plate measures **4.9× its
+  previous detail** and sits at the collection median instead of near the
+  bottom.
+
+Worth recording: the winning candidate measured *lower* gradient energy than a
+Lanczos-plus-unsharp alternative (9.87 vs 13.23) while looking clearly better.
+Sharpening halos inflate that metric without adding detail, so the choice was
+made by eye at 1:1, not by the number.
+
+Because both plates changed appearance, `char_compat.json`, `eyez_compat.json`
+and `wat_compat.json` were regenerated — they encode measured dominant colours,
+so stale entries would have let a character camouflage into the new, much
+brighter fridge. `build_mint` still reports camouflage=0 and eye-clash=0.
 
 ## 2. Stickers are authored to the wrong canvas
 
