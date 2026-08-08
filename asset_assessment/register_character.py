@@ -31,6 +31,9 @@ sys.path.insert(0, ".")
 import generator as g  # noqa: E402
 
 BALL = (690, 601)
+# Median face-hole width across the 30 characters in the collection. New art is
+# scaled to this so the eyes keep overlapping the rim — see register().
+TARGET_HOLE_W = 248
 
 
 def key(path):
@@ -85,13 +88,52 @@ def despill(im):
     return Image.fromarray(out, "RGBA")
 
 
-def register(im, hole):
-    """Scale 1408 -> 1393 and translate so the hole centre lands on the ball."""
-    s = g.CANVAS_SIZE / im.size[0]
-    im = im.resize((g.CANVAS_SIZE, g.CANVAS_SIZE), Image.LANCZOS)
-    hy, hx = np.where(hole)
-    cx, cy = hx.mean() * s, hy.mean() * s
-    dx, dy = round(BALL[0] - cx), round(BALL[1] - cy)
+def _hole_of(im):
+    a = np.asarray(im)[..., 3]
+    m = a > 8
+    h = ndimage.binary_fill_holes(m) & ~m
+    lab, n = ndimage.label(h)
+    sz = ndimage.sum(h, lab, range(1, n + 1))
+    hy, hx = np.where(lab == int(np.argmax(sz)) + 1)
+    return hx, hy
+
+
+def register(im, hole, hole_width=TARGET_HOLE_W):
+    """Land the art so its FACE HOLE matches the cast — size, then position.
+
+    Position alone is not enough. The eyes composite at native size on top of
+    everything, so `eye width / hole width` is fixed by the art and cannot be
+    corrected downstream: `ball_fit` scales the ball, `CHAR_SCALE` scales body
+    and ball and eyes together, and neither changes the ratio. All 30 characters
+    in the collection sit between 1.04 and 1.57 (median 1.13) — the eyes are
+    WIDER than the hole and spill over its rim, and that overlap is the
+    collection's face style.
+
+    A generated body arrives at an arbitrary size, so its hole can be any width;
+    at 305px, C's eyes floated inside the hole with a ring of skin ball showing.
+    Scaling the art until the hole is TARGET_HOLE_W restores the overlap, and it
+    also removes the reason for a FACE_HOLE_BOTTOM_OVERRIDE: a cast-sized hole
+    is one the standard ball already covers.
+
+    Pass hole_width=0 to skip the resize and only pin the position.
+    """
+    if im.size[0] != g.CANVAS_SIZE:
+        s = g.CANVAS_SIZE / im.size[0]
+        im = im.resize((g.CANVAS_SIZE, g.CANVAS_SIZE), Image.LANCZOS)
+        hole = np.asarray(Image.fromarray(hole.astype(np.uint8) * 255)
+                          .resize((g.CANVAS_SIZE, g.CANVAS_SIZE),
+                                  Image.NEAREST)) > 127
+
+    if hole_width:
+        hy, hx = np.where(hole)
+        k = hole_width / (hx.max() - hx.min() + 1)
+        n = max(1, round(g.CANVAS_SIZE * k))
+        im = im.resize((n, n), Image.LANCZOS)
+        hx, hy = _hole_of(im)      # re-measure after the resample
+    else:
+        hy, hx = np.where(hole)
+
+    dx, dy = round(BALL[0] - hx.mean()), round(BALL[1] - hy.mean())
     canvas = Image.new("RGBA", (g.CANVAS_SIZE, g.CANVAS_SIZE), (0, 0, 0, 0))
     canvas.paste(im, (dx, dy))
     return canvas, (dx, dy)
@@ -119,6 +161,10 @@ if __name__ == "__main__":
     ap.add_argument("pairs", nargs="+", metavar="SRC=DEST.png",
                     help="source image = destination filename in characterz")
     ap.add_argument("--out", default=os.path.join(g.TRAITS_DIR, g.CHARACTERZ))
+    ap.add_argument("--hole-width", type=int, default=TARGET_HOLE_W,
+                    help="scale the art until its face hole is this wide "
+                         f"(default {TARGET_HOLE_W}, the cast median); 0 to "
+                         "only pin the position")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -128,7 +174,7 @@ if __name__ == "__main__":
             sys.exit(f"expected SRC=DEST.png, got {pair!r}")
         im, hole = key(src)
         im = despill(im)
-        im, _ = register(im, hole)
+        im, _ = register(im, hole, args.hole_width)
         report(im, dst)
         if not args.dry_run:
             im.save(os.path.join(args.out, dst))

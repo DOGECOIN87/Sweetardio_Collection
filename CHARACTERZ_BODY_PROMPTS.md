@@ -631,6 +631,14 @@ numbers below are measured off `before_skinz_cyan_gummy_bear.png`:
 | Hole width ÷ body width | 0.35 |
 | Ear span ÷ body width | **0.98** — the bear is widest across its ears |
 | Aspect (H ÷ W) | **1.31** |
+| Median eye ÷ hole width | **1.20** — the eyes are wider than the hole |
+
+That last row is the house face style, and it holds across all 30 characters
+(1.04 to 1.57, median 1.13): the eye whites spill past the hole's rim onto the
+body. It is set by the art and nothing downstream can fix it, so a hole that
+comes back too wide leaves the eyes floating inside it. `register_character.py`
+now scales incoming art until the hole is 248px, which restores the overlap —
+but the closer the generator gets, the less the art has to be resampled.
 
 Two changes follow from that, and they are the reason this version should do
 better than the last:
