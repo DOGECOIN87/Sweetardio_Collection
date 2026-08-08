@@ -614,6 +614,275 @@ The ceiling here is taste rather than arithmetic: 0.49 is reachable at 686px
 tall, but that is a perfectly square bear and reads squashed. 0.45 keeps the
 gummy-bear silhouette.
 
+### The standalone prompts — one per colour
+
+Fully assembled: no reference image, no placeholder to fill in, nothing to
+paste together. One block per colour, copy and run.
+
+Every proportion is stated as a fraction of total height, because the current
+bears fail on exactly one number — they stand 1.32× as tall as they are wide,
+which pushes the hole up to 0.384 instead of the middle.
+
+**OG Gummy Bear** — replaces `before_skinz_og_gummy_bear.png`
+
+```
+Create a single 3D-rendered gummy bear character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic gummy
+bear with a round hole punched through its body, into which a cartoon face is
+composited later.
+
+THE COLOUR is a multi-colour gradient gummy — hot pink through the head and shoulders,
+blending through violet across the middle to cyan at the feet, transitions
+smooth and candy-bright.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
+literally:
+
+- Take the character's total height as 100%.
+- The HEAD, with two small rounded ear buttons on top, is the top 30%.
+- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
+  near the MIDDLE of the total height.
+- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+  forward, not long.
+- The character is barely TALLER than it is WIDE — squat, chunky and compact.
+  It must NOT be an elongated or slim bear. If it stands noticeably taller than
+  its own width, it is wrong.
+- That is the test: the distance from the top of the head down to the hole's
+  centre, and the distance from the hole's centre down to the soles of the
+  feet, should be close to equal.
+
+THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
+rounded head with no neck, stubby arms held against the sides flanking the
+hole, short splayed legs, seated-forward stance.
+
+THE HOLE: a clean circular hole punched right THROUGH the body, fully
+transparent inside, centred horizontally. Its diameter is about ONE THIRD of
+the character's width. Give it a visible inner wall so it reads as a real
+opening bored through translucent candy — the gelatin should be lighter and
+more saturated where it is thin around the rim, exactly as real gummy does. No
+eyes, no mouth, no muzzle, no nose — the hole is empty.
+
+STYLE: photorealistic 3D candy render — translucent gelatin with real
+subsurface scattering, so light entering the upper left glows through the mass
+and comes out warmer and deeper on the lower right. A slightly tacky, softly
+glossy surface with fine condensation beading and a few tiny internal bubbles.
+Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and ice creams as if shot in the same studio.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Specular highlights on the
+upper-left of the head, ears, shoulders and knees; the deepest occlusion under
+the arms, between the legs and along the lower-right rim, with a rim light
+picking that edge back out.
+
+DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+surface, table or scene — the character floats alone. Do not add a cast shadow
+or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
+add sugar coating, wrappers, text or logos. Do not make it opaque — the
+translucency is the whole material. Do not add glow, bloom or a halo outside
+the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Cyan Gummy Bear** — replaces `before_skinz_cyan_gummy_bear.png`
+
+```
+Create a single 3D-rendered gummy bear character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic gummy
+bear with a round hole punched through its body, into which a cartoon face is
+composited later.
+
+THE COLOUR is a single vivid cyan gummy, evenly coloured through the whole body, with strong
+light transmission so the thin parts — ears, arms, feet — glow brighter than
+the mass.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
+literally:
+
+- Take the character's total height as 100%.
+- The HEAD, with two small rounded ear buttons on top, is the top 30%.
+- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
+  near the MIDDLE of the total height.
+- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+  forward, not long.
+- The character is barely TALLER than it is WIDE — squat, chunky and compact.
+  It must NOT be an elongated or slim bear. If it stands noticeably taller than
+  its own width, it is wrong.
+- That is the test: the distance from the top of the head down to the hole's
+  centre, and the distance from the hole's centre down to the soles of the
+  feet, should be close to equal.
+
+THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
+rounded head with no neck, stubby arms held against the sides flanking the
+hole, short splayed legs, seated-forward stance.
+
+THE HOLE: a clean circular hole punched right THROUGH the body, fully
+transparent inside, centred horizontally. Its diameter is about ONE THIRD of
+the character's width. Give it a visible inner wall so it reads as a real
+opening bored through translucent candy — the gelatin should be lighter and
+more saturated where it is thin around the rim, exactly as real gummy does. No
+eyes, no mouth, no muzzle, no nose — the hole is empty.
+
+STYLE: photorealistic 3D candy render — translucent gelatin with real
+subsurface scattering, so light entering the upper left glows through the mass
+and comes out warmer and deeper on the lower right. A slightly tacky, softly
+glossy surface with fine condensation beading and a few tiny internal bubbles.
+Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and ice creams as if shot in the same studio.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Specular highlights on the
+upper-left of the head, ears, shoulders and knees; the deepest occlusion under
+the arms, between the legs and along the lower-right rim, with a rim light
+picking that edge back out.
+
+DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+surface, table or scene — the character floats alone. Do not add a cast shadow
+or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
+add sugar coating, wrappers, text or logos. Do not make it opaque — the
+translucency is the whole material. Do not add glow, bloom or a halo outside
+the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Pink Gummy Bear** — replaces `before_skinz_pink_gummy_bear.png`
+
+```
+Create a single 3D-rendered gummy bear character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic gummy
+bear with a round hole punched through its body, into which a cartoon face is
+composited later.
+
+THE COLOUR is a single hot pink gummy, evenly coloured through the whole body, with strong
+light transmission so the thin parts — ears, arms, feet — glow brighter than
+the mass.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
+literally:
+
+- Take the character's total height as 100%.
+- The HEAD, with two small rounded ear buttons on top, is the top 30%.
+- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
+  near the MIDDLE of the total height.
+- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+  forward, not long.
+- The character is barely TALLER than it is WIDE — squat, chunky and compact.
+  It must NOT be an elongated or slim bear. If it stands noticeably taller than
+  its own width, it is wrong.
+- That is the test: the distance from the top of the head down to the hole's
+  centre, and the distance from the hole's centre down to the soles of the
+  feet, should be close to equal.
+
+THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
+rounded head with no neck, stubby arms held against the sides flanking the
+hole, short splayed legs, seated-forward stance.
+
+THE HOLE: a clean circular hole punched right THROUGH the body, fully
+transparent inside, centred horizontally. Its diameter is about ONE THIRD of
+the character's width. Give it a visible inner wall so it reads as a real
+opening bored through translucent candy — the gelatin should be lighter and
+more saturated where it is thin around the rim, exactly as real gummy does. No
+eyes, no mouth, no muzzle, no nose — the hole is empty.
+
+STYLE: photorealistic 3D candy render — translucent gelatin with real
+subsurface scattering, so light entering the upper left glows through the mass
+and comes out warmer and deeper on the lower right. A slightly tacky, softly
+glossy surface with fine condensation beading and a few tiny internal bubbles.
+Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and ice creams as if shot in the same studio.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Specular highlights on the
+upper-left of the head, ears, shoulders and knees; the deepest occlusion under
+the arms, between the legs and along the lower-right rim, with a rim light
+picking that edge back out.
+
+DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+surface, table or scene — the character floats alone. Do not add a cast shadow
+or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
+add sugar coating, wrappers, text or logos. Do not make it opaque — the
+translucency is the whole material. Do not add glow, bloom or a halo outside
+the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Purple Gummy Bear** — replaces `before_skinz_purple_gummy_bear.png`
+
+```
+Create a single 3D-rendered gummy bear character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic gummy
+bear with a round hole punched through its body, into which a cartoon face is
+composited later.
+
+THE COLOUR is a single deep violet-purple gummy, evenly coloured through the whole body, with
+strong light transmission so the thin parts glow brighter than the mass and
+keep the purple from going muddy.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
+literally:
+
+- Take the character's total height as 100%.
+- The HEAD, with two small rounded ear buttons on top, is the top 30%.
+- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
+  near the MIDDLE of the total height.
+- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+  forward, not long.
+- The character is barely TALLER than it is WIDE — squat, chunky and compact.
+  It must NOT be an elongated or slim bear. If it stands noticeably taller than
+  its own width, it is wrong.
+- That is the test: the distance from the top of the head down to the hole's
+  centre, and the distance from the hole's centre down to the soles of the
+  feet, should be close to equal.
+
+THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
+rounded head with no neck, stubby arms held against the sides flanking the
+hole, short splayed legs, seated-forward stance.
+
+THE HOLE: a clean circular hole punched right THROUGH the body, fully
+transparent inside, centred horizontally. Its diameter is about ONE THIRD of
+the character's width. Give it a visible inner wall so it reads as a real
+opening bored through translucent candy — the gelatin should be lighter and
+more saturated where it is thin around the rim, exactly as real gummy does. No
+eyes, no mouth, no muzzle, no nose — the hole is empty.
+
+STYLE: photorealistic 3D candy render — translucent gelatin with real
+subsurface scattering, so light entering the upper left glows through the mass
+and comes out warmer and deeper on the lower right. A slightly tacky, softly
+glossy surface with fine condensation beading and a few tiny internal bubbles.
+Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and ice creams as if shot in the same studio.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Specular highlights on the
+upper-left of the head, ears, shoulders and knees; the deepest occlusion under
+the arms, between the legs and along the lower-right rim, with a rim light
+picking that edge back out.
+
+DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+surface, table or scene — the character floats alone. Do not add a cast shadow
+or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
+add sugar coating, wrappers, text or logos. Do not make it opaque — the
+translucency is the whole material. Do not add glow, bloom or a halo outside
+the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
 ### The v2 prompt
 
 Attach **the current art for that colour** as the reference — a targeted edit,
