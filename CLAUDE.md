@@ -43,6 +43,22 @@ Where this is already encoded:
   must be preserved exactly when an asset is re-authored.
 - `ball_fit()` sizes every skin ball from the **widest eye**, so eye width is
   load-bearing across the whole collection.
+- **The eyes must overlap the face hole's rim.** All 30 characters have the
+  median eye (279px) wider than their face hole — ratios 1.04 to 1.57, median
+  1.13 — so the eye whites spill past the hole edge onto the body. That overlap
+  is the collection's face style, not an accident.
+
+  It is fixed by the **art**, because `eye width ÷ hole width` survives every
+  transform downstream: `ball_fit` scales only the ball, and `CHAR_SCALE` scales
+  body, ball, eyes and mouth together. A body whose hole comes back wider than
+  ~270px cannot be corrected in `generator.py` — the eyes will float inside it
+  with a ring of skin ball showing.
+
+  So new character art is registered to a **hole width of 248px** (the cast
+  median) by `asset_assessment/register_character.py`, which scales the art
+  until the hole matches before pinning it to the ball centre. Sizing the hole
+  correctly also removes any need for a `FACE_HOLE_BOTTOM_OVERRIDE`: a
+  cast-sized hole is one the standard ball already covers.
 
 ## Verification tools
 

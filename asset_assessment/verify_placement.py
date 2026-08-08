@@ -57,18 +57,14 @@ from audit_placement import char_table, measure, BALL_CENTER  # noqa: E402
 # they just do not fail the run, so the exit status stays meaningful.
 WAIVED = {
     ("chocolate_sandwich_cookie", "vertical"):
-        "PENDING a decision, not a false positive: its centre sits ~55px above "
-        "the canvas centre, the same way the doughnuts did before they were "
-        "corrected. Left alone because only the doughnuts were asked for. (Its "
-        "footwear case is separately skewed by the two-part asset: the back "
-        "wafer sits lower than the front disc that carries the face.)",
+        "applies to its FOOTWEAR case only, where CHAR_Y_ADJUST +50 is tuned to "
+        "the FRONT disc: the back wafer sits lower, so the bbox reads ~56px "
+        "below the group. Its bare case is centred correctly and needs no "
+        "waiver — confirmed by render.",
     ("chocolate_sandwich_cookie", "horizontal"):
-        "same two-part asset: the back wafer sits left of the front disc, so the "
-        "bbox centre reads ~54px left. The face-carrying disc is on the column.",
-    ("chocolate_chip_cookie", "vertical"):
-        "PENDING a decision, not a false positive: its centre sits ~40px above "
-        "the canvas centre, the same way the doughnuts did before they were "
-        "corrected. Left alone because only the doughnuts were asked for.",
+        "two-part asset: the back wafer sits left of the front disc, so the bbox "
+        "centre reads ~54px left. The face-carrying disc is on the column — "
+        "confirmed by render.",
 }
 
 

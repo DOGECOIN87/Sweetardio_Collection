@@ -173,22 +173,17 @@ TRAIT_NAMES = {
         "chocolate_sandwich_cookie":        "Chocolate Sandwich Cookie",
         "churro":                           "Churro",
         "cyan_frosted_poptart":             "Cyan Frosted Pop Tart",
-        "cyan_gummy_bear":                  "Cyan Gummy Bear",
         "cyan_sherbert_ice_cream":          "Cyan Sherbert Ice Cream",
         "ding_dong":                        "Ding Dong",
         "glazed_doughnut":                  "Glazed Doughnut",
         "gold_waffle":                      "Gold Waffle",
         "gummy_worm":                       "Gummy Worm",
         "marshmallow":                      "Marshmallow",
-        "mint_chocolate_chip_ice_cream":    "Mint Choc Chip Ice Cream",
         "neopolitan_ice_cream":             "Neapolitan Ice Cream",
         "oatmeal_cream_pie":                "Oatmeal Cream Pie",
         "og_gummy_bear":                    "OG Gummy Bear",
         "og_poptart":                       "OG Pop Tart",
-        "pink_gummy_bear":                  "Pink Gummy Bear",
         "pink_sherbert_ice_cream":          "Pink Sherbert Ice Cream",
-        "purple_gummy_bear":                "Purple Gummy Bear",
-        "rainbow_sherbert_ice_cream":       "Rainbow Sherbert Ice Cream",
         "rice_crispy_treat":                "Rice Crispy Treat",
         "rocky_road_ice_cream":             "Rocky Road Ice Cream",
         "smores":                           "S'mores",
@@ -196,7 +191,6 @@ TRAIT_NAMES = {
         "sugar_doughnut":                   "Sugar Doughnut",
         "vanilla_ice_cream":                "Vanilla Ice Cream",
         "waffle":                           "Waffle",
-        "zaffre_sherbert_ice_cream":        "Zaffre Sherbert Ice Cream",
         "zebra_cake":                       "Zebra Cake",
     },
     BACKGROUNDZ: {
@@ -536,11 +530,8 @@ GORBHOUSE_CHARS = [
 EXCLUDE_WAT_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
-    "rainbow_sherbert_ice_cream",
     "vanilla_ice_cream",
     "rocky_road_ice_cream",
-    "zaffre_sherbert_ice_cream",
-    "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "gummy_bear",
     "twinkie",
@@ -575,11 +566,8 @@ def armz_allowed(arm_file, char_name):
 NO_OFFSET_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
-    "rainbow_sherbert_ice_cream",
     "vanilla_ice_cream",
     "rocky_road_ice_cream",
-    "zaffre_sherbert_ice_cream",
-    "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "twinkie",
     "nutty_bar",
@@ -638,8 +626,15 @@ def is_centered(char_name):
 CHAR_Y_ADJUST = {
     "poptart": -65,
     "twinkie": 45,
-    "pink_sherbert_ice_cream": -42,
-    "rainbow_sherbert_ice_cream": -42,
+    # The five regenerated ice creams (vanilla, neopolitan, rocky road, cyan
+    # and pink sherbert) all measure the same body, so they take the same trim
+    # onto the shared 1111 cone-tip line. The three still on the old art keep
+    # their own values below.
+    "vanilla_ice_cream": -18,
+    "neopolitan_ice_cream": -21,
+    "rocky_road_ice_cream": -21,
+    "cyan_sherbert_ice_cream": -21,
+    "pink_sherbert_ice_cream": -18,
     "chocolate_sandwich_cookie": 50,
     "sugar_cube": 42,
     "gold_waffle": -18,        # measured separately from the plain waffle; the
@@ -649,19 +644,16 @@ CHAR_Y_ADJUST = {
     "ding_dong": 34,
     "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
-    "zaffre_sherbert_ice_cream": -18,
     "brownie_bite": 22,
     "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
                                # stance is held put by FOOTWEARLESS_DY
-    "cyan_gummy_bear": 43,     # rescaled; feet on the shared ground line (1111)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
-    "purple_gummy_bear": 47,    # rescaled; feet on the shared ground line (1111)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": 50,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # rescaled; feet on the shared ground line (1111)
+    "nutty_bar": -118,         # bar body, stands with the Twinkie at 1132;
+                               # re-derived for the regenerated art     # rescaled; feet on the shared ground line (1111)
 }
 
 def char_y_adjust(char_name):
@@ -684,13 +676,17 @@ def char_y_adjust(char_name):
 # across different sizes pushes the biggest bodies high: the doughnuts are the
 # largest rings, so a shared bottom left their mass ~55px above canvas centre
 # while ding_dong (a smaller ring, tuned by eye) sat dead centre. Values below
-# put each body's centre on the canvas centre line (y=696).
+# put each body's centre on the canvas centre line (y=696). Chosen over
+# aligning the face HOLE to centre, which the cookies showed diverging by up to
+# 26px: hole-alignment drops the green centre line through the eyes, while
+# bbox-alignment keeps it just under the face the way the rest of the group
+# reads.
 CENTERED_FOOTWEARLESS_DY = {
     "glazed_doughnut": 99,        # was 45, centre sat 54px high
     "chocolate_doughnut": 93,     # was 38, centre sat 55px high
     "sugar_doughnut": 93,         # was 38, centre sat 55px high
-    "chocolate_sandwich_cookie": 35,
-    "chocolate_chip_cookie": 32,
+    "chocolate_sandwich_cookie": 90,  # was 35, centre sat 90px high
+    "chocolate_chip_cookie": 72,      # was 32, centre sat 72px high
     "oatmeal_cream_pie": 80,
     "ding_dong": 94,       # was the only CENTERED character with no entry, so
                            # it floated ~94px above its ring/disc peers when
@@ -746,6 +742,11 @@ CHAR_SCALE = {
     # feet on the same line as the rescaled cone tips and their width (581px)
     # alongside the rescaled ice creams (582px), keeping the two a family.
     "gummy_bear": 0.881,
+    # The regenerated bar is 1154 tall against the old art's 929, which does not
+    # fit the canvas standing on the 1132 bar line - its crown lands at y=-22.
+    # 0.93 buys a 60px top margin and keeps eye/hole at 1.22, inside the cast's
+    # 1.04-1.57 band.
+    "nutty_bar": 0.93,
 }
 
 def char_scale(char_name):
@@ -919,6 +920,13 @@ FACE_HOLE_BOTTOM = 732
 # match on the character base-name.
 FACE_HOLE_BOTTOM_OVERRIDE = {
     "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
+    "nutty_bar": 765,     # its hole is a TALL ellipse (246 x 294) where the
+                          # rest of the cast's are round or wide, so the ball's
+                          # width covers it but its height does not, and its top
+                          # arc is flatter than the ball's. 765 is the smallest
+                          # value that closes the gap for every skin x eye pair
+                          # (751 left a 107 x 20 crescent at the top on the
+                          # alien skin); it costs 114% of cast-normal ball width.
 }
 
 def face_hole_bottom(char_name):
@@ -1322,7 +1330,14 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 10. Armz (after ALL footwear overlays — WAT and gorbhouse — so a held
     # katana/knife reads on top of the footwear; tracks the character's scale)
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
+        # Arms deliberately do NOT take cscale. A weapon is a rarity trait, and
+        # a Blue Saber should read as the same object whoever holds it — when
+        # arms inherited the character scale, the sabers on the ice creams and
+        # gummy bears (0.74 / 0.881) came out visibly smaller than the same
+        # saber on everyone else. Native size keeps the trait consistent across
+        # the mint; the slightly oversized fists on a small character read as
+        # cartoon, not as an error.
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 11. Sticker
     if sticker:
