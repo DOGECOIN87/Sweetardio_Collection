@@ -652,7 +652,7 @@ CHAR_Y_ADJUST = {
     "oatmeal_cream_pie": 14,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -103,         # bar body, stands with the Twinkie at 1132;
+    "nutty_bar": -118,         # bar body, stands with the Twinkie at 1132;
                                # re-derived for the regenerated art     # rescaled; feet on the shared ground line (1111)
 }
 
@@ -920,7 +920,7 @@ FACE_HOLE_BOTTOM = 732
 # match on the character base-name.
 FACE_HOLE_BOTTOM_OVERRIDE = {
     "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
-    "nutty_bar": 765,     # its hole is a TALL ellipse (246 x 315) where the
+    "nutty_bar": 765,     # its hole is a TALL ellipse (246 x 294) where the
                           # rest of the cast's are round or wide, so the ball's
                           # width covers it but its height does not, and its top
                           # arc is flatter than the ball's. 765 is the smallest
