@@ -616,86 +616,107 @@ gummy-bear silhouette.
 
 ### The standalone prompts — one per colour
 
-Fully assembled: no reference image, no placeholder to fill in, nothing to
-paste together. One block per colour, copy and run.
+Fully assembled: no reference image, no placeholder, nothing to paste together.
 
-Every proportion is stated as a fraction of total height, because the current
-bears fail on exactly one number — they stand 1.32× as tall as they are wide.
+These are built from the **working** bears rather than from a target, because
+two attempts at stating a target percentage both came back with the hole far too
+low (0.579 on the last one, against 0.384 in the art already in the repo). The
+numbers below are measured off `before_skinz_cyan_gummy_bear.png`:
 
-**Target face-frac is 0.40, not the 0.45 the table above solves for.** The hole
-is deliberately kept a little high on the chest, which is where a gummy bear's
-head meets its body; 0.45 put it at the navel. 0.40 is still a clear move from
-today's 0.384 in silhouette terms, because the gain comes from the body getting
-shorter and wider rather than from the hole sliding down it.
+| | measured |
+|---|---|
+| Solid candy above the hole | **25%** of total height |
+| Hole top edge → bottom edge | 25% → 52% |
+| Hole centre | **0.384** |
+| Hole width ÷ body width | 0.35 |
+| Ear span ÷ body width | **0.98** — the bear is widest across its ears |
+| Aspect (H ÷ W) | **1.31** |
+
+Two changes follow from that, and they are the reason this version should do
+better than the last:
+
+- **The aspect demand is relaxed from 1.07 back to ~1.3.** Asking for a squat
+  bear was fighting the hole instruction — the art that works is a third taller
+  than it is wide, and giving the generator two targets to trade off let it
+  satisfy the wrong one.
+- **The hole is anchored to the ears, not to a percentage.** "Widest across the
+  ears, thin brow, hole starting just below them" is a local relationship a
+  generator can actually hit; "centre at 40%" is one it can satisfy by growing
+  the head instead, which is exactly what happened.
 
 **OG Gummy Bear** — replaces `before_skinz_og_gummy_bear.png`
 
 ```
 Create a single 3D-rendered gummy bear character on a transparent background.
-It is one layer of a composited collectible artwork: a photorealistic gummy
-bear with a round hole punched through its body, into which a cartoon face is
-composited later.
 
-THE COLOUR is a multi-colour gradient gummy — hot pink through the head and shoulders,
-blending through violet across the middle to cyan at the feet, transitions
-smooth and candy-bright.
+Think of it as a gummy bear MOULDED AS A RING — a bear-shaped piece of candy
+with a big round hole bored straight through it, the way a bear-shaped pendant
+or teething ring is made. The hole is the character's defining feature, not a
+detail. A cartoon face is composited into it later, so it must be left empty.
 
-BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
-literally:
+THE COLOUR is a multi-colour gradient gummy — hot pink through the ears and brow, blending
+through violet across the middle to cyan at the feet, transitions smooth and
+candy-bright.
 
-- Take the character's total height as 100%.
-- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
-  below the head. It is punched through the head itself, where the face would
-  be. This is the single most important instruction.
-- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
-  at 55%. Its centre is therefore at 40%.
-- Above the hole there is only a THIN BAND of head — about a quarter of the
-  total height, and the two rounded ear buttons live in that band, at the top
-  corners. The hole very nearly fills the head. Do NOT draw a large domed head
-  sitting above the hole; if you can fit a whole blank head in above it, the
-  hole is far too low.
-- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
-  its sides; the legs are short and splayed forward, not long.
-- The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands more than about a tenth
-  taller than its own width, it is wrong.
-- That is the test: measure from the very top of the ears down to the hole's
-  centre, and from the hole's centre down to the soles of the feet. The first
-  distance should be a little SHORTER than the second — roughly 40 to 60. If
-  the first is the LONGER of the two, the hole is far too low.
+BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
 
-THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
-rounded head with no neck, stubby arms held against the sides flanking the
-hole, short splayed legs, seated-forward stance.
+  0%      the very top of the two ears
+  0-14%   the EARS. Two rounded buttons at the TOP CORNERS, set wide apart. The
+          bear is at its very widest across the ears — they reach almost the
+          full width of the character. There is no tall domed head between or
+          above them.
+  14-25%  a shallow BROW — a thin band of candy bridging the two ears. This is
+          the only solid material above the hole, and it is thin.
+  25-52%  THE HOLE. Its top edge starts just below the ears and its bottom edge
+          reaches past the midpoint of the character. Its centre lands at about
+          40% of the total height.
+  52-100% the BODY: stubby arms bulging at the sides level with the hole, a
+          short torso, and two short splayed feet at the bottom.
 
-THE HOLE: a clean circular hole punched right THROUGH the body, fully
-transparent inside, centred horizontally. Its diameter is about ONE THIRD of
-the character's width. Give it a visible inner wall so it reads as a real
-opening bored through translucent candy — the gelatin should be lighter and
-more saturated where it is thin around the rim, exactly as real gummy does. No
-eyes, no mouth, no muzzle, no nose — the hole is empty.
+  Overall the character stands about a third taller than it is wide.
+
+THE HOLE, stated again because it is what these attempts get wrong: it is bored
+through the bear's HEAD, where a face would go — not through its chest, not
+through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
+character's total width, and roughly the same as the distance between the two
+ear buttons.
+
+THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
+with the hole in the chest underneath. If you can fit a whole blank head in
+above the hole, the hole is far too low. Only the ears and a thin brow belong up
+there.
+
+CHECK BEFORE YOU FINISH: measure from the very top of the ears down to the
+centre of the hole, then from the centre of the hole down to the soles of the
+feet. The first distance must be the SHORTER of the two — about 40 against 60.
+If the first is longer, the hole is too low and the head is too big.
+
+THE HOLE'S FINISH: fully transparent inside, centred horizontally, with a
+visible inner wall so it reads as a real opening bored through translucent
+candy — the gelatin should be lighter and more saturated where it is thin
+around the rim, exactly as real gummy does. No eyes, no mouth, no muzzle, no
+nose. The hole is empty.
 
 STYLE: photorealistic 3D candy render — translucent gelatin with real
 subsurface scattering, so light entering the upper left glows through the mass
 and comes out warmer and deeper on the lower right. A slightly tacky, softly
 glossy surface with fine condensation beading and a few tiny internal bubbles.
-Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
-cookies, doughnuts and ice creams as if shot in the same studio.
+Not illustration, not plastic, not cel-shaded. Front-on and symmetrical. It has
+to sit beside photoreal cookies, doughnuts and ice creams as if shot in the
+same studio.
 
 LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
-cooler, dimmer fill from the lower right. Specular highlights on the
-upper-left of the head, ears, shoulders and knees; the deepest occlusion under
-the arms, between the legs and along the lower-right rim, with a rim light
-picking that edge back out.
+cooler, dimmer fill from the lower right. Specular highlights on the upper-left
+of the ears, brow, shoulders and knees; the deepest occlusion under the arms,
+between the feet and along the lower-right rim, with a rim light picking that
+edge back out.
 
-DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
-Do not draw a big domed head above the hole. Do not make it tall or slim, it is
-squat. Do not add a background,
-surface, table or scene — the character floats alone. Do not add a cast shadow
-or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
-add sugar coating, wrappers, text or logos. Do not make it opaque — the
-translucency is the whole material. Do not add glow, bloom or a halo outside
-the silhouette.
+DO NOT: do not put the hole in the chest or the belly. Do not draw a domed head
+above the hole. Do not add a background, surface, table or scene — the
+character floats alone. Do not add a cast shadow or drop shadow. Do not add a
+face, eyes, a mouth, a muzzle or a nose. Do not add sugar coating, wrappers,
+text or logos. Do not make it opaque — the translucency is the whole material.
+Do not add glow, bloom or a halo outside the silhouette.
 
 OUTPUT: the character alone, centred, on a fully transparent background, square
 canvas, highest resolution available. Crisp anti-aliased edge, no colour
@@ -707,70 +728,74 @@ screenshot or a preview of it.
 
 ```
 Create a single 3D-rendered gummy bear character on a transparent background.
-It is one layer of a composited collectible artwork: a photorealistic gummy
-bear with a round hole punched through its body, into which a cartoon face is
-composited later.
 
-THE COLOUR is a single vivid cyan gummy, evenly coloured through the whole body, with strong
-light transmission so the thin parts — ears, arms, feet — glow brighter than
-the mass.
+Think of it as a gummy bear MOULDED AS A RING — a bear-shaped piece of candy
+with a big round hole bored straight through it, the way a bear-shaped pendant
+or teething ring is made. The hole is the character's defining feature, not a
+detail. A cartoon face is composited into it later, so it must be left empty.
 
-BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
-literally:
+THE COLOUR is a single vivid cyan gummy, evenly coloured throughout, with strong light
+transmission so the thin parts — ears, arms, feet — glow brighter than the mass.
 
-- Take the character's total height as 100%.
-- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
-  below the head. It is punched through the head itself, where the face would
-  be. This is the single most important instruction.
-- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
-  at 55%. Its centre is therefore at 40%.
-- Above the hole there is only a THIN BAND of head — about a quarter of the
-  total height, and the two rounded ear buttons live in that band, at the top
-  corners. The hole very nearly fills the head. Do NOT draw a large domed head
-  sitting above the hole; if you can fit a whole blank head in above it, the
-  hole is far too low.
-- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
-  its sides; the legs are short and splayed forward, not long.
-- The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands more than about a tenth
-  taller than its own width, it is wrong.
-- That is the test: measure from the very top of the ears down to the hole's
-  centre, and from the hole's centre down to the soles of the feet. The first
-  distance should be a little SHORTER than the second — roughly 40 to 60. If
-  the first is the LONGER of the two, the hole is far too low.
+BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
 
-THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
-rounded head with no neck, stubby arms held against the sides flanking the
-hole, short splayed legs, seated-forward stance.
+  0%      the very top of the two ears
+  0-14%   the EARS. Two rounded buttons at the TOP CORNERS, set wide apart. The
+          bear is at its very widest across the ears — they reach almost the
+          full width of the character. There is no tall domed head between or
+          above them.
+  14-25%  a shallow BROW — a thin band of candy bridging the two ears. This is
+          the only solid material above the hole, and it is thin.
+  25-52%  THE HOLE. Its top edge starts just below the ears and its bottom edge
+          reaches past the midpoint of the character. Its centre lands at about
+          40% of the total height.
+  52-100% the BODY: stubby arms bulging at the sides level with the hole, a
+          short torso, and two short splayed feet at the bottom.
 
-THE HOLE: a clean circular hole punched right THROUGH the body, fully
-transparent inside, centred horizontally. Its diameter is about ONE THIRD of
-the character's width. Give it a visible inner wall so it reads as a real
-opening bored through translucent candy — the gelatin should be lighter and
-more saturated where it is thin around the rim, exactly as real gummy does. No
-eyes, no mouth, no muzzle, no nose — the hole is empty.
+  Overall the character stands about a third taller than it is wide.
+
+THE HOLE, stated again because it is what these attempts get wrong: it is bored
+through the bear's HEAD, where a face would go — not through its chest, not
+through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
+character's total width, and roughly the same as the distance between the two
+ear buttons.
+
+THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
+with the hole in the chest underneath. If you can fit a whole blank head in
+above the hole, the hole is far too low. Only the ears and a thin brow belong up
+there.
+
+CHECK BEFORE YOU FINISH: measure from the very top of the ears down to the
+centre of the hole, then from the centre of the hole down to the soles of the
+feet. The first distance must be the SHORTER of the two — about 40 against 60.
+If the first is longer, the hole is too low and the head is too big.
+
+THE HOLE'S FINISH: fully transparent inside, centred horizontally, with a
+visible inner wall so it reads as a real opening bored through translucent
+candy — the gelatin should be lighter and more saturated where it is thin
+around the rim, exactly as real gummy does. No eyes, no mouth, no muzzle, no
+nose. The hole is empty.
 
 STYLE: photorealistic 3D candy render — translucent gelatin with real
 subsurface scattering, so light entering the upper left glows through the mass
 and comes out warmer and deeper on the lower right. A slightly tacky, softly
 glossy surface with fine condensation beading and a few tiny internal bubbles.
-Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
-cookies, doughnuts and ice creams as if shot in the same studio.
+Not illustration, not plastic, not cel-shaded. Front-on and symmetrical. It has
+to sit beside photoreal cookies, doughnuts and ice creams as if shot in the
+same studio.
 
 LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
-cooler, dimmer fill from the lower right. Specular highlights on the
-upper-left of the head, ears, shoulders and knees; the deepest occlusion under
-the arms, between the legs and along the lower-right rim, with a rim light
-picking that edge back out.
+cooler, dimmer fill from the lower right. Specular highlights on the upper-left
+of the ears, brow, shoulders and knees; the deepest occlusion under the arms,
+between the feet and along the lower-right rim, with a rim light picking that
+edge back out.
 
-DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
-Do not draw a big domed head above the hole. Do not make it tall or slim, it is
-squat. Do not add a background,
-surface, table or scene — the character floats alone. Do not add a cast shadow
-or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
-add sugar coating, wrappers, text or logos. Do not make it opaque — the
-translucency is the whole material. Do not add glow, bloom or a halo outside
-the silhouette.
+DO NOT: do not put the hole in the chest or the belly. Do not draw a domed head
+above the hole. Do not add a background, surface, table or scene — the
+character floats alone. Do not add a cast shadow or drop shadow. Do not add a
+face, eyes, a mouth, a muzzle or a nose. Do not add sugar coating, wrappers,
+text or logos. Do not make it opaque — the translucency is the whole material.
+Do not add glow, bloom or a halo outside the silhouette.
 
 OUTPUT: the character alone, centred, on a fully transparent background, square
 canvas, highest resolution available. Crisp anti-aliased edge, no colour
@@ -782,70 +807,74 @@ screenshot or a preview of it.
 
 ```
 Create a single 3D-rendered gummy bear character on a transparent background.
-It is one layer of a composited collectible artwork: a photorealistic gummy
-bear with a round hole punched through its body, into which a cartoon face is
-composited later.
 
-THE COLOUR is a single hot pink gummy, evenly coloured through the whole body, with strong
-light transmission so the thin parts — ears, arms, feet — glow brighter than
-the mass.
+Think of it as a gummy bear MOULDED AS A RING — a bear-shaped piece of candy
+with a big round hole bored straight through it, the way a bear-shaped pendant
+or teething ring is made. The hole is the character's defining feature, not a
+detail. A cartoon face is composited into it later, so it must be left empty.
 
-BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
-literally:
+THE COLOUR is a single hot pink gummy, evenly coloured throughout, with strong light
+transmission so the thin parts — ears, arms, feet — glow brighter than the mass.
 
-- Take the character's total height as 100%.
-- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
-  below the head. It is punched through the head itself, where the face would
-  be. This is the single most important instruction.
-- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
-  at 55%. Its centre is therefore at 40%.
-- Above the hole there is only a THIN BAND of head — about a quarter of the
-  total height, and the two rounded ear buttons live in that band, at the top
-  corners. The hole very nearly fills the head. Do NOT draw a large domed head
-  sitting above the hole; if you can fit a whole blank head in above it, the
-  hole is far too low.
-- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
-  its sides; the legs are short and splayed forward, not long.
-- The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands more than about a tenth
-  taller than its own width, it is wrong.
-- That is the test: measure from the very top of the ears down to the hole's
-  centre, and from the hole's centre down to the soles of the feet. The first
-  distance should be a little SHORTER than the second — roughly 40 to 60. If
-  the first is the LONGER of the two, the hole is far too low.
+BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
 
-THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
-rounded head with no neck, stubby arms held against the sides flanking the
-hole, short splayed legs, seated-forward stance.
+  0%      the very top of the two ears
+  0-14%   the EARS. Two rounded buttons at the TOP CORNERS, set wide apart. The
+          bear is at its very widest across the ears — they reach almost the
+          full width of the character. There is no tall domed head between or
+          above them.
+  14-25%  a shallow BROW — a thin band of candy bridging the two ears. This is
+          the only solid material above the hole, and it is thin.
+  25-52%  THE HOLE. Its top edge starts just below the ears and its bottom edge
+          reaches past the midpoint of the character. Its centre lands at about
+          40% of the total height.
+  52-100% the BODY: stubby arms bulging at the sides level with the hole, a
+          short torso, and two short splayed feet at the bottom.
 
-THE HOLE: a clean circular hole punched right THROUGH the body, fully
-transparent inside, centred horizontally. Its diameter is about ONE THIRD of
-the character's width. Give it a visible inner wall so it reads as a real
-opening bored through translucent candy — the gelatin should be lighter and
-more saturated where it is thin around the rim, exactly as real gummy does. No
-eyes, no mouth, no muzzle, no nose — the hole is empty.
+  Overall the character stands about a third taller than it is wide.
+
+THE HOLE, stated again because it is what these attempts get wrong: it is bored
+through the bear's HEAD, where a face would go — not through its chest, not
+through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
+character's total width, and roughly the same as the distance between the two
+ear buttons.
+
+THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
+with the hole in the chest underneath. If you can fit a whole blank head in
+above the hole, the hole is far too low. Only the ears and a thin brow belong up
+there.
+
+CHECK BEFORE YOU FINISH: measure from the very top of the ears down to the
+centre of the hole, then from the centre of the hole down to the soles of the
+feet. The first distance must be the SHORTER of the two — about 40 against 60.
+If the first is longer, the hole is too low and the head is too big.
+
+THE HOLE'S FINISH: fully transparent inside, centred horizontally, with a
+visible inner wall so it reads as a real opening bored through translucent
+candy — the gelatin should be lighter and more saturated where it is thin
+around the rim, exactly as real gummy does. No eyes, no mouth, no muzzle, no
+nose. The hole is empty.
 
 STYLE: photorealistic 3D candy render — translucent gelatin with real
 subsurface scattering, so light entering the upper left glows through the mass
 and comes out warmer and deeper on the lower right. A slightly tacky, softly
 glossy surface with fine condensation beading and a few tiny internal bubbles.
-Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
-cookies, doughnuts and ice creams as if shot in the same studio.
+Not illustration, not plastic, not cel-shaded. Front-on and symmetrical. It has
+to sit beside photoreal cookies, doughnuts and ice creams as if shot in the
+same studio.
 
 LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
-cooler, dimmer fill from the lower right. Specular highlights on the
-upper-left of the head, ears, shoulders and knees; the deepest occlusion under
-the arms, between the legs and along the lower-right rim, with a rim light
-picking that edge back out.
+cooler, dimmer fill from the lower right. Specular highlights on the upper-left
+of the ears, brow, shoulders and knees; the deepest occlusion under the arms,
+between the feet and along the lower-right rim, with a rim light picking that
+edge back out.
 
-DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
-Do not draw a big domed head above the hole. Do not make it tall or slim, it is
-squat. Do not add a background,
-surface, table or scene — the character floats alone. Do not add a cast shadow
-or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
-add sugar coating, wrappers, text or logos. Do not make it opaque — the
-translucency is the whole material. Do not add glow, bloom or a halo outside
-the silhouette.
+DO NOT: do not put the hole in the chest or the belly. Do not draw a domed head
+above the hole. Do not add a background, surface, table or scene — the
+character floats alone. Do not add a cast shadow or drop shadow. Do not add a
+face, eyes, a mouth, a muzzle or a nose. Do not add sugar coating, wrappers,
+text or logos. Do not make it opaque — the translucency is the whole material.
+Do not add glow, bloom or a halo outside the silhouette.
 
 OUTPUT: the character alone, centred, on a fully transparent background, square
 canvas, highest resolution available. Crisp anti-aliased edge, no colour
@@ -857,70 +886,75 @@ screenshot or a preview of it.
 
 ```
 Create a single 3D-rendered gummy bear character on a transparent background.
-It is one layer of a composited collectible artwork: a photorealistic gummy
-bear with a round hole punched through its body, into which a cartoon face is
-composited later.
 
-THE COLOUR is a single deep violet-purple gummy, evenly coloured through the whole body, with
-strong light transmission so the thin parts glow brighter than the mass and
-keep the purple from going muddy.
+Think of it as a gummy bear MOULDED AS A RING — a bear-shaped piece of candy
+with a big round hole bored straight through it, the way a bear-shaped pendant
+or teething ring is made. The hole is the character's defining feature, not a
+detail. A cartoon face is composited into it later, so it must be left empty.
 
-BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
-literally:
+THE COLOUR is a single deep violet-purple gummy, evenly coloured throughout, with strong
+light transmission so the thin parts glow brighter than the mass and keep the
+purple from going muddy.
 
-- Take the character's total height as 100%.
-- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
-  below the head. It is punched through the head itself, where the face would
-  be. This is the single most important instruction.
-- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
-  at 55%. Its centre is therefore at 40%.
-- Above the hole there is only a THIN BAND of head — about a quarter of the
-  total height, and the two rounded ear buttons live in that band, at the top
-  corners. The hole very nearly fills the head. Do NOT draw a large domed head
-  sitting above the hole; if you can fit a whole blank head in above it, the
-  hole is far too low.
-- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
-  its sides; the legs are short and splayed forward, not long.
-- The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands more than about a tenth
-  taller than its own width, it is wrong.
-- That is the test: measure from the very top of the ears down to the hole's
-  centre, and from the hole's centre down to the soles of the feet. The first
-  distance should be a little SHORTER than the second — roughly 40 to 60. If
-  the first is the LONGER of the two, the hole is far too low.
+BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
 
-THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
-rounded head with no neck, stubby arms held against the sides flanking the
-hole, short splayed legs, seated-forward stance.
+  0%      the very top of the two ears
+  0-14%   the EARS. Two rounded buttons at the TOP CORNERS, set wide apart. The
+          bear is at its very widest across the ears — they reach almost the
+          full width of the character. There is no tall domed head between or
+          above them.
+  14-25%  a shallow BROW — a thin band of candy bridging the two ears. This is
+          the only solid material above the hole, and it is thin.
+  25-52%  THE HOLE. Its top edge starts just below the ears and its bottom edge
+          reaches past the midpoint of the character. Its centre lands at about
+          40% of the total height.
+  52-100% the BODY: stubby arms bulging at the sides level with the hole, a
+          short torso, and two short splayed feet at the bottom.
 
-THE HOLE: a clean circular hole punched right THROUGH the body, fully
-transparent inside, centred horizontally. Its diameter is about ONE THIRD of
-the character's width. Give it a visible inner wall so it reads as a real
-opening bored through translucent candy — the gelatin should be lighter and
-more saturated where it is thin around the rim, exactly as real gummy does. No
-eyes, no mouth, no muzzle, no nose — the hole is empty.
+  Overall the character stands about a third taller than it is wide.
+
+THE HOLE, stated again because it is what these attempts get wrong: it is bored
+through the bear's HEAD, where a face would go — not through its chest, not
+through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
+character's total width, and roughly the same as the distance between the two
+ear buttons.
+
+THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
+with the hole in the chest underneath. If you can fit a whole blank head in
+above the hole, the hole is far too low. Only the ears and a thin brow belong up
+there.
+
+CHECK BEFORE YOU FINISH: measure from the very top of the ears down to the
+centre of the hole, then from the centre of the hole down to the soles of the
+feet. The first distance must be the SHORTER of the two — about 40 against 60.
+If the first is longer, the hole is too low and the head is too big.
+
+THE HOLE'S FINISH: fully transparent inside, centred horizontally, with a
+visible inner wall so it reads as a real opening bored through translucent
+candy — the gelatin should be lighter and more saturated where it is thin
+around the rim, exactly as real gummy does. No eyes, no mouth, no muzzle, no
+nose. The hole is empty.
 
 STYLE: photorealistic 3D candy render — translucent gelatin with real
 subsurface scattering, so light entering the upper left glows through the mass
 and comes out warmer and deeper on the lower right. A slightly tacky, softly
 glossy surface with fine condensation beading and a few tiny internal bubbles.
-Not illustration, not plastic, not cel-shaded. It has to sit beside photoreal
-cookies, doughnuts and ice creams as if shot in the same studio.
+Not illustration, not plastic, not cel-shaded. Front-on and symmetrical. It has
+to sit beside photoreal cookies, doughnuts and ice creams as if shot in the
+same studio.
 
 LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
-cooler, dimmer fill from the lower right. Specular highlights on the
-upper-left of the head, ears, shoulders and knees; the deepest occlusion under
-the arms, between the legs and along the lower-right rim, with a rim light
-picking that edge back out.
+cooler, dimmer fill from the lower right. Specular highlights on the upper-left
+of the ears, brow, shoulders and knees; the deepest occlusion under the arms,
+between the feet and along the lower-right rim, with a rim light picking that
+edge back out.
 
-DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
-Do not draw a big domed head above the hole. Do not make it tall or slim, it is
-squat. Do not add a background,
-surface, table or scene — the character floats alone. Do not add a cast shadow
-or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
-add sugar coating, wrappers, text or logos. Do not make it opaque — the
-translucency is the whole material. Do not add glow, bloom or a halo outside
-the silhouette.
+DO NOT: do not put the hole in the chest or the belly. Do not draw a domed head
+above the hole. Do not add a background, surface, table or scene — the
+character floats alone. Do not add a cast shadow or drop shadow. Do not add a
+face, eyes, a mouth, a muzzle or a nose. Do not add sugar coating, wrappers,
+text or logos. Do not make it opaque — the translucency is the whole material.
+Do not add glow, bloom or a halo outside the silhouette.
 
 OUTPUT: the character alone, centred, on a fully transparent background, square
 canvas, highest resolution available. Crisp anti-aliased edge, no colour
