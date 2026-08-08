@@ -644,19 +644,25 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 25%.
-- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
-  a little ABOVE the middle of the total height, high on the chest where the
-  head meets the body.
-- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
-  forward, not long.
+- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
+  below the head. It is punched through the head itself, where the face would
+  be. This is the single most important instruction.
+- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
+  at 55%. Its centre is therefore at 40%.
+- Above the hole there is only a THIN BAND of head — about a quarter of the
+  total height, and the two rounded ear buttons live in that band, at the top
+  corners. The hole very nearly fills the head. Do NOT draw a large domed head
+  sitting above the hole; if you can fit a whole blank head in above it, the
+  hole is far too low.
+- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
+  its sides; the legs are short and splayed forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands noticeably taller than
-  its own width, it is wrong.
-- That is the test: measure from the top of the head down to the hole's centre,
-  and from the hole's centre down to the soles of the feet. The first distance
-  should be a little SHORTER than the second — roughly 40 to 60. Not half and
-  half, and nowhere near a third to two thirds.
+  It must NOT be an elongated or slim bear. If it stands more than about a tenth
+  taller than its own width, it is wrong.
+- That is the test: measure from the very top of the ears down to the hole's
+  centre, and from the hole's centre down to the soles of the feet. The first
+  distance should be a little SHORTER than the second — roughly 40 to 60. If
+  the first is the LONGER of the two, the hole is far too low.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -682,7 +688,9 @@ upper-left of the head, ears, shoulders and knees; the deepest occlusion under
 the arms, between the legs and along the lower-right rim, with a rim light
 picking that edge back out.
 
-DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
+Do not draw a big domed head above the hole. Do not make it tall or slim, it is
+squat. Do not add a background,
 surface, table or scene — the character floats alone. Do not add a cast shadow
 or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
 add sugar coating, wrappers, text or logos. Do not make it opaque — the
@@ -711,19 +719,25 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 25%.
-- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
-  a little ABOVE the middle of the total height, high on the chest where the
-  head meets the body.
-- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
-  forward, not long.
+- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
+  below the head. It is punched through the head itself, where the face would
+  be. This is the single most important instruction.
+- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
+  at 55%. Its centre is therefore at 40%.
+- Above the hole there is only a THIN BAND of head — about a quarter of the
+  total height, and the two rounded ear buttons live in that band, at the top
+  corners. The hole very nearly fills the head. Do NOT draw a large domed head
+  sitting above the hole; if you can fit a whole blank head in above it, the
+  hole is far too low.
+- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
+  its sides; the legs are short and splayed forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands noticeably taller than
-  its own width, it is wrong.
-- That is the test: measure from the top of the head down to the hole's centre,
-  and from the hole's centre down to the soles of the feet. The first distance
-  should be a little SHORTER than the second — roughly 40 to 60. Not half and
-  half, and nowhere near a third to two thirds.
+  It must NOT be an elongated or slim bear. If it stands more than about a tenth
+  taller than its own width, it is wrong.
+- That is the test: measure from the very top of the ears down to the hole's
+  centre, and from the hole's centre down to the soles of the feet. The first
+  distance should be a little SHORTER than the second — roughly 40 to 60. If
+  the first is the LONGER of the two, the hole is far too low.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -749,7 +763,9 @@ upper-left of the head, ears, shoulders and knees; the deepest occlusion under
 the arms, between the legs and along the lower-right rim, with a rim light
 picking that edge back out.
 
-DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
+Do not draw a big domed head above the hole. Do not make it tall or slim, it is
+squat. Do not add a background,
 surface, table or scene — the character floats alone. Do not add a cast shadow
 or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
 add sugar coating, wrappers, text or logos. Do not make it opaque — the
@@ -778,19 +794,25 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 25%.
-- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
-  a little ABOVE the middle of the total height, high on the chest where the
-  head meets the body.
-- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
-  forward, not long.
+- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
+  below the head. It is punched through the head itself, where the face would
+  be. This is the single most important instruction.
+- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
+  at 55%. Its centre is therefore at 40%.
+- Above the hole there is only a THIN BAND of head — about a quarter of the
+  total height, and the two rounded ear buttons live in that band, at the top
+  corners. The hole very nearly fills the head. Do NOT draw a large domed head
+  sitting above the hole; if you can fit a whole blank head in above it, the
+  hole is far too low.
+- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
+  its sides; the legs are short and splayed forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands noticeably taller than
-  its own width, it is wrong.
-- That is the test: measure from the top of the head down to the hole's centre,
-  and from the hole's centre down to the soles of the feet. The first distance
-  should be a little SHORTER than the second — roughly 40 to 60. Not half and
-  half, and nowhere near a third to two thirds.
+  It must NOT be an elongated or slim bear. If it stands more than about a tenth
+  taller than its own width, it is wrong.
+- That is the test: measure from the very top of the ears down to the hole's
+  centre, and from the hole's centre down to the soles of the feet. The first
+  distance should be a little SHORTER than the second — roughly 40 to 60. If
+  the first is the LONGER of the two, the hole is far too low.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -816,7 +838,9 @@ upper-left of the head, ears, shoulders and knees; the deepest occlusion under
 the arms, between the legs and along the lower-right rim, with a rim light
 picking that edge back out.
 
-DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
+Do not draw a big domed head above the hole. Do not make it tall or slim, it is
+squat. Do not add a background,
 surface, table or scene — the character floats alone. Do not add a cast shadow
 or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
 add sugar coating, wrappers, text or logos. Do not make it opaque — the
@@ -845,19 +869,25 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 25%.
-- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
-  a little ABOVE the middle of the total height, high on the chest where the
-  head meets the body.
-- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
-  forward, not long.
+- THE HOLE IS IN THE BEAR'S HEAD. It is not on the chest, not on the belly, not
+  below the head. It is punched through the head itself, where the face would
+  be. This is the single most important instruction.
+- The TOP EDGE of the hole sits at 25% of the total height. The BOTTOM EDGE sits
+  at 55%. Its centre is therefore at 40%.
+- Above the hole there is only a THIN BAND of head — about a quarter of the
+  total height, and the two rounded ear buttons live in that band, at the top
+  corners. The hole very nearly fills the head. Do NOT draw a large domed head
+  sitting above the hole; if you can fit a whole blank head in above it, the
+  hole is far too low.
+- The TORSO, ARMS and LEGS are the bottom 45%. Stubby arms flank the hole at
+  its sides; the legs are short and splayed forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
-  It must NOT be an elongated or slim bear. If it stands noticeably taller than
-  its own width, it is wrong.
-- That is the test: measure from the top of the head down to the hole's centre,
-  and from the hole's centre down to the soles of the feet. The first distance
-  should be a little SHORTER than the second — roughly 40 to 60. Not half and
-  half, and nowhere near a third to two thirds.
+  It must NOT be an elongated or slim bear. If it stands more than about a tenth
+  taller than its own width, it is wrong.
+- That is the test: measure from the very top of the ears down to the hole's
+  centre, and from the hole's centre down to the soles of the feet. The first
+  distance should be a little SHORTER than the second — roughly 40 to 60. If
+  the first is the LONGER of the two, the hole is far too low.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -883,7 +913,9 @@ upper-left of the head, ears, shoulders and knees; the deepest occlusion under
 the arms, between the legs and along the lower-right rim, with a rim light
 picking that edge back out.
 
-DO NOT: do not make it tall or slim, it is squat. Do not add a background,
+DO NOT: do not put the hole on the chest or the belly — it belongs in the head.
+Do not draw a big domed head above the hole. Do not make it tall or slim, it is
+squat. Do not add a background,
 surface, table or scene — the character floats alone. Do not add a cast shadow
 or drop shadow. Do not add a face, eyes, a mouth, a muzzle or a nose. Do not
 add sugar coating, wrappers, text or logos. Do not make it opaque — the
