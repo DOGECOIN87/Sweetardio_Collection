@@ -1271,6 +1271,79 @@ fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
 screenshot or a preview of it.
 ```
 
+
+### Second render — orientation fixed, aperture still half-blocked
+
+| | current art | render 1 | render 2 | target |
+|---|---:|---:|---:|---:|
+| Seam across the bar | 58% | 41% | **59%** | ~58% |
+| Left / right edge luma | 1.58 | 1.17 | **1.24** | > 1 |
+| Aspect (H / W) | 1.99 | 2.75 | **2.29** | ~2.0 |
+| Face-frac | 0.410 | 0.474 | **0.396** | ~0.41 |
+| Transparent aperture / bar width | 0.57 | 0.40 | **0.33** | ~0.55 |
+
+Orientation, seam and face height all landed on the second pass. The aperture
+did not, and the measurement says why — it is not the bore that is too small:
+
+| | render 2 |
+|---|---:|
+| Whole bored opening | 353px = **0.66** of the bar width |
+| Wafer inner wall | takes **50%** of that opening |
+| What is left to see through | 177px = 0.33 of the bar |
+| Aperture shape (w ÷ h) | **0.62** — a tall crescent, not a circle |
+
+The bore is already wide enough. The inner wall is eating half of it, which
+leaves a tall sliver rather than a round window, and a 177px aperture still
+normalises to a 748 x 1714 body — clipped on a 1393 canvas. Thinning the wall
+to about a fifth of the opening fixes the aperture, the shape and the fit in one
+change, and keeps the depth cue that makes the render good.
+
+### The edit prompt
+
+Use this against render 2 rather than starting over — everything except the
+aperture is already right.
+
+```
+Edit this chocolate wafer bar. Keep EVERYTHING about it — the shape, the
+proportions, the chocolate, the waffle lattice, the seam, the way it is turned,
+and the lighting. All of that is right. Change one thing only:
+
+MAKE THE SEE-THROUGH PART OF THE HOLE MUCH BIGGER.
+
+The hole is bored wide enough already — the problem is that the wafer inner
+wall is covering half of it. Right now you can only see through a narrow
+crescent on the left; the pale wafer layers fill the whole right half of the
+opening.
+
+- Keep the wafer inner wall. The visible layers are what give the hole real
+  depth and they should stay.
+- But make it a THIN CRESCENT along the right-hand edge of the opening — about
+  a fifth of the opening's width, not half.
+- The see-through part must be a FULL ROUND CIRCLE, as tall as it is wide. At
+  the moment it is a tall narrow sliver, roughly twice as tall as it is wide.
+  That is wrong; it should read as a proper circular window.
+- That circle should be a little over HALF the bar's width. It removes most of
+  the middle of the bar, leaving a fairly thin frame of chocolate down each
+  side.
+
+Think of it as boring the hole straighter through the bar instead of at a
+steep angle: you see a clean round opening front-to-back, with just a sliver
+of the wafer wall catching the light on one side.
+
+Everything else stays exactly as it is:
+- Same milk chocolate, same diamond waffle lattice, same soft rounded edges.
+- Same seam running down the face, in the same place.
+- Same near-front-on angle with the left panel wider and brighter.
+- Same key light from the upper left.
+- No face, no eyes, no mouth. The hole stays empty.
+- No background, no surface, no cast shadow, no drop shadow, no text or logos.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
 ## 7. Accepting a result
 
 - [ ] **A real PNG with real alpha.** Ask again if what comes back is a JPEG or
