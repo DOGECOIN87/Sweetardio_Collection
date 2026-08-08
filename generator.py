@@ -180,7 +180,6 @@ TRAIT_NAMES = {
         "gold_waffle":                      "Gold Waffle",
         "gummy_worm":                       "Gummy Worm",
         "marshmallow":                      "Marshmallow",
-        "mint_chocolate_chip_ice_cream":    "Mint Choc Chip Ice Cream",
         "neopolitan_ice_cream":             "Neapolitan Ice Cream",
         "oatmeal_cream_pie":                "Oatmeal Cream Pie",
         "og_gummy_bear":                    "OG Gummy Bear",
@@ -188,7 +187,6 @@ TRAIT_NAMES = {
         "pink_gummy_bear":                  "Pink Gummy Bear",
         "pink_sherbert_ice_cream":          "Pink Sherbert Ice Cream",
         "purple_gummy_bear":                "Purple Gummy Bear",
-        "rainbow_sherbert_ice_cream":       "Rainbow Sherbert Ice Cream",
         "rice_crispy_treat":                "Rice Crispy Treat",
         "rocky_road_ice_cream":             "Rocky Road Ice Cream",
         "smores":                           "S'mores",
@@ -196,7 +194,6 @@ TRAIT_NAMES = {
         "sugar_doughnut":                   "Sugar Doughnut",
         "vanilla_ice_cream":                "Vanilla Ice Cream",
         "waffle":                           "Waffle",
-        "zaffre_sherbert_ice_cream":        "Zaffre Sherbert Ice Cream",
         "zebra_cake":                       "Zebra Cake",
     },
     BACKGROUNDZ: {
@@ -536,11 +533,8 @@ GORBHOUSE_CHARS = [
 EXCLUDE_WAT_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
-    "rainbow_sherbert_ice_cream",
     "vanilla_ice_cream",
     "rocky_road_ice_cream",
-    "zaffre_sherbert_ice_cream",
-    "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "gummy_bear",
     "twinkie",
@@ -575,11 +569,8 @@ def armz_allowed(arm_file, char_name):
 NO_OFFSET_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
-    "rainbow_sherbert_ice_cream",
     "vanilla_ice_cream",
     "rocky_road_ice_cream",
-    "zaffre_sherbert_ice_cream",
-    "mint_chocolate_chip_ice_cream",
     "pink_sherbert_ice_cream",
     "twinkie",
     "nutty_bar",
@@ -638,8 +629,15 @@ def is_centered(char_name):
 CHAR_Y_ADJUST = {
     "poptart": -65,
     "twinkie": 45,
-    "pink_sherbert_ice_cream": -42,
-    "rainbow_sherbert_ice_cream": -42,
+    # The five regenerated ice creams (vanilla, neopolitan, rocky road, cyan
+    # and pink sherbert) all measure the same body, so they take the same trim
+    # onto the shared 1111 cone-tip line. The three still on the old art keep
+    # their own values below.
+    "vanilla_ice_cream": -18,
+    "neopolitan_ice_cream": -21,
+    "rocky_road_ice_cream": -21,
+    "cyan_sherbert_ice_cream": -21,
+    "pink_sherbert_ice_cream": -18,
     "chocolate_sandwich_cookie": 50,
     "sugar_cube": 42,
     "gold_waffle": -18,        # measured separately from the plain waffle; the
@@ -649,7 +647,6 @@ CHAR_Y_ADJUST = {
     "ding_dong": 34,
     "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
-    "zaffre_sherbert_ice_cream": -18,
     "brownie_bite": 22,
     "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
                                # stance is held put by FOOTWEARLESS_DY
