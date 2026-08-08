@@ -843,8 +843,13 @@ SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 #               when the silhouette reaches the ground band, else a soft drop.
 #   blur        Gaussian blur radius in px (softness of the shadow edge).
 #   opacity     peak shadow alpha, 0..1.
-#   dx, dy      shadow offset in px (+dy = down). Light is assumed slightly
-#               above, so a small +dy seats the shadow just below the feet.
+#   dx, dy      shadow offset in px (+dx = right, +dy = down). Used by the
+#               contact pool, which sits under its caster regardless of the
+#               key light, so dx stays 0 and a small +dy seats it just below
+#               the feet.
+#   drop_dx,    same, for "drop" mode only. The collection's key light comes
+#   drop_dy     from the TOP LEFT (see CLAUDE.md), so a floating body casts
+#               down AND to the right. Falls back to dx/dy when unset.
 #   squash      "ground" mode only: vertical compression of the silhouette
 #               into a flat contact pool (smaller = flatter pool).
 #   exclude_arms  derive the silhouette from the body+skin mass only, dropping
@@ -858,6 +863,8 @@ GROUND_SHADOW = {
     "opacity": 0.40,
     "dx": 0,
     "dy": 6,
+    "drop_dx": 16,   # top-left key -> a floating body casts down AND right;
+    "drop_dy": 16,   # equal offsets put the cast at 45 deg to match the key
     "squash": 0.16,
     "exclude_arms": True,
     # Sits in the middle of the empty band between the two populations it has
@@ -1359,6 +1366,13 @@ def _ground_shadow(sil_alpha, cfg):
 
     dx = int(cfg.get("dx", 0))
     dy = int(cfg.get("dy", 0))
+    if mode == "drop":
+        # The collection's key light comes from the TOP LEFT, so a floating
+        # body casts down AND to the right. A contact pool does not: it sits
+        # under its caster whatever the key is doing, which is why the offset
+        # is per-mode rather than shared.
+        dx = int(cfg.get("drop_dx", dx))
+        dy = int(cfg.get("drop_dy", dy))
     moved = Image.new("L", sil_alpha.size, 0)
 
     if mode == "ground":

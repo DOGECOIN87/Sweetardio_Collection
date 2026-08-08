@@ -24,11 +24,10 @@ Where this is already encoded:
   ("top-left light, lower-edge falloff") and the limb-luma ratios that prove it
   across the skin balls.
 
-Known exception to review: `GROUND_SHADOW` in `generator.py` uses `dx: 0`, so
-cast shadows drop straight down rather than down-and-right. That is fine for
-`mode: "ground"` (a contact pool sits under the object whatever the key does),
-but `mode: "drop"` — used for the centred/floating characters — should offset
-to the lower right to match the key.
+- `GROUND_SHADOW` in `generator.py` — the cast shadow is offset per mode:
+  `drop_dx`/`drop_dy` push the floating characters' shadow down and to the
+  right at 45°, while the contact pool keeps `dx: 0` because a pool sits under
+  its caster whatever the key light is doing.
 
 ## Canvas and face rule
 
