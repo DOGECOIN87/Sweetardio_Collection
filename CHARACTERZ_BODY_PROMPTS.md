@@ -13,7 +13,8 @@ Companion docs: `SKIN_ENHANCE_PROMPTS.md`, `EYEZ_ENHANCE_PROMPTS.md`,
 | Family | State |
 |---|---|
 | Ice creams | **Settled — shipping as delivered.** The 5 regenerated cones (vanilla, neapolitan, rocky road, cyan sherbert, pink sherbert) are live and final. The 3 that were not returned — mint choc chip, zaffre sherbert, rainbow sherbert — are **retired from the trait set**. |
-| Gummy bears | Unchanged and fine. Prompts below if they are ever revisited. |
+| Gummy bears | **OG only.** Cyan, pink and purple are retired from the trait set; the OG bear keeps its current art. Prompts below if it is ever revisited. |
+| Nutty Bar | Unchanged. Prompt and measured spec in §6. |
 
 **The cone-shortening work in §4a is closed, not pending.** The ice creams keep
 their delivered proportions (face at 0.344 of body height) and
@@ -1137,7 +1138,103 @@ body, with strong light transmission so the thin parts glow brighter than the
 mass and keep the purple from going muddy.
 ```
 
-## 6. Accepting a result
+## 6. Nutty Bar — the spec and the prompt
+
+Measured off the current `Nutty_Bar.png`:
+
+| | measured |
+|---|---|
+| Body | 466 x 929 |
+| Aspect (H / W) | **1.99** — the most slender character in the set |
+| Hole | 267 x 209, an oval rather than a circle |
+| Hole / body width | **0.57** |
+| Hole span | 30% to 52% of height |
+| Face-frac | **0.410**, ratio 41:59 |
+| Median eye / hole | **1.04** — the tightest overlap in the cast |
+
+Two things worth knowing before regenerating it:
+
+- **Its hole is the widest in the collection (267px)** and the only one that is
+  clearly elliptical. That is why its eye-overlap ratio is 1.04, the lowest of
+  all 30 measured — the eyes only just clear the rim. New art should come back
+  with a rounder, slightly smaller opening; `register_character.py` will scale
+  it to the 248px cast median either way, but the closer it starts the less the
+  art has to be resampled.
+- **It stands on the 1132 bar line** with the Twinkie and the churro, not on the
+  1111 cone line, and it is `NO_OFFSET` and `BODY_OVER_SKIN` at `CHAR_SCALE`
+  1.0. None of that needs changing if the new body keeps roughly the current
+  proportions.
+
+### The standalone prompt
+
+Fully assembled: no reference image, no placeholder, nothing to paste together.
+
+```
+Create a single 3D-rendered chocolate wafer bar character on a transparent
+background.
+
+Think of it as a chocolate-coated wafer bar MOULDED WITH A HOLE THROUGH IT — a
+solid bar of candy with a clean opening bored front-to-back, the way a
+bar-shaped pendant is made. The hole is the character's defining feature, not a
+detail. A cartoon face is composited into it later, so it must be left empty.
+
+THE OBJECT: a tall rectangular chocolate-coated wafer bar standing UPRIGHT on
+its short end, like a Nutty Buddy or a chocolate-dipped wafer stick. It is made
+of TWO wafer sticks pressed together side by side, so a shallow groove runs
+straight down the middle of the face. The whole surface is enrobed in milk
+chocolate and embossed with a crisp diamond waffle lattice. The corners and
+edges are softly rounded, the way moulded chocolate is.
+
+BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
+
+  0-30%    the upper bar: flat chocolate face, waffle lattice, centre groove.
+  30-52%   THE HOLE, centred left to right. Its centre lands at about 41% of
+           the total height — a little above the middle.
+  52-100%  the lower bar, continuing the same lattice and groove down to a
+           flat base it stands on.
+
+  The bar is TALL and NARROW — about TWICE as tall as it is wide. This is the
+  most slender character in the set and it should read that way.
+
+THE HOLE: a clean opening punched right THROUGH the bar, fully transparent
+inside, centred horizontally. It is round, or a very slightly wide oval, and
+about HALF the bar's width — err on the SMALL side rather than the large,
+because a cartoon face drops into it later and its eyes are meant to spill
+slightly over the rim, which only works while the hole stays modest. Give it a
+visible inner wall showing the bar's thickness and the paler wafer inside the
+chocolate shell, lit consistently with the rest of the bar. No eyes, no mouth,
+no facial features of any kind — the hole is empty.
+
+VIEWPOINT: front-on, standing upright, turned just a few degrees so one side
+edge is visible and the bar reads as a solid object with real thickness rather
+than a flat card. Do not lie it down, do not tilt it, do not show it at a
+dramatic angle.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real chocolate sheen and real
+micro-texture in the moulding. Not illustration, not clay, not cel-shaded. It
+has to sit beside photoreal cookies, doughnuts and ice creams as if shot in the
+same studio.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Specular highlights along the
+upper-left edge and on the raised lattice ridges; the deepest occlusion down
+the lower-right edge and inside the groove, with a rim light picking the
+right-hand edge back out.
+
+DO NOT: do not lay the bar flat or tilt it. Do not draw a bite mark, a
+wrapper, a split, or crumbs. Do not add a background, surface, table or scene —
+the character floats alone. Do not add a cast shadow or drop shadow. Do not add
+a face, eyes or a mouth. Do not add nuts, drizzle, text or logos. Do not add
+glow, bloom or a halo outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+## 7. Accepting a result
 
 - [ ] **A real PNG with real alpha.** Ask again if what comes back is a JPEG or
       a screenshot — see §7, this cost real quality on the ice creams.
@@ -1148,7 +1245,7 @@ mass and keep the purple from going muddy.
 - [ ] **Photoreal**, matching the cookies and doughnuts.
 - [ ] **Clean transparent edge**, no baked shadow, no halo.
 
-## 7. Getting it into the pipeline
+## 8. Getting it into the pipeline
 
 `register_trait.py` handles skins, eyes and mouths but **not characters** — a
 character needs its face hole landed on (690, 601), which is a different
