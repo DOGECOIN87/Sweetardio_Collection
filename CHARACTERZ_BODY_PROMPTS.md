@@ -620,8 +620,13 @@ Fully assembled: no reference image, no placeholder to fill in, nothing to
 paste together. One block per colour, copy and run.
 
 Every proportion is stated as a fraction of total height, because the current
-bears fail on exactly one number — they stand 1.32× as tall as they are wide,
-which pushes the hole up to 0.384 instead of the middle.
+bears fail on exactly one number — they stand 1.32× as tall as they are wide.
+
+**Target face-frac is 0.40, not the 0.45 the table above solves for.** The hole
+is deliberately kept a little high on the chest, which is where a gummy bear's
+head meets its body; 0.45 put it at the navel. 0.40 is still a clear move from
+today's 0.384 in silhouette terms, because the gain comes from the body getting
+shorter and wider rather than from the hole sliding down it.
 
 **OG Gummy Bear** — replaces `before_skinz_og_gummy_bear.png`
 
@@ -639,17 +644,19 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 30%.
-- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
-  near the MIDDLE of the total height.
-- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+- The HEAD, with two small rounded ear buttons on top, is the top 25%.
+- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
+  a little ABOVE the middle of the total height, high on the chest where the
+  head meets the body.
+- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
   forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
   It must NOT be an elongated or slim bear. If it stands noticeably taller than
   its own width, it is wrong.
-- That is the test: the distance from the top of the head down to the hole's
-  centre, and the distance from the hole's centre down to the soles of the
-  feet, should be close to equal.
+- That is the test: measure from the top of the head down to the hole's centre,
+  and from the hole's centre down to the soles of the feet. The first distance
+  should be a little SHORTER than the second — roughly 40 to 60. Not half and
+  half, and nowhere near a third to two thirds.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -704,17 +711,19 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 30%.
-- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
-  near the MIDDLE of the total height.
-- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+- The HEAD, with two small rounded ear buttons on top, is the top 25%.
+- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
+  a little ABOVE the middle of the total height, high on the chest where the
+  head meets the body.
+- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
   forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
   It must NOT be an elongated or slim bear. If it stands noticeably taller than
   its own width, it is wrong.
-- That is the test: the distance from the top of the head down to the hole's
-  centre, and the distance from the hole's centre down to the soles of the
-  feet, should be close to equal.
+- That is the test: measure from the top of the head down to the hole's centre,
+  and from the hole's centre down to the soles of the feet. The first distance
+  should be a little SHORTER than the second — roughly 40 to 60. Not half and
+  half, and nowhere near a third to two thirds.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -769,17 +778,19 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 30%.
-- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
-  near the MIDDLE of the total height.
-- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+- The HEAD, with two small rounded ear buttons on top, is the top 25%.
+- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
+  a little ABOVE the middle of the total height, high on the chest where the
+  head meets the body.
+- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
   forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
   It must NOT be an elongated or slim bear. If it stands noticeably taller than
   its own width, it is wrong.
-- That is the test: the distance from the top of the head down to the hole's
-  centre, and the distance from the hole's centre down to the soles of the
-  feet, should be close to equal.
+- That is the test: measure from the top of the head down to the hole's centre,
+  and from the hole's centre down to the soles of the feet. The first distance
+  should be a little SHORTER than the second — roughly 40 to 60. Not half and
+  half, and nowhere near a third to two thirds.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
@@ -834,17 +845,19 @@ BUILD IT TO THESE PROPORTIONS. They are the point of the image — read them
 literally:
 
 - Take the character's total height as 100%.
-- The HEAD, with two small rounded ear buttons on top, is the top 30%.
-- The HOLE spans from about 30% down to about 60% — so its centre sits at 45%,
-  near the MIDDLE of the total height.
-- The TORSO and LEGS are the bottom 40%. The legs are short, stubby and splayed
+- The HEAD, with two small rounded ear buttons on top, is the top 25%.
+- The HOLE spans from about 25% down to about 55% — so its centre sits at 40%,
+  a little ABOVE the middle of the total height, high on the chest where the
+  head meets the body.
+- The TORSO and LEGS are the bottom 45%. The legs are short, stubby and splayed
   forward, not long.
 - The character is barely TALLER than it is WIDE — squat, chunky and compact.
   It must NOT be an elongated or slim bear. If it stands noticeably taller than
   its own width, it is wrong.
-- That is the test: the distance from the top of the head down to the hole's
-  centre, and the distance from the hole's centre down to the soles of the
-  feet, should be close to equal.
+- That is the test: measure from the top of the head down to the hole's centre,
+  and from the hole's centre down to the soles of the feet. The first distance
+  should be a little SHORTER than the second — roughly 40 to 60. Not half and
+  half, and nowhere near a third to two thirds.
 
 THE SILHOUETTE: the classic gummy-bear shape, front-on and symmetrical —
 rounded head with no neck, stubby arms held against the sides flanking the
