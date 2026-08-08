@@ -106,7 +106,81 @@ all. 0.45 with a shallow cup is the honest target, and it sits between the
 doughnuts (0.49, because a ring's hole is its centre) and the gummy bears
 (0.384), both of which read fine.
 
-### The v2 prompt
+### The v3 prompt — standalone
+
+Use this when the edit prompt below does not take. It needs no reference image
+and states every proportion as a fraction, because "shallow cup" on its own has
+not been enough: the generator keeps drawing a normal cone.
+
+```
+Create a 3D-rendered ice cream character for a collectible series. It is one
+layer of a composited artwork: a photorealistic ice cream with a round hole
+punched through its scoop, into which a cartoon face is composited later.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
+not the usual ice-cream proportions — read them literally:
+
+- Take the character's total height as 100%.
+- The SCOOP is the top 86% of that height.
+- The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
+  bowl that the scoop sits down into — the height of a tuna tin, not a cone.
+  It must NOT be a cone. It must NOT be a tall cup. If it looks like a normal
+  ice cream cone, it is wrong.
+- The finished character is about as TALL as it is WIDE. Roughly square in its
+  bounding box, dominated by one huge round scoop.
+- The hole therefore lands near the MIDDLE of the total height, at about 45%
+  down from the crown of the scoop. That is the test: measure the hole's centre
+  from the top of the scoop and from the bottom of the cup, and those two
+  distances should be close to equal.
+
+THE SCOOP:
+- One single generous, round, dome-shaped scoop, as wide as the whole
+  character, with a soft irregular lower edge where it overhangs the cup and a
+  gentle melt drip or two over the rim.
+
+THE HOLE:
+- A clean circular hole punched right THROUGH the front of the scoop, fully
+  transparent inside, centred horizontally and centred in the scoop's own
+  height.
+- Its diameter is about ONE THIRD of the character's width.
+- Give it a visible inner wall so it reads as a real opening bored through a
+  solid material, lit consistently with the rest of the scoop.
+- No eyes, no mouth, no facial features of any kind. The hole is empty.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real subsurface and real micro-texture.
+Not illustration, not clay, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and waffles as if shot in the same studio. The cup carries a
+crisp golden waffle lattice.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Highlights on the upper-left of the
+scoop; the terminator and the deepest occlusion on the lower-right and under
+the cup's rim.
+
+DO NOT:
+- Do not draw a cone. The base is a shallow bowl.
+- Do not add a background, surface, table, or scene. The character floats alone.
+- Do not add a cast shadow or drop shadow.
+- Do not add a face, eyes, or a mouth.
+- Do not add sprinkles, wafers, spoons, cherries, text or logos unless the
+  flavour line below asks for them.
+- Do not add glow, bloom, or a halo outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background,
+square canvas, highest resolution available. Crisp anti-aliased edge, no
+colour fringe, no matte line. Deliver the PNG file itself, with real alpha —
+not a screenshot or a preview of it.
+
+>>> FLAVOUR <<<
+```
+
+Flavour lines are the same five as §4 (Vanilla, Neapolitan, Rocky Road, Cyan
+Sherbert, Pink Sherbert), with one change: **drop the words "cone" and "waffle
+cone" from them** — they fight the proportion instruction. Say "shallow golden
+waffle cup" instead.
+
+### The v2 prompt — edit an existing body
 
 Attach **the current art for that flavour** as the reference — this is a
 targeted edit, not a fresh generation, and everything above the cone should
@@ -145,10 +219,21 @@ colour fringe, no matte line. Deliver the PNG file itself, with real alpha —
 not a screenshot or a preview of it.
 ```
 
-Apply it to all five: vanilla, neapolitan, rocky road, cyan sherbert, pink
-sherbert. Then re-register (§7), **delete the `ice_cream` entry from
-`CHAR_SCALE`**, and re-derive `CHAR_Y_ADJUST` — every one of those five values
-is tuned to the current 1089px body and will be wrong for an 840px one.
+Apply either prompt to all five: vanilla, neapolitan, rocky road, cyan
+sherbert, pink sherbert. Then re-register (§7), **delete the `ice_cream` entry
+from `CHAR_SCALE`**, and re-derive `CHAR_Y_ADJUST` — every one of those five
+values is tuned to the current 1089px body and will be wrong for an 840px one.
+
+### If neither prompt lands
+
+This edit does not actually need a generator. The cup's width is unchanged by
+shortening it, so compressing the straight lattice barrel vertically while
+leaving the rounded base at native height joins at exactly its own width — no
+seam, no correction. `scratchpad/shorten_cone.py` in the working session did
+this and measured 812 x 850 at face-frac 0.442 (barrel 285px -> 45px). The cost
+is honest and visible at 1:1: the waffle diamonds flatten by the same factor,
+which reads as a foreshortened bowl rather than a defect, but it is not free.
+Generated art is better if the generator will produce it.
 
 ## 4. Ice cream v1 — the spec and the prompt
 
