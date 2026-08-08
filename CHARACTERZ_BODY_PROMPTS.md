@@ -247,7 +247,92 @@ FLAVOUR: pink sherbert. A hot pink scoop with an icy granular sherbert
 surface and a thick pink melt drip over a golden waffle cone.
 ```
 
-## 5. Gummy bear — the spec and the prompt
+## 5a. Gummy bear v2 — the same problem, in the legs
+
+The bears have the ice creams' defect in a milder form, and the four are
+strikingly consistent about it:
+
+| | Body | Aspect | Hole | Above hole | Below hole | Face-frac |
+|---|---|---:|---:|---:|---:|---:|
+| Cyan | 664 × 871 | 1.31 | 233 | 335 | 535 | 0.384 |
+| OG | 663 × 888 | 1.34 | 237 | 341 | 546 | 0.384 |
+| Pink | 655 × 866 | 1.32 | 235 | 333 | 532 | 0.384 |
+| Purple | 661 × 871 | 1.32 | 234 | 335 | 532 | 0.384 |
+| **Cast median** | **700 × 747** | **1.07** | — | 366 | 381 | **0.490** |
+
+Everything **above** the hole is already right — 336px of head and ears against
+the cast's 366. What is wrong is below it: 535px of torso and legs against the
+cast's 381, which makes the bear an elongated 1.32 where the cast is a compact
+1.07, and drops the face to 0.384.
+
+Take ~23% out of the body below the hole and widen slightly:
+
+| Below-hole | Body | Aspect | Face-frac |
+|---:|---|---:|---:|
+| 535 (today) | 660 × 872 | 1.32 | 0.384 |
+| 444 | 700 × 780 | 1.11 | 0.431 |
+| **411** | **700 × 747** | **1.07** | **0.450** |
+| 384 | 700 × 720 | 1.03 | 0.467 |
+
+At 700 × 747 the bear *is* the cast median, so **`CHAR_SCALE["gummy_bear"] =
+0.881` can be deleted** — and since the bears currently render at 582px wide,
+dropping the scale while widening the art takes them to 700px, a 20% gain.
+
+The ceiling here is taste rather than arithmetic: 0.49 is reachable at 686px
+tall, but that is a perfectly square bear and reads squashed. 0.45 keeps the
+gummy-bear silhouette.
+
+### The v2 prompt
+
+Attach **the current art for that colour** as the reference — a targeted edit,
+not a fresh generation.
+
+```
+Edit this gummy bear character. Keep the head, the ears, and the round hole
+punched through it EXACTLY as they are — same shape, same size, same surface,
+same colour, same lighting, same hole in the same place. Change one thing only:
+
+MAKE THE BODY BELOW THE HOLE SHORTER AND THE WHOLE BEAR SLIGHTLY WIDER.
+
+- The torso and legs below the hole are too long: the bear currently stands
+  about a third taller than it is wide. It should be barely taller than it is
+  wide — squat and chunky, the proportions of a real gummy bear.
+- Take roughly a quarter of the height out of everything BELOW the hole. Shorten
+  the torso, and make the legs stubbier and more tucked. Do not shrink the head
+  or the ears, and do not move or resize the hole.
+- Widen the whole bear by a few percent so it reads solid rather than slim.
+- Result: the hole should end up close to the middle of the character's total
+  height instead of a third of the way down. That is the entire point of this
+  edit.
+
+Keep everything else identical:
+- Translucent gelatin with real subsurface scattering, slightly tacky glossy
+  surface, fine condensation beading, a few tiny internal bubbles. Not opaque,
+  not plastic.
+- Same key light from the UPPER LEFT at about 45 degrees, cooler fill from the
+  lower right, deepest occlusion under the arms, between the legs and along the
+  lower-right rim.
+- The hole stays a real hole, punched right THROUGH the body, fully transparent
+  inside, with its inner wall lighter and more saturated where the candy is
+  thin. No eyes, no mouth, no muzzle, no nose.
+- No background, no surface, no table, no cast shadow, no drop shadow.
+- No sugar coating, wrappers, text or logos.
+
+OUTPUT: the character alone, centred, on a fully transparent background,
+square canvas, highest resolution available. Crisp anti-aliased edge, no
+colour fringe, no matte line. Deliver the PNG file itself, with real alpha —
+not a screenshot or a preview of it.
+```
+
+Apply it to all four: OG, cyan, pink, purple. Then re-register (§7), **delete
+the `gummy_bear` entry from `CHAR_SCALE`**, and re-derive `CHAR_Y_ADJUST` — the
+four current values (32/43/47/50) are tuned to an 872px body at 0.881 and will
+all be wrong for a 747px body at native scale.
+
+Note the bears are already `BODY_OVER_SKIN_CHARS`, so the skin draws first and
+shows through the hole exactly as it does now. No layering change.
+
+## 5. Gummy bear v1 — the spec and the prompt
 
 The bears' **proportions are already right** — unlike the ice creams, there is
 nothing to fix in the geometry. What a regeneration buys is render quality, a
