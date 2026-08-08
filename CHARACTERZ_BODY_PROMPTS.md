@@ -106,46 +106,52 @@ all. 0.45 with a shallow cup is the honest target, and it sits between the
 doughnuts (0.49, because a ring's hole is its centre) and the gummy bears
 (0.384), both of which read fine.
 
-### The v3 prompt — standalone
+### The v3 prompts — standalone, one per flavour
 
-Use this when the edit prompt below does not take. It needs no reference image
-and states every proportion as a fraction, because "shallow cup" on its own has
-not been enough: the generator keeps drawing a normal cone.
+Fully assembled: no reference image, no placeholder to fill in, nothing to
+paste together. One block per flavour, copy and run.
+
+Every proportion is stated as a fraction of total height, because "shallow cup"
+as prose was not enough — the generator kept drawing a normal cone. The word
+"cone" is gone from the flavour text for the same reason.
+
+**Vanilla** — replaces `after_skinz_vanilla_ice_cream.png`
 
 ```
-Create a 3D-rendered ice cream character for a collectible series. It is one
-layer of a composited artwork: a photorealistic ice cream with a round hole
-punched through its scoop, into which a cartoon face is composited later.
+Create a single 3D-rendered ice cream character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic ice cream
+with a round hole punched through its scoop, into which a cartoon face is
+composited later.
+
+THE FLAVOUR is classic vanilla — a pale cream scoop with a soft matte surface and fine
+flecks of vanilla bean, in a shallow golden waffle cup, with a gentle melt drip
+over the rim.
 
 BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
-not the usual ice-cream proportions — read them literally:
+NOT the usual ice-cream proportions — read them literally:
 
 - Take the character's total height as 100%.
 - The SCOOP is the top 86% of that height.
 - The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
-  bowl that the scoop sits down into — the height of a tuna tin, not a cone.
-  It must NOT be a cone. It must NOT be a tall cup. If it looks like a normal
-  ice cream cone, it is wrong.
-- The finished character is about as TALL as it is WIDE. Roughly square in its
+  bowl that the scoop sits down into — the height of a tuna tin. It must NOT be
+  a cone. It must NOT be a tall cup. If it looks like a normal ice cream cone,
+  it is wrong.
+- The finished character is about as TALL as it is WIDE — roughly square in its
   bounding box, dominated by one huge round scoop.
-- The hole therefore lands near the MIDDLE of the total height, at about 45%
-  down from the crown of the scoop. That is the test: measure the hole's centre
-  from the top of the scoop and from the bottom of the cup, and those two
-  distances should be close to equal.
+- The hole therefore lands near the MIDDLE of the total height, about 45% down
+  from the crown of the scoop. That is the test: the distance from the top of
+  the scoop down to the hole's centre, and the distance from the hole's centre
+  down to the bottom of the cup, should be close to equal.
 
-THE SCOOP:
-- One single generous, round, dome-shaped scoop, as wide as the whole
-  character, with a soft irregular lower edge where it overhangs the cup and a
-  gentle melt drip or two over the rim.
+THE SCOOP: one single generous, round, dome-shaped scoop, as wide as the whole
+character, with a soft irregular lower edge where it overhangs the cup.
 
-THE HOLE:
-- A clean circular hole punched right THROUGH the front of the scoop, fully
-  transparent inside, centred horizontally and centred in the scoop's own
-  height.
-- Its diameter is about ONE THIRD of the character's width.
-- Give it a visible inner wall so it reads as a real opening bored through a
-  solid material, lit consistently with the rest of the scoop.
-- No eyes, no mouth, no facial features of any kind. The hole is empty.
+THE HOLE: a clean circular hole punched right THROUGH the front of the scoop,
+fully transparent inside, centred horizontally and centred in the scoop's own
+height. Its diameter is about ONE THIRD of the character's width. Give it a
+visible inner wall so it reads as a real opening bored through solid material,
+lit consistently with the rest of the scoop. No eyes, no mouth, no facial
+features of any kind — the hole is empty.
 
 STYLE: photorealistic 3D confectionery product render — the look of a premium
 food photograph, with real material, real subsurface and real micro-texture.
@@ -158,27 +164,260 @@ cooler, dimmer fill from the lower right. Highlights on the upper-left of the
 scoop; the terminator and the deepest occlusion on the lower-right and under
 the cup's rim.
 
-DO NOT:
-- Do not draw a cone. The base is a shallow bowl.
-- Do not add a background, surface, table, or scene. The character floats alone.
-- Do not add a cast shadow or drop shadow.
-- Do not add a face, eyes, or a mouth.
-- Do not add sprinkles, wafers, spoons, cherries, text or logos unless the
-  flavour line below asks for them.
-- Do not add glow, bloom, or a halo outside the silhouette.
+DO NOT: do not draw a cone, the base is a shallow bowl. Do not add a
+background, surface, table or scene — the character floats alone. Do not add a
+cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not add
+sprinkles, spoons, cherries, text or logos. Do not add glow, bloom or a halo
+outside the silhouette.
 
-OUTPUT: the character alone, centred, on a fully transparent background,
-square canvas, highest resolution available. Crisp anti-aliased edge, no
-colour fringe, no matte line. Deliver the PNG file itself, with real alpha —
-not a screenshot or a preview of it.
-
->>> FLAVOUR <<<
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
 ```
 
-Flavour lines are the same five as §4 (Vanilla, Neapolitan, Rocky Road, Cyan
-Sherbert, Pink Sherbert), with one change: **drop the words "cone" and "waffle
-cone" from them** — they fight the proportion instruction. Say "shallow golden
-waffle cup" instead.
+**Neapolitan** — replaces `after_skinz_neopolitan_ice_cream.png`
+
+```
+Create a single 3D-rendered ice cream character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic ice cream
+with a round hole punched through its scoop, into which a cartoon face is
+composited later.
+
+THE FLAVOUR is neapolitan — one scoop split into three vertical bands, chocolate, vanilla
+and strawberry, meeting cleanly, in a shallow golden waffle cup. Keep the
+three-band split clearly readable at thumbnail size.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
+NOT the usual ice-cream proportions — read them literally:
+
+- Take the character's total height as 100%.
+- The SCOOP is the top 86% of that height.
+- The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
+  bowl that the scoop sits down into — the height of a tuna tin. It must NOT be
+  a cone. It must NOT be a tall cup. If it looks like a normal ice cream cone,
+  it is wrong.
+- The finished character is about as TALL as it is WIDE — roughly square in its
+  bounding box, dominated by one huge round scoop.
+- The hole therefore lands near the MIDDLE of the total height, about 45% down
+  from the crown of the scoop. That is the test: the distance from the top of
+  the scoop down to the hole's centre, and the distance from the hole's centre
+  down to the bottom of the cup, should be close to equal.
+
+THE SCOOP: one single generous, round, dome-shaped scoop, as wide as the whole
+character, with a soft irregular lower edge where it overhangs the cup.
+
+THE HOLE: a clean circular hole punched right THROUGH the front of the scoop,
+fully transparent inside, centred horizontally and centred in the scoop's own
+height. Its diameter is about ONE THIRD of the character's width. Give it a
+visible inner wall so it reads as a real opening bored through solid material,
+lit consistently with the rest of the scoop. No eyes, no mouth, no facial
+features of any kind — the hole is empty.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real subsurface and real micro-texture.
+Not illustration, not clay, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and waffles as if shot in the same studio. The cup carries a
+crisp golden waffle lattice.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Highlights on the upper-left of the
+scoop; the terminator and the deepest occlusion on the lower-right and under
+the cup's rim.
+
+DO NOT: do not draw a cone, the base is a shallow bowl. Do not add a
+background, surface, table or scene — the character floats alone. Do not add a
+cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not add
+sprinkles, spoons, cherries, text or logos. Do not add glow, bloom or a halo
+outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Rocky Road** — replaces `after_skinz_rocky_road_ice_cream.png`
+
+```
+Create a single 3D-rendered ice cream character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic ice cream
+with a round hole punched through its scoop, into which a cartoon face is
+composited later.
+
+THE FLAVOUR is rocky road — a dark chocolate scoop studded with mini marshmallows and
+chocolate chunks breaking the surface, in a shallow golden waffle cup. Keep the
+inclusions chunky and few rather than dense and busy.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
+NOT the usual ice-cream proportions — read them literally:
+
+- Take the character's total height as 100%.
+- The SCOOP is the top 86% of that height.
+- The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
+  bowl that the scoop sits down into — the height of a tuna tin. It must NOT be
+  a cone. It must NOT be a tall cup. If it looks like a normal ice cream cone,
+  it is wrong.
+- The finished character is about as TALL as it is WIDE — roughly square in its
+  bounding box, dominated by one huge round scoop.
+- The hole therefore lands near the MIDDLE of the total height, about 45% down
+  from the crown of the scoop. That is the test: the distance from the top of
+  the scoop down to the hole's centre, and the distance from the hole's centre
+  down to the bottom of the cup, should be close to equal.
+
+THE SCOOP: one single generous, round, dome-shaped scoop, as wide as the whole
+character, with a soft irregular lower edge where it overhangs the cup.
+
+THE HOLE: a clean circular hole punched right THROUGH the front of the scoop,
+fully transparent inside, centred horizontally and centred in the scoop's own
+height. Its diameter is about ONE THIRD of the character's width. Give it a
+visible inner wall so it reads as a real opening bored through solid material,
+lit consistently with the rest of the scoop. No eyes, no mouth, no facial
+features of any kind — the hole is empty.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real subsurface and real micro-texture.
+Not illustration, not clay, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and waffles as if shot in the same studio. The cup carries a
+crisp golden waffle lattice.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Highlights on the upper-left of the
+scoop; the terminator and the deepest occlusion on the lower-right and under
+the cup's rim.
+
+DO NOT: do not draw a cone, the base is a shallow bowl. Do not add a
+background, surface, table or scene — the character floats alone. Do not add a
+cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not add
+sprinkles, spoons, cherries, text or logos. Do not add glow, bloom or a halo
+outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Cyan Sherbert** — replaces `after_skinz_cyan_sherbert_ice_cream.png`
+
+```
+Create a single 3D-rendered ice cream character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic ice cream
+with a round hole punched through its scoop, into which a cartoon face is
+composited later.
+
+THE FLAVOUR is cyan sherbert — a vivid cyan scoop with the slightly icy, granular surface of
+sherbert rather than the smooth fat of ice cream, with a thick cyan melt drip
+over a shallow golden waffle cup.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
+NOT the usual ice-cream proportions — read them literally:
+
+- Take the character's total height as 100%.
+- The SCOOP is the top 86% of that height.
+- The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
+  bowl that the scoop sits down into — the height of a tuna tin. It must NOT be
+  a cone. It must NOT be a tall cup. If it looks like a normal ice cream cone,
+  it is wrong.
+- The finished character is about as TALL as it is WIDE — roughly square in its
+  bounding box, dominated by one huge round scoop.
+- The hole therefore lands near the MIDDLE of the total height, about 45% down
+  from the crown of the scoop. That is the test: the distance from the top of
+  the scoop down to the hole's centre, and the distance from the hole's centre
+  down to the bottom of the cup, should be close to equal.
+
+THE SCOOP: one single generous, round, dome-shaped scoop, as wide as the whole
+character, with a soft irregular lower edge where it overhangs the cup.
+
+THE HOLE: a clean circular hole punched right THROUGH the front of the scoop,
+fully transparent inside, centred horizontally and centred in the scoop's own
+height. Its diameter is about ONE THIRD of the character's width. Give it a
+visible inner wall so it reads as a real opening bored through solid material,
+lit consistently with the rest of the scoop. No eyes, no mouth, no facial
+features of any kind — the hole is empty.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real subsurface and real micro-texture.
+Not illustration, not clay, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and waffles as if shot in the same studio. The cup carries a
+crisp golden waffle lattice.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Highlights on the upper-left of the
+scoop; the terminator and the deepest occlusion on the lower-right and under
+the cup's rim.
+
+DO NOT: do not draw a cone, the base is a shallow bowl. Do not add a
+background, surface, table or scene — the character floats alone. Do not add a
+cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not add
+sprinkles, spoons, cherries, text or logos. Do not add glow, bloom or a halo
+outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
+
+**Pink Sherbert** — replaces `after_skinz_pink_sherbert_ice_cream.png`
+
+```
+Create a single 3D-rendered ice cream character on a transparent background.
+It is one layer of a composited collectible artwork: a photorealistic ice cream
+with a round hole punched through its scoop, into which a cartoon face is
+composited later.
+
+THE FLAVOUR is pink sherbert — a hot pink scoop with an icy granular sherbert surface and a
+thick pink melt drip over a shallow golden waffle cup.
+
+BUILD IT TO THESE PROPORTIONS. They are the point of the image, and they are
+NOT the usual ice-cream proportions — read them literally:
+
+- Take the character's total height as 100%.
+- The SCOOP is the top 86% of that height.
+- The WAFFLE CUP is only the bottom 14%. It is a shallow, flat-bottomed wafer
+  bowl that the scoop sits down into — the height of a tuna tin. It must NOT be
+  a cone. It must NOT be a tall cup. If it looks like a normal ice cream cone,
+  it is wrong.
+- The finished character is about as TALL as it is WIDE — roughly square in its
+  bounding box, dominated by one huge round scoop.
+- The hole therefore lands near the MIDDLE of the total height, about 45% down
+  from the crown of the scoop. That is the test: the distance from the top of
+  the scoop down to the hole's centre, and the distance from the hole's centre
+  down to the bottom of the cup, should be close to equal.
+
+THE SCOOP: one single generous, round, dome-shaped scoop, as wide as the whole
+character, with a soft irregular lower edge where it overhangs the cup.
+
+THE HOLE: a clean circular hole punched right THROUGH the front of the scoop,
+fully transparent inside, centred horizontally and centred in the scoop's own
+height. Its diameter is about ONE THIRD of the character's width. Give it a
+visible inner wall so it reads as a real opening bored through solid material,
+lit consistently with the rest of the scoop. No eyes, no mouth, no facial
+features of any kind — the hole is empty.
+
+STYLE: photorealistic 3D confectionery product render — the look of a premium
+food photograph, with real material, real subsurface and real micro-texture.
+Not illustration, not clay, not cel-shaded. It has to sit beside photoreal
+cookies, doughnuts and waffles as if shot in the same studio. The cup carries a
+crisp golden waffle lattice.
+
+LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
+cooler, dimmer fill from the lower right. Highlights on the upper-left of the
+scoop; the terminator and the deepest occlusion on the lower-right and under
+the cup's rim.
+
+DO NOT: do not draw a cone, the base is a shallow bowl. Do not add a
+background, surface, table or scene — the character floats alone. Do not add a
+cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not add
+sprinkles, spoons, cherries, text or logos. Do not add glow, bloom or a halo
+outside the silhouette.
+
+OUTPUT: the character alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge, no colour
+fringe, no matte line. Deliver the PNG file itself, with real alpha — not a
+screenshot or a preview of it.
+```
 
 ### The v2 prompt — edit an existing body
 
