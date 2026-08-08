@@ -12,8 +12,13 @@ Companion docs: `SKIN_ENHANCE_PROMPTS.md`, `EYEZ_ENHANCE_PROMPTS.md`,
 
 | Family | State |
 |---|---|
-| Ice creams | **5 regenerated and live** (vanilla, neapolitan, rocky road, cyan sherbert, pink sherbert). The 3 that were not returned — mint choc chip, zaffre sherbert, rainbow sherbert — have been **retired from the trait set** rather than left mismatched. |
-| Gummy bears | Prompt below (§5). Current art is fine geometrically; it is the render quality and the socket that need the pass. |
+| Ice creams | **Settled — shipping as delivered.** The 5 regenerated cones (vanilla, neapolitan, rocky road, cyan sherbert, pink sherbert) are live and final. The 3 that were not returned — mint choc chip, zaffre sherbert, rainbow sherbert — are **retired from the trait set**. |
+| Gummy bears | Unchanged and fine. Prompts below if they are ever revisited. |
+
+**The cone-shortening work in §4a is closed, not pending.** The ice creams keep
+their delivered proportions (face at 0.344 of body height) and
+`CHAR_SCALE["ice_cream"] = 0.74`. Everything below this line is reference for a
+future pass — no action is outstanding on any of it.
 
 ---
 
@@ -71,7 +76,10 @@ This is the same path the doughnuts and cookies take (`body_after_skin()` in
 `generator.py`), so no new mechanism was needed; the `after_skinz_` filename
 prefix is the whole switch.
 
-## 4a. Ice cream v2 — the cone is the whole problem
+## 4a. Ice cream — the cone measurement (closed, kept for reference)
+
+> **Decision: not pursued.** The cones ship as delivered. The analysis below
+> stands and the prompts still work, but nothing here is a pending task.
 
 Measured on the delivered art, the scoop is **already correct** and the face is
 **already centred in it**. The face-frac of 0.344 comes from one thing:

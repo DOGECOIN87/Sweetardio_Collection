@@ -123,12 +123,14 @@ the body's hole and the rim reads as a socket in the scoop.
 
 Two things about this belong in a quality review rather than a changelog:
 
-- **The proportion the regeneration was meant to fix did not move.** Face
-  position down the body went 0.33 → 0.344 against a cast median of 0.49, so
-  `CHAR_SCALE["ice_cream"] = 0.74` is still carrying the family onto the ground
-  line. What improved is the scoop's share of the silhouette and the face hole
-  (179–219px → ~257px, now in the doughnut/cookie band of 230–260). The full
-  measurement is in `CHARACTERZ_BODY_PROMPTS.md` §2.
+- **The proportion the regeneration was meant to fix did not move, and this is
+  accepted.** Face position down the body went 0.33 → 0.344 against a cast
+  median of 0.49, so `CHAR_SCALE["ice_cream"] = 0.74` is still carrying the
+  family onto the ground line. What improved is the scoop's share of the
+  silhouette and the face hole (179–219px → ~257px, now in the doughnut/cookie
+  band of 230–260). The cones ship as delivered; the measurement and the
+  prompts that would change it are kept in `CHARACTERZ_BODY_PROMPTS.md` §2 and
+  §4a as reference, not as open work.
 - **The source was a JPEG of the generator's preview**, with transparency
   already flattened onto a grey/white checkerboard. It keys back out cleanly —
   the checker is achromatic and two-valued, so a connected key plus an
