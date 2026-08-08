@@ -652,7 +652,8 @@ CHAR_Y_ADJUST = {
     "oatmeal_cream_pie": 14,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # rescaled; feet on the shared ground line (1111)
+    "nutty_bar": -121,         # bar body, stands with the Twinkie at 1132;
+                               # re-derived for the regenerated art     # rescaled; feet on the shared ground line (1111)
 }
 
 def char_y_adjust(char_name):
@@ -741,6 +742,11 @@ CHAR_SCALE = {
     # feet on the same line as the rescaled cone tips and their width (581px)
     # alongside the rescaled ice creams (582px), keeping the two a family.
     "gummy_bear": 0.881,
+    # The regenerated bar is 1154 tall against the old art's 929, which does not
+    # fit the canvas standing on the 1132 bar line - its crown lands at y=-22.
+    # 0.93 buys a 60px top margin and keeps eye/hole at 1.22, inside the cast's
+    # 1.04-1.57 band.
+    "nutty_bar": 0.93,
 }
 
 def char_scale(char_name):
@@ -914,6 +920,11 @@ FACE_HOLE_BOTTOM = 732
 # match on the character base-name.
 FACE_HOLE_BOTTOM_OVERRIDE = {
     "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
+    "nutty_bar": 751,     # its hole is a TALL ellipse (246 x 292) where the
+                          # rest of the cast's are round or wide, so the ball's
+                          # width covers it but its height does not. Reaching
+                          # to 751 grows the ball to ~305 tall and closes the
+                          # crescents at the top and bottom of the hole.
 }
 
 def face_hole_bottom(char_name):

@@ -14,7 +14,7 @@ Companion docs: `SKIN_ENHANCE_PROMPTS.md`, `EYEZ_ENHANCE_PROMPTS.md`,
 |---|---|
 | Ice creams | **Settled — shipping as delivered.** The 5 regenerated cones (vanilla, neapolitan, rocky road, cyan sherbert, pink sherbert) are live and final. The 3 that were not returned — mint choc chip, zaffre sherbert, rainbow sherbert — are **retired from the trait set**. |
 | Gummy bears | **OG only.** Cyan, pink and purple are retired from the trait set; the OG bear keeps its current art. Prompts below if it is ever revisited. |
-| Nutty Bar | Unchanged. Prompt and measured spec in §6. |
+| Nutty Bar | **Regenerated and live.** New art registered, `CHAR_SCALE` 0.93 and `CHAR_Y_ADJUST` -121 re-derived, `FACE_HOLE_BOTTOM_OVERRIDE` 751 added. Prompts and the render-by-render measurements in §6. |
 
 **The cone-shortening work in §4a is closed, not pending.** The ice creams keep
 their delivered proportions (face at 0.344 of body height) and
@@ -1298,10 +1298,49 @@ normalises to a 748 x 1714 body — clipped on a 1393 canvas. Thinning the wall
 to about a fifth of the opening fixes the aperture, the shape and the fit in one
 change, and keeps the depth cue that makes the render good.
 
-### The edit prompt
+### Render 3 — accepted, with two extraction fixes
 
-Use this against render 2 rather than starting over — everything except the
-aperture is already right.
+The third render landed it, and the file arrived as a genuine 1393 x 1393 RGBA
+PNG rather than a preview. Two things still had to be repaired on the way in,
+and both were mine to catch rather than the generator's to avoid:
+
+- **The surrounding transparency was flattened but the hole's was not.** The
+  checkerboard around the bar is opaque pixels; the hole is real alpha-0. So the
+  outside had to be keyed while the render's own alpha was kept for the hole.
+- **6270px of the hole was still baked checkerboard**, a 123 x 303 crescent on
+  its left rim that the generator wrote as opaque instead of alpha-0. Taking the
+  hole as `alpha == 0` alone left that crescent as solid white-grey art, which
+  rendered as a checkered sliver inside the face. The hole is the union of the
+  alpha-0 region and any enclosed checker: 264 x 318 rather than 252 x 314, and
+  hole/bar 0.50 rather than 0.48.
+
+Measured after registration:
+
+| | old art | render 3 | |
+|---|---:|---:|---|
+| Body | 466 x 929 | 495 x 1154 | taller |
+| Aspect | 1.99 | 2.34 | more slender |
+| Hole | 267 x 209 | 246 x 292 | now taller than wide |
+| Eye / hole | 1.04 | **1.13** | cast median exactly |
+| Face-frac | 0.410 | 0.392 | |
+
+Three table changes follow from the new proportions:
+
+- `CHAR_SCALE["nutty_bar"] = 0.93`. At native size the bar is 1154 tall, and
+  standing on the 1132 bar line its crown lands at y=-22 — off the canvas. 0.93
+  buys a 60px top margin and leaves eye/hole at 1.22, inside the cast's
+  1.04-1.57 band.
+- `CHAR_Y_ADJUST["nutty_bar"] = -121`, re-derived; it lands on 1133 against the
+  group's 1132.
+- `FACE_HOLE_BOTTOM_OVERRIDE["nutty_bar"] = 751`. Its hole is the only TALL one
+  in the cast (246 x 292 where the rest are round or wide), so the standard
+  ball's width covers it but its height does not. Without this, 3161px of
+  background shows through as crescents top and bottom; with it, 233px, which is
+  the antialiasing seam.
+
+### The edit prompt that produced it
+
+Kept for reference.
 
 ```
 Edit this chocolate wafer bar. Keep EVERYTHING about it — the shape, the
