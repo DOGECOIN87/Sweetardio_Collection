@@ -616,7 +616,6 @@ CENTERED_CHARS = [
     "chocolate_chip_cookie",
     "chocolate_sandwich_cookie",
     "oatmeal_cream_pie",
-    "gummy_worm",
     "glazed_doughnut",
     "chocolate_doughnut",
     "sugar_doughnut",
@@ -656,10 +655,11 @@ CHAR_Y_ADJUST = {
     "cyan_gummy_bear": 58,     # enlarged + aligned to the cone line (1290)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
-    "gummy_worm": 18,
     "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
     "oatmeal_cream_pie": 14,
     "pink_gummy_bear": 68,
+    "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
+                               # line; it was the odd one out at 1111
     "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # enlarged + aligned to the cone line (1290)
 }
 
@@ -684,7 +684,6 @@ CENTERED_FOOTWEARLESS_DY = {
     "sugar_doughnut": 38,
     "chocolate_sandwich_cookie": 35,
     "chocolate_chip_cookie": 32,
-    "gummy_worm": 24,
     "oatmeal_cream_pie": 80,
     "ding_dong": 94,       # was the only CENTERED character with no entry, so
                            # it floated ~94px above its ring/disc peers when
@@ -700,12 +699,18 @@ def centered_footwearless_dy(char_name):
 # This lets a character's grounded/footwear placement (CHAR_Y_ADJUST) stay
 # fixed while nudging only its footwear-less standing height — needed when a
 # character looks right with shoes but too low/high standing bare. Default 0.
+# These three were raised because the full +150 drop bottomed them out, but
+# the lift overshot and left them floating 34-58px above the ground band while
+# every other standing character sat on it (measured by verify_placement.py).
+# They now land on the band's TOP edge (1084): still the highest stance the
+# approved band allows, which is what the original tuning was reaching for,
+# but inside it rather than above it.
 FOOTWEARLESS_DY = {
-    "sugar_cube": -45,   # the +150 bare drop bottomed it out; raise the stance
-    "smores": -75,       # softened bare drop (full +150 was too low; see below)
+    "sugar_cube": -23,   # bare bottom -> 1084 (was -45, floating at 1062)
+    "smores": -29,       # bare bottom -> 1084 (was -75, floating at 1038)
     "zebra_cake": 15,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
                          # raises only the with-footwear case
-    "brownie_bite": -65, # raise bare stance to match visual placement with others
+    "brownie_bite": -23, # bare bottom -> 1084 (was -65, floating at 1042)
 }
 
 def footwearless_dy(char_name):
@@ -855,7 +860,12 @@ GROUND_SHADOW = {
     "dy": 6,
     "squash": 0.16,
     "exclude_arms": True,
-    "ground_line": 1040,
+    # Sits in the middle of the empty band between the two populations it has
+    # to separate: centred/floating bodies bottom out at 1023, grounded ones
+    # start at 1084. 1040 gave only 17px of clearance on the floating side and
+    # put smores (1038) and brownie_bite (1042) on opposite sides of the flip
+    # while standing in the same pose; 1053 clears both by ~30px.
+    "ground_line": 1053,
 }
 
 _bbox_cache = {}

@@ -52,6 +52,27 @@ import generator as g  # noqa: E402
 from audit_placement import char_table, measure, BALL_CENTER  # noqa: E402
 
 
+# Deviations confirmed by rendering and deliberately accepted. Keyed by
+# (character, check); "*" matches any case. Waived entries are still printed —
+# they just do not fail the run, so the exit status stays meaningful.
+WAIVED = {
+    ("chocolate_sandwich_cookie", "vertical"):
+        "two-part asset: the back wafer sits lower than the front disc, so the "
+        "bbox reads ~56px low. CHAR_Y_ADJUST +50 aligns the FRONT disc with its "
+        "peers — confirmed by render.",
+    ("chocolate_sandwich_cookie", "horizontal"):
+        "same two-part asset: the back wafer sits left of the front disc, so the "
+        "bbox centre reads ~54px left. The face-carrying disc is on the column.",
+    ("chocolate_chip_cookie", "vertical"):
+        "26px above the centred group's median, and that group floats by design "
+        "rather than touching a floor — reads consistently with its peers.",
+}
+
+
+def waiver(name, check):
+    return WAIVED.get((name, check))
+
+
 def parse_args():
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -135,7 +156,7 @@ def main():
             })
 
     # ── vertical: does each character agree with its own group? ──────────
-    flagged = []
+    flagged, waived = [], []
     print("=" * 78)
     print("VERTICAL — final composited bottom, by placement path")
     print("=" * 78)
@@ -147,8 +168,13 @@ def main():
             d = r["bottom"] - med
             mark = ""
             if abs(d) > args.tol:
-                mark = "   <== OFF GROUP"
-                flagged.append((r, med, d))
+                w = waiver(r["name"], "vertical")
+                if w:
+                    mark = "   (waived)"
+                    waived.append((r["name"], "vertical", w))
+                else:
+                    mark = "   <== OFF GROUP"
+                    flagged.append((r, med, d))
             print(f"   {r['name']:32s} dy {r['dy']:+5d}  bottom {r['bottom']:5d}"
                   f"  {d:+6.0f}{mark}")
 
@@ -164,7 +190,11 @@ def main():
         seen.add(r["name"])
         dx = r["cx"] - BALL_CENTER[0]
         if abs(dx) > args.x_tol:
-            xbad.append((r["name"], r["cx"], dx))
+            w = waiver(r["name"], "horizontal")
+            if w:
+                waived.append((r["name"], "horizontal", w))
+            else:
+                xbad.append((r["name"], r["cx"], dx))
     if xbad:
         for n, cx, dx in sorted(xbad, key=lambda t: -abs(t[2])):
             print(f"   {n:32s} centre x={cx:4d}  {dx:+4d} from the face column")
@@ -202,7 +232,17 @@ def main():
         print(f"\n  {r['name']} [{r['case']}] sits at {r['bottom']}, "
               f"{abs(d):.0f}px {'below' if d > 0 else 'above'} its group's "
               f"{med:.0f}")
-    return 1 if (flagged or xbad or holebad) else 0
+
+    if waived:
+        print(f"\n  waived ({len({(n, c) for n, c, _ in waived})} confirmed "
+              f"non-issues, see WAIVED in this file):")
+        for n, c, why in sorted({(n, c, w) for n, c, w in waived}):
+            print(f"    {n} [{c}] — {why.splitlines()[0]}")
+
+    ok = not (flagged or xbad or holebad)
+    print("\n  RESULT: " + ("all characters placed correctly" if ok
+                            else "PLACEMENT ISSUES FOUND"))
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
