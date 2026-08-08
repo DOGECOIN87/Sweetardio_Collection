@@ -678,16 +678,22 @@ def char_y_adjust(char_name):
 # centre can still read slightly high in-frame (the face holes sit ~100px above
 # canvas centre), so this nudges it down WITHOUT touching the character's
 # footwear placement (CHAR_Y_ADJUST). Default 0; tuned by eye.
+# Align these by BODY CENTRE, not by bottom. A bottom line is the right metric
+# for characters that stand on something, but these float, and matching bottoms
+# across different sizes pushes the biggest bodies high: the doughnuts are the
+# largest rings, so a shared bottom left their mass ~55px above canvas centre
+# while ding_dong (a smaller ring, tuned by eye) sat dead centre. Values below
+# put each body's centre on the canvas centre line (y=696).
 CENTERED_FOOTWEARLESS_DY = {
-    "glazed_doughnut": 45,
-    "chocolate_doughnut": 38,
-    "sugar_doughnut": 38,
+    "glazed_doughnut": 99,        # was 45, centre sat 54px high
+    "chocolate_doughnut": 93,     # was 38, centre sat 55px high
+    "sugar_doughnut": 93,         # was 38, centre sat 55px high
     "chocolate_sandwich_cookie": 35,
     "chocolate_chip_cookie": 32,
     "oatmeal_cream_pie": 80,
     "ding_dong": 94,       # was the only CENTERED character with no entry, so
                            # it floated ~94px above its ring/disc peers when
-                           # bare; 94 puts its bottom on their median (1016)
+                           # bare; centre already lands on the canvas centre
 }
 
 def centered_footwearless_dy(char_name):
