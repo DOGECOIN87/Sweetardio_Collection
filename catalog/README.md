@@ -57,11 +57,11 @@ See `SKIN_ENHANCE_PROMPTS.md`, `EYEZ_ENHANCE_PROMPTS.md` and
 `sample_batch_100.png` is an inspection sheet: 100 random tokens straight off
 the production pipeline, 10×10 at 700px per cell, each cell captioned with its
 index and character. The seed used is stamped in the bottom-right corner —
-current sheet is **seed 340731559**.
+current sheet is **seed 323037840**.
 
 ```bash
 python3 asset_assessment/render_sample_sheet.py                   # fresh 100
-python3 asset_assessment/render_sample_sheet.py --seed 340731559  # re-render this one
+python3 asset_assessment/render_sample_sheet.py --seed 323037840  # re-render this one
 ```
 
 The run prints a manifest listing every trait of every cell, so anything that
