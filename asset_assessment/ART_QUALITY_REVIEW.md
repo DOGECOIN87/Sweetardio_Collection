@@ -70,15 +70,29 @@ and `wat_compat.json` were regenerated — they encode measured dominant colours
 so stale entries would have let a character camouflage into the new, much
 brighter fridge. `build_mint` still reports camouflage=0 and eye-clash=0.
 
-## 2. Stickers are authored to the wrong canvas
+## 2. Stickers were authored to the wrong canvas — fixed
 
-22 of 23 stickers are **1343 × 1343**, not 1393 — every one gets upscaled 1.04×.
-Individually negligible, but it is a whole class authored to a different spec,
-so it will keep happening as stickers are added.
+22 of 23 stickers were **1343 × 1343** rather than 1393, so every one was
+resized at render time. That mattered more than the 1.04× scale suggests:
+`_render_layer()` maps 0–1343 onto 0–1393, which moves the origin as well as
+scaling the art — a sticker's true position was **40px** from where its own
+file placed it. Position was implicitly defined by the resize.
 
-The one sticker that *is* 1393² — `Sweetardio_200 (30).png` — is the **softest
-of the class** (sharpness 0.178 against a class median of 0.317), so native
-resolution did not help it. That asset is soft in origin, not in handling.
+All 22 were normalised by baking that exact resize into the file. Verified by
+hashing every sticker's composited output before and after: **23 of 23 are
+byte-identical**, so there is no visual change — the sheet did not need
+re-rendering. What changed is that position and scale are now explicit in the
+art instead of emerging from a runtime resize, and the whole class conforms.
+
+No higher-resolution sticker sources exist, so there was no detail to recover;
+this is a hygiene fix, not a quality gain. `Sweetardio_200 (30).png` remains
+the softest of the class (0.178 against a 0.317 median) — soft in origin, not
+in handling.
+
+Every trait class is now on-spec: 129 assets at 1393² across characterz,
+skinz, eyez, mouthz, armz, what_are_thosez, stickerz and secret_rarez.
+`backgroundz` is the only class allowed to vary, since a plate is re-fit to the
+frame by design.
 
 ## 3. Two sabers carry colour under full transparency
 
@@ -134,9 +148,8 @@ ever re-graded.
 - **Face-hole edges.** 27 of 33 characters have perfectly anti-aliased face
   holes. The remaining 6 carry 21–89 hard-stepped pixels each — Nutty Bar is
   the worst at 89, out of roughly 800 boundary pixels. Negligible.
-- **Canvas hygiene.** Every character, skin, eye, mouth, arm, footwear and
-  secret-rare asset is exactly 1393 × 1393 RGBA. Only stickers and backgrounds
-  deviate.
+- **Canvas hygiene.** All 129 trait assets are exactly 1393 × 1393 RGBA across
+  every class. Only `backgroundz` varies, by design.
 - **Transparency.** No ghost colour anywhere except the two sabers above.
 - **Geometry.** Placement, scale and face-hole alignment verified separately by
   `verify_placement.py` — 33 characters, 55 placement cases, zero issues.

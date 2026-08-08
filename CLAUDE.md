@@ -31,7 +31,12 @@ Where this is already encoded:
 
 ## Canvas and face rule
 
-- Canvas is **1393 × 1393**.
+- Canvas is **1393 × 1393**, and **every trait asset must be authored at that
+  size**. `_render_layer()` silently resizes anything else, which scales the
+  art *and moves its origin* — a 1343 sticker landed 40px off from where its
+  file said. All 129 trait assets now conform; only `backgroundz` may vary,
+  since a plate is re-fit to the frame by design.
+  `asset_assessment/audit_art_quality.py` flags any deviation.
 - The skin ball, eyes and mouth composite at **fixed canvas positions**; the
   ball centre is ~(690, 601) and every character's face hole is drawn around
   it. Nothing moves to meet a layer that drifted, so footprints and positions
