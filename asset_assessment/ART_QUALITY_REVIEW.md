@@ -1,7 +1,7 @@
 # Sweetardio — Art Quality Review
 
 Measured with `asset_assessment/audit_art_quality.py` plus targeted checks, over
-all 33 characters, 3 skins, 11 eyes, 9 mouths, 16 arms, 11 footwear, 23 stickers,
+all 30 characters, 3 skins, 11 eyes, 9 mouths, 16 arms, 11 footwear, 23 stickers,
 69 background plates and the 23 secret-rare 1/1s — every asset in the
 collection.
 
@@ -89,21 +89,57 @@ this is a hygiene fix, not a quality gain. `Sweetardio_200 (30).png` remains
 the softest of the class (0.178 against a 0.317 median) — soft in origin, not
 in handling.
 
-Every trait class is now on-spec: 129 assets at 1393² across characterz,
+Every trait class is now on-spec: 126 assets at 1393² across characterz,
 skinz, eyez, mouthz, armz, what_are_thosez, stickerz and secret_rarez.
 `backgroundz` is the only class allowed to vary, since a plate is re-fit to the
 frame by design.
 
-## 3. Two sabers carry colour under full transparency
+## 3. Two sabers carry colour under full transparency — inert, left alone
 
 `Sweetardio_114 (5).png` (Pink Saber) and `(6).png` (Cyan Saber) have non-zero
 RGB in fully transparent pixels — mean 11.9 and 14.6, peaks at 255. The Blue
 Saber is cleaner at 7.5.
 
-Harmless under a straight alpha composite, but it is latent: any resampling
-mixes those pixels into neighbours. That now happens on **every ice cream and
-gummy bear**, whose arms are resampled by `cscale` (0.74 / 0.881). No visible
-fringe today; worth cleaning when the sabers are next touched.
+This was reported as latent risk, on the grounds that resampling would mix
+those pixels into their neighbours and that this happened on every ice cream
+and gummy bear whose arms took `cscale`. **Arms no longer take `cscale`** — they
+are authored to fixed sockets and render at native scale — and none of the
+three sabers appears in `ARM_SCALE`, so no saber is ever resampled. The ghost
+colour cannot reach a rendered pixel.
+
+`asset_assessment/clean_alpha.py` exists and will bleed the visible edge colour
+outward on demand (only alpha-0 pixels touched, composite asserted unchanged).
+It is deliberately not run here: its own metric *rises* on these files (7.5 →
+12.9), because the correct fill — the colour the edge already is — is brighter
+than the arbitrary residue it replaces. Cleaning an asset that is never
+resampled would trade a real, verified no-op for a worse-looking number.
+
+## 3a. The ice creams were replaced, and three flavours retired
+
+Five ice-cream bodies were regenerated and re-registered onto the canvas
+(`asset_assessment/register_character.py`, which pins the face hole to
+(690, 601)). They now draw **after** the skin ball, so the ball shows through
+the body's hole and the rim reads as a socket in the scoop.
+
+Two things about this belong in a quality review rather than a changelog:
+
+- **The proportion the regeneration was meant to fix did not move.** Face
+  position down the body went 0.33 → 0.344 against a cast median of 0.49, so
+  `CHAR_SCALE["ice_cream"] = 0.74` is still carrying the family onto the ground
+  line. What improved is the scoop's share of the silhouette and the face hole
+  (179–219px → ~257px, now in the doughnut/cookie band of 230–260). The full
+  measurement is in `CHARACTERZ_BODY_PROMPTS.md` §2.
+- **The source was a JPEG of the generator's preview**, with transparency
+  already flattened onto a grey/white checkerboard. It keys back out cleanly —
+  the checker is achromatic and two-valued, so a connected key plus an
+  un-premultiply against the checker level lifts it without a halo — but the
+  true anti-aliased alpha is gone and JPEG noise is baked into the edge. These
+  five are the only assets in the collection with that provenance, and they
+  should be re-registered from real PNGs if those ever arrive.
+
+Mint choc chip, zaffre sherbert and rainbow sherbert were not regenerated and
+were **retired from the trait set** rather than left visibly on older art beside
+five new bodies. Their files are kept in `characterz_originals/`.
 
 ## 4. The 1/1s are clean
 
@@ -141,18 +177,25 @@ ever re-graded.
 
 ## What is verified clean
 
-- **Lighting.** Zero of 33 characters violate the top-left key light. Skins
+- **Lighting.** Zero of 33 characters violated the top-left key light when the
+  cast was 33 strong. Skins
   measure 1.32–1.61 upper-left / lower-right limb luma — correctly keyed. (See
   the methodology note below: this only became a trustworthy result after the
   check was gated on albedo uniformity.)
-- **Face-hole edges.** 27 of 33 characters have perfectly anti-aliased face
-  holes. The remaining 6 carry 21–89 hard-stepped pixels each — Nutty Bar is
+- **Face-hole edges.** 27 of the 33 characters then in the set had perfectly
+  anti-aliased face holes. The remaining 6 carry 21–89 hard-stepped pixels each — Nutty Bar is
   the worst at 89, out of roughly 800 boundary pixels. Negligible.
-- **Canvas hygiene.** All 129 trait assets are exactly 1393 × 1393 RGBA across
-  every class. Only `backgroundz` varies, by design.
-- **Transparency.** No ghost colour anywhere except the two sabers above.
+- **Canvas hygiene.** Every trait asset is exactly 1393 × 1393 RGBA across every
+  class. Only `backgroundz` varies, by design.
+- **Transparency.** No ghost colour anywhere except the two sabers above, which
+  §3 shows cannot reach a rendered pixel. The OG Gummy Bear carried 217 stray
+  components — a column of debris off the body's right, part of it at alpha 1–8
+  and so invisible to an `alpha > 8` check but not to `getbbox()`, which read
+  the bear as 1014 × 1293 against a true 663 × 888 and drew it 35% small in any
+  fit-to-bbox render. Stripped; the bear now measures and renders with its
+  siblings.
 - **Geometry.** Placement, scale and face-hole alignment verified separately by
-  `verify_placement.py` — 33 characters, 55 placement cases, zero issues.
+  `verify_placement.py` — 30 characters, 52 placement cases, zero issues.
 
 ---
 
@@ -192,12 +235,14 @@ Not defects — judgement calls worth having an opinion on.
   than everything under it. This is exactly what `EYEZ_ENHANCE_PROMPTS.md` and
   `MOUTHZ_ENHANCE_PROMPTS.md` exist to address, and the trial run showed the
   treatment works.
-- **Ice cream and gummy-bear faces are now ~26% smaller** than the rest of the
-  cast, a consequence of the accepted `CHAR_SCALE` fix. Deliberate, but it is
-  the one place the collection's uniform face size no longer holds.
-- **Two cookies still sit high.** chocolate_chip_cookie −40px and
-  chocolate_sandwich_cookie −55px from canvas centre, the same issue the
-  doughnuts had. Pending a decision, tracked in `verify_placement.py`.
+- **Ice cream and gummy-bear faces are ~26% and ~12% smaller** than the rest of
+  the cast, a consequence of the accepted `CHAR_SCALE` fix. Deliberate, but it
+  is the one place the collection's uniform face size no longer holds. The
+  ice-cream regeneration did not recover it — see `CHARACTERZ_BODY_PROMPTS.md`
+  §2 — because the new bodies kept the old proportions.
+- **The cookies were centred** (`CENTERED_FOOTWEARLESS_DY` 72 / 90), closing the
+  same defect the doughnuts had. All seven centred-bare characters now sit
+  within 2px of canvas centre.
 
 ---
 
