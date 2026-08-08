@@ -1,11 +1,9 @@
 {
- "comment": "Skin rarity modeled on the reference collection's tiers: two dominant neutrals (White slightly > Black) then a sharp drop to rare specials, with Gold Foil the legendary. Weights are ~= target percent of the mint (they are normalised, so any positive scale works). Matched by case-insensitive substring of the skin filename; 'default' applies to an untagged skin.",
+ "comment": "Skin rarity modeled on the reference collection's tiers: two dominant neutrals (White slightly > Black) then a sharp drop to the rare Alien special. Weights are ~= target percent of the mint (they are normalised, so any positive scale works). Matched by case-insensitive substring of the skin filename; 'default' applies to an untagged skin. Fluorescent Cyan and Gold Foil were retired from the set; the remaining three keep their original ratio, rescaled to sum to 100.",
  "weights": {
-  "Gold": 0.7,
-  "Alien": 6,
-  "Cyan": 11,
-  "Black": 32,
-  "White": 49
+  "Alien": 7,
+  "Black": 37,
+  "White": 56
  },
  "default": 11
 }

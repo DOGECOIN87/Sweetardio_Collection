@@ -1,0 +1,402 @@
+# Skin Trait — AI Enhancement Prompts
+
+Paste-ready prompts for re-rendering each of the three **Skinz** assets in an AI
+image generator (ChatGPT / GPT Image) so they read as photoreal 3D — real form
+shadow, occlusion, rim light and micro-surface — instead of flat painted balls.
+
+**One skin per prompt. Attach that skin's original PNG with the prompt.**
+
+Companion sheet: `catalog/skinz_reference_sheet.png` (all three at 1:1).
+Companion docs: `EYEZ_ENHANCE_PROMPTS.md`, `MOUTHZ_ENHANCE_PROMPTS.md`.
+
+---
+
+## 1. What a "skin" actually is (why the prompts are shaped this way)
+
+The skin is the **face ball**. It is not a background element and it is never
+seen whole and unobstructed:
+
+- It sits in the **face hole** of the character body on a 1393×1393 canvas.
+- The pipeline **enlarges it 1.08–1.16×** at composite time (`ball_fit()` in
+  `generator.py`) so it always covers the deepest face hole and is wide enough
+  for the widest eyes.
+- **Eyes and mouth are composited on top of it** at fixed canvas positions.
+  Eyes are up to **288px wide**, centred about **30px above** the ball's
+  centre — nearly as wide as the ball itself.
+
+So after compositing, only about this much of the ball is actually visible:
+
+| Region | Visible | What it must carry |
+|--------|---------|--------------------|
+| Band above the eyes | ~50 px | the form turning away toward the top, ambient occlusion into the face hole |
+| Left / right margins | ~10–17 px each | the terminator and the rim light — this is where "3D" is won |
+| Lower third (around the mouth) | ~110 px | the bottom of the sphere falling into shadow, contact darkening |
+| Dead centre / upper middle | **hidden** | covered by the eyes — do not put the money detail here |
+
+That single fact drives every prompt below: **the modelling has to live at the
+rim, the top band and the lower third.** A gorgeous specular hotspot in the
+middle of the ball is wasted — the eyes cover it, and a bright blown-out patch
+there fights the eye art it shows through.
+
+---
+
+## 2. Geometry reference (measured from the current assets)
+
+Every enhanced skin has to land back on the same canvas footprint or the face
+will not line up with the eyes and the character's face hole.
+
+| Skin file | Ball W×H (px) | Ball centre (x, y) | Composite upscale |
+|-----------|--------------:|-------------------:|------------------:|
+| `layer-layer-layer-Skin_White (2).png` | 276 × 253 | (691, 598) | 1.134× |
+| `layer-Skin_Black (3).png` | 281 × 257 | (691, 599) | 1.114× |
+| `layer-Skin_Alien (2).png` | 269 × 248 | (689, 605) | 1.164× |
+
+Canvas is **1393 × 1393, fully transparent** outside the ball.
+
+---
+
+## 3. How to run these
+
+1. Open a **fresh chat per skin** — mixing them makes the model blend
+   materials. (To hand off all three in one go instead, use §4.4.)
+2. Attach **only** that skin's original PNG.
+3. Paste the prompt for that skin verbatim.
+4. Check the result against the acceptance list in §5 before keeping it.
+5. If it drifts (wrong shape, added face, new object), reply with the **retry
+   line** in §6 rather than re-rolling blind.
+
+The generator will most likely hand back a 1024×1024 image, not 1393×1393, and
+transparency is unreliable in the chat UI — that is expected and handled: each
+prompt includes a flat-green fallback, and the asset gets re-cut and re-centred
+to the numbers in §2 locally afterward.
+
+---
+
+## 4. The prompts
+
+### 4.1 — White (warm cream / vanilla fondant)
+
+```
+Re-render the attached image as a photorealistic 3D asset. It is a single
+trait layer from a 3D-rendered collectible series: a rounded "face ball" that
+gets composited into a hole in a character's body.
+
+Keep it the SAME object — same shape, same silhouette, same colour identity.
+This is a quality upgrade, not a redesign. Someone comparing before and after
+must see the same ball, rendered properly.
+
+MATERIAL: warm cream-beige confectionery — soft matte fondant or marzipan.
+Base tone #C9A176. Light-side tone around #DAB68B, shadow side around #B68E63,
+deepest occluded bottom edge around #6A4C2E. Give it gentle subsurface warmth
+so light bleeds slightly under the surface at the rim, plus a very fine
+powdered-sugar micro-grain across the form. Semi-matte: a soft broad sheen,
+never a glossy plastic highlight.
+
+FORM AND LIGHT:
+- Read as a slightly flattened sphere / domed disc, not a flat circle.
+- One soft key light from the upper left at about 45 degrees, with a cooler,
+  dimmer fill from the lower right.
+- A soft terminator where the form turns away, real ambient occlusion
+  darkening the lower and outer rim, and a subtle warm rim light catching the
+  lower-right edge to separate the ball from what sits behind it.
+- The strongest modelling must be at the RIM, the TOP BAND and the LOWER
+  THIRD of the ball. Keep the upper-middle area smooth, evenly lit and free of
+  any blown-out specular hotspot or busy texture.
+
+DO NOT:
+- Do not add eyes, a mouth, a nose, eyebrows, or any face. It must stay a
+  featureless ball — the face is composited on top later.
+- Do not add a background, backdrop, surface, table, or scene.
+- Do not add a cast shadow or drop shadow.
+- Do not add glow, bloom, or any halo outside the ball's outline.
+- Do not add text, logos, watermarks, or sparkles.
+- Do not change the hue family — it must stay warm cream-beige.
+- Do not change the outline shape or the width-to-height proportion.
+
+OUTPUT: the ball alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge with no fringe
+or matte line. If you cannot output true transparency, render it on a flat,
+uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
+colour spill onto the green.
+```
+
+### 4.2 — Black (dark milk chocolate)
+
+```
+Re-render the attached image as a photorealistic 3D asset. It is a single
+trait layer from a 3D-rendered collectible series: a rounded "face ball" that
+gets composited into a hole in a character's body.
+
+Keep it the SAME object — same shape, same silhouette, same colour identity.
+This is a quality upgrade, not a redesign. Someone comparing before and after
+must see the same ball, rendered properly.
+
+MATERIAL: rich dark milk chocolate, tempered and freshly moulded. Base tone
+#553C2B. Light-side tone around #5D4332, shadow side around #4A3323, deepest
+occluded bottom edge around #2D1D11. Semi-matte cocoa surface with a faint
+satin sheen — the low, wide sheen of set chocolate, not wet gloss. Add
+believable micro-detail: fine cocoa pitting and a barely-there mould texture,
+subtle enough that it reads as surface quality rather than noise.
+
+FORM AND LIGHT:
+- Read as a slightly flattened sphere / domed disc, not a flat circle.
+- One soft key light from the upper left at about 45 degrees, with a cooler,
+  dimmer fill from the lower right.
+- A soft terminator where the form turns away, real ambient occlusion
+  darkening the lower and outer rim, and a warm rim light catching the
+  lower-right edge so the dark ball still separates from a dark background.
+- The strongest modelling must be at the RIM, the TOP BAND and the LOWER
+  THIRD of the ball. Keep the upper-middle area smooth, evenly lit and free of
+  any blown-out specular hotspot or busy texture.
+- Do not let the shadow side crush to pure black — hold detail and colour in
+  the darks so the form still reads.
+
+DO NOT:
+- Do not add eyes, a mouth, a nose, eyebrows, or any face. It must stay a
+  featureless ball — the face is composited on top later.
+- Do not add a background, backdrop, surface, table, or scene.
+- Do not add a cast shadow or drop shadow.
+- Do not add glow, bloom, or any halo outside the ball's outline.
+- Do not add text, logos, watermarks, or sparkles.
+- Do not change the hue family — it must stay warm dark chocolate brown, not
+  neutral grey or black.
+- Do not change the outline shape or the width-to-height proportion.
+
+OUTPUT: the ball alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge with no fringe
+or matte line. If you cannot output true transparency, render it on a flat,
+uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
+colour spill onto the green.
+```
+
+### 4.3 — Alien (cool grey-blue matte)
+
+```
+Re-render the attached image as a photorealistic 3D asset. It is a single
+trait layer from a 3D-rendered collectible series: a rounded "face ball" that
+gets composited into a hole in a character's body.
+
+Keep it the SAME object — same shape, same silhouette, same colour identity.
+This is a quality upgrade, not a redesign. Someone comparing before and after
+must see the same ball, rendered properly.
+
+MATERIAL: cool grey-blue, smooth matte silicone or soft vinyl — the surface of
+a high-end designer toy. Base tone #A8B0B6. Light-side tone around #B2B8BF,
+shadow side around #9BA1A6, deepest occluded bottom edge around #646A6E. Give
+it a faint waxy sheen and a whisper of translucency at the rim, so the very
+edge picks up a slightly lighter, warmer glow where light passes through the
+thin part of the form. Surface should be almost flawless with only the
+faintest micro-texture.
+
+FORM AND LIGHT:
+- Read as a slightly flattened sphere / domed disc, not a flat circle.
+- One soft key light from the upper left at about 45 degrees, with a cooler,
+  dimmer fill from the lower right.
+- A soft, wide terminator suited to a matte surface, real ambient occlusion
+  darkening the lower and outer rim, and a clean rim light along the
+  lower-right edge.
+- The strongest modelling must be at the RIM, the TOP BAND and the LOWER
+  THIRD of the ball. Keep the upper-middle area smooth, evenly lit and free of
+  any blown-out specular hotspot or busy texture.
+
+DO NOT:
+- Do not add eyes, a mouth, a nose, eyebrows, or any face. It must stay a
+  featureless ball — the face is composited on top later.
+- Do not add a background, backdrop, surface, table, or scene.
+- Do not add a cast shadow or drop shadow.
+- Do not add glow, bloom, or any halo outside the ball's outline.
+- Do not add text, logos, watermarks, or sparkles.
+- Do not change the hue family — it must stay cool desaturated grey-blue, and
+  must not drift green, purple, or toward chrome.
+- Do not make it metallic or reflective.
+- Do not change the outline shape or the width-to-height proportion.
+
+OUTPUT: the ball alone, centred, on a fully transparent background, square
+canvas, highest resolution available. Crisp anti-aliased edge with no fringe
+or matte line. If you cannot output true transparency, render it on a flat,
+uniform pure green (#00FF00) field with absolutely no shadow, gradient, or
+colour spill onto the green.
+```
+
+### 4.4 — All three at once (hand off the reference sheet)
+
+`catalog/skinz_reference_sheet.png` shows all three balls **at 1:1**, so their
+real size differences and their non-circular proportions survive the handoff.
+Regenerate it with `python3 asset_assessment/render_ref_sheet.py skinz`.
+
+**Attach the sheet, paste this, and let it work through the list.** Ask for one
+image per ball — a generator asked to return all three in one picture gives
+back balls well under the ~292px native detail you already have, and then they
+have to be cut apart by hand. (If it returns a sheet anyway, see the extraction
+note at the end of this doc.)
+
+```
+The attached sheet shows three trait layers from a 3D-rendered collectible
+series. Each one is a "face ball" that gets composited into a hole in a
+character's body. I want each of them re-rendered as a photorealistic 3D
+object.
+
+Work through them ONE AT A TIME and return each as its own separate,
+full-size image — do not return a grid, sheet, or contact sheet.
+
+RULES THAT APPLY TO ALL THREE:
+- Keep the SAME object: same silhouette, same proportion, same colour
+  identity. This is a quality upgrade, not a redesign.
+- The balls are NOT circles and they are NOT all the same size. The sheet is
+  1:1 — match each one's width-to-height proportion exactly as shown.
+- Light: one soft key from the upper left at about 45 degrees, cooler dimmer
+  fill from the lower right. Same lighting for all three so they read as a set.
+- Put the strongest modelling at the RIM, the TOP BAND and the LOWER THIRD:
+  soft terminator, real ambient occlusion at the lower and outer rim, and a
+  rim light on the lower-right edge. Keep the upper-middle smooth and evenly
+  lit with no blown-out specular hotspot — a separate layer is composited over
+  that area later.
+- No eyes, no mouth, no nose, no face of any kind. These stay featureless.
+- No background, no surface, no scene, no cast shadow, no outer glow or halo,
+  no text, no watermark, no added sparkles.
+- Output each ball alone, centred, on a fully transparent background, with a
+  crisp anti-aliased edge and no colour fringe. If you cannot do true
+  transparency, use a flat pure green (#00FF00) field with no shadow,
+  gradient, or spill onto it.
+
+THE THREE:
+
+1. ALIEN — cool grey-blue, smooth matte silicone or soft vinyl, like a
+   high-end designer toy. Base #A8B0B6, lit #B2B8BF, shadow #9BA1A6, occluded
+   bottom #646A6E. Faint waxy sheen, a whisper of translucency at the rim.
+   Not metallic, not reflective, and must not drift green or purple. This is
+   the rarest of the three, so make it the most impressive render.
+
+2. BLACK — rich dark milk chocolate, tempered and freshly moulded. Base
+   #553C2B, lit #5D4332, shadow #4A3323, occluded bottom #2D1D11. Semi-matte
+   cocoa with a faint satin sheen, fine cocoa pitting. Hold detail in the
+   darks — do not crush the shadow side to black. Stays warm brown, not grey.
+
+3. WHITE — warm cream-beige confectionery, soft matte fondant or marzipan.
+   Base #C9A176, lit #DAB68B, shadow #B68E63, occluded bottom #6A4C2E. Gentle
+   subsurface warmth bleeding under the surface at the rim, very fine
+   powdered-sugar micro-grain, a soft broad sheen and never a glossy plastic
+   highlight.
+
+Start with number 1.
+```
+
+Even with the sheet attached, the single-skin prompts in §4.1–4.3 produce
+better results — they carry more direction per ball and give the model nothing
+else to dilute its attention. Use the sheet when you want all three to feel
+like one consistent set, or the single prompts when a particular skin needs
+work.
+
+---
+
+## 5. Acceptance checklist
+
+Reject and retry if any of these fail:
+
+- [ ] **No face.** No eyes, mouth, brows, or implied features anywhere on it.
+- [ ] **Same silhouette.** Outline matches the original; the ball has not
+      become rounder, taller, or narrower. Lay it over the original at 50%
+      opacity — the edges should track.
+- [ ] **Same colour identity.** Still reads as the trait its metadata name
+      claims (White / Black / Alien).
+- [ ] **Clean edge.** No baked drop shadow, no outer glow, no dark matte
+      fringe, no leftover backdrop colour in the anti-aliased pixels — any of
+      these show as a visible ring inside the character's face hole.
+- [ ] **Upper-middle is calm.** No blown-out highlight or busy texture where
+      the eyes land, ~30px above centre and up to 288px wide.
+- [ ] **Rim does the work.** Terminator, occlusion and rim light are legible in
+      the outer 15px, because that ring is most of what the viewer will see.
+- [ ] **Not flat.** Held at thumbnail size it reads as a sphere with a light
+      source, not a coloured circle.
+
+---
+
+## 6. Retry lines
+
+Append to the original prompt when an output misses:
+
+- **Wrong shape:** `The outline must match the attached image exactly — same
+  width, same height, same proportion. Overlay it on the original: the edges
+  must line up.`
+- **Added a face:** `Remove all facial features. This layer is a blank
+  featureless ball; the eyes and mouth are separate layers added later.`
+- **Went flat:** `Increase the sense of three-dimensional form: deepen the
+  shadow side, strengthen the ambient occlusion at the lower and outer rim,
+  and add a rim light on the lower-right edge. It must read as a sphere, not a
+  disc.`
+- **Hotspot in the middle:** `Move the specular highlight off the centre. Keep
+  the middle of the ball evenly lit — the brightest values belong at the upper
+  rim and the lower-right rim.`
+- **Background survived:** `Output the ball alone with a fully transparent
+  background — no backdrop, no surface, no shadow.`
+- **Colour drifted:** `Return to the original colour: <base hex from §2 table
+  for that skin>. Do not shift the hue.`
+
+---
+
+## 7. Getting the result back into the pipeline
+
+The generator's output will not be canvas-ready — expect ~1024×1024, and a
+green/magenta field instead of real transparency.
+`asset_assessment/register_trait.py` does the conversion:
+
+```bash
+python3 asset_assessment/register_trait.py enhanced.png "layer-Skin_Black (3).png" \
+    --preview /tmp/black_ab.png
+```
+
+It keys out the backdrop (auto-detecting green vs magenta), despills the colour
+that bled into the edge pixels, drops stray specks, crops to the ball, then
+resizes and pastes it onto a 1393×1393 transparent canvas at the target's exact
+footprint and centre — measured live from the file being replaced, so the table
+in §2 can never go stale. It writes to `output/skinz_registered/` and prints the
+result's size, centre drift and new `ball_fit` upscale. Pass `--replace` to
+write straight into `traits/skinz/`.
+
+Useful flags:
+
+| Flag | When |
+|------|------|
+| `--key green\|magenta\|none` | auto-detection guessed wrong |
+| `--tol` / `--soft` | backdrop survives (raise `--tol`) or the edge is eaten (lower it) |
+| `--fit contain` | the ball came back a different aspect and you would rather not stretch it — watch the reported `ball_fit`, a narrower ball gets blown up harder at composite |
+| `--shrink 1` | a one-pixel halo survives keying |
+| `--preview PATH` | before/after side by side on neutral gray |
+
+Two things the script will not do for you:
+
+1. **Keep the filename identical.** `traits/skin_weights.json` matches rarity by
+   case-insensitive substring of the filename, and `TRAIT_NAMES` in
+   `generator.py` maps the filename to the display name in token metadata.
+   Renaming a skin silently changes both its rarity and its metadata value.
+2. **Verify in a real render before committing:**
+   ```bash
+   python3 asset_assessment/render_sample_sheet.py --n 25 --cols 5 --cell 500 \
+       --out /tmp/skin_check.png
+   ```
+   Check the faces across characters — especially an `after_skinz` body like
+   `brownie_bite` or `rice_crispy_treat`, whose face hole is deepest and will
+   expose any gap, halo, or off-centre ball immediately.
+
+### If the generator returns the whole SHEET instead of separate images
+
+It usually will, when handed the reference sheet. The result is flat RGB with
+the matte and chrome baked in, reflowed to whatever aspect ratio the model
+outputs. `asset_assessment/extract_sheet.py` recovers canvas-ready assets:
+
+```bash
+python3 asset_assessment/extract_sheet.py returned_sheet.png skinz --debug
+cp output/skinz_enhanced/*.png traits/skinz/
+```
+
+It takes the **shape** from the original asset's alpha and the **texture**
+from the enhanced art, which is what the pipeline needs: exact footprint and
+position, no matte fringe, and any drift in the model's outline corrected
+rather than inherited. Keying the matte out instead does not work here — a
+mid-gray backdrop sits inside the tonal range of the skin balls' shadow side
+and the Cyborg eye's metal bezel, and punches holes straight through them.
+
+The run prints how far each asset's aspect drifted. Under about 10%, the
+transplant is invisible. Past roughly 15–20%, correcting the proportion pulls
+hard internal detail out of register with its own silhouette — regenerate
+those individually rather than salvaging them.
