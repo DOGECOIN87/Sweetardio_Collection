@@ -1337,8 +1337,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     return layers, char_name
 
 def _render_layer(layer_info):
-    """Load a layer and apply all of its geometric transforms (fscale, cscale,
-    ascale, then the footwear-less offset + per-character dy). Returns a
+    """Load a layer and apply all of its geometric transforms (fscale, ascale,
+    cscale, then the footwear-less offset + per-character dy). Returns a
     full-canvas RGBA image, or None if the file is missing. No shadow is
     applied here — shadows are handled by the compositor stages."""
     layer_path = layer_info["path"]
@@ -1352,12 +1352,18 @@ def _render_layer(layer_info):
 
     if abs(layer_info.get("fscale", 1.0) - 1.0) > 0.001:
         img = scale_about(img, layer_info["fscale"], layer_info["fcenter"])
-    # per-character enlargement about the ball center (body + arms)
-    if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
-        img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
-    # per-arm intrinsic scale about the hand line (oversized arm art)
+    # Per-arm intrinsic scale about the hand line, BEFORE cscale. ARM_SCALE_PIVOT
+    # is the hand line in the art's NATIVE space, and cscale moves it (a 0.74
+    # character puts its hands at y=926, not 1040). Scaling about the stale pivot
+    # afterwards left the weapon off the hands by (1-ascale) x the displacement:
+    # 17px on the old 1.19 bears, 23px on a 0.74 ice cream. Applying it first
+    # keeps the pivot valid, and cscale then carries the result with the body.
+    # Only affects arms with an ARM_SCALE entry (today: the dual Uzis).
     if abs(layer_info.get("ascale", 1.0) - 1.0) > 0.001:
         img = scale_about(img, layer_info["ascale"], layer_info["acenter"])
+    # per-character scale about the ball center (body + arms + ball + face)
+    if abs(layer_info.get("cscale", 1.0) - 1.0) > 0.001:
+        img = scale_about(img, layer_info["cscale"], layer_info["ccenter"])
 
     # vertical placement: footwear-less offset rule + per-character trim
     dy = (VERTICAL_OFFSET if layer_info["offset"] else 0) + layer_info.get("dy", 0)
