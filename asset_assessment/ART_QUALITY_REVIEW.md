@@ -1,8 +1,9 @@
 # Sweetardio — Art Quality Review
 
 Measured with `asset_assessment/audit_art_quality.py` plus targeted checks, over
-all 33 characters, 3 skins, 11 eyes, 9 mouths, 16 arms, 11 footwear, 23 stickers
-and 69 background plates.
+all 33 characters, 3 skins, 11 eyes, 9 mouths, 16 arms, 11 footwear, 23 stickers,
+69 background plates and the 23 secret-rare 1/1s — every asset in the
+collection.
 
 `ASSESSMENT.md` measures colour and composition for grading decisions. This
 asks a narrower question: **is any asset technically substandard, and does the
@@ -90,6 +91,38 @@ mixes those pixels into neighbours. That now happens on **every ice cream and
 gummy bear**, whose arms are resampled by `cscale` (0.74 / 0.881). No visible
 fringe today; worth cleaning when the sabers are next touched.
 
+## 4. The 1/1s are clean
+
+All **23 secret rares** pass every check: 1393 × 1393 RGBA, fully opaque,
+no ghost colour, no stray specks. These mint standalone and are the most
+valuable tokens in the set, so it is worth stating plainly — there is nothing
+to fix here.
+
+Two were flagged `SOFT` (`Secret_Milk_Dunk`, `Secret_Unicorn_Twinkie`) and both
+are false. Rendered at 1:1 the Oreo embossing and the Twinkie's crumb texture
+are crisp; the metric is depressed by large flat areas in their compositions —
+a black ground and a bokeh backdrop respectively. Same failure mode the `SOFT`
+flag showed elsewhere: it tracks how much of the frame is smooth, not how much
+real detail the art carries.
+
+## 5. Background softness is deliberate, with one to watch
+
+Beyond resolution, 25 plates flag `SOFT` — but backgrounds are *supposed* to be
+soft, defocused so the character reads on top of them. The class spans a huge
+range of real detail (0.82 to 31.1 gradient energy, median 4.19), which is what
+you would expect from a deliberate depth-of-field treatment.
+
+The three softest were checked individually: `Flavor_Explosion` (atmospheric
+blur behind a silhouette), `Sugar` (shallow-DOF product shot, sharp at the top
+of frame) and `Graham` (a plain cracker-texture backdrop). All three are native
+1393² with no sharper source, and all read as intentional. None shows the tell
+that gave `Empty_Fridge` away — soft art *with* a sharp original sitting
+unused.
+
+`Graham` at 0.82 is the softest real plate in the collection, five times below
+the median. Not a defect, but the one to revisit first if the backdrops are
+ever re-graded.
+
 ---
 
 ## What is verified clean
@@ -101,8 +134,9 @@ fringe today; worth cleaning when the sabers are next touched.
 - **Face-hole edges.** 27 of 33 characters have perfectly anti-aliased face
   holes. The remaining 6 carry 21–89 hard-stepped pixels each — Nutty Bar is
   the worst at 89, out of roughly 800 boundary pixels. Negligible.
-- **Canvas hygiene.** Every character, skin, eye, mouth, arm and footwear asset
-  is exactly 1393 × 1393 RGBA. Only stickers and backgrounds deviate.
+- **Canvas hygiene.** Every character, skin, eye, mouth, arm, footwear and
+  secret-rare asset is exactly 1393 × 1393 RGBA. Only stickers and backgrounds
+  deviate.
 - **Transparency.** No ghost colour anywhere except the two sabers above.
 - **Geometry.** Placement, scale and face-hole alignment verified separately by
   `verify_placement.py` — 33 characters, 55 placement cases, zero issues.
