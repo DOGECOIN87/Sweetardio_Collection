@@ -173,7 +173,6 @@ TRAIT_NAMES = {
         "chocolate_sandwich_cookie":        "Chocolate Sandwich Cookie",
         "churro":                           "Churro",
         "cyan_frosted_poptart":             "Cyan Frosted Pop Tart",
-        "cyan_gummy_bear":                  "Cyan Gummy Bear",
         "cyan_sherbert_ice_cream":          "Cyan Sherbert Ice Cream",
         "ding_dong":                        "Ding Dong",
         "glazed_doughnut":                  "Glazed Doughnut",
@@ -184,9 +183,7 @@ TRAIT_NAMES = {
         "oatmeal_cream_pie":                "Oatmeal Cream Pie",
         "og_gummy_bear":                    "OG Gummy Bear",
         "og_poptart":                       "OG Pop Tart",
-        "pink_gummy_bear":                  "Pink Gummy Bear",
         "pink_sherbert_ice_cream":          "Pink Sherbert Ice Cream",
-        "purple_gummy_bear":                "Purple Gummy Bear",
         "rice_crispy_treat":                "Rice Crispy Treat",
         "rocky_road_ice_cream":             "Rocky Road Ice Cream",
         "smores":                           "S'mores",
@@ -650,12 +647,9 @@ CHAR_Y_ADJUST = {
     "brownie_bite": 22,
     "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
                                # stance is held put by FOOTWEARLESS_DY
-    "cyan_gummy_bear": 43,     # rescaled; feet on the shared ground line (1111)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
-    "purple_gummy_bear": 47,    # rescaled; feet on the shared ground line (1111)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": 50,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
     "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # rescaled; feet on the shared ground line (1111)
