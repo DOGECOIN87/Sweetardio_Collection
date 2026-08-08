@@ -687,7 +687,9 @@ THE HOLE, stated again because it is what these attempts get wrong: it is bored
 through the bear's HEAD, where a face would go — not through its chest, not
 through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
 character's total width, and roughly the same as the distance between the two
-ear buttons.
+ear buttons. Err on the SMALL side rather than the large: a cartoon face drops
+into the hole later and its eyes are meant to spill slightly over the rim, which
+only works while the hole stays modest.
 
 THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
 with the hole in the chest underneath. If you can fit a whole blank head in
@@ -766,7 +768,9 @@ THE HOLE, stated again because it is what these attempts get wrong: it is bored
 through the bear's HEAD, where a face would go — not through its chest, not
 through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
 character's total width, and roughly the same as the distance between the two
-ear buttons.
+ear buttons. Err on the SMALL side rather than the large: a cartoon face drops
+into the hole later and its eyes are meant to spill slightly over the rim, which
+only works while the hole stays modest.
 
 THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
 with the hole in the chest underneath. If you can fit a whole blank head in
@@ -845,7 +849,9 @@ THE HOLE, stated again because it is what these attempts get wrong: it is bored
 through the bear's HEAD, where a face would go — not through its chest, not
 through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
 character's total width, and roughly the same as the distance between the two
-ear buttons.
+ear buttons. Err on the SMALL side rather than the large: a cartoon face drops
+into the hole later and its eyes are meant to spill slightly over the rim, which
+only works while the hole stays modest.
 
 THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
 with the hole in the chest underneath. If you can fit a whole blank head in
@@ -925,7 +931,9 @@ THE HOLE, stated again because it is what these attempts get wrong: it is bored
 through the bear's HEAD, where a face would go — not through its chest, not
 through its belly, and NOT below a head. Its diameter is about ONE THIRD of the
 character's total width, and roughly the same as the distance between the two
-ear buttons.
+ear buttons. Err on the SMALL side rather than the large: a cartoon face drops
+into the hole later and its eyes are meant to spill slightly over the rim, which
+only works while the hole stays modest.
 
 THE COMMON MISTAKE, so you can avoid it: drawing a large round head at the top
 with the hole in the chest underneath. If you can fit a whole blank head in
