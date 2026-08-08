@@ -71,7 +71,86 @@ This is the same path the doughnuts and cookies take (`body_after_skin()` in
 `generator.py`), so no new mechanism was needed; the `after_skinz_` filename
 prefix is the whole switch.
 
-## 4. Ice cream — the spec and the prompt
+## 4a. Ice cream v2 — the cone is the whole problem
+
+Measured on the delivered art, the scoop is **already correct** and the face is
+**already centred in it**. The face-frac of 0.344 comes from one thing:
+
+| | px | share of body |
+|---|---:|---:|
+| Scoop | 720 tall × 813 wide | 66% |
+| Cone | 369 tall | 34% |
+| Hole centre, measured down the **scoop** | 375 of 720 | **0.52 — dead centre** |
+| Hole centre, measured down the **body** | 375 of 1089 | 0.344 |
+
+So nothing about the scoop or the hole needs to change. **Shorten the cone from
+369px to ~120px** — a shallow wafer cup instead of a tall cone — and the
+arithmetic does the rest:
+
+| Cone | Body | Face-frac |
+|---:|---|---:|
+| 369 (today) | 813 × 1089 | 0.344 |
+| 160 | 813 × 880 | 0.426 |
+| **120** | **813 × 840** | **0.446** |
+| 100 | 813 × 820 | 0.457 |
+
+At 120px the body is 813 × 840 — near enough square, and in the same size band
+as the cast's 700 × 747 median with the face at 0.446 against the cast's 0.49.
+Close enough that **`CHAR_SCALE["ice_cream"]` can be deleted entirely** and the
+family runs at native size, which is what makes them read bigger.
+
+Worth being straight about the ceiling: a scoop-on-a-cone cannot reach 0.49
+while it still has a cone. With the hole centred in the scoop, face-frac =
+(S/2)/(S+C), so 0.49 needs the cone to be ~4% of the scoop — i.e. no cone at
+all. 0.45 with a shallow cup is the honest target, and it sits between the
+doughnuts (0.49, because a ring's hole is its centre) and the gummy bears
+(0.384), both of which read fine.
+
+### The v2 prompt
+
+Attach **the current art for that flavour** as the reference — this is a
+targeted edit, not a fresh generation, and everything above the cone should
+survive it.
+
+```
+Edit this ice cream character. Keep the scoop EXACTLY as it is — same shape,
+same size, same surface, same colour, same lighting, and the same round hole
+punched through it in the same place. Change one thing only:
+
+REPLACE THE TALL CONE WITH A SHALLOW WAFER CUP.
+
+- The cone is currently about a third of the character's total height. It
+  should be about an EIGHTH — a squat, flat-bottomed wafer cup that the scoop
+  sits down into, not a cone the scoop perches on top of.
+- Keep the golden waffle lattice texture and the same width where the scoop
+  meets it. Just remove almost all of its height.
+- Result: the finished character should be about as tall as it is wide, and the
+  hole should end up close to the middle of its total height instead of a third
+  of the way down. That is the entire point of this edit.
+
+Keep everything else identical:
+- Same key light from the UPPER LEFT at about 45 degrees, cooler fill from the
+  lower right, deepest occlusion lower-right and under the cup's rim.
+- The hole stays a real hole, punched right THROUGH the scoop, fully
+  transparent inside, with its inner wall lit to match. No eyes, no mouth, no
+  facial features.
+- No background, no surface, no table, no cast shadow, no drop shadow.
+- No sprinkles, spoons, cherries, text or logos.
+- Photorealistic 3D confectionery render throughout — it has to sit beside
+  photoreal cookies and doughnuts as if shot in the same studio.
+
+OUTPUT: the character alone, centred, on a fully transparent background,
+square canvas, highest resolution available. Crisp anti-aliased edge, no
+colour fringe, no matte line. Deliver the PNG file itself, with real alpha —
+not a screenshot or a preview of it.
+```
+
+Apply it to all five: vanilla, neapolitan, rocky road, cyan sherbert, pink
+sherbert. Then re-register (§7), **delete the `ice_cream` entry from
+`CHAR_SCALE`**, and re-derive `CHAR_Y_ADJUST` — every one of those five values
+is tuned to the current 1089px body and will be wrong for an 840px one.
+
+## 4. Ice cream v1 — the spec and the prompt
 
 Non-negotiable, because the compositor pins the face:
 
