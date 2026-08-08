@@ -1165,6 +1165,29 @@ Two things worth knowing before regenerating it:
   1.0. None of that needs changing if the new body keeps roughly the current
   proportions.
 
+
+### What came back, and why the prompt changed
+
+| | current art | returned render | verdict |
+|---|---:|---:|---|
+| Aspect (H / W) | 1.99 | **2.75** | too slender |
+| Seam position across the bar | **58%** | **41%** | mirrored |
+| Left-edge / right-edge luma | **1.58** | 1.17 | key light weakened by the mirror |
+| Hole width | 267 | **181** | far too small |
+| Hole / bar width | 0.57 | **0.40** | far too small |
+| Median eye / hole | 1.04 | **1.54** | eyes would overshoot the rim |
+
+The seam is the clean tell on orientation: it sits at 58% across in the art that
+works and 41% in the render, which is a mirror. That also costs the lighting —
+turning the bar the other way puts the wide receding panel on the shadow side,
+dropping left/right luma from 1.58 to 1.17.
+
+**The small hole is a hard blocker, not a preference.**
+`register_character.py` scales incoming art until the hole is the cast's 248px,
+and from 181px that is a 1.37x enlargement — which takes the body to
+623 x 1717 on a 1393 canvas. It does not fit; the bar is clipped top and bottom.
+A bigger hole is the only thing that makes the art usable at all.
+
 ### The standalone prompt
 
 Fully assembled: no reference image, no placeholder, nothing to paste together.
@@ -1174,41 +1197,49 @@ Create a single 3D-rendered chocolate wafer bar character on a transparent
 background.
 
 Think of it as a chocolate-coated wafer bar MOULDED WITH A HOLE THROUGH IT — a
-solid bar of candy with a clean opening bored front-to-back, the way a
+solid bar of candy with a big clean opening bored front-to-back, the way a
 bar-shaped pendant is made. The hole is the character's defining feature, not a
 detail. A cartoon face is composited into it later, so it must be left empty.
 
 THE OBJECT: a tall rectangular chocolate-coated wafer bar standing UPRIGHT on
 its short end, like a Nutty Buddy or a chocolate-dipped wafer stick. It is made
-of TWO wafer sticks pressed together side by side, so a shallow groove runs
-straight down the middle of the face. The whole surface is enrobed in milk
-chocolate and embossed with a crisp diamond waffle lattice. The corners and
-edges are softly rounded, the way moulded chocolate is.
+of TWO wafer sticks pressed together side by side, so a seam runs straight down
+the face. The whole surface is enrobed in milk chocolate and embossed with a
+crisp diamond waffle lattice. The corners and edges are softly rounded, the way
+moulded chocolate is.
+
+WHICH WAY IT FACES — get this right, it is easy to mirror by mistake:
+- Nearly front-on, turned only a FEW degrees, so the bar reads as a solid object
+  with real thickness rather than a flat card.
+- Turned so the LEFT-HAND panel is the wider, more face-on one. The seam between
+  the two sticks should sit slightly RIGHT of centre — roughly 58% of the way
+  across the bar — with the right-hand panel narrower and receding.
+- Any visible side face showing the bar's thickness is NARROW and on the RIGHT.
+- The left half of the finished bar must be visibly BRIGHTER than the right
+  half. If the right side is the wide, well-lit one, the image is mirrored.
+- Do not lie it down. Do not tilt it. Do not show it at a dramatic angle.
 
 BUILD THE SILHOUETTE FROM THE TOP DOWN. Take the total height as 100%:
 
-  0-30%    the upper bar: flat chocolate face, waffle lattice, centre groove.
-  30-52%   THE HOLE, centred left to right. Its centre lands at about 41% of
-           the total height — a little above the middle.
-  52-100%  the lower bar, continuing the same lattice and groove down to a
-           flat base it stands on.
+  0-30%    the upper bar: chocolate face, waffle lattice, seam.
+  30-52%   THE HOLE. Its centre lands at about 41% of the total height —
+           noticeably above the middle, not at the middle.
+  52-100%  the lower bar, continuing the same lattice and seam down to a flat
+           base it stands on.
 
-  The bar is TALL and NARROW — about TWICE as tall as it is wide. This is the
-  most slender character in the set and it should read that way.
+  The bar is TALL and NARROW — about TWICE as tall as it is wide, and no more.
+  Two-and-a-half or three times as tall is too thin.
 
-THE HOLE: a clean opening punched right THROUGH the bar, fully transparent
-inside, centred horizontally. It is round, or a very slightly wide oval, and
-about HALF the bar's width — err on the SMALL side rather than the large,
-because a cartoon face drops into it later and its eyes are meant to spill
-slightly over the rim, which only works while the hole stays modest. Give it a
-visible inner wall showing the bar's thickness and the paler wafer inside the
-chocolate shell, lit consistently with the rest of the bar. No eyes, no mouth,
-no facial features of any kind — the hole is empty.
-
-VIEWPOINT: front-on, standing upright, turned just a few degrees so one side
-edge is visible and the bar reads as a solid object with real thickness rather
-than a flat card. Do not lie it down, do not tilt it, do not show it at a
-dramatic angle.
+THE HOLE — make it BIG. This is the part most likely to come back too small:
+- Its width is about 55% of the bar's width. It is a large opening that removes
+  most of the middle of the bar, leaving only a fairly thin frame of chocolate
+  down each side. It should look like a bar with a big window through it, not a
+  bar with a small porthole.
+- Round, or a very slightly wide oval. Centred left to right on the bar.
+- Fully transparent inside, with a visible inner wall showing the bar's
+  thickness and the paler wafer layers inside the chocolate shell, lit
+  consistently with the rest of the bar.
+- No eyes, no mouth, no facial features of any kind — the hole is empty.
 
 STYLE: photorealistic 3D confectionery product render — the look of a premium
 food photograph, with real material, real chocolate sheen and real
@@ -1219,14 +1250,20 @@ same studio.
 LIGHTING: one soft key light from the UPPER LEFT at about 45 degrees, with a
 cooler, dimmer fill from the lower right. Specular highlights along the
 upper-left edge and on the raised lattice ridges; the deepest occlusion down
-the lower-right edge and inside the groove, with a rim light picking the
+the lower-right edge and inside the seam, with a rim light picking the
 right-hand edge back out.
 
-DO NOT: do not lay the bar flat or tilt it. Do not draw a bite mark, a
-wrapper, a split, or crumbs. Do not add a background, surface, table or scene —
-the character floats alone. Do not add a cast shadow or drop shadow. Do not add
-a face, eyes or a mouth. Do not add nuts, drizzle, text or logos. Do not add
-glow, bloom or a halo outside the silhouette.
+CHECK BEFORE YOU FINISH:
+- Is the left half brighter and wider than the right half? It must be.
+- Is the hole at least half the width of the bar? It must be.
+- Is the bar about twice as tall as it is wide, not three times?
+
+DO NOT: do not mirror the bar so the right side is the wide one. Do not lay it
+flat or tilt it. Do not draw a bite mark, a wrapper, a split, or crumbs. Do not
+add a background, surface, table or scene — the character floats alone. Do not
+add a cast shadow or drop shadow. Do not add a face, eyes or a mouth. Do not
+add nuts, drizzle, text or logos. Do not add glow, bloom or a halo outside the
+silhouette.
 
 OUTPUT: the character alone, centred, on a fully transparent background, square
 canvas, highest resolution available. Crisp anti-aliased edge, no colour
