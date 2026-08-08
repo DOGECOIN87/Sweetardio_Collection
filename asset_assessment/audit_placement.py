@@ -21,7 +21,9 @@ Alignment targets (from the owner-approved batches):
     inside the approved 1084-1109 ground band
   * fixed characters (NO_OFFSET_CHARS, e.g. churro/twinkie/bears):
     bottom -> GROUND_FIXED (1111, the churro line)
-  * ice creams: cone tip -> GROUND_CONE (1290, the family majority)
+  * ice creams / gummy bears: cone tip and feet -> GROUND_CONE (1111),
+    the same line the fixed characters use, now that CHAR_SCALE has
+    brought both families down to the rest of the cast's size
 
 Owner-tuned values are kept verbatim (poptart -65, twinkie +45: the owner
 asked for deliberate overshoot) — listed in KEEP_OWNER_TUNED.
@@ -46,7 +48,9 @@ BALL_CENTER = (690, 601)
 HOLE_TOL = 40          # px; face hole farther than this from the ball = flag
 GROUND_STAND = 957     # standing bottom for offset-eligible characters
 GROUND_FIXED = 1111    # standing bottom for NO_OFFSET characters (churro line)
-GROUND_CONE = 1290     # ice-cream cone tip line
+GROUND_CONE = 1111     # ice-cream cone tip line — since the ice creams
+                       # were rescaled to cast size (CHAR_SCALE 0.74) their
+                       # tips share the ground line with everyone else
 DY_MIN = 12            # trims smaller than this are noise; omit from table
 
 KEEP_OWNER_TUNED = {"poptart": -65, "twinkie": 45}
@@ -142,9 +146,8 @@ def main():
                         round(py + f * (hole[1] - py)))
         bottom = round(bbox[3])
         no_off = any(k.lower() in name.lower() for k in g.NO_OFFSET_CHARS)
-        # gummy bears are enlarged to the ice-cream size and share the same
-        # bottom line (the cone line ~1290), so they fill the frame like the
-        # ice creams rather than floating high at the churro line.
+        # gummy bears are scaled to the ice-cream size and share the same
+        # bottom line, so the two families read as one.
         if "ice_cream" in name.lower() or "gummy_bear" in name.lower():
             target, mode = GROUND_CONE, "cone"
         elif no_off:

@@ -584,9 +584,9 @@ NO_OFFSET_CHARS = [
     "twinkie",
     "nutty_bar",
     "churro",
-    # bears are CHAR_SCALE-enlarged and aligned to the ice-cream cone line
-    # (1290) via CHAR_Y_ADJUST; NO_OFFSET so the +150 footwear-less drop
-    # never disturbs that placement
+    # bears are CHAR_SCALE-adjusted and aligned to the ice-cream family's
+    # ground line (1111) via CHAR_Y_ADJUST; NO_OFFSET so the +150
+    # footwear-less drop never disturbs that placement
     "gummy_bear",
     # NOTE: smores used to live here (full +150 drop was too low) but bare it
     # then sat too HIGH. It is now offset-eligible with a SOFTENED footwear-less
@@ -632,13 +632,14 @@ def is_centered(char_name):
 # asset_assessment/audit_placement.py (main-body bottoms, sparkle-proof):
 # standing characters align to bottom 957 (-> 1107 with the footwear-less
 # drop, inside the approved 1084-1109 ground band), NO_OFFSET characters
-# to the churro line (1111), ice-cream cone tips to 1290.
+# to the churro line (1111), and ice-cream cone tips / gummy-bear feet to
+# that same 1111 line now that CHAR_SCALE brings both down to cast size.
 # poptart/twinkie keep their owner-tuned overshoot values (2026-06).
 CHAR_Y_ADJUST = {
     "poptart": -65,
     "twinkie": 45,
-    "pink_sherbert_ice_cream": -57,
-    "rainbow_sherbert_ice_cream": -57,
+    "pink_sherbert_ice_cream": -42,
+    "rainbow_sherbert_ice_cream": -42,
     "chocolate_sandwich_cookie": 50,
     "sugar_cube": 42,
     "gold_waffle": -18,        # measured separately from the plain waffle; the
@@ -646,21 +647,21 @@ CHAR_Y_ADJUST = {
                                # claims it and lifts it 20px too high
     "waffle": -38,
     "ding_dong": 34,
-    "og_gummy_bear": 44,      # bears enlarged + aligned to the cone line (1290)
+    "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
-    "zaffre_sherbert_ice_cream": -25,
+    "zaffre_sherbert_ice_cream": -18,
     "brownie_bite": 22,
     "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
                                # stance is held put by FOOTWEARLESS_DY
-    "cyan_gummy_bear": 58,     # enlarged + aligned to the cone line (1290)
+    "cyan_gummy_bear": 43,     # rescaled; feet on the shared ground line (1111)
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
-    "purple_gummy_bear": 63,    # enlarged + aligned to the cone line (1290)
+    "purple_gummy_bear": 47,    # rescaled; feet on the shared ground line (1111)
     "oatmeal_cream_pie": 14,
-    "pink_gummy_bear": 68,
+    "pink_gummy_bear": 50,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # enlarged + aligned to the cone line (1290)
+    "nutty_bar": -19,          # bar body, stands with the Twinkie at 1132     # rescaled; feet on the shared ground line (1111)
 }
 
 def char_y_adjust(char_name):
@@ -735,7 +736,16 @@ def footwearless_dy(char_name):
 # scale-aware so the feet still land on the ground line.
 CHAR_SCALE_PIVOT = (690, 601)   # == audit_placement.BALL_CENTER
 CHAR_SCALE = {
-    "gummy_bear": 1.19,   # -> ~789px wide, matching the ice-cream family
+    # The ice creams were 43% taller than the rest of the cast (1067px vs a
+    # 743px median) and their cone tips sat ~180px BELOW the ground band every
+    # other character stands on, so they read oversized and broke the floor.
+    # 0.74 brings the body to cast height and the cone tip onto the band.
+    "ice_cream": 0.74,
+    # The bears had been scaled UP to 1.19 to match the old, oversized
+    # ice-cream family, so they inherited the same problem. 0.881 puts their
+    # feet on the same line as the rescaled cone tips and their width (581px)
+    # alongside the rescaled ice creams (582px), keeping the two a family.
+    "gummy_bear": 0.881,
 }
 
 def char_scale(char_name):
@@ -1280,11 +1290,19 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 4. After-skinz body layers (above skin ball — face hole reveals skin)
     layers.extend(after_char_layers)
 
-    # 6. Eyez (original size and placement)
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+    # 6/7. Eyez and Mouthz. These carry cscale too, about the same pivot as the
+    # body and ball. Leaving them native only works while CHAR_SCALE enlarges:
+    # shrink a character and a native-size eye (up to 288px) overflows the
+    # scaled-down ball (313px * 0.74 = 232px) and spills onto the body. Scaling
+    # the whole face with the character keeps the eye-in-ball relationship that
+    # ball_fit establishes, at any scale in either direction.
+    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye),
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
+                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
 
-    # 7. Mouthz
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth), "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
+                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
 
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
     # so a held weapon (katana/knives) reads on top of the slippers instead

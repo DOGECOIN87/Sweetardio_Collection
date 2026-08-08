@@ -57,15 +57,18 @@ from audit_placement import char_table, measure, BALL_CENTER  # noqa: E402
 # they just do not fail the run, so the exit status stays meaningful.
 WAIVED = {
     ("chocolate_sandwich_cookie", "vertical"):
-        "two-part asset: the back wafer sits lower than the front disc, so the "
-        "bbox reads ~56px low. CHAR_Y_ADJUST +50 aligns the FRONT disc with its "
-        "peers — confirmed by render.",
+        "PENDING a decision, not a false positive: its centre sits ~55px above "
+        "the canvas centre, the same way the doughnuts did before they were "
+        "corrected. Left alone because only the doughnuts were asked for. (Its "
+        "footwear case is separately skewed by the two-part asset: the back "
+        "wafer sits lower than the front disc that carries the face.)",
     ("chocolate_sandwich_cookie", "horizontal"):
         "same two-part asset: the back wafer sits left of the front disc, so the "
         "bbox centre reads ~54px left. The face-carrying disc is on the column.",
     ("chocolate_chip_cookie", "vertical"):
-        "26px above the centred group's median, and that group floats by design "
-        "rather than touching a floor — reads consistently with its peers.",
+        "PENDING a decision, not a false positive: its centre sits ~40px above "
+        "the canvas centre, the same way the doughnuts did before they were "
+        "corrected. Left alone because only the doughnuts were asked for.",
 }
 
 
@@ -151,6 +154,7 @@ def main():
                 "name": name, "case": case, "dy": dy,
                 "group": group_of(name, case),
                 "bottom": round(bbox[3]) + dy,
+                "cy": round((bbox[1] + bbox[3]) / 2) + dy,
                 "cx": round((bbox[0] + bbox[2]) / 2),
                 "hole": hole,
             })
@@ -160,12 +164,24 @@ def main():
     print("=" * 78)
     print("VERTICAL — final composited bottom, by placement path")
     print("=" * 78)
+    canvas_cy = g.CANVAS_SIZE // 2
     for grp in sorted({r["group"] for r in rows}):
         members = [r for r in rows if r["group"] == grp]
-        med = statistics.median(r["bottom"] for r in members)
-        print(f"\n{grp}  ({len(members)} characters, median bottom {med:.0f})")
-        for r in sorted(members, key=lambda r: r["bottom"]):
-            d = r["bottom"] - med
+        # Characters that STAND are judged on a shared bottom line. Ones that
+        # FLOAT are judged on their centre against the canvas centre: matching
+        # bottoms across different body sizes pushes the biggest bodies high,
+        # which is exactly how the oversized doughnuts passed this check.
+        # only the BARE centred case floats; "centred, on gorbhouse"
+        # stands on the gorbhouse and is judged on a bottom line
+        floats = grp == "centred, bare"
+        key = "cy" if floats else "bottom"
+        med = canvas_cy if floats else statistics.median(
+            r["bottom"] for r in members)
+        label = (f"centre vs canvas centre {med:.0f}" if floats
+                 else f"median bottom {med:.0f}")
+        print(f"\n{grp}  ({len(members)} characters, {label})")
+        for r in sorted(members, key=lambda r: r[key]):
+            d = r[key] - med
             mark = ""
             if abs(d) > args.tol:
                 w = waiver(r["name"], "vertical")
@@ -175,8 +191,8 @@ def main():
                 else:
                     mark = "   <== OFF GROUP"
                     flagged.append((r, med, d))
-            print(f"   {r['name']:32s} dy {r['dy']:+5d}  bottom {r['bottom']:5d}"
-                  f"  {d:+6.0f}{mark}")
+            print(f"   {r['name']:32s} dy {r['dy']:+5d}  "
+                  f"{key} {r[key]:5d}  {d:+6.0f}{mark}")
 
     # ── horizontal: bodies must stay on the face column ─────────────────
     print("\n" + "=" * 78)
@@ -229,9 +245,9 @@ def main():
     print(f"  horizontal drift   : {len(xbad)}")
     print(f"  face-hole drift    : {len(holebad)}")
     for r, med, d in flagged:
-        print(f"\n  {r['name']} [{r['case']}] sits at {r['bottom']}, "
-              f"{abs(d):.0f}px {'below' if d > 0 else 'above'} its group's "
-              f"{med:.0f}")
+        print(f"\n  {r['name']} [{r['case']}] sits {abs(d):.0f}px "
+              f"{'below' if d > 0 else 'above'} where its group sits "
+              f"({med:.0f})")
 
     if waived:
         print(f"\n  waived ({len({(n, c) for n, c, _ in waived})} confirmed "
