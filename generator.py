@@ -684,13 +684,17 @@ def char_y_adjust(char_name):
 # across different sizes pushes the biggest bodies high: the doughnuts are the
 # largest rings, so a shared bottom left their mass ~55px above canvas centre
 # while ding_dong (a smaller ring, tuned by eye) sat dead centre. Values below
-# put each body's centre on the canvas centre line (y=696).
+# put each body's centre on the canvas centre line (y=696). Chosen over
+# aligning the face HOLE to centre, which the cookies showed diverging by up to
+# 26px: hole-alignment drops the green centre line through the eyes, while
+# bbox-alignment keeps it just under the face the way the rest of the group
+# reads.
 CENTERED_FOOTWEARLESS_DY = {
     "glazed_doughnut": 99,        # was 45, centre sat 54px high
     "chocolate_doughnut": 93,     # was 38, centre sat 55px high
     "sugar_doughnut": 93,         # was 38, centre sat 55px high
-    "chocolate_sandwich_cookie": 35,
-    "chocolate_chip_cookie": 32,
+    "chocolate_sandwich_cookie": 90,  # was 35, centre sat 90px high
+    "chocolate_chip_cookie": 72,      # was 32, centre sat 72px high
     "oatmeal_cream_pie": 80,
     "ding_dong": 94,       # was the only CENTERED character with no entry, so
                            # it floated ~94px above its ring/disc peers when
@@ -1322,7 +1326,14 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 10. Armz (after ALL footwear overlays — WAT and gorbhouse — so a held
     # katana/knife reads on top of the footwear; tracks the character's scale)
     if arm:
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
+        # Arms deliberately do NOT take cscale. A weapon is a rarity trait, and
+        # a Blue Saber should read as the same object whoever holds it — when
+        # arms inherited the character scale, the sabers on the ice creams and
+        # gummy bears (0.74 / 0.881) came out visibly smaller than the same
+        # saber on everyone else. Native size keeps the trait consistent across
+        # the mint; the slightly oversized fists on a small character read as
+        # cartoon, not as an error.
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 11. Sticker
     if sticker:
