@@ -50,12 +50,60 @@ Special cases (automatic): `Whitehouse_Lawn_Overlay.png` is 1 %-opaque →
 tone ops only, no spatial ops; alpha channels are passed through untouched;
 the one JPG source is written as PNG.
 
+## Phase 3 — the two gaps grading alone could not close
+
+**1. Twelve plates had never been graded.** `traits/backgroundz` had drifted to
+69 plates while the logs covered 50, and a pixel diff against
+`backgroundz_originals` showed 14 of the unlogged 19 were graded (just missing
+log rows) — but **12 had no original preserved at all**, which is also why they
+had never been regraded: they were the only copy. They measured as the sharpest
+plates in the set (edge 16–24 against a graded family topping out near 16), and
+they looked it: the Liberty coin, the sheet of hundreds and the gravestones
+rendered at full contrast with the character sitting flat on top of them.
+
+They are now copied into `traits/backgroundz_originals/` **first** (so the
+operation is reversible like every other plate) and then graded with `--only`,
+logged to `PHASE3_GRADE_LOG.md`. The approved 50 were not touched — see the
+non-determinism note at the end of `ULTIMATE_GRADE_LOG.md`.
+
+**2. A plate can only be graded as a whole; the pocket the character stands in
+is a composite-time problem.** Grading does not know where the body will land,
+so a plate that is quiet at the frame and busy dead-centre still competes with
+the body in front of it. `generator.SUBJECT_SEPARATION` adds a silhouette-driven
+pass in `create_image()` (see `_subject_separation`), between the character
+build and the grounding shadow:
+
+- a **wide** recession field — the silhouette blurred to 170px and gained so it
+  is at full strength on the silhouette's edge — inside which the plate is
+  defocused, desaturated and dimmed;
+- a **tight** occlusion band hugging the silhouette, offset down and right
+  because the key light comes from the top left (`CLAUDE.md`).
+
+Its strength is **adaptive**, measured per token on the annulus of plate the
+character does not cover, because a fixed amplitude is wrong in both
+directions — rendered as a ladder, `Toasted` still lost to its own marshmallows
+at the setting that already smudged `Celestial` into a grey cloud.
+
+The competition metric is a **band-pass**, `|blur(8) − blur(40)|`. The first
+metric tried was plain gradient energy at 4px, which ranked `Celestial` the
+7th busiest plate in the collection because it was reading the plate's film
+grain — grain is not what the eye compares a doughnut against. Band-passed,
+`Celestial` drops to 2.6 (second quietest, and the pass correctly leaves it
+alone) while `Toasted` rises to 17.4. Ramp: off at 2.5, full at 14.0.
+
+The background overlays in `BG_OVERLAY_PAIRS` are composited *after* the
+character and are deliberately untouched — they are foreground, not stage.
+Cost is +0.16s per token (1.15s → 1.31s). Set `SUBJECT_SEPARATION = None` to
+disable.
+
 ## Results
 
 - Plate family converges: mean L 13–144 → 33–136 (std 33→24), mean S
   0.00–0.93 → 0.06–0.67 (std 0.24→0.16), temp −84…+50 → −68…+32.
 - Cast-wide stress test (`asset_assessment/verify_separation.py`, 49 cast
-  entries × 34 plates): weak-separation pairings **37 → 15**, remaining ones
+  entries × every plate): weak-separation pairings **73 → 15** across the full
+  69-plate set after Phase 3 (was 37 → 15 over the 34 plates graded at the
+  time). Remaining ones
   are borderline dark-pixel HSV artifacts dominated by the documented gummy
   worm tradeoff (its body lives in the stage corridor; saturation contrast
   carries it — see `samples/verify_Sweetardio_115_1.png`).

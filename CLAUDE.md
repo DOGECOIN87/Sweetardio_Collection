@@ -24,6 +24,10 @@ Where this is already encoded:
   ("top-left light, lower-edge falloff") and the limb-luma ratios that prove it
   across the skin balls.
 
+- `SUBJECT_SEPARATION` in `generator.py` — the occlusion band that separates
+  the character from the plate is offset **down and right**, for the same
+  reason the cast shadow is.
+
 - `GROUND_SHADOW` in `generator.py` — the cast shadow is offset per mode:
   `drop_dx`/`drop_dy` push the floating characters' shadow down and to the
   right at 45°, while the contact pool keeps `dx: 0` because a pool sits under
@@ -116,6 +120,24 @@ substring of `gold_waffle`, which is exactly how the waffle spent a long time
 rendering the gold waffle's body (with its own placement tables applied to it,
 leaking a 132×31 hole through its face) while `after_skinz_waffle.png` was
 never drawn at all.
+
+## Backgrounds are a two-stage problem
+
+The plates are graded as a family by `background_pop_studies/grade.py`
+(cool / desaturated / mid-key, out of the characters' hue bands), and every
+plate in `traits/backgroundz` must have its ungraded source preserved in
+`traits/backgroundz_originals` — **copy it there before you touch it**, or it
+can never be regraded. Twelve plates were the only copy of themselves for a
+whole phase, which is exactly why they stayed ungraded and razor-sharp.
+
+Grading is global, so it cannot know where the body lands.
+`SUBJECT_SEPARATION` in `generator.py` closes that half at composite time,
+opening a defocused / desaturated / dimmed pocket in the plate around the
+silhouette plus a tight occlusion band on its edge. Its strength is measured
+per token from a **band-pass** (`|blur(8) − blur(40)|`) on the ring of plate
+the character does not cover — a plain high-pass reads film grain and ranks
+smooth plates as busy. Never make it a fixed amplitude: the setting a busy
+plate needs turns a quiet one into a grey cloud.
 
 ## Verification tools
 

@@ -907,6 +907,60 @@ GROUND_SHADOW = {
     "ground_line": 1053,
 }
 
+# Subject separation ("stage pocket"). Grading the plates as a family
+# (background_pop_studies/grade.py) can only push the WHOLE plate back; it
+# cannot know where the character will land, so a plate that is quiet in the
+# corners and busy dead-centre still fights the body it is standing in front
+# of. This pass runs at composite time, where the silhouette IS known, and
+# opens a pocket in the plate around the character:
+#
+#   wide    an atmospheric-recession field, the silhouette blurred out to
+#           `wide_blur` px, gained so it is already at full strength on the
+#           silhouette's edge and falls to nothing by the frame. Inside it the
+#           plate is defocused, desaturated and dimmed, so detail and colour
+#           recede exactly where the eye compares them against the body.
+#   tight   a short-range occlusion band hugging the silhouette, which is what
+#           actually crisps the edge. Offset DOWN AND RIGHT because the
+#           collection's key light comes from the top left (see CLAUDE.md), so
+#           it reads as the body's own occlusion rather than a sticker glow.
+#
+# Both fields are derived from the same silhouette the grounding shadow uses,
+# so they follow footwear, arms and per-character placement for free. The
+# background overlays (BG_OVERLAY_PAIRS) are composited after the character
+# and are deliberately NOT touched — they are foreground, not stage.
+# Set to None to disable the pass entirely.
+# How hard the pass works is NOT fixed: it scales with how much the plate
+# actually competes, measured on the ring of plate the character does not
+# cover. A fixed amplitude is wrong in both directions — rendered as a ladder,
+# a busy plate (Toasted) still lost to its own marshmallows at the setting
+# that already smudged a quiet one (Celestial) into a grey cloud.
+#
+# The competition metric is a BAND-PASS, |blur(8) - blur(40)|, not a plain
+# high-pass: the first metric tried was gradient energy at 4px, which ranked
+# Celestial the 7th busiest plate in the set because it read the plate's film
+# grain. Grain is not what the eye compares a doughnut against; mid-scale
+# structure is. Band-passed, Celestial drops to 2.6 (second quietest) and
+# Toasted rises to 17.4, which is what the renders show.
+SUBJECT_SEPARATION = {
+    "wide_blur": 170,     # px; radius of the recession field
+    "wide_gain": 2.3,     # saturates the field at the silhouette edge
+    "defocus": 6.0,       # px of extra blur at full strength
+    "sat": 0.70,          # chroma multiplier at full strength
+    "dim": 0.86,          # luma multiplier at full strength
+    "tight_blur": 26,     # px; radius of the occlusion band
+    "tight_gain": 1.5,
+    "tight_dx": 11,       # top-left key -> occlusion falls down and right
+    "tight_dy": 11,
+    "tight_opacity": 0.34,
+    # the occlusion band never reads as a cloud, so it keeps a floor even on
+    # a plate that needs no recession at all
+    "tight_floor": 0.35,
+    "band_lo": 8,         # band-pass radii, in px
+    "band_hi": 40,
+    "busy0": 2.5,         # band-pass mean at/below which the pass is OFF
+    "busy1": 14.0,        # ...and at/above which it runs at full strength
+}
+
 _bbox_cache = {}
 
 def _opaque_bbox(path, thresh=128):
@@ -1452,6 +1506,88 @@ def _ground_shadow(sil_alpha, cfg):
     return shadow
 
 
+def _subject_separation(bg_img, sil_alpha, cfg):
+    """Open a stage pocket in the background plate around the character.
+
+    Takes the composited background (full-canvas RGBA) and the character
+    silhouette, and returns a NEW background with the plate defocused,
+    desaturated and dimmed behind the subject, plus a short-range occlusion
+    band hugging its edge. See SUBJECT_SEPARATION for what each knob does.
+
+    Runs before the grounding shadow and the character, so the pocket is
+    under both; nothing here can ever draw over the foreground."""
+    from PIL import ImageChops, ImageEnhance, ImageFilter, ImageStat
+    if sil_alpha.getbbox() is None:
+        return bg_img
+
+    def _field(radius, gain, dx=0, dy=0):
+        """Silhouette -> a 0..255 falloff field. The gain is what puts full
+        strength ON the silhouette edge: a plain blur is only ~50% there,
+        which spends the whole effect inside the body, where it is hidden."""
+        src = sil_alpha
+        if dx or dy:
+            src = Image.new("L", sil_alpha.size, 0)
+            src.paste(sil_alpha, (dx, dy))
+        f = src.filter(ImageFilter.GaussianBlur(radius))
+        if abs(gain - 1.0) > 0.001:
+            f = f.point(lambda v: min(255, int(v * gain)))
+        return f
+
+    out = bg_img
+    alpha = out.getchannel("A")
+    wide = _field(cfg["wide_blur"], cfg.get("wide_gain", 1.0))
+
+    # ---- how much does this plate actually compete? ----
+    # Measured on the annulus (the lit field minus the silhouette), i.e. only
+    # the plate the character does NOT cover — the pixels the eye compares it
+    # against. Everything below scales with the result.
+    annulus = ImageChops.subtract(wide, sil_alpha)
+    if annulus.getbbox() is None:
+        return bg_img
+    grey = out.convert("L")
+    band = ImageChops.difference(
+        grey.filter(ImageFilter.GaussianBlur(cfg.get("band_lo", 8))),
+        grey.filter(ImageFilter.GaussianBlur(cfg.get("band_hi", 40))))
+    busy = ImageStat.Stat(band, annulus).mean[0]
+    b0, b1 = cfg.get("busy0", 2.5), cfg.get("busy1", 14.0)
+    t = min(1.0, max(0.0, (busy - b0) / max(b1 - b0, 1e-6)))
+    amount = t * t * (3.0 - 2.0 * t)          # smoothstep
+
+    # ---- wide: atmospheric recession (defocus + desaturate + dim) ----
+    defocus = cfg.get("defocus", 0.0) * amount
+    sat = 1.0 - (1.0 - cfg.get("sat", 1.0)) * amount
+    dim = 1.0 - (1.0 - cfg.get("dim", 1.0)) * amount
+    recessed = out
+    if defocus > 0.05:
+        recessed = recessed.filter(ImageFilter.GaussianBlur(defocus))
+    if abs(sat - 1.0) > 0.001:
+        recessed = ImageEnhance.Color(recessed).enhance(sat)
+    if abs(dim - 1.0) > 0.001:
+        recessed = ImageEnhance.Brightness(recessed).enhance(dim)
+    if recessed is not out:
+        # GaussianBlur/Enhance drop the plate's own alpha into the blur; put
+        # the original back so a transparent plate stays transparent.
+        recessed.putalpha(alpha)
+        out = Image.composite(recessed, out, wide)
+
+    # ---- tight: occlusion band, offset for the top-left key ----
+    floor = cfg.get("tight_floor", 0.0)
+    op = cfg.get("tight_opacity", 0.0) * (floor + (1.0 - floor) * amount)
+    if op > 0.005:
+        band = _field(cfg["tight_blur"], cfg.get("tight_gain", 1.0),
+                      int(cfg.get("tight_dx", 0)), int(cfg.get("tight_dy", 0)))
+        band = band.point(lambda v: int(v * op))
+        # never darken past the plate's own coverage (overlay plates are
+        # mostly transparent and must not gain a black cloud)
+        band = ImageChops.multiply(band, alpha)
+        occl = Image.new("RGBA", bg_img.size, (0, 0, 0, 255))
+        occl.putalpha(band)
+        out = out.copy()
+        out.alpha_composite(occl)
+
+    return out
+
+
 def create_image(layers, output_name=None, metadata=None):
     """Composite all layers and write the PNG.
     If metadata is provided (a list of {"trait_type", "value"} dicts as
@@ -1526,6 +1662,12 @@ def create_image(layers, output_name=None, metadata=None):
         fg_mask = ImageChops.lighter(fg_mask, alpha)
         if not (exclude_arms and _is_arm(layer_info)):
             sil_alpha = ImageChops.lighter(sil_alpha, alpha)
+
+    # 3a. Subject separation: push the plate back around the silhouette. Must
+    #     run before the grounding shadow, so the shadow lands on the pocket
+    #     rather than being defocused and dimmed by it.
+    if SUBJECT_SEPARATION:
+        base_img = _subject_separation(base_img, sil_alpha, SUBJECT_SEPARATION)
 
     # 3. Grounding shadow derived from the silhouette, onto the background.
     if GROUND_SHADOW:
