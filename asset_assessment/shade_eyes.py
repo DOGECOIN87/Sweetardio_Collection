@@ -114,6 +114,35 @@ PRESET = {
     "lens_rim": 0.20,    # darken each lens's own rim, so it reads rounded
 }
 
+# Per-asset multiplier on the lens terms. One global strength was wrong: the
+# assets differ in what they ALREADY are, so the same bead that rescues a flat
+# cartoon eye doubles a highlight that was painted in, or puts a wet streak on
+# a brow that is not an eyeball at all.
+#
+# An attempt to decide this by measurement failed and is worth recording: the
+# obvious signal, "fraction of near-white pixels", ranks Googly / Side Eye /
+# Clueless highest at ~0.47-0.49 -- but that is their white SCLERA, not a
+# catchlight, and those three are precisely the flat ones that need the gloss
+# most. A catchlight is small and compact; a sclera is most of the asset. The
+# numbers said the exact opposite of the renders, so these are set by eye.
+#
+#   1.0   flat cartoon eyes, nothing painted in -- the gloss is the whole point
+#   0.45  anime eyes that already carry a painted triangle catchlight; a full
+#         bead gives them a competing second highlight
+#   0.35  brows, which are line art rather than eyeballs
+#   0.0   art that is already rendered as a glossy 3D object, where the bead
+#         only adds glare on top of a specular that is already there
+LENS_SCALE = {
+    "layer-Sweetardio_nft (15).png": 0.0,                        # Alien
+    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.0,   # Cyborg
+    "layer-art_mattrick_011.png": 0.35,                          # Beady
+    "layer-file_00000000a21871f894573a9d4ee67519 (2).png": 0.35,  # Smug
+    "Blue.png": 0.45,
+    "Cerise.png": 0.45,
+    "layer-Eyes_Cyan (1).png": 0.45,                             # Cyan
+    # Googly, Side Eye and Clueless default to 1.0
+}
+
 
 def sstep(a, b, x):
     t = np.clip((x - a) / (b - a), 0.0, 1.0)
@@ -129,6 +158,16 @@ def ball_normals(shape):
     r2 = nx * nx + ny * ny
     nz = np.sqrt(np.clip(1.0 - r2, 0.0, 1.0))
     return np.stack([nx, ny, nz], axis=-1), np.sqrt(np.clip(r2, 0.0, 1.0))
+
+
+def preset_for(filename, base=None):
+    """PRESET with this asset's LENS_SCALE applied to the lens terms."""
+    p = dict(base or PRESET)
+    s = LENS_SCALE.get(filename, 1.0)
+    if s != 1.0:
+        for k in ("lens", "lens_tight", "lens_rim"):
+            p[k] = p[k] * s
+    return p
 
 
 def relight(img, p):
@@ -230,7 +269,7 @@ def render_ladder(out_path):
     for r, fn in enumerate(files):
         src = Image.open(os.path.join(EYE_DIR, fn)).convert("RGBA")
         for c, (name, p) in enumerate(variants):
-            im = src if p is None else relight(src, p)
+            im = src if p is None else relight(src, preset_for(fn, p))
             crop = im.crop((BALL_CX - 160, BALL_CY - 150,
                             BALL_CX + 160, BALL_CY + 90))
             plate = Image.new("RGBA", crop.size, (196, 166, 132, 255))
@@ -252,7 +291,7 @@ def apply():
         if not os.path.exists(bak):
             shutil.copy2(src, bak)
         img = Image.open(bak).convert("RGBA")
-        out = relight(img, PRESET)
+        out = relight(img, preset_for(fn))
         assert np.array_equal(np.asarray(img)[..., 3],
                               np.asarray(out)[..., 3]), f"{fn}: alpha changed"
         out.save(src)

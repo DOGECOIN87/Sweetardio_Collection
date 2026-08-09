@@ -28,7 +28,8 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
   "Celestial.png": [
-   "Blue.png"
+   "Blue.png",
+   "Cerise.png"
   ],
   "Cereal_Killer.png": [
    "Blue.png",
@@ -127,25 +128,25 @@
  },
  "weights": {
   "Abduction.png": {
-   "Cerise.png": 0.747
+   "Cerise.png": 0.742
   },
   "Ayotollah.png": {
-   "Blue.png": 0.894,
-   "Cerise.png": 0.798,
+   "Blue.png": 0.895,
+   "Cerise.png": 0.803,
    "layer-Eyes_Cyan (1).png": 0.947,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.947
   },
   "Baked.png": {
-   "Blue.png": 0.976,
-   "Cerise.png": 0.84,
+   "Blue.png": 0.977,
+   "Cerise.png": 0.845,
    "layer-Eyes_Cyan (1).png": 0.923,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.932
   },
   "Bored_Apes.png": {
-   "Cerise.png": 0.783
+   "Cerise.png": 0.778
   },
   "Bouquet_Drip.png": {
-   "Cerise.png": 0.793
+   "Cerise.png": 0.784
   },
   "Bubble_Trouble.png": {
    "layer-Eyes_Cyan (1).png": 0.768,
@@ -153,139 +154,138 @@
   },
   "Cabaret_Alley.png": {
    "Blue.png": 0.091,
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.544,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.406
   },
   "Candy_Tundra.png": {
-   "Cerise.png": 0.685
+   "Cerise.png": 0.677
   },
   "Celestial.png": {
-   "Cerise.png": 0.541,
    "layer-Eyes_Cyan (1).png": 0.732,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.722
   },
   "Cereal_Killer.png": {
-   "Cerise.png": 0.727
+   "Cerise.png": 0.725
   },
   "Choco_Falls.png": {
-   "Blue.png": 0.92,
-   "Cerise.png": 0.804,
+   "Blue.png": 0.921,
+   "Cerise.png": 0.81,
    "layer-Eyes_Cyan (1).png": 0.932,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.941
   },
   "Coder_Chick.png": {
-   "Blue.png": 0.916,
-   "Cerise.png": 0.717,
+   "Blue.png": 0.917,
+   "Cerise.png": 0.724,
    "layer-Eyes_Cyan (1).png": 0.955,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.962
   },
   "Cookboy.png": {
-   "Cerise.png": 0.71,
+   "Cerise.png": 0.703,
    "layer-Eyes_Cyan (1).png": 0.646,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.579
   },
   "Cookboy_Black_Enamel.png": {
    "Blue.png": 0.091,
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.463,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.3
   },
   "Cookboy_Chocolate.png": {
-   "Blue.png": 0.945,
-   "Cerise.png": 0.806,
+   "Blue.png": 0.947,
+   "Cerise.png": 0.811,
    "layer-Eyes_Cyan (1).png": 0.958,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967
   },
   "Cookboy_Gold.png": {
-   "Blue.png": 0.979,
-   "Cerise.png": 0.841,
+   "Blue.png": 0.98,
+   "Cerise.png": 0.846,
    "layer-Eyes_Cyan (1).png": 0.924,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933
   },
   "Cookboy_Silver.png": {
    "Blue.png": 0.091,
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.461,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.291
   },
   "Crumble_Trail.png": {
-   "Blue.png": 0.94,
-   "Cerise.png": 0.804,
+   "Blue.png": 0.941,
+   "Cerise.png": 0.809,
    "layer-Eyes_Cyan (1).png": 0.955,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.963
   },
   "Drained_The_Swamp.png": {
-   "Blue.png": 0.85,
-   "Cerise.png": 0.839,
+   "Blue.png": 0.851,
+   "Cerise.png": 0.844,
    "layer-Eyes_Cyan (1).png": 0.869,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.848
   },
   "Druski.png": {
-   "Blue.png": 0.782,
-   "Cerise.png": 0.758,
+   "Blue.png": 0.786,
+   "Cerise.png": 0.757,
    "layer-Eyes_Cyan (1).png": 0.94,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.941
   },
   "Emblem.png": {
-   "Blue.png": 0.185,
-   "Cerise.png": 0.744,
+   "Blue.png": 0.183,
+   "Cerise.png": 0.739,
    "layer-Eyes_Cyan (1).png": 0.56,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.485
   },
   "Empty_Fridge.png": {
-   "Blue.png": 0.96,
-   "Cerise.png": 0.838,
+   "Blue.png": 0.961,
+   "Cerise.png": 0.844,
    "layer-Eyes_Cyan (1).png": 0.91,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.918
   },
   "Flavor_Explosion.png": {
-   "Blue.png": 0.938,
-   "Cerise.png": 0.798,
+   "Blue.png": 0.939,
+   "Cerise.png": 0.803,
    "layer-Eyes_Cyan (1).png": 0.958,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967
   },
   "Goo_Lagoon.png": {
-   "Blue.png": 0.885,
-   "Cerise.png": 0.977,
+   "Blue.png": 0.884,
+   "Cerise.png": 0.982,
    "layer-Eyes_Cyan (1).png": 0.758,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.775
   },
   "Graham.png": {
-   "Blue.png": 0.979,
-   "Cerise.png": 0.841,
+   "Blue.png": 0.98,
+   "Cerise.png": 0.846,
    "layer-Eyes_Cyan (1).png": 0.924,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.933
   },
   "Gummy_Bears.png": {
-   "Blue.png": 0.594,
+   "Blue.png": 0.595,
    "layer-Eyes_Cyan (1).png": 0.717,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.705
   },
   "He_Needs_Some_Milk.png": {
-   "Blue.png": 0.407,
-   "Cerise.png": 0.724,
+   "Blue.png": 0.406,
+   "Cerise.png": 0.718,
    "layer-Eyes_Cyan (1).png": 0.606,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.545
   },
   "Hurshey.png": {
-   "Blue.png": 0.945,
-   "Cerise.png": 0.799,
+   "Blue.png": 0.946,
+   "Cerise.png": 0.805,
    "layer-Eyes_Cyan (1).png": 0.958,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967
   },
   "Im_Not_Sorry.png": {
-   "Blue.png": 0.908,
-   "Cerise.png": 0.758,
+   "Blue.png": 0.909,
+   "Cerise.png": 0.764,
    "layer-Eyes_Cyan (1).png": 0.991,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 1.0
   },
   "Legendary_Just_Aliens.png": {
-   "Cerise.png": 0.745,
+   "Cerise.png": 0.74,
    "layer-Eyes_Cyan (1).png": 0.585
   },
   "Legendary_Opengotchi.png": {
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.741,
    "layer-Eyes_Cyan (1).png": 0.595
   },
   "Legendary_Simplex.png": {
@@ -293,40 +293,40 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.648
   },
   "Legendary_Tenders.png": {
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.59
   },
   "M&Ms.png": {
    "layer-Eyes_Cyan (1).png": 0.7,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.664
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.665
   },
   "Mars_Overlay.png": {
-   "Cerise.png": 0.714,
+   "Cerise.png": 0.708,
    "layer-Eyes_Cyan (1).png": 0.653,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.637
   },
   "Midnight_Snack (1).png": {
-   "Blue.png": 0.908,
-   "Cerise.png": 0.781,
+   "Blue.png": 0.909,
+   "Cerise.png": 0.788,
    "layer-Eyes_Cyan (1).png": 0.95,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.957
   },
   "Nabisco.png": {
-   "Blue.png": 0.863,
-   "Cerise.png": 0.795,
+   "Blue.png": 0.864,
+   "Cerise.png": 0.801,
    "layer-Eyes_Cyan (1).png": 0.93,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.908
   },
   "Neon_Backroom.png": {
-   "Cerise.png": 0.669
+   "Cerise.png": 0.66
   },
   "Neon_Strip.png": {
    "layer-Eyes_Cyan (1).png": 0.664,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.634
   },
   "Pink_Abyss.png": {
-   "Blue.png": 0.843,
-   "Cerise.png": 0.698,
+   "Blue.png": 0.844,
+   "Cerise.png": 0.703,
    "layer-Eyes_Cyan (1).png": 0.942,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.932
   },
@@ -335,147 +335,147 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.793
   },
   "Psychedelics.png": {
-   "Blue.png": 0.784,
-   "Cerise.png": 0.794,
+   "Blue.png": 0.785,
+   "Cerise.png": 0.799,
    "layer-Eyes_Cyan (1).png": 0.93,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.904
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.905
   },
   "RIP_Gorbagana.png": {
-   "Blue.png": 0.933,
-   "Cerise.png": 0.909,
+   "Blue.png": 0.932,
+   "Cerise.png": 0.914,
    "layer-Eyes_Cyan (1).png": 0.837,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.845
   },
   "Smuckers_Blue.png": {
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.547
   },
   "Snack_Pack.png": {
-   "Blue.png": 0.967,
-   "Cerise.png": 0.839,
+   "Blue.png": 0.968,
+   "Cerise.png": 0.844,
    "layer-Eyes_Cyan (1).png": 0.922,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.929
   },
   "Starburst.png": {
-   "Blue.png": 0.808,
-   "Cerise.png": 0.606,
+   "Blue.png": 0.809,
+   "Cerise.png": 0.656,
    "layer-Eyes_Cyan (1).png": 0.908,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.898
   },
   "Store.png": {
-   "Cerise.png": 0.675,
+   "Cerise.png": 0.667,
    "layer-Eyes_Cyan (1).png": 0.686,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.64
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.641
   },
   "Straight_of_America (1).png": {
-   "Blue.png": 0.22,
-   "Cerise.png": 0.783,
+   "Blue.png": 0.218,
+   "Cerise.png": 0.777,
    "layer-Eyes_Cyan (1).png": 0.218,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.198
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.199
   },
   "Sugar.png": {
-   "Cerise.png": 0.747
+   "Cerise.png": 0.742
   },
   "Sweet_Castle_2.png": {
-   "Cerise.png": 0.678
+   "Cerise.png": 0.667
   },
   "Sweet_Shop.png": {
-   "Blue.png": 0.945,
-   "Cerise.png": 0.805,
+   "Blue.png": 0.947,
+   "Cerise.png": 0.81,
    "layer-Eyes_Cyan (1).png": 0.958,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967
   },
   "Sweetardio (16).png": {
-   "Cerise.png": 0.73
+   "Cerise.png": 0.723
   },
   "Sweetardio.png": {
-   "Blue.png": 0.917,
-   "Cerise.png": 0.804,
+   "Blue.png": 0.918,
+   "Cerise.png": 0.809,
    "layer-Eyes_Cyan (1).png": 0.939,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.944
   },
   "Sweetardio_116 (20).png": {
-   "Cerise.png": 0.8,
+   "Cerise.png": 0.805,
    "layer-Eyes_Cyan (1).png": 0.89,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.863
   },
   "Tampa_Bay_Pete.png": {
    "Blue.png": 0.091,
-   "Cerise.png": 0.701,
+   "Cerise.png": 0.691,
    "layer-Eyes_Cyan (1).png": 0.573,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.506
   },
   "The_Set.png": {
-   "Blue.png": 0.916,
-   "Cerise.png": 0.801,
+   "Blue.png": 0.917,
+   "Cerise.png": 0.806,
    "layer-Eyes_Cyan (1).png": 0.935,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.943
   },
   "Toasted.png": {
-   "Cerise.png": 0.641,
+   "Cerise.png": 0.633,
    "layer-Eyes_Cyan (1).png": 0.653,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.603
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.604
   },
   "Tootsie_Blue.png": {
-   "Cerise.png": 0.711,
+   "Cerise.png": 0.706,
    "layer-Eyes_Cyan (1).png": 0.671,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.626
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.627
   },
   "Tootsie_Cerise.png": {
-   "Cerise.png": 0.647,
+   "Cerise.png": 0.643,
    "layer-Eyes_Cyan (1).png": 0.687,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.662
   },
   "UAP_Taskforce.png": {
-   "Cerise.png": 0.741,
+   "Cerise.png": 0.735,
    "layer-Eyes_Cyan (1).png": 0.588
   },
   "Vanilla_Lane (1).png": {
-   "Blue.png": 0.932,
-   "Cerise.png": 0.806,
+   "Blue.png": 0.934,
+   "Cerise.png": 0.811,
    "layer-Eyes_Cyan (1).png": 0.945,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.954
   },
   "Wheres_My_$_B1tch (1).png": {
-   "Blue.png": 0.215,
-   "Cerise.png": 0.728,
+   "Blue.png": 0.213,
+   "Cerise.png": 0.72,
    "layer-Eyes_Cyan (1).png": 0.578,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.473
   },
   "Whitehouse_Lawn.png": {
-   "Blue.png": 0.261,
-   "Cerise.png": 0.742,
+   "Blue.png": 0.259,
+   "Cerise.png": 0.736,
    "layer-Eyes_Cyan (1).png": 0.455,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.382
   },
   "Whitehouse_Lawn_Overlay.png": {
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.741,
    "layer-Eyes_Cyan (1).png": 0.578
   },
   "Why_So_Cereal.png": {
-   "Cerise.png": 0.74
+   "Cerise.png": 0.735
   },
   "Winning.png": {
-   "Blue.png": 0.936,
-   "Cerise.png": 0.833,
+   "Blue.png": 0.937,
+   "Cerise.png": 0.837,
    "layer-Eyes_Cyan (1).png": 0.905,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.907
   },
   "art_mattrick_001-1-2 (1).png": {
-   "Blue.png": 0.302,
-   "Cerise.png": 0.782,
+   "Blue.png": 0.3,
+   "Cerise.png": 0.777,
    "layer-Eyes_Cyan (1).png": 0.318,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.273
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.274
   },
   "art_mattrick_001-15-2 (1).png": {
    "Blue.png": 0.091,
-   "Cerise.png": 0.747,
+   "Cerise.png": 0.742,
    "layer-Eyes_Cyan (1).png": 0.553,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.396
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.397
   },
   "soft_serve.png": {
-   "Blue.png": 0.365,
-   "Cerise.png": 0.779,
+   "Blue.png": 0.361,
+   "Cerise.png": 0.774,
    "layer-Eyes_Cyan (1).png": 0.382,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.353
   }
