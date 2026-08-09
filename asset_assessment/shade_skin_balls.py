@@ -74,7 +74,7 @@ PRESET = {
     # Applied as a per-channel REDDENING of the skin's own colour rather than
     # a pink overlay, so it reads on the dark skin too instead of going
     # chalky. Set "blush" to 0 to switch it off.
-    "blush": 0.0,        # off by default -- see --blush
+    "blush": 1.0,        # owner-enabled 2026-08
     "blush_x": 0.52,     # cheek centre, left/right of the ball centre
     "blush_y": 0.26,     # ...and below it
     "blush_r": 0.30,     # cheek radius
