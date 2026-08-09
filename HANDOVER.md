@@ -14,7 +14,7 @@ constrain everything below.
 
 ## 1. What this session changed
 
-Four things, in order. All are committed and all the checks below pass.
+Six things, in order. All are committed and all the checks below pass.
 
 ### 1a. No skin draws over a character
 
