@@ -154,6 +154,63 @@ which clips to the foreground so it lands on the ball and body but never the
 plate. Only those two are listed: the other seven mouths are flat line art
 painted onto the face, and a shadow embosses them.
 
+## The eyes are registered, then lit as lenses
+
+**Every eye is authored to one size and one baseline.** `register_eyes.py`
+puts all ten on width 277–278 (1.11× the 250px hole), centre x within ±0.5 of
+the ball's 690, centre y at −29. Before it they ran width 236–288, cx −7…+25.5,
+cy −36.5…−16.5 — which left `Beady` visibly slid across the face, and left
+`Googly` (236) and `Clueless` (245) *narrower than the hole*, so they never
+overlapped its rim. That overlap is the collection's face style.
+
+**Eye width is load-bearing.** `ball_fit()` sizes the ball from the eye's
+opaque width, so registering the widths also collapses `ball_fit` to one value
+per skin. That is where "one face, one size" already pointed, but it means
+**`verify_face_coverage.py` is the gate** on any eye-width change — a smaller
+ball on the widest pairing can stop short of a hole rim.
+
+`shade_eyes.py` then lights them, and the useful idea is that the gloss is
+**per eyeball, not per face**. A specular taken from the ball's normal lays one
+soft sheen across the whole face and never looks wet; each connected blob is
+instead fitted as its own convex lens and given a catchlight on its upper-left.
+It deliberately does **not** skip dark pixels — an earlier version guarded gloss
+away from near-black art to keep brows matte and thereby killed it on every
+pupil and iris, which is exactly where wetness lives.
+
+`LENS_SCALE` sets the strength per asset, because the assets differ in what
+they already are: 1.0 for flat cartoon eyes, 0.45 for anime eyes that already
+carry a painted catchlight, 0.35 for brows, 0 for `Alien` and `Cyborg`, which
+are already rendered as glossy 3D objects.
+
+**Both eye tools preserve alpha bit-for-bit**, for the same reason the skin
+tool does. Note the two back up to *different* folders on purpose:
+`eyez_originals/` holds the pre-registration art (and the retired `Retardio`),
+`eyez_registered/` holds `shade_eyes.py`'s input. Each tool always works from
+its own backup so it is idempotent; sharing one would make the shading pass
+silently undo the registration.
+
+Retiring an eye means rebuilding `traits/eyez_compat.json`
+(`build_eyez_compat.py`), and so does any pass that changes eye colour.
+
+## Face holes: check the rim for a baked matte line
+
+Some character art was cut with a black outline left in the pixels bordering
+its face hole. Over the light skin ball it reads as a hard, stepped dark
+hairline round the face; over flat green it is unmistakable.
+`fix_hole_matte_line.py --report` ranks the cast by it. The churro is fixed;
+**`sugar_cube` (−69.5), `gold_waffle` (−59.9) and `og_gummy_bear` (−57.7) still
+carry it.** Most of the cast sits within ~10 of its own body, so this is a
+defect in four assets, not house style.
+
+The repaint band must straddle the boundary — the partly transparent pixels
+*inside* the hole carry the line too, and repainting only the outside leaves a
+dotted fringe where the solid ring was. Alpha is never touched, which is what
+keeps `audit_face_holes.py` and `verify_face_coverage.py` out of it.
+
+`FACE_INSET_SHADOW` in `generator.py` shades the ball where the hole's rim
+occludes it, so the face reads as set *into* the recess. It lands exactly on
+that rim, so fix the matte line first or the shadow deepens it.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
@@ -181,6 +238,8 @@ python3 asset_assessment/audit_face_holes.py      # is every hole the cast size
 python3 asset_assessment/verify_generator_rules.py # footwear + locked-arm rules
 python3 asset_assessment/audit_placement.py       # what CHAR_Y_ADJUST should be
 python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeline
+python3 asset_assessment/register_eyes.py --report        # eye size + baseline
+python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
 ```
 
 `verify_placement.py` exits non-zero if any character is off its group, drifts
