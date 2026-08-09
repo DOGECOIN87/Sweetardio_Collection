@@ -857,6 +857,24 @@ BALL_FIT_MARGIN = 0.92
 # and clipped to the foreground so it never falls on the background plate.
 SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 
+# ---- mouth-prop shadow (cast onto the SKIN BALL) ----
+# Most mouths are flat line art painted onto the face — a smile, a frown, a
+# flat line — and giving those a shadow embosses them, which is wrong. Two
+# mouths are three-dimensional props that genuinely stand off the face and
+# should therefore drop a shadow onto the skin: the lit joint and the
+# lollipop. Only those are listed here.
+#
+# It rides the generic per-layer shadow in create_image(), which clips to the
+# foreground built so far, so the shadow lands on the skin ball and the body
+# and can never spill onto the background plate. Offset DOWN AND RIGHT — the
+# key light is upper-left (CLAUDE.md), same as every other cast shadow here.
+# Set to None to disable.
+MOUTH_PROP_SHADOW = {"blur": 7, "opacity": 0.42, "dx": 9, "dy": 11}
+MOUTH_PROP_FILES = {
+    "layer-Mouth_Smoke (1).png",
+    "layer-Mouth_Lollipop (1).png",
+}
+
 # ---- character grounding shadow (cast ONTO the background) ----
 # Soft shadow cast by the character's silhouette onto the background plate,
 # composited ABOVE the plate and BELOW the character, so each character sits
@@ -1375,8 +1393,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye),
                    "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
-    layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+    mouth_layer = {"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+    # a mouth that is a 3D prop (joint, lollipop) drops a shadow on the skin;
+    # flat painted mouths do not — see MOUTH_PROP_SHADOW
+    if MOUTH_PROP_SHADOW and mouth in MOUTH_PROP_FILES:
+        mouth_layer["shadow"] = dict(MOUTH_PROP_SHADOW)
+    layers.append(mouth_layer)
 
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
     # so a held weapon (katana/knives) reads on top of the slippers instead

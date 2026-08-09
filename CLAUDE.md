@@ -121,6 +121,39 @@ rendering the gold waffle's body (with its own placement tables applied to it,
 leaking a 132×31 hole through its face) while `after_skinz_waffle.png` was
 never drawn at all.
 
+## The skin balls are lit spheres, not flat discs
+
+The three skins ship **relit** by `asset_assessment/shade_skin_balls.py`:
+a mean-preserving Lambert form ramp from the upper-left key, a broad satin
+specular plus a small glossy hotspot, a cool bounce on the lower-right limb
+and rim occlusion. Before this they were near-uniform matte discs whose entire
+luma gradient lived in the outer ~8 % of the radius, which is why a face read
+as a sticker — the eye got no form information anywhere the eyes and mouth
+actually sit. Measured in-ball luma span went 0.43–0.66 → 1.09–1.65, and the
+BR/TL limb ratio 0.51–0.67 → 0.28–0.37 (the old 0.48–0.65 band recorded in
+`shade_cyan_skin.py` described the flat art and is superseded).
+
+Two rules hold it together:
+
+- **Alpha is preserved bit-for-bit; only RGB is touched.** `ball_fit()` sizes
+  every ball from the widest eye and each face hole is registered against the
+  ball's footprint, so a change to the alpha would move the whole cast's face
+  geometry. The tool asserts on this.
+- **The form ramp is mean-preserving**, so each skin keeps its identity — the
+  median colour of all three moved by dE ≈ 2.4, imperceptible.
+
+Originals live in `traits/skinz_originals/` (a *sibling* of `traits/skinz` —
+the generator mints every `.png` in a trait folder, so a backup inside it
+would mint as a skin). The tool always relights from the backup, so re-running
+it is idempotent rather than compounding the pass on itself; `--restore` puts
+the originals back and `--ladder` renders candidates without writing.
+
+**Mouth props cast onto the skin.** `MOUTH_PROP_SHADOW` in `generator.py`
+gives the joint and the lollipop a shadow via the generic per-layer shadow,
+which clips to the foreground so it lands on the ball and body but never the
+plate. Only those two are listed: the other seven mouths are flat line art
+painted onto the face, and a shadow embosses them.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
