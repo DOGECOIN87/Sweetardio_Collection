@@ -4,7 +4,7 @@ Branch: **`claude/handover-md-continuation-djmyoq`** (all work goes here; do not
 open a PR unless asked).
 
 Read `CLAUDE.md` first — it holds the lighting convention, the canvas rule, the
-face rule, the z-order rule and the name-resolution rule, all of which
+face-size rule, the z-order rule and the name-resolution rule, all of which
 constrain everything below.
 
 **Environment note:** a fresh container has no `pillow`, `numpy` or `scipy`.
@@ -12,125 +12,149 @@ constrain everything below.
 
 ---
 
-## 1. Done — no skin draws over a character any more
+## 1. What this session changed
 
-The instruction was: *"we need to properly fix the skins/character face holes so
-that they appear correctly. I no longer want any of the skins placed over the
-character."* Confirmed again in session: *"yes I want all character ls to render
-after skins."*
+Four things, in order. All are committed and all the checks below pass.
 
-`body_after_skin()` in `generator.py` now returns **True unconditionally**.
-`SKIN_ON_TOP_CHARS` (churro) and `BODY_OVER_SKIN_CHARS` (gummy bears, nutty
-bar) are gone — there is no longer any per-character exception, and the
-`before_skinz_` / `after_skinz_` filename prefixes now record only how the art
-was authored. All 27 characters composite skin-first, body-over.
+### 1a. No skin draws over a character
 
-Seven characters flipped: Twinkie, zebra_cake, churro, og_poptart,
-cyan_frosted_poptart, sugar_cube, chocolate_frosted_poptart. Their visible face
-shrank from the whole ball to the hole — most on chocolate_frosted_poptart
-(eye ÷ hole 1.54). Rendered side by side before/after and it reads as the rest
-of the cast does.
+*"I no longer want any of the skins placed over the character"*, confirmed as
+*"yes I want all character ls to render after skins."*
 
-**Two bugs fell out of the checks, both fixed:**
+`body_after_skin()` returns **True unconditionally**. `SKIN_ON_TOP_CHARS`
+(churro) and `BODY_OVER_SKIN_CHARS` (gummy bears, nutty bar) are gone — no
+per-character z-order exceptions remain, and the `before_skinz_` /
+`after_skinz_` prefixes now record only how the art was authored. Seven
+characters flipped: Twinkie, zebra_cake, churro, og_poptart,
+cyan_frosted_poptart, sugar_cube, chocolate_frosted_poptart.
 
-1. **`waffle` was rendering `gold_waffle`'s body.** The character-file lookup
-   ended in a substring match (`char_name in f and "after_skinz" in f`), and
-   "waffle" is a substring of "gold_waffle" — which matched on the *first*
-   pattern, so `after_skinz_waffle.png` was never drawn by anything. The waffle
-   was effectively a duplicate of the gold waffle wearing the waffle's own
-   `CHAR_SCALE` / `CHAR_Y_ADJUST` / `face_hole_bottom`, and the mismatched hole
-   override leaked a 132×31 hole through its face on 663px of the White skin ×
-   Googly eyes pair. Body art is now resolved by **exact base-name equality**
-   through the new `generator.char_base_name()`, which is also what builds the
-   cast list, so the two cannot disagree. Every one of the 27 files is now used
-   by exactly one character, and none is shared.
-2. The same stripping logic existed in **five** copies (generator plus four
-   tools). They all delegate to `char_base_name()` now.
+### 1b. `waffle` was rendering `gold_waffle`'s body
 
-That second fix removed the leak at its root, so **no new
-`FACE_HOLE_BOTTOM_OVERRIDE` was needed** — the existing gold_waffle 750 /
-nutty_bar 765 entries are unchanged.
+The character-file lookup ended in a substring match, and "waffle" is a
+substring of "gold_waffle" — so the waffle was a duplicate of the gold waffle
+wearing the waffle's own placement tables (which leaked a 132×31 hole through
+its face), and `after_skinz_waffle.png` was never drawn at all. Body art now
+resolves by **exact base-name equality** via `generator.char_base_name()`,
+which is also what builds the cast list, so the two cannot disagree. The same
+name-stripping had existed in five copies; they all delegate to it now.
+
+### 1c. One katana, one knives, and the locked-arm draw fixed
+
+There were five arm files all named "Katana" in the metadata and two named
+"Knives" — one per character family, from when each family was a different
+size. `CHAR_SCALE` has since brought the cast to one size, so one of each fits
+everyone. Kept `Armz_Katana.png` and `Armz_Knives.png` (the two whose fists
+actually touch the narrow bodies); the other five are in `traits/armz_originals/`.
+
+`ARMZ_CHAR_LOCK` is now empty. Separately, the arm draw was
+`random.choice(all_arm_files)` over *every* arm with the lock override applied
+only when the character had a lock of its own, so a character could pick up
+someone else's signature weapon — 56 hits per 600 combos. The draw is filtered
+by `armz_allowed` first now.
+
+### 1d. Every face is the same size
+
+Two halves, and both were needed.
+
+**The compositor:** the face assembly — skin ball, eyes, mouth — no longer
+carries `CHAR_SCALE`. Only the body scales. Previously a 0.74 ice cream got a
+0.74 face: a 217px ball against everyone else's 293px, through a 190px hole
+against their 250px.
+
+**The art:** every hole is registered so `file hole × CHAR_SCALE == 250`
+rendered. `asset_assessment/normalize_face_hole.py` warps art onto that circle
+without moving the body silhouette.
+
+The cast went from **179–260px rendered (a 1.45× spread) to 249–252px**,
+roundness 0.99–1.01. That also emptied `FACE_HOLE_BOTTOM_OVERRIDE` — both
+entries it held died once the holes were registered rather than worked around.
+
+Rendered all three candidate targets before choosing. Normalising at 250 with
+a native-size face was the only one that is uniform *at a size that reads*:
+holding the current architecture caps the whole cast at the ice creams' 190px,
+which shrinks every other face by about 27%.
+
+### 1e. The Nutty Bar was too tall
+
+1139px against a cast median of 771, aspect 2.33 on the narrowest body in the
+set. `CHAR_SCALE` cannot fix that — it is a uniform scale, so every value that
+brought the height into line left a narrower plank with a smaller face
+(rendered the ladder to confirm). The art was squashed vertically to 0.85
+about the ball centre: aspect 2.33 → 1.98, matching the Twinkie, keeping the
+width and the full-size face. `CHAR_Y_ADJUST` re-derived −118 → −20.
 
 ### Verification run at handover
 
 | check | result |
 |---|---|
-| `verify_face_coverage.py` (new — 891 composites) | 0 leaks, all 27 covered on every skin × eye |
-| `verify_placement.py` | exit 0, 49 placement cases, 0 flags |
-| `build_char_compat.py` | rebuilt; output byte-identical (it already read the correct waffle art) |
-| `build_mint.py --n 400 --seed 7` | camouflage=0, eye-clash=0 |
-| `render_sample_sheet.py` | rendered and eyeballed — faces inset, eyes overlapping the rim, no background through a face |
-| `verify_generator_rules.py` | still **exit 1** — the pre-existing locked-arms bug in §4, unchanged. Layer resolution is now 0 failures. |
-
-`asset_assessment/verify_face_coverage.py` is new: it composites body + ball for
-every character × skin × eye and counts transparent pixels *enclosed* by the
-result (`binary_fill_holes(m) & ~m`). Under ~200px is rim anti-aliasing;
-hundreds-to-thousands is a real leak with a bbox you can point at. Run it after
-any change to character art, `CHAR_SCALE`, or the hole overrides.
+| `verify_face_coverage.py` (891 composites) | 0 leaks, all 27 covered on every skin × eye |
+| `audit_face_holes.py` | all 27 render 250px, exit 0 |
+| `verify_placement.py` | exit 0, 49 cases, 0 flags |
+| `verify_generator_rules.py` | **exit 0** — 0 lock leaks, synthetic lock fires correctly |
+| `build_char_compat.py` | rebuilt against the new art |
+| `build_mint.py --n 4444 --seed 7` | camouflage=0, eye-clash=0, 4421/4444 unique |
+| whole cast rendered | eyeballed, all 27 |
 
 ---
 
-## 2. Tooling that exists (context)
+## 2. Tooling
 
-- **`asset_assessment/verify_face_coverage.py`** — the coverage check above.
-- **`asset_assessment/audit_edges.py`** — halo, stepped edges, thresholded
-  alpha, ghost colour, specks, face-hole wobble across all 123 trait assets.
-  Run before and after any asset change.
-- **`asset_assessment/fix_matte_line.py`** — removes a white outline baked into
-  an anti-aliased edge. Applied to 9 characters.
-- **`asset_assessment/strip_specks.py`** — removes disconnected render debris.
-  Applied to 38 assets.
-- **`asset_assessment/build_nutty_bar.py`** — the full extraction for the
-  regenerated Nutty Bar, kept because it documents the technique.
+New this session:
 
-`clean_alpha.py` was also run across every class. The skins matter most there —
-`ball_fit` resamples them on **every** token.
+- **`verify_face_coverage.py`** — composites body + ball for every character ×
+  skin × eye and counts transparent pixels *enclosed* by the result. Catches a
+  hole too BIG for the ball (background leaking through a face).
+- **`audit_face_holes.py`** — checks `file hole × CHAR_SCALE == FACE_HOLE_WIDTH`.
+  Catches a hole too SMALL, which leaks nothing and just reads as a shrunken
+  head. **You need both; they catch opposite failures.**
+- **`normalize_face_hole.py`** — per-angle radial warp that resizes a hole onto
+  the cast circle without moving the body's silhouette.
+- **`squash_character.py`** — vertical-only scale about the ball centre, for an
+  aspect-ratio problem `CHAR_SCALE` cannot touch.
+
+Existing:
+
+- **`audit_edges.py`** — halo, stepped edges, thresholded alpha, ghost colour,
+  specks, face-hole wobble across all 123 trait assets.
+- **`fix_matte_line.py`** — removes a white outline baked into an edge.
+- **`strip_specks.py`** — removes disconnected render debris.
+- **`build_nutty_bar.py`** — the regenerated Nutty Bar's extraction, kept
+  because it documents the technique.
 
 ---
 
-## 3. Remaining backlog from the audit
+## 3. Remaining backlog from the edge audit
 
-`python3 asset_assessment/audit_edges.py` flags 69 of 123. Not all are defects;
-the ones worth working through, in priority order:
+`audit_edges.py` flags 69 of 123. Not all are defects; in priority order:
 
 - **STEPPED (16 assets)** — opaque pixels touching fully-clear ones, i.e. no
-  anti-aliasing. Worst: `armz/Arms_Cash.png` 615, `what_are_thosez/Gorbhouse_base`
-  214, `characterz/after_skinz_gold_waffle` 201,
+  anti-aliasing. Worst: `armz/Arms_Cash.png` 615,
+  `what_are_thosez/Gorbhouse_base` 214, `characterz/after_skinz_gold_waffle` 201,
   `characterz/before_skinz_og_gummy_bear` 148. **Look before fixing** — a
   feather changes alpha, which moves `getbbox()`, which can move placement.
 - **GHOST (42)** — mostly `what_are_thosez` and `stickerz`, which are never
-  resampled, so this is hygiene rather than a visible defect. Low priority.
-- **HALO (23)** — the remaining ones are gradient contamination rather than a
-  clipped white line, so `fix_matte_line.py` skips them (its threshold is 20%
-  clipped-white fringe). `armz/layer-layer-layer-layer-Military_Brat.png` at
-  +113.8 is the worst and should be looked at directly.
-- **WOBBLE (4)** — `sugar_cube` 5.1 is the only large one, and it is probably a
-  **false positive**: the metric fits an ellipse, and a sugar cube's hole may be
-  a rounded square. Verify by eye before touching it.
+  resampled, so hygiene rather than a visible defect. Low priority.
+- **HALO (23)** — gradient contamination rather than a clipped white line, so
+  `fix_matte_line.py` skips them.
+  `armz/layer-layer-layer-layer-Military_Brat.png` at +113.8 is the worst.
+- **WOBBLE (4)** — was largely a face-hole metric, and every hole is now a
+  registered circle, so re-run it before working from the old numbers.
+
+Note the numbers above predate the hole normalisation and the arm retirement.
+**Re-run `audit_edges.py` to get a current list.**
 
 ---
 
-## 4. Three pre-existing bugs, all flagged to the user, none fixed
+## 4. The three backlog bugs — all now fixed
 
-All three are the user's call because each changes output across the whole
-collection.
-
-1. **Locked arms land on the wrong characters.** `verify_generator_rules.py`
-   **exits 1**: 56 hits per 600 combos. In `generate_random_combination()`,
-   `arm = random.choice(all_arm_files)` draws from *every* arm including
-   character-locked ones, and the `locked_arms` override only fires when the
-   character has a lock of its own. So a glazed doughnut can end up holding
-   `Armz_Gummy_Bear_Knives.png`. One-line fix — draw from arms allowed for the
-   character — but it reshuffles the arm draw for every token in the collection.
-2. **`gummy_worm` is a dead trait.** `TRAIT_NAMES` carries it with no art, and
-   `Armz_Gummy_worms_katana.png` is locked to it, so that arm can never be
-   selected (0 appearances in 600 combos, confirmed). 28 name entries against
-   27 character files.
-3. **No token in a mint wears footwear.** `build_mint.py --n 400 --seed 7`
-   reports `FOOTWEAR (worn 0/400 = 0.0%)`, and it did so before any of this
-   session's changes too — so a whole trait class (11 assets) never ships.
-   Worth deciding whether that is the intended rarity or a bug in the mint
-   allocator's optional-slot handling.
+1. **Locked arms landed on the wrong characters** (56 hits per 600 combos).
+   Fixed in §1c; `verify_generator_rules.py` exits 0.
+2. **`gummy_worm` was a dead trait.** Its `TRAIT_NAMES` entry is gone, and the
+   arm locked to it — which could therefore never be drawn — became the cast's
+   single generic `Armz_Katana.png`.
+3. **Footwear never minted.** Not a bug: `--n 400` was running quotas sized for
+   4444, and signature-arm slots were excluded from the footwear pool. At
+   `--n 4444` footwear mints 533 (12.0%), and `SIGNATURE_ARMS` is now empty.
 
 ---
 
@@ -138,37 +162,38 @@ collection.
 
 - **Light comes from the top left.** Cast shadows fall down and to the right.
 - **Canvas is 1393 × 1393** for every trait asset; only `backgroundz` may vary.
-- **The body always draws over the skin ball.** See `CLAUDE.md`; there are no
-  per-character exceptions left, and the filename prefixes do not control it.
+- **The body always draws over the skin ball.** No per-character exceptions,
+  and the filename prefixes do not control it.
 - **Character art resolves by exact base name**, never by substring —
   `generator.char_base_name()` is the single definition.
-- **The compositor pins the face.** Skin ball, eyes and mouth land at fixed
-  coordinates around **(690, 601)**. Nothing moves to follow a body that
-  drifted, so new character art is registered by its **face hole**, not its
-  bbox — `asset_assessment/register_character.py`, which scales the art until
-  the hole is 248px (the cast median; the 27 holes measure 180–261, median 250).
-- **Eyes overlap the hole rim.** All 27 characters have the median eye (277px)
-  wider than their hole — ratios 1.06 to 1.54, median 1.11. `eye ÷ hole` is
-  fixed by the art and survives every transform: `ball_fit` scales only the
-  ball, `CHAR_SCALE` scales body, ball, eyes and mouth together. It cannot be
-  corrected in `generator.py`.
-- **`CHAR_SCALE` cannot change where the face sits on a body.** It scales about
-  a pivot inside the face, so the ratio is unchanged. This came up repeatedly.
+- **One face, one size.** Ball, eyes and mouth do NOT carry `CHAR_SCALE`; only
+  the body scales. Every hole is authored so
+  `file hole × CHAR_SCALE == FACE_HOLE_WIDTH` (250).
+- **The compositor pins the face** at ~(690, 601). Nothing moves to follow a
+  body that drifted, so new art is registered by its **face hole**, not its
+  bbox — `register_character.py`, then `normalize_face_hole.py`.
+- **`FACE_HOLE_BOTTOM_OVERRIDE` is empty and should stay that way.** Growing
+  one character's ball is the fallback for art that cannot be re-registered,
+  and it costs face size wherever it applies.
+- **`CHAR_SCALE` cannot change where the face sits on a body,** and it cannot
+  change a body's proportions either — it is a uniform scale. Use
+  `squash_character.py` for an aspect-ratio problem.
 
 ## 6. Decisions already made — do not reopen
 
-- **All characters render after the skins.** Asked for, implemented, rendered
-  and confirmed in session.
-- **The ice creams ship as delivered.** Face at 0.344 of body height,
-  `CHAR_SCALE["ice_cream"] = 0.74`. The measurement and the prompts that would
-  change it are kept in `CHARACTERZ_BODY_PROMPTS.md` §4a as reference, marked
-  closed.
+- **All characters render after the skins.** Asked for, implemented, rendered,
+  confirmed.
+- **All face holes are the same size**, at 250px rendered, with the face
+  assembly at native size. Three options were rendered; the user picked this
+  one ("I liked opt 1 the best").
+- **The ice creams' bodies ship as delivered** at `CHAR_SCALE` 0.74. Note their
+  *faces* are no longer scaled with them — that is §1d, not a reopening of the
+  body decision.
 - **Gummy bears: OG only.** Cyan, pink and purple are retired to
-  `characterz_originals/`. Three regenerated candidates were measured and
-  rejected; the analysis is in the session history, the prompts in §5a.
+  `characterz_originals/`.
 - **Mint choc chip, zaffre and rainbow sherbert are retired.** Cast is 27.
-- **The Nutty Bar's hole is not extended downward** — the user asked for it,
-  saw it, and reversed the decision.
+- **The Nutty Bar's hole is not extended downward** — asked for, seen, reversed.
+  (Its *body* was squashed in §1e, which is a different change.)
 
 ## 7. A note on method
 
@@ -181,7 +206,15 @@ subjects; nearest-neighbour zoom fabricates aliasing; a raw ghost mean cannot
 tell a correct bleed from junk. **Render it and look before reporting a finding
 as real** — that step caught every one of them.
 
-The waffle bug in §1 is the newest entry in that pattern, from the other
-direction: the leak metric was right, but the obvious fix (add a hole override)
-would have papered over a character rendering the wrong art entirely. Chase a
-finding to its cause before treating the symptom.
+Three more from this session, all caught the same way:
+
+- The waffle's face leak was real, but the obvious fix (add a hole override)
+  would have papered over a character rendering the wrong art entirely. **Chase
+  a finding to its cause before treating the symptom.**
+- The first hole-normalisation pass left hairline cracks radiating from every
+  hole — a half-pixel discontinuity in the warp field at the cardinal angles,
+  invisible in the summary numbers (which said every hole was on target) and
+  obvious the moment the art was zoomed. Circular median + box filter on the
+  radius field fixed it.
+- "Footwear never mints" looked like a bug in the allocator for a whole
+  session. It was a tool run below its design size.

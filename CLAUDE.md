@@ -43,23 +43,49 @@ Where this is already encoded:
   must be preserved exactly when an asset is re-authored.
 - `ball_fit()` sizes every skin ball from the **widest eye**, so eye width is
   load-bearing across the whole collection.
-- **The eyes must overlap the face hole's rim.** All 27 characters have the
-  median eye (277px) wider than their face hole — ratios 1.06 to 1.54, median
-  1.11 — so the eye whites spill past the hole edge onto the body. That overlap
-  is the collection's face style, not an accident.
+- **The eyes must overlap the face hole's rim.** The eye whites spill past the
+  hole edge onto the body — that overlap is the collection's face style, not an
+  accident. With the hole registered at 250px and the median eye at 277px, the
+  ratio is ~1.11 for every character.
 
-  It is fixed by the **art**, because `eye width ÷ hole width` survives every
-  transform downstream: `ball_fit` scales only the ball, and `CHAR_SCALE` scales
-  body, ball, eyes and mouth together. A body whose hole comes back wider than
-  ~270px cannot be corrected in `generator.py` — the eyes will float inside it
-  with a ring of skin ball showing.
+## One face, one size, for the whole cast
 
-  So new character art is registered to a **hole width of 248px** (the cast
-  median; the 27 holes measure 180–261, median 250) by
-  `asset_assessment/register_character.py`, which scales the art until the hole
-  matches before pinning it to the ball centre. Sizing the hole correctly also
-  removes any need for a `FACE_HOLE_BOTTOM_OVERRIDE`: a cast-sized hole is one
-  the standard ball already covers.
+**The face assembly — skin ball, eyes, mouth — is the same size on every
+character.** It composites at fixed canvas positions around (690, 601) and
+does **not** carry `CHAR_SCALE`. Only the **body** scales.
+
+This is the rule that makes every face read the same. When the assembly did
+scale with the body, a 0.74 ice cream got a 0.74 face: a 217px ball against
+everyone else's 293px, showing through a 190px hole against their 250px. The
+cast ran **179–260px rendered, a 1.45× spread**.
+
+The other half of the rule lives in the **art**: because the body still
+carries `CHAR_SCALE`, each hole must be authored so that
+
+    file hole width × CHAR_SCALE == FACE_HOLE_WIDTH (250)
+
+so a 0.74 ice cream needs a 338px hole in its file and an unscaled body needs
+250px. `asset_assessment/normalize_face_hole.py` warps existing art onto that
+circle without moving the body's silhouette, and
+`asset_assessment/audit_face_holes.py` checks it. All 27 now render 249–252px,
+roundness 0.99–1.01.
+
+Two consequences worth knowing:
+
+- A hole that is too **small** leaks nothing — it just shows a ring of skin
+  ball around the face and reads as a shrunken head. Only `audit_face_holes.py`
+  catches that. A hole too **big** leaks the background plate, which is
+  `verify_face_coverage.py`'s job. You need both.
+- `FACE_HOLE_BOTTOM_OVERRIDE` is now **empty and should stay that way**.
+  Growing one character's ball is the wrong lever — it is the fallback for art
+  that cannot be re-registered, and it costs face size wherever it applies.
+  Both entries it once held (nutty_bar 765, gold_waffle 750) died once their
+  holes were registered properly.
+
+New character art is registered by `asset_assessment/register_character.py`,
+which scales the art until its hole matches before pinning it to the ball
+centre; run `normalize_face_hole.py` afterwards to put the hole exactly on the
+cast circle.
 
 ## Z-order: the body is always drawn over the skin
 
@@ -96,6 +122,8 @@ never drawn at all.
 ```bash
 python3 asset_assessment/verify_placement.py      # where characters actually land
 python3 asset_assessment/verify_face_coverage.py  # does the ball cover every hole
+python3 asset_assessment/audit_face_holes.py      # is every hole the cast size
+python3 asset_assessment/verify_generator_rules.py # footwear + locked-arm rules
 python3 asset_assessment/audit_placement.py       # what CHAR_Y_ADJUST should be
 python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeline
 ```
@@ -107,6 +135,13 @@ horizontally off the face column, or has a face hole away from the ball centre.
 transparent pixels enclosed by body + ball — i.e. background showing through a
 face. It is the check that has to pass before any character art, `CHAR_SCALE`
 or `FACE_HOLE_BOTTOM_OVERRIDE` change is called done.
+
+`audit_face_holes.py` is its complement: it exits non-zero if any hole renders
+off `FACE_HOLE_WIDTH`. Run both — they catch opposite failures.
+
+`verify_generator_rules.py` covers the footwear exclusions and the
+character-locked arms. Its lock audit includes a **synthetic** lock, so it
+still tests the rule while `ARMZ_CHAR_LOCK` is empty.
 
 The environment needs `pillow`, `numpy` and `scipy` (`pip install pillow numpy
 scipy`); a bare container has none of them.

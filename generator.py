@@ -919,19 +919,30 @@ def _opaque_bbox(path, thresh=128):
 FACE_HOLE_TOP = 464
 FACE_HOLE_BOTTOM = 732
 
-# A few after-skinz bodies have a face hole that sits lower/deeper than the
-# cast-wide FACE_HOLE_BOTTOM, so the standard skin ball stopped short of the
-# hole's bottom edge and a sliver of background showed under the face. Override
-# the hole bottom (px) for just those characters so their ball is enlarged
-# enough to cover it, without growing every other character's face. Substring
-# match on the character base-name.
-# Prefer fixing the ART: the nutty_bar entry (765) is gone because squashing
-# its hole from a 246x293 tall ellipse to a cast-sized 246x249 round one left
-# nothing for the standard ball to miss. An override grows the ball for that
-# character, which costs face size everywhere it applies.
-FACE_HOLE_BOTTOM_OVERRIDE = {
-    "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
-}
+# The one face-hole width, in RENDERED pixels, that every character's art is
+# registered to. The face assembly (ball, eyes, mouth) is the same size for
+# the whole cast, so the hole has to be too, or the face reads a different
+# size on different characters — the cast used to run 179-260px, a 1.45x
+# spread. Because the BODY still carries CHAR_SCALE, a character's hole in
+# FILE space must be FACE_HOLE_WIDTH / char_scale (338 for a 0.74 ice cream,
+# 250 for an unscaled body). asset_assessment/normalize_face_hole.py warps
+# art onto this, and audit_face_holes.py checks it.
+FACE_HOLE_WIDTH = 250
+
+# A body whose face hole sits lower/deeper than the cast-wide
+# FACE_HOLE_BOTTOM leaves the standard skin ball stopping short of the hole's
+# bottom edge, and a sliver of background shows under the face. An entry here
+# raises the hole bottom (px) for that character alone, so ball_fit's need_h
+# enlarges its ball enough to cover it. Substring match on the base-name; the
+# value is in PRE-CHAR_SCALE file space.
+#
+# EMPTY, and it should stay that way. Both entries this once held died when
+# their holes were registered rather than worked around: nutty_bar (765) when
+# the art was squashed from a 246x293 tall ellipse to a round one, and
+# gold_waffle (750) when normalize_face_hole.py put every hole on the same
+# circle. Growing the ball is the wrong lever — it is the fallback for art
+# that cannot be re-registered, and it costs face size wherever it applies.
+FACE_HOLE_BOTTOM_OVERRIDE = {}
 
 def face_hole_bottom(char_name):
     return next((v for k, v in FACE_HOLE_BOTTOM_OVERRIDE.items()
@@ -1265,20 +1276,33 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 3. Before-skinz body layers (below skin ball)
     layers.extend(before_char_layers)
 
-    # 5. Skinz: ball sits above before-skinz body, below after-skinz body.
-    # The ball carries the per-character CHAR_SCALE too (cscale), so an
-    # enlarged character's face hole and its skin ball grow together — the
-    # ball always covers the hole exactly as it does at native size, for any
-    # skin (without this the alien skin's small 269px ball leaves a gap on a
-    # scaled bear). ball_fit (fscale) runs first about the ball center, then
-    # cscale about the shared pivot; eyes/mouth stay native size.
+    # 5/6/7. The FACE ASSEMBLY: skin ball, eyes and mouth.
+    #
+    # These deliberately do NOT carry the character's CHAR_SCALE. The face is
+    # one fixed-size assembly pinned at CHAR_SCALE_PIVOT for every character
+    # in the cast; only the BODY varies in size. That is what makes every
+    # character's face the same size — the thing CHAR_SCALE otherwise
+    # prevents, because it scales the ball and the hole together and so a
+    # 0.74 ice cream got a 0.74 face (a 217px ball against everyone else's
+    # 293px, and a 190px hole against their 250px).
+    #
+    # The old comment here warned that native eyes overflow a scaled-down
+    # ball. That was true of eyes native WITH the ball still scaled; with the
+    # whole assembly native the eye-in-ball relationship ball_fit establishes
+    # holds for everyone, identically, at any CHAR_SCALE.
+    #
+    # The other half of the rule lives in the ART: each body's face hole is
+    # authored so that hole x CHAR_SCALE == FACE_HOLE_WIDTH, which is what
+    # asset_assessment/normalize_face_hole.py enforces. A body whose hole is
+    # not registered that way will show a ring of skin ball (hole too small)
+    # or leak the plate (hole too big) — verify_face_coverage.py catches the
+    # second, audit_face_holes.py the first.
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye),
                              hole_bottom=face_hole_bottom(char_name))
     skin_layer = {"path": skin_path, "offset": apply_offset,
                   "dy": y_adjust + bg_extra_y,
-                  "fscale": bfit, "fcenter": bcenter,
-                  "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+                  "fscale": bfit, "fcenter": bcenter}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
@@ -1286,19 +1310,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 4. After-skinz body layers (above skin ball — face hole reveals skin)
     layers.extend(after_char_layers)
 
-    # 6/7. Eyez and Mouthz. These carry cscale too, about the same pivot as the
-    # body and ball. Leaving them native only works while CHAR_SCALE enlarges:
-    # shrink a character and a native-size eye (up to 288px) overflows the
-    # scaled-down ball (313px * 0.74 = 232px) and spills onto the body. Scaling
-    # the whole face with the character keeps the eye-in-ball relationship that
-    # ball_fit establishes, at any scale in either direction.
     layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
-                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
-                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
     # so a held weapon (katana/knives) reads on top of the slippers instead
