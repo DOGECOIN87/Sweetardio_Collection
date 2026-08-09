@@ -113,10 +113,49 @@ def main():
           f"locked-arm-on-wrong-character hits: {len(lock_hits)}")
     for c, a in lock_hits[:10]:
         print(f"  {c}: {a}")
-    print("locked-arm appearances on their own character:")
-    for a, cnt in sorted(lock_ok.items()):
-        print(f"  {a}: {cnt}")
-    if bad_rule or hits or lock_hits:
+    if g.ARMZ_CHAR_LOCK:
+        print("locked-arm appearances on their own character:")
+        for a, cnt in sorted(lock_ok.items()):
+            print(f"  {a}: {cnt}")
+    else:
+        print("  (ARMZ_CHAR_LOCK is empty — every arm is generic)")
+
+    # phase 3b: SYNTHETIC lock. With no locks defined, phase 3 passes no
+    # matter what the arm draw does, so it cannot catch a regression in the
+    # rule it exists to test. Inject a lock, re-run, and require both halves:
+    # the locked arm must never land on another character, and it must
+    # actually reach its own. This is the check that fails against the old
+    # `random.choice(all_arm_files)` draw, which ignored locks unless the
+    # character had one of its own.
+    syn_arm = sorted(g.get_files(g.ARMZ))[0]
+    syn_char = "sugar_cube"
+    saved = g.ARMZ_CHAR_LOCK
+    g.ARMZ_CHAR_LOCK = dict(saved, **{syn_arm: [syn_char]})
+    random.seed(5678)
+    syn_wrong, syn_right = [], 0
+    try:
+        for _ in range(trials):
+            layers, char_name = g.generate_random_combination()
+            arms = [os.path.basename(l["path"]) for l in layers
+                    if os.path.normpath(l["path"]).startswith(
+                        os.path.normpath(armz_dir))]
+            if syn_arm not in arms:
+                continue
+            if g.armz_allowed(syn_arm, char_name):
+                syn_right += 1
+            else:
+                syn_wrong.append(char_name)
+    finally:
+        g.ARMZ_CHAR_LOCK = saved
+    print(f"\nsynthetic lock ({syn_arm} -> {syn_char}), {trials} combos: "
+          f"{len(syn_wrong)} on the wrong character, {syn_right} on its own")
+    for c in syn_wrong[:10]:
+        print(f"  leaked onto {c}")
+    if syn_right == 0:
+        print("  WARNING: the locked arm never appeared at all — the lock "
+              "override is not firing")
+
+    if bad_rule or hits or lock_hits or syn_wrong or syn_right == 0:
         sys.exit(1)
 
 

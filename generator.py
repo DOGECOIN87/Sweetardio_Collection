@@ -178,7 +178,6 @@ TRAIT_NAMES = {
         "ding_dong":                        "Ding Dong",
         "glazed_doughnut":                  "Glazed Doughnut",
         "gold_waffle":                      "Gold Waffle",
-        "gummy_worm":                       "Gummy Worm",
         "marshmallow":                      "Marshmallow",
         "neopolitan_ice_cream":             "Neapolitan Ice Cream",
         "oatmeal_cream_pie":                "Oatmeal Cream Pie",
@@ -294,13 +293,8 @@ TRAIT_NAMES = {
     },
     ARMZ: {
         "Arms_Cash.png":                                "Cash",
-        "Armz_Gummy_Bear_Knives.png":                   "Knives",
-        "Armz_Gummy_worms_katana.png":                  "Katana",
-        "Armz_Katana_for_ice_cream_character.png":      "Katana",
-        "Armz_Marshmallow_knives.png":                  "Knives",
-        "Armz_Oatmeal_Pie_Katana.png":                  "Katana",
-        "Armz_Twinkie_Katana.png":                      "Katana",
-        "Armz_choc_cookie_katana.png":                  "Katana",
+        "Armz_Katana.png":                              "Katana",
+        "Armz_Knives.png":                              "Knives",
         "Sweetardio_114 (4).png":                       "Blue Saber",
         "Sweetardio_114 (5).png":                       "Pink Saber",
         "Sweetardio_114 (6).png":                       "Cyan Saber",
@@ -546,15 +540,15 @@ EXCLUDE_WAT_CHARS = [
 # e.g. "ice_cream" covers every *_ice_cream character; "gummy_bear" covers
 # all bear color variants). Armz files NOT in this map are generic and can
 # pair with any character.
-ARMZ_CHAR_LOCK = {
-    "Armz_Gummy_Bear_Knives.png": ["gummy_bear"],
-    "Armz_Gummy_worms_katana.png": ["gummy_worm"],
-    "Armz_Katana_for_ice_cream_character.png": ["ice_cream"],
-    "Armz_Marshmallow_knives.png": ["marshmallow"],
-    "Armz_Oatmeal_Pie_Katana.png": ["oatmeal_cream_pie"],
-    "Armz_Twinkie_Katana.png": ["twinkie"],
-    "Armz_choc_cookie_katana.png": ["chocolate_chip_cookie"],
-}
+#
+# EMPTY BY DESIGN. There used to be seven locked weapons — five files all
+# named "Katana" in the metadata and two named "Knives" — because each
+# character family was a different size and needed its own copy at its own
+# scale. CHAR_SCALE has since brought the whole cast to one size, so one
+# katana and one pair of knives fit everyone and the duplicates were retired
+# to traits/armz_originals/. The mechanism stays for a genuinely
+# character-specific weapon later; the arm draw below respects it.
+ARMZ_CHAR_LOCK = {}
 
 def armz_allowed(arm_file, char_name):
     """Generic armz pair with anyone; locked armz only with their character."""
@@ -1166,8 +1160,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
                 if f.lower().startswith(chosen_wat.lower()) and "overlay" in f.lower():
                     wat_overlays.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f))
 
-    # --- arms slot: any arm may be drawn (including katanas/knives); a
-    # character with a locked weapon overrides the draw with its own ---
+    # --- arms slot: draw from the arms this character is ALLOWED to hold; a
+    # character with a locked weapon of its own gets that instead ---
     arm = None
     if "arms" in active and all_arm_files:
         if force_arm not in ("auto", None):
@@ -1177,9 +1171,16 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             if armz_allowed(force_arm, char_name):
                 arm = force_arm
         else:
-            arm = random.choice(all_arm_files)
-            locked_arms = [f for f in all_arm_files
-                           if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
+            # The draw MUST be filtered by armz_allowed. It used to be
+            # `random.choice(all_arm_files)` over every arm, with the locked
+            # override applied only when the character had a lock of its own —
+            # so a character with no signature weapon could pick up someone
+            # else's (a glazed doughnut holding the gummy bear's knives), at
+            # 56 hits per 600 combos.
+            allowed = [f for f in all_arm_files if armz_allowed(f, char_name)]
+            if allowed:
+                arm = random.choice(allowed)
+            locked_arms = [f for f in allowed if f in ARMZ_CHAR_LOCK]
             if locked_arms:
                 arm = random.choice(locked_arms)
 
