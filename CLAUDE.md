@@ -148,11 +148,22 @@ would mint as a skin). The tool always relights from the backup, so re-running
 it is idempotent rather than compounding the pass on itself; `--restore` puts
 the originals back and `--ladder` renders candidates without writing.
 
-**Mouth props cast onto the skin.** `MOUTH_PROP_SHADOW` in `generator.py`
-gives the joint and the lollipop a shadow via the generic per-layer shadow,
-which clips to the foreground so it lands on the ball and body but never the
-plate. Only those two are listed: the other seven mouths are flat line art
-painted onto the face, and a shadow embosses them.
+**Everything on the face casts onto the ball.** Three configs in
+`generator.py`, all riding the generic per-layer shadow, which clips to the
+foreground so they land on the ball and body but never the plate, and all
+offset down-and-right for the top-left key:
+
+- `EYE_SHADOW` — every eye. Without it the eyes were the last thing on the
+  face standing off the ball with nothing under them, and at a face zoom they
+  read as stickers, the brow-style assets worst of all.
+- `MOUTH_PROP_SHADOW` — the joint and the lollipop, which are 3D props.
+- `MOUTH_SHADOW` — the other seven, at **lighter** settings.
+
+That last one corrects an earlier rule here which said flat line-art mouths
+should get no shadow because it embosses them. Rendered three ways once the
+eyes had shadows, that was half right: at the eyes' strength the thin line
+mouths *do* emboss, but with nothing at all they float, and conspicuously so
+beside eyes that no longer do. **The distinction is strength, not presence.**
 
 ## The eyes are registered, then lit as lenses
 

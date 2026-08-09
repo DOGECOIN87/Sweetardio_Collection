@@ -857,12 +857,19 @@ BALL_FIT_MARGIN = 0.92
 # and clipped to the foreground so it never falls on the background plate.
 SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 
-# ---- mouth-prop shadow (cast onto the SKIN BALL) ----
-# Most mouths are flat line art painted onto the face — a smile, a frown, a
-# flat line — and giving those a shadow embosses them, which is wrong. Two
-# mouths are three-dimensional props that genuinely stand off the face and
-# should therefore drop a shadow onto the skin: the lit joint and the
-# lollipop. Only those are listed here.
+# ---- mouth shadow (cast onto the SKIN BALL) ----
+# Two strengths, because the mouths are two different kinds of object.
+#
+# MOUTH_PROP_SHADOW is for the two that are three-dimensional props genuinely
+# standing off the face: the lit joint and the lollipop.
+#
+# MOUTH_SHADOW is for the other seven, the line-art mouths. They were given
+# nothing at first, on the reasoning that a shadow embosses art painted into a
+# face. Rendered three ways once the eyes had shadows, that turned out to be
+# half right: at the eyes' strength the thin line mouths DO emboss, but with
+# no shadow at all they float, and they float conspicuously next to eyes that
+# no longer do. A lighter shadow seats them without the embossing. So the
+# distinction is strength, not presence.
 #
 # It rides the generic per-layer shadow in create_image(), which clips to the
 # foreground built so far, so the shadow lands on the skin ball and the body
@@ -870,6 +877,23 @@ SKIN_SHADOW = None  # e.g. {"blur": 14, "opacity": 0.55, "dx": 0, "dy": 8}
 # key light is upper-left (CLAUDE.md), same as every other cast shadow here.
 # Set to None to disable.
 MOUTH_PROP_SHADOW = {"blur": 7, "opacity": 0.42, "dx": 9, "dy": 11}
+MOUTH_SHADOW = {"blur": 5, "opacity": 0.26, "dx": 5, "dy": 7}
+
+# ---- eye shadow (cast onto the SKIN BALL) ----
+# The eyes are the last thing on the face still standing off the ball with
+# nothing under them. Everything else that sits proud of a surface now drops a
+# shadow -- the mouth props onto the skin, the hole rim onto the ball, the
+# character onto the plate -- and at a face zoom the eyes read as stickers
+# because of it, most obviously the brow-style assets, which are floating
+# black shapes on a lit sphere.
+#
+# Unlike the mouths this applies to EVERY eye, because every eye asset is a
+# thing lying on the face rather than a marking painted into it: a sclera, a
+# lens, a moulded brow. It rides the generic per-layer shadow, which clips to
+# the foreground built so far, so it lands on the ball and the body and can
+# never reach the plate. Offset down and right for the top-left key.
+# Set to None to disable.
+EYE_SHADOW = {"blur": 6, "opacity": 0.36, "dx": 7, "dy": 9}
 MOUTH_PROP_FILES = {
     "layer-Mouth_Smoke (1).png",
     "layer-Mouth_Lollipop (1).png",
@@ -1420,15 +1444,21 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 4. After-skinz body layers (above skin ball — face hole reveals skin)
     layers.extend(after_char_layers)
 
-    layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+    eye_layer = {"path": os.path.join(TRAITS_DIR, EYEZ, eye),
+                 "offset": apply_offset, "dy": y_adjust + bg_extra_y}
+    if EYE_SHADOW:
+        eye_layer["shadow"] = dict(EYE_SHADOW)
+    layers.append(eye_layer)
 
     mouth_layer = {"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
                    "offset": apply_offset, "dy": y_adjust + bg_extra_y}
-    # a mouth that is a 3D prop (joint, lollipop) drops a shadow on the skin;
-    # flat painted mouths do not — see MOUTH_PROP_SHADOW
-    if MOUTH_PROP_SHADOW and mouth in MOUTH_PROP_FILES:
-        mouth_layer["shadow"] = dict(MOUTH_PROP_SHADOW)
+    # a 3D prop mouth (joint, lollipop) drops a full shadow; a line-art mouth
+    # drops a lighter one — see MOUTH_PROP_SHADOW / MOUTH_SHADOW
+    if mouth in MOUTH_PROP_FILES:
+        if MOUTH_PROP_SHADOW:
+            mouth_layer["shadow"] = dict(MOUTH_PROP_SHADOW)
+    elif MOUTH_SHADOW:
+        mouth_layer["shadow"] = dict(MOUTH_SHADOW)
     layers.append(mouth_layer)
 
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
