@@ -893,19 +893,16 @@ MOUTH_PROP_FILES = {
 # Applied after the body and BEFORE the eyes and mouth, so the face features
 # sit on top of the shading rather than under it.
 #
-# OFF by default, and it is a genuine judgement call rather than a fix: it
-# makes the face read as set INTO the hole, but it does so by darkening the
-# top of the ball, and the reference face this was chased against is bright
-# at the top. Rendered both ways before leaving it off. Swap None for the
-# dict below to enable.
-FACE_INSET_SHADOW = None
-FACE_INSET_SHADOW_PRESET = {
+# Owner-picked off a rendered ladder (2026-08, "deep looks better"): the
+# deepest of the four candidates, roughly 1.4x the mid setting. Set to None
+# to disable.
+FACE_INSET_SHADOW = {
     "cast_blur": 26,
-    "cast_opacity": 0.40,
+    "cast_opacity": 0.55,
     "cast_dx": 15,
     "cast_dy": 17,
     "ao_blur": 9,
-    "ao_opacity": 0.30,
+    "ao_opacity": 0.40,
 }
 
 # ---- character grounding shadow (cast ONTO the background) ----
