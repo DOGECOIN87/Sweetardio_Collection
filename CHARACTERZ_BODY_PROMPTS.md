@@ -74,8 +74,10 @@ overlaps the ball and reads as a recess in the scoop. The old art was
 sit flat on top of the scoop with no socket.
 
 This is the same path the doughnuts and cookies take (`body_after_skin()` in
-`generator.py`), so no new mechanism was needed; the `after_skinz_` filename
-prefix is the whole switch.
+`generator.py`), so no new mechanism was needed. It is now the path *every*
+character takes: `body_after_skin()` returns True unconditionally and the
+`after_skinz_` prefix no longer switches anything — it only records how the art
+was authored.
 
 ## 4a. Ice cream — the cone measurement (closed, kept for reference)
 
@@ -1026,8 +1028,9 @@ the `gummy_bear` entry from `CHAR_SCALE`**, and re-derive `CHAR_Y_ADJUST` — th
 four current values (32/43/47/50) are tuned to an 872px body at 0.881 and will
 all be wrong for a 747px body at native scale.
 
-Note the bears are already `BODY_OVER_SKIN_CHARS`, so the skin draws first and
-shows through the hole exactly as it does now. No layering change.
+Note the skin draws first and shows through the hole exactly as it does now.
+No layering change — `body_after_skin()` is unconditionally True for every
+character, so z-order is never a per-character setting.
 
 ## 5. Gummy bear v1 — the spec and the prompt
 
@@ -1051,8 +1054,8 @@ They run at `CHAR_SCALE["gummy_bear"] = 0.881` to put their feet on the same
   ice creams and doughnuts.
 - **~625 wide × ~825 tall**, which with the hole pinned puts the **top of the
   ears near y = 285** and the **soles of the feet near y = 1110**.
-- A **through hole**, and the body draws over the ball (`BODY_OVER_SKIN_CHARS`
-  already lists `gummy_bear`, so no filename change is needed).
+- A **through hole**, and the body draws over the ball — as every character
+  does, whatever its filename prefix says.
 
 ### The prompt
 
@@ -1161,9 +1164,9 @@ Two things worth knowing before regenerating it:
   it to the 248px cast median either way, but the closer it starts the less the
   art has to be resampled.
 - **It stands on the 1132 bar line** with the Twinkie and the churro, not on the
-  1111 cone line, and it is `NO_OFFSET` and `BODY_OVER_SKIN` at `CHAR_SCALE`
-  1.0. None of that needs changing if the new body keeps roughly the current
-  proportions.
+  1111 cone line, and it is `NO_OFFSET` at `CHAR_SCALE` 1.0 (its body draws
+  over the ball, as every character's does). None of that needs changing if the
+  new body keeps roughly the current proportions.
 
 
 ### What came back, and why the prompt changed

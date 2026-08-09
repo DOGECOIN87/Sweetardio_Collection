@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import re
 from PIL import Image
 
 TRAITS_DIR = "traits"
@@ -177,7 +178,6 @@ TRAIT_NAMES = {
         "ding_dong":                        "Ding Dong",
         "glazed_doughnut":                  "Glazed Doughnut",
         "gold_waffle":                      "Gold Waffle",
-        "gummy_worm":                       "Gummy Worm",
         "marshmallow":                      "Marshmallow",
         "neopolitan_ice_cream":             "Neapolitan Ice Cream",
         "oatmeal_cream_pie":                "Oatmeal Cream Pie",
@@ -293,13 +293,8 @@ TRAIT_NAMES = {
     },
     ARMZ: {
         "Arms_Cash.png":                                "Cash",
-        "Armz_Gummy_Bear_Knives.png":                   "Knives",
-        "Armz_Gummy_worms_katana.png":                  "Katana",
-        "Armz_Katana_for_ice_cream_character.png":      "Katana",
-        "Armz_Marshmallow_knives.png":                  "Knives",
-        "Armz_Oatmeal_Pie_Katana.png":                  "Katana",
-        "Armz_Twinkie_Katana.png":                      "Katana",
-        "Armz_choc_cookie_katana.png":                  "Katana",
+        "Armz_Katana.png":                              "Katana",
+        "Armz_Knives.png":                              "Knives",
         "Sweetardio_114 (4).png":                       "Blue Saber",
         "Sweetardio_114 (5).png":                       "Pink Saber",
         "Sweetardio_114 (6).png":                       "Cyan Saber",
@@ -545,15 +540,15 @@ EXCLUDE_WAT_CHARS = [
 # e.g. "ice_cream" covers every *_ice_cream character; "gummy_bear" covers
 # all bear color variants). Armz files NOT in this map are generic and can
 # pair with any character.
-ARMZ_CHAR_LOCK = {
-    "Armz_Gummy_Bear_Knives.png": ["gummy_bear"],
-    "Armz_Gummy_worms_katana.png": ["gummy_worm"],
-    "Armz_Katana_for_ice_cream_character.png": ["ice_cream"],
-    "Armz_Marshmallow_knives.png": ["marshmallow"],
-    "Armz_Oatmeal_Pie_Katana.png": ["oatmeal_cream_pie"],
-    "Armz_Twinkie_Katana.png": ["twinkie"],
-    "Armz_choc_cookie_katana.png": ["chocolate_chip_cookie"],
-}
+#
+# EMPTY BY DESIGN. There used to be seven locked weapons — five files all
+# named "Katana" in the metadata and two named "Knives" — because each
+# character family was a different size and needed its own copy at its own
+# scale. CHAR_SCALE has since brought the whole cast to one size, so one
+# katana and one pair of knives fit everyone and the duplicates were retired
+# to traits/armz_originals/. The mechanism stays for a genuinely
+# character-specific weapon later; the arm draw below respects it.
+ARMZ_CHAR_LOCK = {}
 
 def armz_allowed(arm_file, char_name):
     """Generic armz pair with anyone; locked armz only with their character."""
@@ -652,8 +647,9 @@ CHAR_Y_ADJUST = {
     "oatmeal_cream_pie": 14,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -118,         # bar body, stands with the Twinkie at 1132;
-                               # re-derived for the regenerated art     # rescaled; feet on the shared ground line (1111)
+    "nutty_bar": -20,          # bar body, stands with the Twinkie at 1132;
+                               # re-derived after the art was squashed to
+                               # aspect 1.98 (was -118 at aspect 2.33)
 }
 
 def char_y_adjust(char_name):
@@ -666,31 +662,39 @@ def char_y_adjust(char_name):
     return CHAR_Y_ADJUST[max(hits, key=len)] if hits else 0
 
 # Per-character vertical trim (px, +down) for CENTERED characters in their
-# footwear-less CENTRED position (where the normal CHAR_Y_ADJUST is suppressed
-# so the round/baseless body sits at its natural centre). A round body's native
-# centre can still read slightly high in-frame (the face holes sit ~100px above
-# canvas centre), so this nudges it down WITHOUT touching the character's
-# footwear placement (CHAR_Y_ADJUST). Default 0; tuned by eye.
-# Align these by BODY CENTRE, not by bottom. A bottom line is the right metric
-# for characters that stand on something, but these float, and matching bottoms
-# across different sizes pushes the biggest bodies high: the doughnuts are the
-# largest rings, so a shared bottom left their mass ~55px above canvas centre
-# while ding_dong (a smaller ring, tuned by eye) sat dead centre. Values below
-# put each body's centre on the canvas centre line (y=696). Chosen over
-# aligning the face HOLE to centre, which the cookies showed diverging by up to
-# 26px: hole-alignment drops the green centre line through the eyes, while
-# bbox-alignment keeps it just under the face the way the rest of the group
-# reads.
+# footwear-less position, where the normal CHAR_Y_ADJUST and the +150 drop are
+# both suppressed and this value places the body outright.
+#
+# Align these by BOTTOM, on the same 1096 line the standing-bare characters
+# use. They were previously aligned by BODY CENTRE onto the canvas centre
+# (y=696), on the reasoning that a round body floats and a shared bottom
+# pushes the biggest bodies high. Centre-alignment has the mirror-image flaw,
+# and it is the worse one: it makes the float depend on body height, so the
+# SHORTEST bodies hang highest. This group spans 639-759px tall, so their
+# bottoms spread 1017-1076 — the ding_dong (shortest at 639) ended up 79px
+# above where the bare standing cast plants, the cookie 65px, while the sugar
+# doughnut sat only 20px off. It also straddled GROUND_SHADOW's 1053
+# ground_line, so half the group cast a floating drop shadow and half a
+# grounded contact pool.
+#
+# A shared bottom makes every bare character in the collection sit in one
+# 1084-1109 band and gives them all the same contact shadow. The tops now
+# vary by body height instead, which is what resting on a floor looks like.
 CENTERED_FOOTWEARLESS_DY = {
-    "glazed_doughnut": 99,        # was 45, centre sat 54px high
-    "chocolate_doughnut": 93,     # was 38, centre sat 55px high
-    "sugar_doughnut": 93,         # was 38, centre sat 55px high
-    "chocolate_sandwich_cookie": 90,  # was 35, centre sat 90px high
-    "chocolate_chip_cookie": 72,      # was 32, centre sat 72px high
-    "oatmeal_cream_pie": 80,
-    "ding_dong": 94,       # was the only CENTERED character with no entry, so
-                           # it floated ~94px above its ring/disc peers when
-                           # bare; centre already lands on the canvas centre
+    "glazed_doughnut": 121,           # was 99, bare bottom 1074
+    "chocolate_doughnut": 121,        # was 93, bare bottom 1068
+    "sugar_doughnut": 113,            # was 93, bare bottom 1076
+    "chocolate_sandwich_cookie": 133, # was 90, bare bottom 1053. Two-part
+                                      # asset: the bbox bottom is the BACK
+                                      # wafer, which is the lowest thing it
+                                      # rests on, so grounding by bbox is
+                                      # right here even though the front disc
+                                      # then sits higher than its peers'.
+    "chocolate_chip_cookie": 137,     # was 72, bare bottom 1031 (65px high)
+    "oatmeal_cream_pie": 153,         # was 80, bare bottom 1023 (73px high)
+    "ding_dong": 173,                 # was 94, bare bottom 1017 — the worst
+                                      # of the group at 79px high, because it
+                                      # is the shortest body in it
 }
 
 def centered_footwearless_dy(char_name):
@@ -742,10 +746,13 @@ CHAR_SCALE = {
     # feet on the same line as the rescaled cone tips and their width (581px)
     # alongside the rescaled ice creams (582px), keeping the two a family.
     "gummy_bear": 0.881,
-    # The regenerated bar is 1154 tall against the old art's 929, which does not
-    # fit the canvas standing on the 1132 bar line - its crown lands at y=-22.
-    # 0.93 buys a 60px top margin and keeps eye/hole at 1.22, inside the cast's
-    # 1.04-1.57 band.
+    # The regenerated bar came in at 1139 tall against a cast median of 771 —
+    # a plank. 0.93 was chosen to fit it on the canvas, but a UNIFORM scale
+    # cannot fix a proportion: every value that brought its height into line
+    # left it a narrower plank with a smaller face. The art has since been
+    # squashed vertically to aspect 1.98 (asset_assessment/squash_character.py),
+    # which matches the Twinkie, the cast's other standing bar. 0.93 is kept
+    # because it is what its CHAR_Y_ADJUST and the bar line are tuned to.
     "nutty_bar": 0.93,
 }
 
@@ -753,37 +760,45 @@ def char_scale(char_name):
     return next((s for k, s in CHAR_SCALE.items()
                  if k in char_name.lower()), 1.0)
 
-# Characters whose face reads better with the skin ball drawn ON TOP of the
-# body (like the before-skinz ice creams), even though their art is authored
-# as an after-skinz "hole" file. The churro is a stack of pieces that
-# otherwise hide the face peeking through the hole; treating it as
-# skin-on-top draws the face cleanly over the dough.
-SKIN_ON_TOP_CHARS = ["churro"]
+def char_base_name(fname):
+    """A characterz filename -> the internal character base-name.
 
-def skin_on_top(char_name):
-    return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
+    Strips the authoring prefixes and a trailing " (n)" duplicate marker.
+    The longest prefix must go first: "layer-after_skinz_" before
+    "after_skinz_", otherwise "layer-after_skinz_churro" becomes
+    "layer-churro" and never matches its own file again. A bare "layer-" is
+    deliberately NOT stripped — some assets carry it as part of their name.
 
-# Characters whose BODY should draw ON TOP of the skin ball (skin placed
-# BEFORE the body, revealed through the body's face hole) even though their
-# art is authored as a before-skinz file. Gummy bears read better with the
-# bear body in front and the skin showing through the eye hole.
-BODY_OVER_SKIN_CHARS = ["gummy_bear", "nutty_bar"]
-
-def body_over_skin(char_name):
-    return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
+    This is the ONE definition of a character's name. It builds the cast list
+    AND resolves a name back to its art, so the two cannot disagree; keeping
+    them separate is what let 'waffle' resolve to gold_waffle's file (see the
+    body-file lookup in generate_random_combination)."""
+    name = (fname.replace("layer-after_skinz_", "")
+                 .replace("before_skinz_", "")
+                 .replace("after_skinz_", "")
+                 .replace(".png", ""))
+    return re.sub(r"\s*\(\d+\)", "", name).strip()
 
 def body_after_skin(char_name, fname):
-    """True when the BODY draws AFTER (on top of) the skin ball — i.e. the
-    skin is placed first and shows through the body's face hole. Defaults to
-    the after_skinz_ filename marker; two per-character overrides win:
-      SKIN_ON_TOP_CHARS  (churro)      -> skin on top  -> body BEFORE skin
-      BODY_OVER_SKIN_CHARS (gummy bears) -> body on top -> body AFTER skin
+    """Always True: the BODY draws AFTER (on top of) the skin ball, for every
+    character. The ball is composited first and the visible face is whatever
+    shows through the body's face hole — no skin is ever painted over a
+    character.
+
+    This used to switch on the `after_skinz_` / `before_skinz_` filename
+    marker, with two per-character exception lists on top of it
+    (SKIN_ON_TOP_CHARS for the churro, BODY_OVER_SKIN_CHARS for the gummy
+    bears and the nutty bar). All three are gone: the filename prefixes now
+    record only how the art was authored, not how it is composited.
+
+    The consequence to keep in mind is that flipping a character to
+    body-over-skin SHRINKS its visible face from the whole ball to the hole,
+    and the ball must then reach the hole's rim for every skin x eye pair —
+    see FACE_HOLE_BOTTOM_OVERRIDE and asset_assessment/verify_face_coverage.py.
+    The signature keeps `fname` so the call sites read the same and a future
+    per-file rule has somewhere to go.
     """
-    if skin_on_top(char_name):
-        return False
-    if body_over_skin(char_name):
-        return True
-    return "after_skinz" in fname.lower()
+    return True
 
 # ---- per-arm intrinsic scale (about the hand line) ----
 # Some arm art was exported larger than the character family. ARM_SCALE
@@ -912,22 +927,30 @@ def _opaque_bbox(path, thresh=128):
 FACE_HOLE_TOP = 464
 FACE_HOLE_BOTTOM = 732
 
-# A few after-skinz bodies have a face hole that sits lower/deeper than the
-# cast-wide FACE_HOLE_BOTTOM, so the standard skin ball stopped short of the
-# hole's bottom edge and a sliver of background showed under the face. Override
-# the hole bottom (px) for just those characters so their ball is enlarged
-# enough to cover it, without growing every other character's face. Substring
-# match on the character base-name.
-FACE_HOLE_BOTTOM_OVERRIDE = {
-    "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
-    "nutty_bar": 765,     # its hole is a TALL ellipse (246 x 294) where the
-                          # rest of the cast's are round or wide, so the ball's
-                          # width covers it but its height does not, and its top
-                          # arc is flatter than the ball's. 765 is the smallest
-                          # value that closes the gap for every skin x eye pair
-                          # (751 left a 107 x 20 crescent at the top on the
-                          # alien skin); it costs 114% of cast-normal ball width.
-}
+# The one face-hole width, in RENDERED pixels, that every character's art is
+# registered to. The face assembly (ball, eyes, mouth) is the same size for
+# the whole cast, so the hole has to be too, or the face reads a different
+# size on different characters — the cast used to run 179-260px, a 1.45x
+# spread. Because the BODY still carries CHAR_SCALE, a character's hole in
+# FILE space must be FACE_HOLE_WIDTH / char_scale (338 for a 0.74 ice cream,
+# 250 for an unscaled body). asset_assessment/normalize_face_hole.py warps
+# art onto this, and audit_face_holes.py checks it.
+FACE_HOLE_WIDTH = 250
+
+# A body whose face hole sits lower/deeper than the cast-wide
+# FACE_HOLE_BOTTOM leaves the standard skin ball stopping short of the hole's
+# bottom edge, and a sliver of background shows under the face. An entry here
+# raises the hole bottom (px) for that character alone, so ball_fit's need_h
+# enlarges its ball enough to cover it. Substring match on the base-name; the
+# value is in PRE-CHAR_SCALE file space.
+#
+# EMPTY, and it should stay that way. Both entries this once held died when
+# their holes were registered rather than worked around: nutty_bar (765) when
+# the art was squashed from a 246x293 tall ellipse to a round one, and
+# gold_waffle (750) when normalize_face_hole.py put every hole on the same
+# circle. Growing the ball is the wrong lever — it is the fallback for art
+# that cannot be re-registered, and it costs face size wherever it applies.
+FACE_HOLE_BOTTOM_OVERRIDE = {}
 
 def face_hole_bottom(char_name):
     return next((v for k, v in FACE_HOLE_BOTTOM_OVERRIDE.items()
@@ -999,17 +1022,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     if not char_files:
         raise ValueError("No character assets found in traits/characterz")
     
-    base_names = set()
-    for f in char_files:
-        # strip the longest prefix first: "layer-after_skinz_" must go
-        # before "after_skinz_", otherwise names like
-        # "layer-after_skinz_churro" become "layer-churro" and never
-        # match their own layer files again
-        name = f.replace("layer-after_skinz_", "").replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
-        import re
-        name = re.sub(r'\s*\(\d+\)', '', name).strip()
-        base_names.add(name)
-    
+    base_names = {char_base_name(f) for f in char_files}
+
     if not base_names:
         raise ValueError("No valid character names found")
     
@@ -1166,8 +1180,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
                 if f.lower().startswith(chosen_wat.lower()) and "overlay" in f.lower():
                     wat_overlays.append(os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f))
 
-    # --- arms slot: any arm may be drawn (including katanas/knives); a
-    # character with a locked weapon overrides the draw with its own ---
+    # --- arms slot: draw from the arms this character is ALLOWED to hold; a
+    # character with a locked weapon of its own gets that instead ---
     arm = None
     if "arms" in active and all_arm_files:
         if force_arm not in ("auto", None):
@@ -1177,9 +1191,16 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             if armz_allowed(force_arm, char_name):
                 arm = force_arm
         else:
-            arm = random.choice(all_arm_files)
-            locked_arms = [f for f in all_arm_files
-                           if f in ARMZ_CHAR_LOCK and armz_allowed(f, char_name)]
+            # The draw MUST be filtered by armz_allowed. It used to be
+            # `random.choice(all_arm_files)` over every arm, with the locked
+            # override applied only when the character had a lock of its own —
+            # so a character with no signature weapon could pick up someone
+            # else's (a glazed doughnut holding the gummy bear's knives), at
+            # 56 hits per 600 combos.
+            allowed = [f for f in all_arm_files if armz_allowed(f, char_name)]
+            if allowed:
+                arm = random.choice(allowed)
+            locked_arms = [f for f in allowed if f in ARMZ_CHAR_LOCK]
             if locked_arms:
                 arm = random.choice(locked_arms)
 
@@ -1229,68 +1250,67 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
 
     # 3. Character layers split by z-order relative to the skin ball.
-    # before_skinz_ files sit BELOW the skin (ice-cream body, sugar cube, etc).
-    # after_skinz_ files sit ABOVE the skin (doughnut/brownie/cookie body with a
-    # face hole — the hole reveals the skin ball beneath). Plain-name files
-    # (Twinkie, Sweetardio) have no hole so they go below by default.
+    # Every body now sits ABOVE the ball (body_after_skin is unconditionally
+    # True): the skin is composited first and the face is what shows through
+    # the body's face hole, so no skin is ever drawn over a character. The
+    # before_skinz_ / after_skinz_ filename prefixes are historical and say
+    # only how the art was authored. before_char_layers is kept because the
+    # split is the shape of the compositor, not because anything uses it today.
+    #
+    # A character's art is whatever file(s) share its base name EXACTLY. This
+    # used to be a cascade of prefix patterns with a SUBSTRING fallback
+    # (`char_name in f and "after_skinz" in f`), and a substring match cannot
+    # tell a name from a name that contains it: "waffle" matched
+    # after_skinz_gold_waffle.png, so the waffle rendered the gold waffle's
+    # body — with the waffle's own CHAR_SCALE / CHAR_Y_ADJUST /
+    # face_hole_bottom applied to it, which is what leaked a 132x31 hole
+    # through its face — and after_skinz_waffle.png was never drawn at all.
+    # Base-name equality also removes the need for the fallback: char_base_name
+    # builds base_names above, so every name resolves by construction.
     before_char_layers = []
     after_char_layers = []
-    char_found = False
 
-    for f in char_files:
-        if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-            if body_after_skin(char_name, f):
-                after_char_layers.append(layer)
-            else:
-                before_char_layers.append(layer)
-            char_found = True
-            break
-
-    main_found = False
-    patterns = [f"{char_name}.png", f"after_skinz_{char_name}.png", f"layer-after_skinz_{char_name}.png"]
-    for p in patterns:
-        for f in char_files:
-            if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if body_after_skin(char_name, f):
-                    after_char_layers.append(layer)
-                else:
-                    before_char_layers.append(layer)
-                main_found = True
-                char_found = True
-                break
-        if main_found:
-            break
-
-    if not char_found:
-        for f in char_files:
-            if char_name.lower() in f.lower():
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if body_after_skin(char_name, f):
-                    after_char_layers.append(layer)
-                else:
-                    before_char_layers.append(layer)
-                char_found = True
-                break
+    body_files = [f for f in char_files if char_base_name(f) == char_name]
+    if not body_files:
+        raise ValueError(f"No art in traits/{CHARACTERZ} for character "
+                         f"{char_name!r}")
+    for f in body_files:
+        layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+        if body_after_skin(char_name, f):
+            after_char_layers.append(layer)
+        else:
+            before_char_layers.append(layer)
 
     # 3. Before-skinz body layers (below skin ball)
     layers.extend(before_char_layers)
 
-    # 5. Skinz: ball sits above before-skinz body, below after-skinz body.
-    # The ball carries the per-character CHAR_SCALE too (cscale), so an
-    # enlarged character's face hole and its skin ball grow together — the
-    # ball always covers the hole exactly as it does at native size, for any
-    # skin (without this the alien skin's small 269px ball leaves a gap on a
-    # scaled bear). ball_fit (fscale) runs first about the ball center, then
-    # cscale about the shared pivot; eyes/mouth stay native size.
+    # 5/6/7. The FACE ASSEMBLY: skin ball, eyes and mouth.
+    #
+    # These deliberately do NOT carry the character's CHAR_SCALE. The face is
+    # one fixed-size assembly pinned at CHAR_SCALE_PIVOT for every character
+    # in the cast; only the BODY varies in size. That is what makes every
+    # character's face the same size — the thing CHAR_SCALE otherwise
+    # prevents, because it scales the ball and the hole together and so a
+    # 0.74 ice cream got a 0.74 face (a 217px ball against everyone else's
+    # 293px, and a 190px hole against their 250px).
+    #
+    # The old comment here warned that native eyes overflow a scaled-down
+    # ball. That was true of eyes native WITH the ball still scaled; with the
+    # whole assembly native the eye-in-ball relationship ball_fit establishes
+    # holds for everyone, identically, at any CHAR_SCALE.
+    #
+    # The other half of the rule lives in the ART: each body's face hole is
+    # authored so that hole x CHAR_SCALE == FACE_HOLE_WIDTH, which is what
+    # asset_assessment/normalize_face_hole.py enforces. A body whose hole is
+    # not registered that way will show a ring of skin ball (hole too small)
+    # or leak the plate (hole too big) — verify_face_coverage.py catches the
+    # second, audit_face_holes.py the first.
     skin_path = os.path.join(TRAITS_DIR, SKINZ, skin)
     bfit, bcenter = ball_fit(skin_path, os.path.join(TRAITS_DIR, EYEZ, eye),
                              hole_bottom=face_hole_bottom(char_name))
     skin_layer = {"path": skin_path, "offset": apply_offset,
                   "dy": y_adjust + bg_extra_y,
-                  "fscale": bfit, "fcenter": bcenter,
-                  "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+                  "fscale": bfit, "fcenter": bcenter}
     if SKIN_SHADOW:
         skin_layer["shadow"] = dict(SKIN_SHADOW)
     layers.append(skin_layer)
@@ -1298,19 +1318,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 4. After-skinz body layers (above skin ball — face hole reveals skin)
     layers.extend(after_char_layers)
 
-    # 6/7. Eyez and Mouthz. These carry cscale too, about the same pivot as the
-    # body and ball. Leaving them native only works while CHAR_SCALE enlarges:
-    # shrink a character and a native-size eye (up to 288px) overflows the
-    # scaled-down ball (313px * 0.74 = 232px) and spills onto the body. Scaling
-    # the whole face with the character keeps the eye-in-ball relationship that
-    # ball_fit establishes, at any scale in either direction.
     layers.append({"path": os.path.join(TRAITS_DIR, EYEZ, eye),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
-                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     layers.append({"path": os.path.join(TRAITS_DIR, MOUTHZ, mouth),
-                   "offset": apply_offset, "dy": y_adjust + bg_extra_y,
-                   "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT})
+                   "offset": apply_offset, "dy": y_adjust + bg_extra_y})
 
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
     # so a held weapon (katana/knives) reads on top of the slippers instead

@@ -63,20 +63,23 @@ GENERIC_ARM_COUNTS = {
     SABERS[2]:                                  25,    # Cyan Saber
     "Sweetardio_115 (11).png":                  40,    # Dual Uzis
     "layer-layer-layer-layer-AR47.png":         55,    # AR47
+    "Armz_Knives.png":                          64,    # Knives
     "layer-layer-layer-layer-Military_Brat.png":85,    # Military Brat
     "layer-layer-layer-layer-Nerf_Blaster.png": 110,   # Nerf Blaster
+    "Armz_Katana.png":                          128,   # Katana
     "Arms_Cash.png":                            130,   # Cash
 }
-# character-locked signature weapons (only minted onto their owner). The dead
-# gummy-worm katana is intentionally excluded (no gummy_worm character exists).
-SIGNATURE_ARMS = {
-    "Armz_Gummy_Bear_Knives.png":              32,
-    "Armz_Katana_for_ice_cream_character.png": 32,
-    "Armz_Marshmallow_knives.png":             32,
-    "Armz_Oatmeal_Pie_Katana.png":             32,
-    "Armz_Twinkie_Katana.png":                 32,
-    "Armz_choc_cookie_katana.png":             32,
-}
+# Character-locked signature weapons (only minted onto their owner).
+#
+# EMPTY BY DESIGN, mirroring generator.ARMZ_CHAR_LOCK. The katana and knives
+# used to be seven per-character files here at 32 each; they are now one
+# generic file each, in GENERIC_ARM_COUNTS above. The counts there preserve
+# what a collector actually sees, because the metadata only ever showed the
+# display name: four minted katanas x 32 = 128 "Katana" tokens and two knives
+# x 32 = 64 "Knives", so the trait rarity table does not move. What changes is
+# that the weapons now spread across the whole cast instead of being pinned to
+# one owner each.
+SIGNATURE_ARMS = {}
 
 # ---- footwear rarity (base name as returned by wat_base_name, or "gorbhouse")
 FOOTWEAR_COUNTS = {

@@ -57,10 +57,10 @@ from audit_placement import char_table, measure, BALL_CENTER  # noqa: E402
 # they just do not fail the run, so the exit status stays meaningful.
 WAIVED = {
     ("chocolate_sandwich_cookie", "vertical"):
-        "applies to its FOOTWEAR case only, where CHAR_Y_ADJUST +50 is tuned to "
-        "the FRONT disc: the back wafer sits lower, so the bbox reads ~56px "
-        "below the group. Its bare case is centred correctly and needs no "
-        "waiver — confirmed by render.",
+        "applies to its FOOTWEAR and GORBHOUSE cases, where CHAR_Y_ADJUST +50 "
+        "is tuned to the FRONT disc: the back wafer sits lower, so the bbox "
+        "reads ~56px below the group. Its bare case is bottom-aligned with the "
+        "rest of the centred group and needs no waiver — confirmed by render.",
     ("chocolate_sandwich_cookie", "horizontal"):
         "two-part asset: the back wafer sits left of the front disc, so the bbox "
         "centre reads ~54px left. The face-carrying disc is on the column — "
@@ -163,18 +163,18 @@ def main():
     canvas_cy = g.CANVAS_SIZE // 2
     for grp in sorted({r["group"] for r in rows}):
         members = [r for r in rows if r["group"] == grp]
-        # Characters that STAND are judged on a shared bottom line. Ones that
-        # FLOAT are judged on their centre against the canvas centre: matching
-        # bottoms across different body sizes pushes the biggest bodies high,
-        # which is exactly how the oversized doughnuts passed this check.
-        # only the BARE centred case floats; "centred, on gorbhouse"
-        # stands on the gorbhouse and is judged on a bottom line
-        floats = grp == "centred, bare"
-        key = "cy" if floats else "bottom"
-        med = canvas_cy if floats else statistics.median(
-            r["bottom"] for r in members)
-        label = (f"centre vs canvas centre {med:.0f}" if floats
-                 else f"median bottom {med:.0f}")
+        # EVERY group is judged on a shared bottom line, including "centred,
+        # bare". That group used to be judged on its centre against the canvas
+        # centre, on the reasoning that its members float and a shared bottom
+        # pushes the biggest bodies high. But centre-alignment ties the float
+        # to body height, so the SHORTEST bodies hang highest — and once the
+        # cast was size-normalised that became the visible defect: ding_dong
+        # (the group's shortest at 639px) sat 79px above where the bare
+        # standing cast plants, the cookie 65px. They are bottom-aligned onto
+        # the standing line now, so one metric covers the whole cast.
+        key = "bottom"
+        med = statistics.median(r["bottom"] for r in members)
+        label = f"median bottom {med:.0f}"
         print(f"\n{grp}  ({len(members)} characters, {label})")
         for r in sorted(members, key=lambda r: r[key]):
             d = r[key] - med

@@ -46,13 +46,10 @@ def pair_score(c, p):
 
 
 def base_name(fname):
-    """File name -> generator character base-name (EXACT same stripping as
-    generate_random_combination: strips the layer-after_skinz_/before_skinz_/
-    after_skinz_ prefixes and a trailing ' (n)', but NOT a bare 'layer-')."""
-    n = (fname.replace("layer-after_skinz_", "")
-              .replace("before_skinz_", "").replace("after_skinz_", "")
-              .replace(".png", ""))
-    return re.sub(r"\s*\(\d+\)", "", n).strip()
+    """File name -> generator character base-name. Delegates to
+    generator.char_base_name so this cannot drift from the stripping the
+    generator actually uses; kept as a name here because callers import it."""
+    return g.char_base_name(fname)
 
 
 def char_table():
