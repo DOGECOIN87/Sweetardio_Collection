@@ -34,7 +34,7 @@ Where this is already encoded:
 - Canvas is **1393 × 1393**, and **every trait asset must be authored at that
   size**. `_render_layer()` silently resizes anything else, which scales the
   art *and moves its origin* — a 1343 sticker landed 40px off from where its
-  file said. All 129 trait assets now conform; only `backgroundz` may vary,
+  file said. All 123 trait assets now conform; only `backgroundz` may vary,
   since a plate is re-fit to the frame by design.
   `asset_assessment/audit_art_quality.py` flags any deviation.
 - The skin ball, eyes and mouth composite at **fixed canvas positions**; the
@@ -43,9 +43,9 @@ Where this is already encoded:
   must be preserved exactly when an asset is re-authored.
 - `ball_fit()` sizes every skin ball from the **widest eye**, so eye width is
   load-bearing across the whole collection.
-- **The eyes must overlap the face hole's rim.** All 30 characters have the
-  median eye (279px) wider than their face hole — ratios 1.04 to 1.57, median
-  1.13 — so the eye whites spill past the hole edge onto the body. That overlap
+- **The eyes must overlap the face hole's rim.** All 27 characters have the
+  median eye (277px) wider than their face hole — ratios 1.06 to 1.54, median
+  1.11 — so the eye whites spill past the hole edge onto the body. That overlap
   is the collection's face style, not an accident.
 
   It is fixed by the **art**, because `eye width ÷ hole width` survives every
@@ -55,18 +55,58 @@ Where this is already encoded:
   with a ring of skin ball showing.
 
   So new character art is registered to a **hole width of 248px** (the cast
-  median) by `asset_assessment/register_character.py`, which scales the art
-  until the hole matches before pinning it to the ball centre. Sizing the hole
-  correctly also removes any need for a `FACE_HOLE_BOTTOM_OVERRIDE`: a
-  cast-sized hole is one the standard ball already covers.
+  median; the 27 holes measure 180–261, median 250) by
+  `asset_assessment/register_character.py`, which scales the art until the hole
+  matches before pinning it to the ball centre. Sizing the hole correctly also
+  removes any need for a `FACE_HOLE_BOTTOM_OVERRIDE`: a cast-sized hole is one
+  the standard ball already covers.
+
+## Z-order: the body is always drawn over the skin
+
+**No skin ball is ever painted over a character.** The ball is composited
+first and the visible face is whatever shows through the body's face hole —
+for every character, with no exceptions. `body_after_skin()` in `generator.py`
+returns True unconditionally; the `before_skinz_` / `after_skinz_` filename
+prefixes are historical and record only how the art was authored, never how it
+is composited.
+
+Two things follow, and both are checked by
+`asset_assessment/verify_face_coverage.py`:
+
+- **The ball must reach the hole's rim for every skin × eye pair.** If it
+  falls short the gap is neither skin nor body, it is a hole through to the
+  background plate — and it appears for only some pairs, because `ball_fit`
+  sizes the ball from the widest eye and each ball has its own size and centre.
+  The fix is `FACE_HOLE_BOTTOM_OVERRIDE[<char>]`, whose value is in
+  **pre-`CHAR_SCALE` file space**, not composited canvas space.
+- **Every character therefore needs a real enclosed hole.** All 27 have one.
+
+## Character art is resolved by exact base name
+
+`char_base_name()` in `generator.py` is the one definition of a character's
+name. It builds the cast list *and* maps a name back to its art, so the two
+cannot disagree. Never match a character to a file by substring: `waffle` is a
+substring of `gold_waffle`, which is exactly how the waffle spent a long time
+rendering the gold waffle's body (with its own placement tables applied to it,
+leaking a 132×31 hole through its face) while `after_skinz_waffle.png` was
+never drawn at all.
 
 ## Verification tools
 
 ```bash
-python3 asset_assessment/verify_placement.py    # where characters actually land
-python3 asset_assessment/audit_placement.py     # what CHAR_Y_ADJUST should be
-python3 asset_assessment/render_sample_sheet.py # N random tokens, full pipeline
+python3 asset_assessment/verify_placement.py      # where characters actually land
+python3 asset_assessment/verify_face_coverage.py  # does the ball cover every hole
+python3 asset_assessment/audit_placement.py       # what CHAR_Y_ADJUST should be
+python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeline
 ```
 
 `verify_placement.py` exits non-zero if any character is off its group, drifts
 horizontally off the face column, or has a face hole away from the ball centre.
+
+`verify_face_coverage.py` exits non-zero if any character × skin × eye leaves
+transparent pixels enclosed by body + ball — i.e. background showing through a
+face. It is the check that has to pass before any character art, `CHAR_SCALE`
+or `FACE_HOLE_BOTTOM_OVERRIDE` change is called done.
+
+The environment needs `pillow`, `numpy` and `scipy` (`pip install pillow numpy
+scipy`); a bare container has none of them.

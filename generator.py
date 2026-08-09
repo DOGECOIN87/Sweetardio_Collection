@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import re
 from PIL import Image
 
 TRAITS_DIR = "traits"
@@ -753,37 +754,45 @@ def char_scale(char_name):
     return next((s for k, s in CHAR_SCALE.items()
                  if k in char_name.lower()), 1.0)
 
-# Characters whose face reads better with the skin ball drawn ON TOP of the
-# body (like the before-skinz ice creams), even though their art is authored
-# as an after-skinz "hole" file. The churro is a stack of pieces that
-# otherwise hide the face peeking through the hole; treating it as
-# skin-on-top draws the face cleanly over the dough.
-SKIN_ON_TOP_CHARS = ["churro"]
+def char_base_name(fname):
+    """A characterz filename -> the internal character base-name.
 
-def skin_on_top(char_name):
-    return any(k in char_name.lower() for k in SKIN_ON_TOP_CHARS)
+    Strips the authoring prefixes and a trailing " (n)" duplicate marker.
+    The longest prefix must go first: "layer-after_skinz_" before
+    "after_skinz_", otherwise "layer-after_skinz_churro" becomes
+    "layer-churro" and never matches its own file again. A bare "layer-" is
+    deliberately NOT stripped — some assets carry it as part of their name.
 
-# Characters whose BODY should draw ON TOP of the skin ball (skin placed
-# BEFORE the body, revealed through the body's face hole) even though their
-# art is authored as a before-skinz file. Gummy bears read better with the
-# bear body in front and the skin showing through the eye hole.
-BODY_OVER_SKIN_CHARS = ["gummy_bear", "nutty_bar"]
-
-def body_over_skin(char_name):
-    return any(k in char_name.lower() for k in BODY_OVER_SKIN_CHARS)
+    This is the ONE definition of a character's name. It builds the cast list
+    AND resolves a name back to its art, so the two cannot disagree; keeping
+    them separate is what let 'waffle' resolve to gold_waffle's file (see the
+    body-file lookup in generate_random_combination)."""
+    name = (fname.replace("layer-after_skinz_", "")
+                 .replace("before_skinz_", "")
+                 .replace("after_skinz_", "")
+                 .replace(".png", ""))
+    return re.sub(r"\s*\(\d+\)", "", name).strip()
 
 def body_after_skin(char_name, fname):
-    """True when the BODY draws AFTER (on top of) the skin ball — i.e. the
-    skin is placed first and shows through the body's face hole. Defaults to
-    the after_skinz_ filename marker; two per-character overrides win:
-      SKIN_ON_TOP_CHARS  (churro)      -> skin on top  -> body BEFORE skin
-      BODY_OVER_SKIN_CHARS (gummy bears) -> body on top -> body AFTER skin
+    """Always True: the BODY draws AFTER (on top of) the skin ball, for every
+    character. The ball is composited first and the visible face is whatever
+    shows through the body's face hole — no skin is ever painted over a
+    character.
+
+    This used to switch on the `after_skinz_` / `before_skinz_` filename
+    marker, with two per-character exception lists on top of it
+    (SKIN_ON_TOP_CHARS for the churro, BODY_OVER_SKIN_CHARS for the gummy
+    bears and the nutty bar). All three are gone: the filename prefixes now
+    record only how the art was authored, not how it is composited.
+
+    The consequence to keep in mind is that flipping a character to
+    body-over-skin SHRINKS its visible face from the whole ball to the hole,
+    and the ball must then reach the hole's rim for every skin x eye pair —
+    see FACE_HOLE_BOTTOM_OVERRIDE and asset_assessment/verify_face_coverage.py.
+    The signature keeps `fname` so the call sites read the same and a future
+    per-file rule has somewhere to go.
     """
-    if skin_on_top(char_name):
-        return False
-    if body_over_skin(char_name):
-        return True
-    return "after_skinz" in fname.lower()
+    return True
 
 # ---- per-arm intrinsic scale (about the hand line) ----
 # Some arm art was exported larger than the character family. ARM_SCALE
@@ -999,17 +1008,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     if not char_files:
         raise ValueError("No character assets found in traits/characterz")
     
-    base_names = set()
-    for f in char_files:
-        # strip the longest prefix first: "layer-after_skinz_" must go
-        # before "after_skinz_", otherwise names like
-        # "layer-after_skinz_churro" become "layer-churro" and never
-        # match their own layer files again
-        name = f.replace("layer-after_skinz_", "").replace("before_skinz_", "").replace("after_skinz_", "").replace(".png", "")
-        import re
-        name = re.sub(r'\s*\(\d+\)', '', name).strip()
-        base_names.add(name)
-    
+    base_names = {char_base_name(f) for f in char_files}
+
     if not base_names:
         raise ValueError("No valid character names found")
     
@@ -1229,50 +1229,36 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     bg_extra_y = BG_CHAR_EXTRA_Y.get(bg, 0) if apply_offset else 0
 
     # 3. Character layers split by z-order relative to the skin ball.
-    # before_skinz_ files sit BELOW the skin (ice-cream body, sugar cube, etc).
-    # after_skinz_ files sit ABOVE the skin (doughnut/brownie/cookie body with a
-    # face hole — the hole reveals the skin ball beneath). Plain-name files
-    # (Twinkie, Sweetardio) have no hole so they go below by default.
+    # Every body now sits ABOVE the ball (body_after_skin is unconditionally
+    # True): the skin is composited first and the face is what shows through
+    # the body's face hole, so no skin is ever drawn over a character. The
+    # before_skinz_ / after_skinz_ filename prefixes are historical and say
+    # only how the art was authored. before_char_layers is kept because the
+    # split is the shape of the compositor, not because anything uses it today.
+    #
+    # A character's art is whatever file(s) share its base name EXACTLY. This
+    # used to be a cascade of prefix patterns with a SUBSTRING fallback
+    # (`char_name in f and "after_skinz" in f`), and a substring match cannot
+    # tell a name from a name that contains it: "waffle" matched
+    # after_skinz_gold_waffle.png, so the waffle rendered the gold waffle's
+    # body — with the waffle's own CHAR_SCALE / CHAR_Y_ADJUST /
+    # face_hole_bottom applied to it, which is what leaked a 132x31 hole
+    # through its face — and after_skinz_waffle.png was never drawn at all.
+    # Base-name equality also removes the need for the fallback: char_base_name
+    # builds base_names above, so every name resolves by construction.
     before_char_layers = []
     after_char_layers = []
-    char_found = False
 
-    for f in char_files:
-        if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-            if body_after_skin(char_name, f):
-                after_char_layers.append(layer)
-            else:
-                before_char_layers.append(layer)
-            char_found = True
-            break
-
-    main_found = False
-    patterns = [f"{char_name}.png", f"after_skinz_{char_name}.png", f"layer-after_skinz_{char_name}.png"]
-    for p in patterns:
-        for f in char_files:
-            if f.lower() == p.lower() or (char_name.lower() in f.lower() and "after_skinz" in f.lower()):
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if body_after_skin(char_name, f):
-                    after_char_layers.append(layer)
-                else:
-                    before_char_layers.append(layer)
-                main_found = True
-                char_found = True
-                break
-        if main_found:
-            break
-
-    if not char_found:
-        for f in char_files:
-            if char_name.lower() in f.lower():
-                layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
-                if body_after_skin(char_name, f):
-                    after_char_layers.append(layer)
-                else:
-                    before_char_layers.append(layer)
-                char_found = True
-                break
+    body_files = [f for f in char_files if char_base_name(f) == char_name]
+    if not body_files:
+        raise ValueError(f"No art in traits/{CHARACTERZ} for character "
+                         f"{char_name!r}")
+    for f in body_files:
+        layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
+        if body_after_skin(char_name, f):
+            after_char_layers.append(layer)
+        else:
+            before_char_layers.append(layer)
 
     # 3. Before-skinz body layers (below skin ball)
     layers.extend(before_char_layers)

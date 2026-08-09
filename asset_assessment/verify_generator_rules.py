@@ -26,43 +26,13 @@ import generator as g
 
 
 def base_names(char_files):
-    names = set()
-    for f in char_files:
-        # same order as generator.py: longest prefix stripped first
-        name = (f.replace("layer-after_skinz_", "")
-                .replace("before_skinz_", "").replace("after_skinz_", "")
-                .replace(".png", ""))
-        name = re.sub(r"\s*\(\d+\)", "", name).strip()
-        names.add(name)
-    return sorted(names)
+    return sorted({g.char_base_name(f) for f in char_files})
 
 
 def resolves(char_name, char_files):
-    """Replay generator.py's layer lookup for a character; True if any
-    character layer file is found."""
-    found = []
-    for f in char_files:
-        if f.startswith("before_skinz_") and char_name.lower() in f.lower():
-            found.append(f)
-            break
-    patterns = [f"{char_name}.png", f"after_skinz_{char_name}.png",
-                f"layer-after_skinz_{char_name}.png"]
-    for p in patterns:
-        hit = False
-        for f in char_files:
-            if f.lower() == p.lower() or (char_name.lower() in f.lower()
-                                          and "after_skinz" in f.lower()):
-                found.append(f)
-                hit = True
-                break
-        if hit:
-            break
-    if not found:
-        for f in char_files:
-            if char_name.lower() in f.lower():
-                found.append(f)
-                break
-    return found
+    """The art generator.py will draw for a character: every file whose base
+    name matches it exactly. Empty means the character has no art."""
+    return [f for f in char_files if g.char_base_name(f) == char_name]
 
 
 def main():

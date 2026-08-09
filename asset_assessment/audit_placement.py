@@ -114,14 +114,9 @@ def measure(path, ds=4):
 
 def char_table():
     """base name -> primary character file (generator's resolution order)."""
-    char_files = g.get_files(g.CHARACTERZ)
     names = {}
-    for f in char_files:
-        n = (f.replace("layer-after_skinz_", "")
-              .replace("before_skinz_", "").replace("after_skinz_", "")
-              .replace(".png", ""))
-        n = re.sub(r"\s*\(\d+\)", "", n).strip()
-        names.setdefault(n, f)
+    for f in g.get_files(g.CHARACTERZ):
+        names.setdefault(g.char_base_name(f), f)
     return names
 
 
