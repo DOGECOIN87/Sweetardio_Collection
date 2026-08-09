@@ -69,6 +69,16 @@ PRESET = {
     "fill": 0.15,        # cool bounce on the shadow limb
     "occl": 0.26,        # rim ambient occlusion
     "occl_width": 0.34,  # how far in from the limb the occlusion reaches
+    # Cheek blush. Positions are in ball-normalised coordinates (0 = centre,
+    # 1 = limb), so they ride the ball and stay put whatever ball_fit does.
+    # Applied as a per-channel REDDENING of the skin's own colour rather than
+    # a pink overlay, so it reads on the dark skin too instead of going
+    # chalky. Set "blush" to 0 to switch it off.
+    "blush": 0.0,        # off by default -- see --blush
+    "blush_x": 0.52,     # cheek centre, left/right of the ball centre
+    "blush_y": 0.26,     # ...and below it
+    "blush_r": 0.30,     # cheek radius
+    "blush_gain": np.array([0.34, -0.07, 0.01]),   # reddening per channel
 }
 
 
@@ -143,6 +153,17 @@ def relight(img, p):
     bounce = np.clip((n * fill).sum(axis=-1), 0.0, 1.0) ** 2.0
     bounce *= sstep(0.45, 1.0, rim)
     rgb += FILL_TINT * (p["fill"] * bounce)[..., None]
+
+    # ---- cheek blush ----
+    if p.get("blush", 0.0) > 0.001:
+        bx, by, br = p["blush_x"], p["blush_y"], p["blush_r"]
+        cheeks = np.zeros_like(nx)
+        for sx in (-1.0, 1.0):
+            d = np.sqrt(((nx - sx * bx) / br) ** 2 + ((ny - by) / br) ** 2)
+            cheeks = np.maximum(cheeks, 1.0 - sstep(0.0, 1.0, d))
+        # keep it on the ball and off the limb
+        cheeks *= 1.0 - sstep(0.72, 0.98, rim)
+        rgb *= 1.0 + p["blush"] * cheeks[..., None] * p["blush_gain"]
 
     # filmic shoulder so the hotspot rolls off instead of clipping flat
     s = 0.90

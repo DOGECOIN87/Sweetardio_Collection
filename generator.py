@@ -875,6 +875,39 @@ MOUTH_PROP_FILES = {
     "layer-Mouth_Lollipop (1).png",
 }
 
+# ---- face-inset shadow (the hole's rim, cast ONTO the skin ball) ----
+# The ball sits BEHIND the body and shows through the face hole, so the hole
+# is a recess and its rim occludes it. Without this the ball is lit as a free
+# sphere floating in a hole, which is why a face can still read as pasted
+# behind the body rather than set into it: there is no contact anywhere the
+# two meet.
+#
+# Two terms, both confined to the hole (body transparent AND ball opaque), so
+# nothing here can touch the body, the plate or the silhouette:
+#   cast   the rim's own shadow, the body alpha pushed DOWN AND RIGHT by the
+#          top-left key (CLAUDE.md) and blurred, so the shadow hugs the
+#          hole's upper-left interior and falls away across the face
+#   ao     contact occlusion all the way round the rim, unoffset and tighter,
+#          so the ball darkens slightly wherever it meets the hole edge
+#
+# Applied after the body and BEFORE the eyes and mouth, so the face features
+# sit on top of the shading rather than under it.
+#
+# OFF by default, and it is a genuine judgement call rather than a fix: it
+# makes the face read as set INTO the hole, but it does so by darkening the
+# top of the ball, and the reference face this was chased against is bright
+# at the top. Rendered both ways before leaving it off. Swap None for the
+# dict below to enable.
+FACE_INSET_SHADOW = None
+FACE_INSET_SHADOW_PRESET = {
+    "cast_blur": 26,
+    "cast_opacity": 0.40,
+    "cast_dx": 15,
+    "cast_dy": 17,
+    "ao_blur": 9,
+    "ao_opacity": 0.30,
+}
+
 # ---- character grounding shadow (cast ONTO the background) ----
 # Soft shadow cast by the character's silhouette onto the background plate,
 # composited ABOVE the plate and BELOW the character, so each character sits
@@ -1529,6 +1562,42 @@ def _ground_shadow(sil_alpha, cfg):
     return shadow
 
 
+def _face_inset_shadow(char_img, ball_alpha, body_alpha, cfg):
+    """Shade the skin ball where the face hole's rim occludes it.
+
+    Composites in place onto char_img. Everything is masked to the HOLE --
+    the region where the body is transparent and the ball is opaque -- so the
+    result is identical to having drawn it under the body, and it can never
+    reach the body, the plate or the silhouette. See FACE_INSET_SHADOW."""
+    from PIL import ImageChops, ImageFilter
+    # the hole: ball present, body absent
+    hole = ImageChops.multiply(ball_alpha, ImageChops.invert(body_alpha))
+    if hole.getbbox() is None:
+        return
+
+    shade = Image.new("L", char_img.size, 0)
+
+    # ---- the rim's cast shadow, pushed down-right by the top-left key ----
+    op = cfg.get("cast_opacity", 0.0)
+    if op > 0.005:
+        moved = Image.new("L", char_img.size, 0)
+        moved.paste(body_alpha, (int(cfg.get("cast_dx", 0)),
+                                 int(cfg.get("cast_dy", 0))))
+        cast = moved.filter(ImageFilter.GaussianBlur(cfg.get("cast_blur", 26)))
+        shade = ImageChops.lighter(shade, cast.point(lambda v: int(v * op)))
+
+    # ---- contact occlusion all round the rim ----
+    op = cfg.get("ao_opacity", 0.0)
+    if op > 0.005:
+        ao = body_alpha.filter(ImageFilter.GaussianBlur(cfg.get("ao_blur", 9)))
+        shade = ImageChops.lighter(shade, ao.point(lambda v: int(v * op)))
+
+    shade = ImageChops.multiply(shade, hole)
+    layer = Image.new("RGBA", char_img.size, (0, 0, 0, 255))
+    layer.putalpha(shade)
+    char_img.alpha_composite(layer)
+
+
 def _subject_separation(bg_img, sil_alpha, cfg):
     """Open a stage pocket in the background plate around the character.
 
@@ -1663,10 +1732,27 @@ def create_image(layers, output_name=None, metadata=None):
     sil_alpha = Image.new("L", canvas, 0)
     exclude_arms = bool(GROUND_SHADOW and GROUND_SHADOW.get("exclude_arms"))
 
+    skin_prefix = os.path.normpath(os.path.join(TRAITS_DIR, SKINZ))
+    char_prefix = os.path.normpath(os.path.join(TRAITS_DIR, CHARACTERZ))
+    ball_alpha = Image.new("L", canvas, 0)
+    body_alpha = Image.new("L", canvas, 0)
+    inset_done = False
+
     for layer_info in char_layers:
         img = _render_layer(layer_info)
         if img is None:
             continue
+        # The inset shadow needs the ball and the body, and must land under
+        # the eyes and mouth -- so it goes in the moment we leave the body
+        # and reach the first face feature.
+        p = os.path.normpath(layer_info["path"])
+        is_skin = p.startswith(skin_prefix + os.sep)
+        is_body = p.startswith(char_prefix + os.sep)
+        if (FACE_INSET_SHADOW and not inset_done and not is_skin
+                and not is_body and ball_alpha.getbbox() is not None):
+            _face_inset_shadow(char_img, ball_alpha, body_alpha,
+                               FACE_INSET_SHADOW)
+            inset_done = True
         sh = layer_info.get("shadow")
         if sh:
             a = img.getchannel("A")
@@ -1682,6 +1768,10 @@ def create_image(layers, output_name=None, metadata=None):
             char_img.alpha_composite(shadow)
         char_img.alpha_composite(img)
         alpha = img.getchannel("A")
+        if is_skin:
+            ball_alpha = ImageChops.lighter(ball_alpha, alpha)
+        elif is_body:
+            body_alpha = ImageChops.lighter(body_alpha, alpha)
         fg_mask = ImageChops.lighter(fg_mask, alpha)
         if not (exclude_arms and _is_arm(layer_info)):
             sil_alpha = ImageChops.lighter(sil_alpha, alpha)
