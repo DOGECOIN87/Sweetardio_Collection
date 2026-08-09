@@ -662,31 +662,39 @@ def char_y_adjust(char_name):
     return CHAR_Y_ADJUST[max(hits, key=len)] if hits else 0
 
 # Per-character vertical trim (px, +down) for CENTERED characters in their
-# footwear-less CENTRED position (where the normal CHAR_Y_ADJUST is suppressed
-# so the round/baseless body sits at its natural centre). A round body's native
-# centre can still read slightly high in-frame (the face holes sit ~100px above
-# canvas centre), so this nudges it down WITHOUT touching the character's
-# footwear placement (CHAR_Y_ADJUST). Default 0; tuned by eye.
-# Align these by BODY CENTRE, not by bottom. A bottom line is the right metric
-# for characters that stand on something, but these float, and matching bottoms
-# across different sizes pushes the biggest bodies high: the doughnuts are the
-# largest rings, so a shared bottom left their mass ~55px above canvas centre
-# while ding_dong (a smaller ring, tuned by eye) sat dead centre. Values below
-# put each body's centre on the canvas centre line (y=696). Chosen over
-# aligning the face HOLE to centre, which the cookies showed diverging by up to
-# 26px: hole-alignment drops the green centre line through the eyes, while
-# bbox-alignment keeps it just under the face the way the rest of the group
-# reads.
+# footwear-less position, where the normal CHAR_Y_ADJUST and the +150 drop are
+# both suppressed and this value places the body outright.
+#
+# Align these by BOTTOM, on the same 1096 line the standing-bare characters
+# use. They were previously aligned by BODY CENTRE onto the canvas centre
+# (y=696), on the reasoning that a round body floats and a shared bottom
+# pushes the biggest bodies high. Centre-alignment has the mirror-image flaw,
+# and it is the worse one: it makes the float depend on body height, so the
+# SHORTEST bodies hang highest. This group spans 639-759px tall, so their
+# bottoms spread 1017-1076 — the ding_dong (shortest at 639) ended up 79px
+# above where the bare standing cast plants, the cookie 65px, while the sugar
+# doughnut sat only 20px off. It also straddled GROUND_SHADOW's 1053
+# ground_line, so half the group cast a floating drop shadow and half a
+# grounded contact pool.
+#
+# A shared bottom makes every bare character in the collection sit in one
+# 1084-1109 band and gives them all the same contact shadow. The tops now
+# vary by body height instead, which is what resting on a floor looks like.
 CENTERED_FOOTWEARLESS_DY = {
-    "glazed_doughnut": 99,        # was 45, centre sat 54px high
-    "chocolate_doughnut": 93,     # was 38, centre sat 55px high
-    "sugar_doughnut": 93,         # was 38, centre sat 55px high
-    "chocolate_sandwich_cookie": 90,  # was 35, centre sat 90px high
-    "chocolate_chip_cookie": 72,      # was 32, centre sat 72px high
-    "oatmeal_cream_pie": 80,
-    "ding_dong": 94,       # was the only CENTERED character with no entry, so
-                           # it floated ~94px above its ring/disc peers when
-                           # bare; centre already lands on the canvas centre
+    "glazed_doughnut": 121,           # was 99, bare bottom 1074
+    "chocolate_doughnut": 121,        # was 93, bare bottom 1068
+    "sugar_doughnut": 113,            # was 93, bare bottom 1076
+    "chocolate_sandwich_cookie": 133, # was 90, bare bottom 1053. Two-part
+                                      # asset: the bbox bottom is the BACK
+                                      # wafer, which is the lowest thing it
+                                      # rests on, so grounding by bbox is
+                                      # right here even though the front disc
+                                      # then sits higher than its peers'.
+    "chocolate_chip_cookie": 137,     # was 72, bare bottom 1031 (65px high)
+    "oatmeal_cream_pie": 153,         # was 80, bare bottom 1023 (73px high)
+    "ding_dong": 173,                 # was 94, bare bottom 1017 — the worst
+                                      # of the group at 79px high, because it
+                                      # is the shortest body in it
 }
 
 def centered_footwearless_dy(char_name):

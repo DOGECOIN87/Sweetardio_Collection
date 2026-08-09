@@ -83,13 +83,28 @@ brought the height into line left a narrower plank with a smaller face
 about the ball centre: aspect 2.33 → 1.98, matching the Twinkie, keeping the
 width and the full-size face. `CHAR_Y_ADJUST` re-derived −118 → −20.
 
+### 1f. The centred round bodies floated when bare
+
+The seven `CENTERED_CHARS` (cookies, doughnuts, ding dong) skip the standing
+drop when they have no footwear and were placed by **body centre** on the
+canvas centre. That ties the float to body height, so the SHORTEST bodies hung
+highest: ding_dong (639px, the shortest) sat 79px above where the bare
+standing cast plants, chocolate_chip_cookie 65px, while the sugar doughnut was
+only 20px off. The group also straddled `GROUND_SHADOW`'s 1053 `ground_line`,
+so half of it cast a floating drop shadow and half a grounded contact pool.
+
+They are **bottom-aligned onto 1096** now — the standing-bare median — so the
+whole cast sits in one 1084-1109 band with a consistent contact shadow.
+`verify_placement.py` judges every group on a shared bottom line as a result;
+the centre-based rule it used for this group is gone.
+
 ### Verification run at handover
 
 | check | result |
 |---|---|
 | `verify_face_coverage.py` (891 composites) | 0 leaks, all 27 covered on every skin × eye |
 | `audit_face_holes.py` | all 27 render 250px, exit 0 |
-| `verify_placement.py` | exit 0, 49 cases, 0 flags |
+| `verify_placement.py` | exit 0, 49 cases, 0 flags; centred group all exactly on 1096 |
 | `verify_generator_rules.py` | **exit 0** — 0 lock leaks, synthetic lock fires correctly |
 | `build_char_compat.py` | rebuilt against the new art |
 | `build_mint.py --n 4444 --seed 7` | camouflage=0, eye-clash=0, 4421/4444 unique |
