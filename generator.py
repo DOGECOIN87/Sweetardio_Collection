@@ -647,8 +647,9 @@ CHAR_Y_ADJUST = {
     "oatmeal_cream_pie": 14,
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
-    "nutty_bar": -118,         # bar body, stands with the Twinkie at 1132;
-                               # re-derived for the regenerated art     # rescaled; feet on the shared ground line (1111)
+    "nutty_bar": -20,          # bar body, stands with the Twinkie at 1132;
+                               # re-derived after the art was squashed to
+                               # aspect 1.98 (was -118 at aspect 2.33)
 }
 
 def char_y_adjust(char_name):
@@ -737,10 +738,13 @@ CHAR_SCALE = {
     # feet on the same line as the rescaled cone tips and their width (581px)
     # alongside the rescaled ice creams (582px), keeping the two a family.
     "gummy_bear": 0.881,
-    # The regenerated bar is 1154 tall against the old art's 929, which does not
-    # fit the canvas standing on the 1132 bar line - its crown lands at y=-22.
-    # 0.93 buys a 60px top margin and keeps eye/hole at 1.22, inside the cast's
-    # 1.04-1.57 band.
+    # The regenerated bar came in at 1139 tall against a cast median of 771 —
+    # a plank. 0.93 was chosen to fit it on the canvas, but a UNIFORM scale
+    # cannot fix a proportion: every value that brought its height into line
+    # left it a narrower plank with a smaller face. The art has since been
+    # squashed vertically to aspect 1.98 (asset_assessment/squash_character.py),
+    # which matches the Twinkie, the cast's other standing bar. 0.93 is kept
+    # because it is what its CHAR_Y_ADJUST and the bar line are tuned to.
     "nutty_bar": 0.93,
 }
 
@@ -921,15 +925,12 @@ FACE_HOLE_BOTTOM = 732
 # the hole bottom (px) for just those characters so their ball is enlarged
 # enough to cover it, without growing every other character's face. Substring
 # match on the character base-name.
+# Prefer fixing the ART: the nutty_bar entry (765) is gone because squashing
+# its hole from a 246x293 tall ellipse to a cast-sized 246x249 round one left
+# nothing for the standard ball to miss. An override grows the ball for that
+# character, which costs face size everywhere it applies.
 FACE_HOLE_BOTTOM_OVERRIDE = {
     "gold_waffle": 750,   # hole bottom ~741; ball must reach below it
-    "nutty_bar": 765,     # its hole is a TALL ellipse (246 x 294) where the
-                          # rest of the cast's are round or wide, so the ball's
-                          # width covers it but its height does not, and its top
-                          # arc is flatter than the ball's. 765 is the smallest
-                          # value that closes the gap for every skin x eye pair
-                          # (751 left a 107 x 20 crescent at the top on the
-                          # alien skin); it costs 114% of cast-normal ball width.
 }
 
 def face_hole_bottom(char_name):
