@@ -197,10 +197,14 @@ Retiring an eye means rebuilding `traits/eyez_compat.json`
 Some character art was cut with a black outline left in the pixels bordering
 its face hole. Over the light skin ball it reads as a hard, stepped dark
 hairline round the face; over flat green it is unmistakable.
-`fix_hole_matte_line.py --report` ranks the cast by it. The churro is fixed;
-**`sugar_cube` (−69.5), `gold_waffle` (−59.9) and `og_gummy_bear` (−57.7) still
-carry it.** Most of the cast sits within ~10 of its own body, so this is a
-defect in four assets, not house style.
+`fix_hole_matte_line.py --report` ranks the cast by it. **All four affected
+assets are now fixed** — churro (−59.5), `sugar_cube` (−69.5), `gold_waffle`
+(−59.9) and `og_gummy_bear` (−57.7) — and nothing is left above the −40 flag.
+Most of the cast always sat within ~10 of its own body, so this was a defect in
+four assets, not house style. The residue the report still lists (−39.4
+`chocolate_frosted_poptart` down to −23.6 `chocolate_chip_cookie`) is soft
+shading around the hole, not a hairline; check it over flat green before
+"fixing" anything there.
 
 The repaint band must straddle the boundary — the partly transparent pixels
 *inside* the hole carry the line too, and repainting only the outside leaves a
