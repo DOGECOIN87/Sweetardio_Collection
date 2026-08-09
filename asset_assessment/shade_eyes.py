@@ -13,13 +13,28 @@ and the two read as one surface:
   form    a mean-preserving Lambert gradient from the upper-left key, so the
           eye on the shadow side of the face is fractionally darker, matching
           the ball
-  gloss   a wet Blinn-Phong highlight, kept OFF the pixels that are already
-          painted highlights (they are near-white and would blow out) and off
-          near-black line art (a brow is matte, not glass)
+  gloss   a broad face-wide sheen, also from the ball's normal
 
-Both are deliberately gentle. These are stylised 2D assets with painted
-catchlights of their own; the goal is to seat them on the ball, not to
-re-render them as 3D objects. Rendered as a ladder before picking.
+That seats them, but it does not make them look WET, and a single specular
+taken from the ball's normal never will: it lays one soft sheen across the
+whole face. A wet eye carries its own catchlight, because each eyeball is a
+separate convex lens. So there is a third term:
+
+  lens    every connected blob in the asset is fitted as its own lens and
+          given a catchlight on its upper-left from the same key -- a broad
+          bead plus a tighter speck -- with its own rim darkened slightly so
+          the blob reads as rounded rather than as a flat cutout
+
+The lens term deliberately does NOT skip dark pixels. An earlier version
+guarded gloss away from near-black art to keep brows matte, and that also
+killed it on every pupil and iris, i.e. on exactly the surfaces meant to look
+wet: a glossy eye is mostly dark with a bright speck on it. What IS guarded is
+the near-white end, so the assets carrying a painted catchlight of their own
+keep its shape instead of blooming into a patch.
+
+Strength was picked off a ladder judged on rendered FACES, not on the isolated
+assets. At 1.5x the picked value the beads start washing the colour out of an
+iris and the brow assets turn into a white streak.
 
 ALPHA IS PRESERVED BIT-FOR-BIT, only RGB is touched. ball_fit() sizes the skin
 ball from the eye's opaque WIDTH, so any change to eye alpha would resize every
@@ -76,10 +91,27 @@ KEY = np.array([-0.52, -0.52, 0.68])     # same key as shade_skin_balls.py
 # isolated assets, where the effect is nearly invisible either way.
 PRESET = {
     "form": 0.26,        # depth of the Lambert ramp (skins use 0.62)
-    "gloss": 0.16,       # wet highlight strength
-    "gloss_n": 34,       # ...and its exponent
-    "hi_guard": 0.72,    # skip gloss above this luma (painted catchlights)
-    "lo_guard": 0.10,    # skip gloss below this luma (matte black line art)
+    "gloss": 0.10,       # face-wide sheen, from the BALL normal
+    "gloss_n": 34,
+    "hi_guard": 0.80,    # roll gloss off above this luma, so the assets that
+                         # already carry a painted catchlight do not blow out
+    # ---- per-eyeball lens gloss ----
+    # This is what actually reads as "glossy". A single specular taken from
+    # the ball's normal puts one soft sheen across the whole face; a wet eye
+    # instead carries its OWN catchlight, because each eyeball is a separate
+    # convex lens. So every connected blob in the asset is fitted as its own
+    # lens and gets a highlight on its upper-left, from the same key.
+    #
+    # Note this deliberately does NOT skip dark pixels. The first version
+    # guarded gloss off near-black art to keep brows matte, which also killed
+    # it on every pupil and iris -- i.e. on exactly the surfaces that are
+    # meant to look wet. A glossy eye is mostly dark with a bright speck.
+    "lens": 0.62,        # catchlight strength
+    "lens_n": 26,        # exponent: lower = broader, softer bead
+    "lens_tight": 0.40,  # a second, tighter speck on top
+    "lens_tight_n": 150,
+    "lens_min_px": 300,  # ignore blobs smaller than this (stray marks)
+    "lens_rim": 0.20,    # darken each lens's own rim, so it reads rounded
 }
 
 
@@ -115,17 +147,53 @@ def relight(img, p):
     lam_mean = float(lam[on].mean())
     rgb *= (1.0 + p["form"] * (lam - lam_mean))[..., None]
 
-    # ---- gloss: skip painted catchlights and matte line art ----
     view = np.array([0.0, 0.0, 1.0])
     half = key + view
     half /= np.linalg.norm(half)
+
+    def guard_of(img_rgb):
+        """Roll the highlight off where the art is already near-white, so a
+        painted catchlight keeps its shape instead of blooming into a patch."""
+        yy = (0.2126 * img_rgb[..., 0] + 0.7152 * img_rgb[..., 1]
+              + 0.0722 * img_rgb[..., 2])
+        return 1.0 - sstep(p["hi_guard"], p["hi_guard"] + 0.16, yy)
+
+    # ---- face-wide sheen, from the ball's normal ----
     ndh = np.clip((n * half).sum(axis=-1), 0.0, 1.0)
     spec = p["gloss"] * ndh ** p["gloss_n"]
-    y = 0.2126 * rgb[..., 0] + 0.7152 * rgb[..., 1] + 0.0722 * rgb[..., 2]
-    guard = (1.0 - sstep(p["hi_guard"], p["hi_guard"] + 0.18, y)) \
-        * sstep(p["lo_guard"] - 0.06, p["lo_guard"] + 0.06, y)
-    spec = spec * guard * (1.0 - sstep(0.92, 1.0, rim))
+    spec = spec * guard_of(rgb) * (1.0 - sstep(0.92, 1.0, rim))
     rgb += spec[..., None]
+
+    # ---- per-eyeball lens gloss ----
+    if p.get("lens", 0.0) > 0.001:
+        from scipy import ndimage
+        lab, ncomp = ndimage.label(on)
+        h, w = on.shape
+        yy, xx = np.mgrid[0:h, 0:w]
+        for c in range(1, ncomp + 1):
+            m = lab == c
+            if m.sum() < p["lens_min_px"]:
+                continue
+            ys, xs = np.nonzero(m)
+            cx, cy = (xs.min() + xs.max()) / 2.0, (ys.min() + ys.max()) / 2.0
+            rx = max((xs.max() - xs.min()) / 2.0, 1.0)
+            ry = max((ys.max() - ys.min()) / 2.0, 1.0)
+            lx = (xx[m] - cx) / rx
+            ly = (yy[m] - cy) / ry
+            lr2 = lx * lx + ly * ly
+            lz = np.sqrt(np.clip(1.0 - lr2, 0.0, 1.0))
+            ln = np.stack([lx, ly, lz], axis=-1)
+            ldh = np.clip((ln * half).sum(axis=-1), 0.0, 1.0)
+            bead = (p["lens"] * ldh ** p["lens_n"]
+                    + p["lens_tight"] * ldh ** p["lens_tight_n"])
+            # a highlight dies at the silhouette, and the lens's own rim
+            # darkens so the blob reads as a bead rather than a flat cutout
+            edge = sstep(0.72, 1.0, np.sqrt(np.clip(lr2, 0.0, 1.0)))
+            bead *= 1.0 - edge
+            sub = rgb[m]
+            sub *= 1.0 - p["lens_rim"] * edge[..., None]
+            sub += (bead * guard_of(sub))[..., None]
+            rgb[m] = sub
 
     rgb = np.clip(rgb, 0.0, 1.0)
     # never touch a pixel the eye does not cover
@@ -146,7 +214,8 @@ def render_ladder(out_path):
     variants = [("original", None)]
     for name, s in [("soft", 0.55), ("PICKED", 1.0), ("strong", 1.7)]:
         p = dict(PRESET)
-        p["form"], p["gloss"] = PRESET["form"] * s, PRESET["gloss"] * s
+        for k in ("form", "gloss", "lens", "lens_tight", "lens_rim"):
+            p[k] = PRESET[k] * s
         variants.append((name, p))
     try:
         font = ImageFont.truetype(
