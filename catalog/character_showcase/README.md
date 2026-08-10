@@ -6,6 +6,8 @@ Selection was scored then corrected by eye. The score maximises hue complement a
 
 Six pairings the solver got wrong were replaced after rendering them — the solver optimises contrast, which is not the same as looking good. Nutty Bar floated on a blank white sugar bag, OG Pop Tart sat in near-black, and the Oreo collided with a face in the plate.
 
+Note the ice cream plates were chosen against the ART, so when the four mis-named ice creams were corrected the pairings travelled with the bodies, not with the names.
+
 Regenerate: `python3 asset_assessment/render_showcase.py`
 
 | character | background | chosen by |
@@ -16,21 +18,21 @@ Regenerate: `python3 asset_assessment/render_showcase.py`
 | chocolate_chip_cookie | Wheres_My_$_B1tch (1).png | solver |
 | chocolate_doughnut | M&Ms.png | eye |
 | chocolate_frosted_poptart | He_Needs_Some_Milk.png | solver |
+| chocolate_ice_cream | art_mattrick_001-15-2 (1).png | solver |
 | chocolate_sandwich_cookie | Gummy_Bears.png | eye |
 | churro | Legendary_Just_Aliens.png | solver |
 | cyan_frosted_poptart | Crumble_Trail.png | solver |
-| cyan_sherbert_ice_cream | Hurshey.png | eye |
+| cyan_sherbert_ice_cream | Nabisco.png | solver |
 | ding_dong | Sweet_Castle_2.png | solver |
 | glazed_doughnut | Legendary_Tenders.png | solver |
 | gold_waffle | Abduction.png | solver |
 | marshmallow | Legendary_Opengotchi.png | solver |
-| neopolitan_ice_cream | Nabisco.png | solver |
+| neopolitan_ice_cream | Hurshey.png | eye |
 | oatmeal_cream_pie | Cookboy_Silver.png | solver |
 | og_gummy_bear | Candy_Tundra.png | solver |
 | og_poptart | Pixie_Stix.png | eye |
-| pink_sherbert_ice_cream | art_mattrick_001-15-2 (1).png | solver |
+| pink_sherbert_ice_cream | soft_serve.png | solver |
 | rice_crispy_treat | Cabaret_Alley.png | solver |
-| rocky_road_ice_cream | soft_serve.png | solver |
 | smores | Toasted.png | eye |
 | sugar_cube | Smuckers_Blue.png | solver |
 | sugar_doughnut | Bored_Apes.png | solver |

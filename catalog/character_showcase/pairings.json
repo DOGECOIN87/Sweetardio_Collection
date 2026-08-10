@@ -23,6 +23,10 @@
     "plate": "He_Needs_Some_Milk.png",
     "picked_by": "solver"
   },
+  "chocolate_ice_cream": {
+    "plate": "art_mattrick_001-15-2 (1).png",
+    "picked_by": "solver"
+  },
   "chocolate_sandwich_cookie": {
     "plate": "Gummy_Bears.png",
     "picked_by": "eye"
@@ -36,8 +40,8 @@
     "picked_by": "solver"
   },
   "cyan_sherbert_ice_cream": {
-    "plate": "Hurshey.png",
-    "picked_by": "eye"
+    "plate": "Nabisco.png",
+    "picked_by": "solver"
   },
   "ding_dong": {
     "plate": "Sweet_Castle_2.png",
@@ -56,8 +60,8 @@
     "picked_by": "solver"
   },
   "neopolitan_ice_cream": {
-    "plate": "Nabisco.png",
-    "picked_by": "solver"
+    "plate": "Hurshey.png",
+    "picked_by": "eye"
   },
   "oatmeal_cream_pie": {
     "plate": "Cookboy_Silver.png",
@@ -72,15 +76,11 @@
     "picked_by": "eye"
   },
   "pink_sherbert_ice_cream": {
-    "plate": "art_mattrick_001-15-2 (1).png",
+    "plate": "soft_serve.png",
     "picked_by": "solver"
   },
   "rice_crispy_treat": {
     "plate": "Cabaret_Alley.png",
-    "picked_by": "solver"
-  },
-  "rocky_road_ice_cream": {
-    "plate": "soft_serve.png",
     "picked_by": "solver"
   },
   "smores": {

@@ -111,6 +111,36 @@ Two things follow, and both are checked by
   **pre-`CHAR_SCALE` file space**, not composited canvas space.
 - **Every character therefore needs a real enclosed hole.** All 27 have one.
 
+## The ice cream names describe the art, and did not always
+
+Four of the five ice creams carried the wrong name until 2026-08. Measured by
+the dominant hue of the top 45 % of the body (the scoop, above the cone):
+
+| name | art | now |
+|---|---|---|
+| `cyan_sherbert_ice_cream` | neapolitan stripes (7°) | `neopolitan_ice_cream` |
+| `neopolitan_ice_cream` | solid cyan (181°) | `cyan_sherbert_ice_cream` |
+| `pink_sherbert_ice_cream` | solid chocolate (16°, V 0.51) | `chocolate_ice_cream` |
+| `rocky_road_ice_cream` | solid pink (346°) | `pink_sherbert_ice_cream` |
+
+`rocky_road` is gone as a name: rocky road has marshmallows and nuts in it, and
+a plain brown scoop is **chocolate**.
+
+Two things this cost, both worth knowing before renaming anything else here:
+
+- **Per-character values are tuned to the ART, so they move with it.** The four
+  were identical everywhere except `CHAR_Y_ADJUST`, where the chocolate body
+  measured −18 against the others' −21. That −18 had to follow the body to its
+  new name, or the rename silently misplaces two characters by 3px.
+- **`char_y_adjust` and `is_wat_excluded` match by SUBSTRING**, so a new name
+  can collide with an existing one. `chocolate_ice_cream` sits alongside four
+  other `chocolate_*` characters; it was checked in both directions before the
+  rename (nothing matched, and `char_y_adjust` takes the longest key anyway).
+
+Renaming also invalidates `char_compat.json` (rebuild it) and therefore the
+rarity gains, because a changed blocklist changes the draw — re-run
+`calibrate_rarity.py` and regenerate `catalog/RARITY.md`.
+
 ## Character art is resolved by exact base name
 
 `char_base_name()` in `generator.py` is the one definition of a character's

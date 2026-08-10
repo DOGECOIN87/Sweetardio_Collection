@@ -209,7 +209,7 @@ TRAIT_NAMES = {
         "og_poptart":                       "OG Pop Tart",
         "pink_sherbert_ice_cream":          "Pink Sherbert Ice Cream",
         "rice_crispy_treat":                "Rice Crispy Treat",
-        "rocky_road_ice_cream":             "Rocky Road Ice Cream",
+        "chocolate_ice_cream":              "Chocolate Ice Cream",
         "smores":                           "S'mores",
         "sugar_cube":                       "Sugar Cube",
         "sugar_doughnut":                   "Sugar Doughnut",
@@ -550,7 +550,7 @@ EXCLUDE_WAT_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
     "vanilla_ice_cream",
-    "rocky_road_ice_cream",
+    "chocolate_ice_cream",
     "pink_sherbert_ice_cream",
     "gummy_bear",
     "twinkie",
@@ -586,7 +586,7 @@ NO_OFFSET_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
     "vanilla_ice_cream",
-    "rocky_road_ice_cream",
+    "chocolate_ice_cream",
     "pink_sherbert_ice_cream",
     "twinkie",
     "nutty_bar",
@@ -651,9 +651,12 @@ CHAR_Y_ADJUST = {
     # their own values below.
     "vanilla_ice_cream": -18,
     "neopolitan_ice_cream": -21,
-    "rocky_road_ice_cream": -21,
+    # -18 follows the CHOCOLATE body. It was mis-named pink_sherbert until the
+    # ice cream names were corrected against their art; the value was measured
+    # from the art, so it moved with it.
+    "chocolate_ice_cream": -18,
     "cyan_sherbert_ice_cream": -21,
-    "pink_sherbert_ice_cream": -18,
+    "pink_sherbert_ice_cream": -21,
     "chocolate_sandwich_cookie": 50,
     "sugar_cube": 42,
     "gold_waffle": -18,        # measured separately from the plain waffle; the
