@@ -155,8 +155,68 @@ def main():
         print("  WARNING: the locked arm never appeared at all — the lock "
               "override is not firing")
 
-    if bad_rule or hits or lock_hits or syn_wrong or syn_right == 0:
+    rate_bad = check_optional_rates()
+
+    if bad_rule or hits or lock_hits or syn_wrong or syn_right == 0 or rate_bad:
         sys.exit(1)
+
+
+def check_optional_rates(trials=2500, tol=1.2,
+                         seeds=(1, 7, 42)):
+    """The ad-hoc render path must sample the SAME collection build_mint mints.
+
+    Arms, footwear and stickers are declared once, as exact counts in the
+    "optional" block of traits/rarity_weights.json; build_mint slot-allocates
+    them and generator derives its roll rates from them. Nothing stopped the
+    two drifting when they were declared separately, and they did: sheets
+    rendered arms at 34.7% against a mint of 15.9%, so every sample sheet
+    overstated how armed the collection was by more than double, invisibly.
+
+    Returns True on failure."""
+    import collections
+    import json
+    import random as _r
+    try:
+        with open(g.RARITY_PATH) as f:
+            o = json.load(f)["optional"]
+    except (OSError, ValueError, KeyError):
+        print("\noptional-rate check: no rarity_weights.json optional block, "
+              "skipped")
+        return False
+    n = o["supply"]
+    target = {"arm": sum(o["arms"].values()) / n,
+              "wat": sum(o["footwear"].values()) / n,
+              "sticker": o["sticker_total"] / n}
+    # AVERAGED over several seeds. One seed is not enough to judge this: the
+    # seed-to-seed stdev is ~0.65 points at n=3000, so a single fixed seed can
+    # sit 2.6 sigma out and fail a configuration that is actually correct.
+    # That happened while this check was being written.
+    got = collections.Counter()
+    for sd in seeds:
+        _r.seed(sd)
+        for _ in range(trials):
+            layers, _c = g.generate_random_combination()
+            for key, d in (("arm", g.ARMZ), ("wat", g.WHAT_ARE_THOSEZ),
+                           ("sticker", g.STICKERZ)):
+                pref = os.path.normpath(os.path.join(g.TRAITS_DIR, d)) + os.sep
+                if any(os.path.normpath(l["path"]).startswith(pref)
+                       for l in layers[1:]):
+                    got[key] += 1
+    trials *= len(seeds)
+    print(f"\noptional-trait rates, ad-hoc path vs mint "
+          f"({trials} tokens over {len(seeds)} seeds, "
+          f"tolerance {tol:.1f} points):")
+    bad = False
+    for k in ("arm", "wat", "sticker"):
+        act = 100.0 * got[k] / trials
+        tgt = 100.0 * target[k]
+        d = act - tgt
+        flag = ""
+        if abs(d) > tol:
+            bad, flag = True, "   <-- DRIFTED"
+        print(f"  {k:<8} ad-hoc {act:6.2f}%   mint {tgt:6.2f}%   "
+              f"delta {d:+5.2f}{flag}")
+    return bad
 
 
 if __name__ == "__main__":

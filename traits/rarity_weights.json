@@ -112,5 +112,32 @@
       "Sweetardio_116 (20).png": 1.0006,
       "Whitehouse_Lawn.png": 0.4136
     }
+  },
+  "optional": {
+    "comment": "SINGLE SOURCE OF TRUTH for the optional traits (arms, footwear, sticker). build_mint.py slot-allocates these EXACT counts; generator.py derives its per-token roll rates from the same numbers, so an ad-hoc render is a real sample of the mint. These used to be declared twice -- exact counts here, independent rates in generator -- and they silently disagreed: sheets showed arms at 34.7% against a mint of 15.9%. asset_assessment/verify_generator_rules.py now fails if the two drift apart again.",
+    "supply": 4444,
+    "arms": {
+      "layer-layer-layer-layer-AK15.png": 20,
+      "Sweetardio_114 (4).png": 25,
+      "Sweetardio_114 (5).png": 25,
+      "Sweetardio_114 (6).png": 25,
+      "Sweetardio_115 (11).png": 40,
+      "layer-layer-layer-layer-AR47.png": 55,
+      "Armz_Knives.png": 64,
+      "layer-layer-layer-layer-Military_Brat.png": 85,
+      "layer-layer-layer-layer-Nerf_Blaster.png": 110,
+      "Armz_Katana.png": 128,
+      "Arms_Cash.png": 130
+    },
+    "footwear": {
+      "gorbhouse": 100,
+      "Cookie_Monster_Slippers": 108,
+      "layer-Bunny_Slippers": 108,
+      "layer-Pepe": 108,
+      "layer-Shiba": 109
+    },
+    "sticker_total": 4222,
+    "footwear_availability_comment": "Divisor for the footwear roll, NOT a literal availability share. Footwear is only offered to characters that can wear it, so the roll rate is scaled up to still land on the mint's overall share. CALIBRATED BY MEASUREMENT, not derived: the narrow count (is_wat_excluded over the cast) gives 0.553, but gorbhouse reaches some excluded characters. 0.591 was a first estimate and undershot -- averaged over six seeds x 3000 tokens it realised 11.40% against a target of 11.99%, so it is scaled by 11.40/11.99 to 0.562. Re-measure with verify_generator_rules.py if the cast or CHARACTER_COUNTS change; a single seed is not enough to judge it, the seed-to-seed stdev is 0.65 points at n=3000.",
+    "footwear_availability": 0.562
   }
 }

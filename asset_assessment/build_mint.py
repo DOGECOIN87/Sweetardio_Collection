@@ -56,19 +56,19 @@ TRAIT_KEYS = ("character", "bg", "skin", "eye", "mouth", "arm", "wat", "sticker"
 AK15        = "layer-layer-layer-layer-AK15.png"
 SABERS      = ["Sweetardio_114 (4).png", "Sweetardio_114 (5).png",
                "Sweetardio_114 (6).png"]
-GENERIC_ARM_COUNTS = {
-    AK15:                                       20,    # Golden AK (mythic)
-    SABERS[0]:                                  25,    # Blue Saber
-    SABERS[1]:                                  25,    # Pink Saber
-    SABERS[2]:                                  25,    # Cyan Saber
-    "Sweetardio_115 (11).png":                  40,    # Dual Uzis
-    "layer-layer-layer-layer-AR47.png":         55,    # AR47
-    "Armz_Knives.png":                          64,    # Knives
-    "layer-layer-layer-layer-Military_Brat.png":85,    # Military Brat
-    "layer-layer-layer-layer-Nerf_Blaster.png": 110,   # Nerf Blaster
-    "Armz_Katana.png":                          128,   # Katana
-    "Arms_Cash.png":                            130,   # Cash
-}
+# ---- optional-trait counts: LOADED, not declared here ----
+# The exact counts live in the "optional" block of traits/rarity_weights.json,
+# which is the single source of truth: generator.py derives its per-token roll
+# rates (ARM_RATE / FOOTWEAR_RATE / STICKER_RATE) from the same numbers, so an
+# ad-hoc render samples the same collection this allocator mints.
+#
+# They were declared in both places once, and drifted without anything
+# noticing: sheets rendered arms at 34.7% against a mint of 15.9%.
+# verify_generator_rules.py now fails if the two disagree.
+_OPT = json.load(open(g.RARITY_PATH))["optional"]
+GENERIC_ARM_COUNTS = _OPT["arms"]        # filename -> exact mint count
+FOOTWEAR_COUNTS = _OPT["footwear"]       # wat base name / "gorbhouse" -> count
+STICKER_TOTAL = _OPT["sticker_total"]    # ~95%: a bare token is the rare case
 # Character-locked signature weapons (only minted onto their owner).
 #
 # EMPTY BY DESIGN, mirroring generator.ARMZ_CHAR_LOCK. The katana and knives
@@ -82,20 +82,8 @@ GENERIC_ARM_COUNTS = {
 SIGNATURE_ARMS = {}
 
 # ---- footwear rarity (base name as returned by wat_base_name, or "gorbhouse")
-FOOTWEAR_COUNTS = {
-    "gorbhouse":                100,
-    "Cookie_Monster_Slippers":  108,
-    "layer-Bunny_Slippers":     108,
-    "layer-Pepe":               108,
-    "layer-Shiba":              109,
-}
 
-# Stickers are COMMON: most of the collection carries one, so a bare token is
-# the scarce case. Not a named trait -- a token without a sticker simply has no
-# Sticker attribute, as before; only the frequency changed.
-# Keep in step with generator.STICKER_RATE, which governs ad-hoc renders, or
-# sample sheets stop representing the mint.
-STICKER_TOTAL = 4222  # 95% of 4444, spread evenly across all sticker assets
+
 
 # ---- per-character rarity (base character name -> EXACT mint count) ----
 # Characters are otherwise drawn uniformly, so every unlisted character shares

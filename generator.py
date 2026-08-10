@@ -867,32 +867,46 @@ GORBHOUSE_CHANCE = 0.4
 # ignored, and the weights renormalise over what's left. Tune to taste:
 # raising the 0/1 weights makes minimal/near-minimal renders more common.
 # ---- optional-trait rates (arms, footwear, sticker) ----
-# Each optional slot now rolls INDEPENDENTLY, at a rate that means what it
-# says. The old scheme rolled "how many optional traits" from
-# OPTIONAL_TRAIT_COUNT_WEIGHTS = {0:4, 1:3, 2:2, 3:1} and then picked that many
-# slots uniformly, which had two problems:
+# DERIVED, never declared. The exact mint counts in the "optional" block of
+# traits/rarity_weights.json are the single source of truth: build_mint.py
+# slot-allocates them, and these rates are computed from the same numbers, so
+# a one-off render is a real sample of the mint rather than a different
+# collection that happens to share the art.
 #
-#   * a slot could not be common while its pool-mates were rare — every slot
-#     in the pool shared one rate. That is what pinned stickers at ~18 %.
-#   * the per-slot rate depended on how many slots happened to be AVAILABLE,
-#     so it moved with the character. 12 of the 27 are footwear-excluded, and
-#     for those the pool was smaller and every remaining slot correspondingly
-#     more likely. Pulling the sticker out made this visible: arms jumped from
-#     33 % to 38.7 % measured over 1500 tokens, purely from the pool shrinking.
+# They used to be declared twice — exact counts in build_mint, independent
+# rates here — and they silently disagreed. Sheets showed arms at 34.7 %
+# against a mint of 15.9 %, so every sample sheet overstated how armed the
+# collection was by more than double, and it was invisible because nothing
+# compared the two. verify_generator_rules.py now fails if they drift.
 #
-# Independent rates remove both. ARM/FOOTWEAR are set to the ~33 % each was
-# effectively getting before, so this change is confined to the sticker.
+# Each slot rolls INDEPENDENTLY. The previous scheme rolled "how many optional
+# traits" and then picked that many slots uniformly, which meant a slot could
+# not be common while its pool-mates were rare (that is what pinned stickers
+# at ~18 %), and the per-slot rate moved with how many slots the character
+# happened to have available.
 #
-# NOTE these govern ad-hoc renders (sample sheets, one-off tokens) only.
-# build_mint.py pins arms, footwear and stickers to EXACT counts and ignores
-# them — its rates are 15.9 % / 12.0 % / 95.0 %. Only the sticker figure is in
-# step; arms and footwear read heavier on a sheet than they mint.
-ARM_RATE = 0.33
-FOOTWEAR_RATE = 0.33
-# The sticker is COMMON: most of the collection carries one, so a bare token is
-# the scarce case. It is NOT a named trait — a token without a sticker simply
-# has no Sticker attribute, exactly as before. Only the frequency changed.
-STICKER_RATE = 0.95
+# Footwear is the one that is not a straight division: it is only offered to
+# characters that can wear it, so the roll has to be scaled up by the share of
+# tokens where the slot exists at all. That share is MEASURED, not assumed —
+# 12 of 27 are wat-excluded, but the pinned character counts skew the mix, so
+# the uniform 15/27 = 0.556 is wrong.
+def _optional_rates():
+    try:
+        with open(RARITY_PATH) as f:
+            o = json.load(f).get("optional") or {}
+        n = float(o.get("supply") or 0) or None
+        if not n:
+            raise ValueError("no supply")
+        avail = float(o.get("footwear_availability") or 1.0)
+        return (sum(o["arms"].values()) / n,
+                min(1.0, (sum(o["footwear"].values()) / n) / max(avail, 1e-6)),
+                o["sticker_total"] / n)
+    except (OSError, ValueError, KeyError, TypeError, ZeroDivisionError):
+        # missing/broken file -> the pre-rarity behaviour, not a crash
+        return 0.33, 0.33, 0.95
+
+
+ARM_RATE, FOOTWEAR_RATE, STICKER_RATE = _optional_rates()
 
 
 # ---- face composition rule (from measured asset geometry) ----
