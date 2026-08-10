@@ -866,7 +866,33 @@ GORBHOUSE_CHANCE = 0.4
 # weights. Counts above the number of slots a given character actually has are
 # ignored, and the weights renormalise over what's left. Tune to taste:
 # raising the 0/1 weights makes minimal/near-minimal renders more common.
-OPTIONAL_TRAIT_COUNT_WEIGHTS = {0: 4, 1: 3, 2: 2, 3: 1}
+# ---- optional-trait rates (arms, footwear, sticker) ----
+# Each optional slot now rolls INDEPENDENTLY, at a rate that means what it
+# says. The old scheme rolled "how many optional traits" from
+# OPTIONAL_TRAIT_COUNT_WEIGHTS = {0:4, 1:3, 2:2, 3:1} and then picked that many
+# slots uniformly, which had two problems:
+#
+#   * a slot could not be common while its pool-mates were rare — every slot
+#     in the pool shared one rate. That is what pinned stickers at ~18 %.
+#   * the per-slot rate depended on how many slots happened to be AVAILABLE,
+#     so it moved with the character. 12 of the 27 are footwear-excluded, and
+#     for those the pool was smaller and every remaining slot correspondingly
+#     more likely. Pulling the sticker out made this visible: arms jumped from
+#     33 % to 38.7 % measured over 1500 tokens, purely from the pool shrinking.
+#
+# Independent rates remove both. ARM/FOOTWEAR are set to the ~33 % each was
+# effectively getting before, so this change is confined to the sticker.
+#
+# NOTE these govern ad-hoc renders (sample sheets, one-off tokens) only.
+# build_mint.py pins arms, footwear and stickers to EXACT counts and ignores
+# them — its rates are 15.9 % / 12.0 % / 95.0 %. Only the sticker figure is in
+# step; arms and footwear read heavier on a sheet than they mint.
+ARM_RATE = 0.33
+FOOTWEAR_RATE = 0.33
+# The sticker is COMMON: most of the collection carries one, so a bare token is
+# the scarce case. It is NOT a named trait — a token without a sticker simply
+# has no Sticker attribute, exactly as before. Only the frequency changed.
+STICKER_RATE = 0.95
 
 
 # ---- face composition rule (from measured asset geometry) ----
@@ -1294,23 +1320,20 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     footwear_available = (not should_exclude_wat
                           and (wat_bases or gets_gorbhouse_overlay(char_name)))
 
-    # Only slots left on "auto" take part in the minimal-traits-first count
-    # roll; any force-driven slot (mint allocator) is decided explicitly below.
-    optional_slots = []
-    if force_wat == "auto" and footwear_available:
-        optional_slots.append("footwear")
-    if force_arm == "auto" and all_arm_files:
-        optional_slots.append("arms")
-    if force_sticker == "auto" and sticker_files:
-        optional_slots.append("sticker")
-
-    # roll HOW MANY optional traits (weighted toward fewer), then WHICH slots
-    counts = list(range(len(optional_slots) + 1))
-    cw = [OPTIONAL_TRAIT_COUNT_WEIGHTS.get(k, 0) for k in counts]
-    if sum(cw) == 0:                      # no configured weights -> uniform
-        cw = [1] * len(counts)
-    n_optional = random.choices(counts, weights=cw, k=1)[0]
-    active = set(random.sample(optional_slots, n_optional)) if n_optional else set()
+    # Each optional slot rolls on its own, at its own rate, so one can be
+    # common while another stays rare and neither moves when the other is
+    # unavailable for this character. See ARM_RATE / FOOTWEAR_RATE /
+    # STICKER_RATE. Slots driven by the mint allocator are decided below.
+    active = set()
+    if (force_wat == "auto" and footwear_available
+            and random.random() < FOOTWEAR_RATE):
+        active.add("footwear")
+    if (force_arm == "auto" and all_arm_files
+            and random.random() < ARM_RATE):
+        active.add("arms")
+    if (force_sticker == "auto" and sticker_files
+            and random.random() < STICKER_RATE):
+        active.add("sticker")
 
     # apply forced ON slots (a specific trait was requested by the allocator)
     if force_wat not in ("auto", None):

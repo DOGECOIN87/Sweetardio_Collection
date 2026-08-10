@@ -90,7 +90,12 @@ FOOTWEAR_COUNTS = {
     "layer-Shiba":              109,
 }
 
-STICKER_TOTAL = 800   # ~18%, spread evenly across all sticker assets
+# Stickers are COMMON: most of the collection carries one, so a bare token is
+# the scarce case. Not a named trait -- a token without a sticker simply has no
+# Sticker attribute, as before; only the frequency changed.
+# Keep in step with generator.STICKER_RATE, which governs ad-hoc renders, or
+# sample sheets stop representing the mint.
+STICKER_TOTAL = 4222  # 95% of 4444, spread evenly across all sticker assets
 
 # ---- per-character rarity (base character name -> EXACT mint count) ----
 # Characters are otherwise drawn uniformly, so every unlisted character shares

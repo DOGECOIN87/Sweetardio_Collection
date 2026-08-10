@@ -4,7 +4,7 @@ Generated from `build_mint.py --n 4444 --seed 4444`, the seed the draw gains in 
 
 **4444 tokens, all composited.** The 1/1 secret-rare tier is retired to `traits/secret_rarez_retired`, so every token is a character.
 
-Always-present traits (character, background, skin, eyes, mouth) are drawn by calibrated weight and land within ~0.6 points of target, which is the sampling floor at this supply. Optional traits (arms, footwear, stickers) and the legendary plates are slot-allocated to EXACT counts.
+Always-present traits (character, background, skin, eyes, mouth) are drawn by calibrated weight and land within ~0.15 points of target. Optional traits (arms, footwear, stickers) and the legendary plates are slot-allocated to EXACT counts.
 
 
 ## Characters
@@ -27,19 +27,19 @@ Always-present traits (character, background, skin, eyes, mouth) are drawn by ca
 | rice_crispy_treat | 130 | 2.93% | uncommon |
 | chocolate_sandwich_cookie | 130 | 2.93% | uncommon |
 | Nutty_Bar | 130 | 2.93% | uncommon |
-| neopolitan_ice_cream | 176 | 3.96% | common |
-| pink_sherbert_ice_cream | 176 | 3.96% | common |
-| rocky_road_ice_cream | 183 | 4.12% | common |
-| og_poptart | 192 | 4.32% | common |
-| cyan_sherbert_ice_cream | 202 | 4.55% | common |
-| vanilla_ice_cream | 211 | 4.75% | common |
-| chocolate_frosted_poptart | 213 | 4.79% | common |
-| chocolate_chip_cookie | 240 | 5.40% | common |
-| sugar_cube | 247 | 5.56% | common |
-| brownie_bite | 261 | 5.87% | common |
-| sugar_doughnut | 261 | 5.87% | common |
-| chocolate_doughnut | 267 | 6.01% | common |
-| glazed_doughnut | 275 | 6.19% | common |
+| og_poptart | 189 | 4.25% | common |
+| cyan_sherbert_ice_cream | 191 | 4.30% | common |
+| rocky_road_ice_cream | 194 | 4.37% | common |
+| chocolate_frosted_poptart | 194 | 4.37% | common |
+| pink_sherbert_ice_cream | 198 | 4.46% | common |
+| vanilla_ice_cream | 199 | 4.48% | common |
+| neopolitan_ice_cream | 206 | 4.64% | common |
+| chocolate_chip_cookie | 231 | 5.20% | common |
+| sugar_cube | 241 | 5.42% | common |
+| brownie_bite | 255 | 5.74% | common |
+| chocolate_doughnut | 266 | 5.99% | common |
+| glazed_doughnut | 266 | 5.99% | common |
+| sugar_doughnut | 274 | 6.17% | common |
 
 ## Eyes
 
@@ -47,38 +47,38 @@ Calibrated, so the shares are chosen rather than left to the plate blocklist —
 
 | trait | count | share |
 |---|---:|---:|
-| Cyborg | 133 | 2.99% |
-| Blue | 218 | 4.91% |
-| Cerise | 300 | 6.75% |
-| Cyan | 305 | 6.86% |
-| Alien | 473 | 10.64% |
-| Side Eye | 524 | 11.79% |
-| Beady | 525 | 11.81% |
-| Smug | 592 | 13.32% |
-| Clueless | 660 | 14.85% |
-| Googly | 714 | 16.07% |
+| Cyborg | 136 | 3.06% |
+| Blue | 222 | 5.00% |
+| Cyan | 312 | 7.02% |
+| Cerise | 316 | 7.11% |
+| Alien | 446 | 10.04% |
+| Side Eye | 528 | 11.88% |
+| Beady | 537 | 12.08% |
+| Smug | 574 | 12.92% |
+| Clueless | 665 | 14.96% |
+| Googly | 708 | 15.93% |
 
 ## Mouths
 
 | trait | count | share |
 |---|---:|---:|
-| Lollipop | 188 | 4.23% |
-| Smoke | 223 | 5.02% |
-| Diamond Grill | 314 | 7.07% |
-| Fang | 414 | 9.32% |
-| Tasty | 471 | 10.60% |
-| Awkward Smile | 568 | 12.78% |
-| Smirk | 689 | 15.50% |
-| Sad | 737 | 16.58% |
-| Flat | 840 | 18.90% |
+| Lollipop | 179 | 4.03% |
+| Smoke | 225 | 5.06% |
+| Diamond Grill | 312 | 7.02% |
+| Fang | 398 | 8.96% |
+| Tasty | 492 | 11.07% |
+| Awkward Smile | 577 | 12.98% |
+| Smirk | 662 | 14.90% |
+| Sad | 752 | 16.92% |
+| Flat | 847 | 19.06% |
 
 ## Skins
 
 | trait | count | share |
 |---|---:|---:|
-| Alien | 339 | 7.63% |
-| Black | 1656 | 37.26% |
-| White | 2449 | 55.11% |
+| Alien | 313 | 7.04% |
+| Black | 1669 | 37.56% |
+| White | 2462 | 55.40% |
 
 ## Arms
 
@@ -109,3 +109,10 @@ Exact counts.
 | Cookie_Monster_Slippers_Overlay.png | 108 | 2.43% |
 | layer-Pepe_Overlay (1).png | 108 | 2.43% |
 | layer-Shiba_Overlay_Right (1).png | 109 | 2.45% |
+
+## Stickers
+
+**4222 of 4444 carry a sticker (95.0%)** — stickers are COMMON, so the 222 bare tokens (5.0%) are the scarce case. A bare token has no Sticker attribute at all; "no sticker" is not a named trait.
+
+The 23 sticker assets are spread evenly across those tokens.
+
