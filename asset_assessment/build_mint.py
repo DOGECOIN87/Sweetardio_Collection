@@ -195,9 +195,14 @@ def main():
                  f"exceeds n={args.n}")
 
     # 1/1 secret rares: one standalone token each, never composited
+    # Secret rares are RETIRED: traits/secret_rarez is gone, its 23 assets
+    # moved to traits/secret_rarez_retired. Restoring the folder restores the
+    # tier -- nothing else here is conditional on them. A missing directory is
+    # the normal case now, not an error.
     sr_dir = os.path.join(g.TRAITS_DIR, g.SECRET_RAREZ)
     secrets = sorted(f for f in os.listdir(sr_dir)
-                     if f.endswith(".png") and g.is_secret_rare(f))
+                     if f.endswith(".png") and g.is_secret_rare(f)) \
+        if os.path.isdir(sr_dir) else []
 
     # measure each legendary plate + each character body for the camo check
     leg_stats = {f: plate_stats(os.path.join(bg_dir, f)) for f in legs}
@@ -415,13 +420,20 @@ def main():
 
     sr_d = {srf: [tid for tid, t in manifest.items()
                   if t.get("secret_rare") == srf] for srf in secrets}
-    p(f"SECRET RARES (1/1 standalone, {len(secrets)} total):")
-    for srf in secrets:
-        ids = sr_d[srf]
-        p(f"  {g.trait_name(g.SECRET_RAREZ, srf):20} x{len(ids):<2} "
-          f"-> token {ids[0] if ids else '?'}")
-    sr_bad = {srf: len(ids) for srf, ids in sr_d.items() if len(ids) != 1}
-    p(f"  -> each exactly once? {'YES' if not sr_bad else 'NO ' + str(sr_bad)}\n")
+    if not secrets:
+        p("SECRET RARES: none — tier retired to traits/secret_rarez_retired.\n"
+          "  Every token is a composited character; restoring the folder\n"
+          "  restores the tier, but re-run calibrate_rarity.py afterwards\n"
+          "  because it moves the composited-token denominator.\n")
+    else:
+        p(f"SECRET RARES (1/1 standalone, {len(secrets)} total):")
+        for srf in secrets:
+            ids = sr_d[srf]
+            p(f"  {g.trait_name(g.SECRET_RAREZ, srf):20} x{len(ids):<2} "
+              f"-> token {ids[0] if ids else '?'}")
+        sr_bad = {srf: len(ids) for srf, ids in sr_d.items() if len(ids) != 1}
+        p(f"  -> each exactly once? "
+          f"{'YES' if not sr_bad else 'NO ' + str(sr_bad)}\n")
 
     leg_d = {f: sum(1 for t in manifest.values() if t["bg"] == f) for f in legs}
     bad = {f: c for f, c in leg_d.items() if c != args.leg_each}

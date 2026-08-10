@@ -29,17 +29,22 @@ distortion is close to multiplicative.
 Allocation without rendering is ~20 s at n=4444, so a full solve is a couple
 of minutes.
 
-THE GAINS ARE FITTED TO A SPECIFIC (n, seed). That is deliberate rather than a
-limitation: the collection is minted once, from one seed, so calibrating
-against the seed that will ship makes the realised distribution the one that
-was measured -- within ~0.1 points on every asset. Fitted to seed 4444 and
-then measured on an unseen seed, the same gains drift to ~1.6 points, which is
-ordinary sampling noise at these counts (2 sigma is about +/-1.1 points for a
-16 % trait at n=4421), not a bug in the fit.
+THE GAINS ARE FITTED TO A SPECIFIC (n, seed). Re-run this whenever --n or the
+mint seed changes, or whenever an asset is added or retired -- retiring the
+secret rares moved the composited-token denominator from 4421 to 4444 and
+invalidated every gain in the file.
 
-So: RE-RUN THIS whenever --n or the mint seed changes, or whenever an asset is
-added or retired. Use --seeds to average several allocations per pass instead,
-which trades the exactness on one seed for gains that hold across any seed.
+DO NOT TIGHTEN --tol BELOW ~0.5 POINTS. It looks like it should converge and it
+does not: changing a gain changes every subsequent random draw, so each pass
+re-randomises the allocation rather than refining the last one. The iteration
+is not contractive near the noise floor. Run at --tol 0.22 it bounced between
+0.57 and 1.31 for twelve passes and the gains drifted with it, which is
+fitting noise, not signal. About +/-0.6 points is the achievable precision for
+a single seed, and it is where the sampling noise sits anyway: 1 sigma for a
+16 % trait at n=4444 is 0.55 points.
+
+Use --seeds to average several allocations per pass instead, which trades the
+exactness on one seed for gains that hold across any seed.
 
 Usage (from repo root):
   python3 asset_assessment/calibrate_rarity.py                 # solve + write
@@ -88,9 +93,10 @@ def run_alloc(n, seed):
 
 
 def realised(tokens, key):
-    """Share of COMPOSITED tokens carrying each asset, in percent. Secret
-    rares are standalone 1/1s with no traits, so they are not part of the
-    denominator any target is expressed against."""
+    """Share of COMPOSITED tokens carrying each asset, in percent. Tokens
+    with no traits at all (the retired secret-rare tier was the only source of
+    those) are excluded from the denominator, so targets stay comparable
+    whether or not such a tier exists."""
     vals = [t.get(key) for t in tokens if t.get(key)]
     total = len(vals)
     c = collections.Counter(vals)
@@ -128,7 +134,8 @@ def main():
     ap.add_argument("--check", action="store_true",
                     help="measure against target and exit, writing nothing")
     ap.add_argument("--tol", type=float, default=0.6,
-                    help="stop once every asset is within this many points")
+                    help="stop once every asset is within this many points; "
+                         "do not go below ~0.5, see the module docstring")
     args = ap.parse_args()
 
     seeds = ([int(x) for x in args.seeds.split(",")] if args.seeds
