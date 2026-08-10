@@ -100,8 +100,42 @@ STICKER_TOTAL = 800   # ~18%, spread evenly across all sticker assets
 # legendary camouflage re-roll can never fight a forced character.
 #
 #   "sugar_cube": 20,        # <- would make sugar cube the rarest in the set
+#
+# Tiered by how distinctive the body reads, judged off a render of all 27 on
+# one plate with one face (not from the filenames). The COMMON tier is
+# deliberately left unpinned: legendary-background slots re-roll the character
+# when it camouflages against the plate, which a forced character can never
+# satisfy, so the 200 legendary slots have to draw from somewhere.
+#
+#   chase     4 x 60  = 240   the four that look like nothing else in the set
+#   uncommon 10 x 130 = 1300  strong, individual silhouettes
+#   common   13 unpinned      ~222 each; the cones, torus doughnuts and
+#                             squares, which repeat each other's shapes
 CHARACTER_COUNTS = {
+    # chase
+    "og_gummy_bear": 60,      # translucent gradient body, the only humanoid
+    "gold_waffle": 60,        # metallic gold, the only one that reads premium
+    "churro": 60,             # tall ridged column, unique silhouette
+    "zebra_cake": 60,         # hexagonal with stripes, unique outline
+    # uncommon
+    "chocolate_sandwich_cookie": 130,
+    "ding_dong": 130,
+    "Nutty_Bar": 130,
+    "Twinkie": 130,
+    "marshmallow": 130,
+    "smores": 130,
+    "waffle": 130,
+    "cyan_frosted_poptart": 130,
+    "rice_crispy_treat": 130,
+    "oatmeal_cream_pie": 130,
 }
+
+
+# Unpinned slots must draw from the COMPLEMENT of the pinned set, or a pinned
+# count is only a floor: the pinned slots force the character and every other
+# slot then draws it again at random on top. That put a 60-target character at
+# 157 before this existed.
+PINNED_CHARS = frozenset(CHARACTER_COUNTS)
 
 
 def traits_of(layers, char):
@@ -214,11 +248,16 @@ def main():
         for s in char_free[cur:cur + cnt]:
             forced_char[s] = cname
         cur += cnt
-    # A pinned character cannot also carry a character-locked signature arm,
-    # and some characters are footwear-excluded (is_wat_excluded, e.g. churro),
-    # so a forced footwear on such a slot is unsatisfiable. Keep pinned slots
-    # out of both pools, exactly as legendary-background slots are.
+    # A pinned character cannot also carry a character-locked signature arm.
     is_rarechar = {s for s in range(N) if forced_char[s] is not None}
+    # Footwear is a separate question, and the blanket rule that used to live
+    # here got it wrong. Forcing footwear onto a pinned slot is unsatisfiable
+    # only when THAT character is footwear-excluded (is_wat_excluded: churro,
+    # the gummy bear, the ice creams, the poptarts -- 12 of 27). Excluding
+    # every pinned slot instead silently stripped slippers from the pinned
+    # characters that can wear them, so tiering a character quietly cost it a
+    # trait. Only the genuinely excluded ones are held back now.
+    no_wat = {s for s in is_rarechar if g.is_wat_excluded(forced_char[s])}
 
     # 2) signature arms -> NON-legendary slots (owner-locked, footwear-free)
     nonleg = [s for s in avail if s not in is_leg and s not in is_rarechar]
@@ -243,15 +282,35 @@ def main():
         cur += cnt
 
     # 4) footwear -> non-legendary, non-signature slots (one footwear per token)
-    free_for_wat = [s for s in avail
-                    if s not in is_leg and s not in sig_set
-                    and s not in is_rarechar]
+    # Eligibility is per FOOTWEAR TYPE, not per slot, which is the part the
+    # old blanket rule hid. An unpinned slot can take anything (its character
+    # is still free). A pinned slot can take regular slippers only if that
+    # character is not footwear-excluded, and can take the gorbhouse only if
+    # it is one of the six gorbhouse-eligible characters. Allocating gorbhouse
+    # without that second test is unsatisfiable and fails the mint outright.
+    def wat_ok(slot, wat):
+        c = forced_char[slot]
+        if c is None:
+            return True
+        if g.is_wat_excluded(c):
+            return False
+        if str(wat).lower() == "gorbhouse":
+            return g.gets_gorbhouse_overlay(c)
+        return True
+
+    free_for_wat = [s for s in avail if s not in is_leg and s not in sig_set]
     random.shuffle(free_for_wat)
-    cur = 0
-    for wat, cnt in FOOTWEAR_COUNTS.items():
-        for s in free_for_wat[cur:cur + cnt]:
+    taken = set()
+    # rarest first, so the most constrained type picks from the widest pool
+    for wat, cnt in sorted(FOOTWEAR_COUNTS.items(), key=lambda kv: kv[1]):
+        pool = [s for s in free_for_wat
+                if s not in taken and wat_ok(s, wat)]
+        if len(pool) < cnt:
+            sys.exit(f"footwear {wat!r}: only {len(pool)} eligible slots "
+                     f"for {cnt} tokens")
+        for s in pool[:cnt]:
             forced_wat[s] = wat
-        cur += cnt
+            taken.add(s)
 
     # 5) stickers -> any composable slot, spread evenly across every sticker
     sticker_files = g.get_files(g.STICKERZ)
@@ -296,6 +355,7 @@ def main():
                 force_arm=farm if farm is not None else None,
                 force_wat=fwat if fwat is not None else None,
                 force_sticker=fstk if fstk is not None else None,
+                exclude_chars=PINNED_CHARS,
             )
             if leg is not None and camo(char, leg):
                 continue                           # re-roll camouflaging char

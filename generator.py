@@ -22,6 +22,30 @@ BG_OVERLAY_PAIRS = {
 # asset_assessment/build_eyez_compat.py. Missing file = no restrictions.
 EYEZ_COMPAT_PATH = os.path.join(TRAITS_DIR, "eyez_compat.json")
 
+# Global per-asset rarity gains for the ALWAYS-PRESENT traits (eyes, mouths,
+# backgrounds). An optional trait — arms, footwear, stickers — is either on a
+# token or not, so build_mint.py can slot-allocate it to an EXACT count. An
+# always-present trait cannot be allocated that way: it has to compose with the
+# compat blocklists, so it is drawn by weight instead, and the weights are
+# solved by asset_assessment/calibrate_rarity.py until the realised share
+# matches the intended one. Missing file -> every gain 1.0, i.e. the previous
+# behaviour exactly.
+RARITY_PATH = os.path.join(TRAITS_DIR, "rarity_weights.json")
+_rarity_cache = None
+
+
+def load_rarity_gains(category):
+    """{asset filename: draw multiplier} for a trait category. 1.0 default."""
+    global _rarity_cache
+    if _rarity_cache is None:
+        try:
+            with open(RARITY_PATH) as f:
+                _rarity_cache = json.load(f)
+        except (OSError, ValueError):
+            _rarity_cache = {}
+    return (_rarity_cache.get(category) or {}).get("gain", {})
+
+
 def load_eyez_blocklist():
     try:
         with open(EYEZ_COMPAT_PATH) as f:
@@ -1122,7 +1146,7 @@ def get_files(category):
 
 def generate_random_combination(force_bg=None, force_arm="auto",
                                 force_wat="auto", force_sticker="auto",
-                                force_char=None):
+                                force_char=None, exclude_chars=None):
     """force_bg = (bg_dir, bg_file) pins the background (e.g. a legendary
     plate from traits/backgroundz); it bypasses the random plate pick,
     the char<->bg compat filter and any paired overlay. Default = random.
@@ -1161,7 +1185,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
                              f"in traits/{CHARACTERZ}")
         char_name = force_char
     else:
-        char_name = random.choice(sorted(base_names))
+        # exclude_chars is how the mint allocator makes a pinned character
+        # count EXACT. Pinning alone only sets a floor: the pinned slots force
+        # the character, and then every unpinned slot draws it again at random
+        # on top, which put a 60-target character at 157. Unpinned slots draw
+        # from the complement instead.
+        pool = sorted(base_names - set(exclude_chars or ()))
+        char_name = random.choice(pool or sorted(base_names))
     
     # Check if this character should be excluded from what_are_thosez. The
     # gorbhouse roll now happens INSIDE the footwear slot below, as part of the
@@ -1195,9 +1225,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
         char_blocked = load_char_blocklist().get(char_name, [])
         allowed_bgs = [f for f in bg_files if f not in char_blocked] or bg_files
         cw = load_char_weights().get(char_name, {})
-        bg = random.choices(allowed_bgs,
-                            weights=[cw.get(f, 1.0) for f in allowed_bgs],
-                            k=1)[0]
+        bgg = load_rarity_gains(BACKGROUNDZ)
+        bg = random.choices(
+            allowed_bgs,
+            weights=[cw.get(f, 1.0) * bgg.get(f, 1.0) for f in allowed_bgs],
+            k=1)[0]
     
     skin_files = get_files(SKINZ)
     if not skin_files:
@@ -1219,10 +1251,22 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # (soft weights), mirroring the character<->background pairing rule.
     eyez_blocked = load_eyez_blocklist().get(bg, [])
     allowed_eyes = [f for f in eye_files if f not in eyez_blocked] or eye_files
+    # The per-plate soft weight is multiplied by the asset's GLOBAL rarity
+    # gain, so the two do different jobs: the soft weight decides which eye
+    # suits this plate, the gain decides how often that eye appears across the
+    # whole mint. Without the gain the eye distribution is whatever the hard
+    # blocklist happens to leave behind — which made Blue the rarest eye in the
+    # set at 3.9% purely because it is barred from 42% of plates.
     ew = load_eyez_weights().get(bg, {})
-    eye = random.choices(allowed_eyes,
-                         weights=[ew.get(f, 1.0) for f in allowed_eyes], k=1)[0]
-    mouth = random.choice(mouth_files)
+    eg = load_rarity_gains(EYEZ)
+    eye = random.choices(
+        allowed_eyes,
+        weights=[ew.get(f, 1.0) * eg.get(f, 1.0) for f in allowed_eyes],
+        k=1)[0]
+    mg = load_rarity_gains(MOUTHZ)
+    mouth = random.choices(mouth_files,
+                           weights=[mg.get(f, 1.0) for f in mouth_files],
+                           k=1)[0]
     
     # ---- optional traits: minimal-traits-first via probability tiers ----
     # The mandatory core (background + body + skin + eyes + mouth) is already
