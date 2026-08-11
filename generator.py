@@ -240,7 +240,7 @@ TRAIT_NAMES = {
         "zebra_cake":                       "Zebra Cake",
     },
     BACKGROUNDZ: {
-        "Ayotollah.png":                    "Ayotollah",
+        "Ayotollah.png":                    "Ayatollah",
         "Baked.png":                        "Baked",
         "Bubble_Trouble.png":               "Bubble Trouble",
         "Cabaret_Alley.png":                "Cabaret Alley",
@@ -274,7 +274,7 @@ TRAIT_NAMES = {
         "Snack_Pack.png":                   "Snack Pack",
         "Straight_of_America (1).png":      "Straight of America",
         "Sugar.png":                        "Sugar",
-        "Sweet_Castle_2.png":               "Sweet Castle 2",
+        "Sweet_Castle_2.png":               "Sweet Castle",
         "Sweet_Shop.png":                   "Sweet Shop",
         "Sweetardio.png":                   "Sweetardio",
         "Sweetardio_116 (20).png":          "Mars",

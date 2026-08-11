@@ -50,7 +50,7 @@ The four `Legendary` plates are slot-allocated at exactly 50 each and never appe
 | trait | count | share |
 |---|---:|---:|
 | Goo Lagoon | 24 | 0.54% |
-| Sweet Castle 2 | 25 | 0.56% |
+| Sweet Castle | 25 | 0.56% |
 | Winning | 25 | 0.56% |
 | Bubble Trouble | 25 | 0.56% |
 | In Cook We Trust | 26 | 0.59% |
@@ -83,7 +83,7 @@ The four `Legendary` plates are slot-allocated at exactly 50 each and never appe
 | Pixie Stix | 57 | 1.28% |
 | M&Ms | 58 | 1.31% |
 | I'm Not Sorry | 60 | 1.35% |
-| Ayotollah | 63 | 1.42% |
+| Ayatollah | 63 | 1.42% |
 | Cookboy Gold | 65 | 1.46% |
 | The Set | 67 | 1.51% |
 | Drained The Swamp | 67 | 1.51% |
