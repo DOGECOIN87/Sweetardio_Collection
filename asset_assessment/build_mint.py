@@ -154,10 +154,16 @@ def expected_arm_name(arm_file):
 
 
 def expected_footwear_name(wat):
+    """Display name for a footwear slot value.
+
+    The gorbhouse case routes through trait_name like every other, rather
+    than returning a literal: a hardcoded name here would silently disagree
+    with generator.TRAIT_NAMES the moment either side was renamed, and this
+    function is what the mint's own consistency check compares against."""
     if not wat:
         return None
-    return "Gorbhouse" if str(wat).lower() == "gorbhouse" \
-        else g.trait_name(g.WHAT_ARE_THOSEZ, wat)
+    key = "Gorbhouse" if str(wat).lower() == "gorbhouse" else wat
+    return g.trait_name(g.WHAT_ARE_THOSEZ, key)
 
 
 def expected_sticker_name(sticker_file):

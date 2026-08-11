@@ -330,11 +330,15 @@ TRAIT_NAMES = {
     },
     # Keyed by wat_base_name() result, plus "Gorbhouse" for trash-can slippers.
     WHAT_ARE_THOSEZ: {
-        "Cookie_Monster_Slippers":  "Monster",
-        "Gorbhouse":                "Gorbhouse",
-        "layer-Bunny_Slippers":     "Bunny",
-        "layer-Pepe":               "Pepe",
-        "layer-Shiba":              "Shiba",
+        # Every one of these is a novelty SLIPPER, the gorbhouse included (it
+        # is a pair of trash-can slippers), so every value says so. "Monster"
+        # was a truncation of Cookie Monster that read as a creature rather
+        # than footwear, and bare "Pepe" / "Shiba" / "Bunny" did the same.
+        "Cookie_Monster_Slippers":  "Cookie Monster Slippers",
+        "Gorbhouse":                "Gorbhouse Slippers",
+        "layer-Bunny_Slippers":     "Bunny Slippers",
+        "layer-Pepe":               "Pepe Slippers",
+        "layer-Shiba":              "Shiba Slippers",
     },
     STICKERZ: {
         "01_Peppermint_Butler.png":         "Peppermint Butler",
