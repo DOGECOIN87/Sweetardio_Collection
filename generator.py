@@ -853,11 +853,26 @@ ARM_SCALE_PIVOT = (694, 1040)
 # bodies are not: on the squat bodies (sugar cube, ding dong, marshmallow) every
 # variant rode the weapon up over the eyes, ~13,000 px of gun across the face.
 #
-# Worth knowing if this is revisited: ARM_SCALE_PIVOT (694, 1040) is a SCALING
-# pivot, not a hand line -- y=1040 is outside most of the arm art entirely
-# (Cash spans 625..908, the sabers 122..1302), so it is not a usable anchor.
-# A real fix needs a per-arm hand marker, or per-character arm offsets authored
-# by eye, not a formula over the body bbox.
+# A FOURTH attempt, also reverted, got closest and is the most instructive. It
+# was a one-sided CLAMP: lift an arm only by however far it hung past the
+# body's base, never push one down, and allow 55px of overhang so the weapon
+# still reads as touching the ground. That removed the overhang everywhere
+# (+117px worst case -> +55) and left 9 of 27 characters untouched. It still
+# lost, for a reason no formula over a bbox can dodge: the clamp measures the
+# WEAPON'S bbox, and some weapons are drawn long on purpose. The three sabers
+# span 122..1302 with the blade past the feet, so clamping them hauled the
+# blade up across the eyes on 8 pairings; exempting tall art then left the Dual
+# Uzis doing the same thing to the sugar cube (844px of gun over its eyes).
+#
+# The owner's call, after seeing all four rendered: no clamp. A weapon hanging
+# below a short body looks better than any of the corrections.
+#
+# Worth knowing if this is ever revisited: ARM_SCALE_PIVOT (694, 1040) is a
+# SCALING pivot, not a hand line -- y=1040 is outside most of the arm art
+# entirely (Cash spans 625..908, the sabers 122..1302), so it is not a usable
+# anchor. Every approach here failed the same way, by inferring where the hands
+# are from a bounding box. A real fix needs a per-arm HAND MARKER authored into
+# the art, or per-character arm offsets authored by eye -- not a formula.
 ARM_SCALE = {
     "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
 }
