@@ -169,10 +169,32 @@ def secret_rare_combination(filename):
     name = trait_name(SECRET_RAREZ, filename)
     return [{"path": path, "offset": False}], name
 
+_secret_rare_keys_cache = None
+
+
+def _secret_rare_keys():
+    """Sorted secret-rare filenames, from the trait folder. Empty when the
+    tier is retired (the folder is absent), which is the normal case."""
+    global _secret_rare_keys_cache
+    if _secret_rare_keys_cache is None:
+        d = os.path.join(TRAITS_DIR, SECRET_RAREZ)
+        try:
+            _secret_rare_keys_cache = sorted(
+                f for f in os.listdir(d)
+                if f.lower().endswith(".png") and is_secret_rare(f))
+        except OSError:
+            _secret_rare_keys_cache = []
+    return _secret_rare_keys_cache
+
+
 def secret_rare_number(filename):
     """Stable 1-based index (#1..#N) of a secret rare within the set, ordered
     by filename so it never shifts run to run."""
-    keys = sorted(TRAIT_NAMES.get(SECRET_RAREZ, {}).keys())
+    # Read the FOLDER, not TRAIT_NAMES: the names block was removed when the
+    # tier was retired, and deriving the number from it would have silently
+    # numbered every restored secret rare #0. Sorted filenames give the same
+    # order the names table did, so restored tokens keep their old numbers.
+    keys = _secret_rare_keys()
     base = os.path.basename(filename)
     return keys.index(base) + 1 if base in keys else 0
 
@@ -294,7 +316,6 @@ TRAIT_NAMES = {
     EYEZ: {
         "Blue.png":                                             "Blue",
         "Cerise.png":                                           "Cerise",
-        "layer-Sweetardio_nft (9) (1).png":                     "Retardio",
         "layer-Sweetardio_nft (15).png":                        "Alien",
         "layer-Eyes_Cyan (1).png":                              "Cyan",
         "layer-Eyes_Googly (1).png":                            "Googly",
@@ -366,31 +387,11 @@ TRAIT_NAMES = {
         "Sweetardio_200 (30).png":          "Cookboy",
     },
     # 1/1 secret rares (standalone full-canvas artworks, never composited).
-    SECRET_RAREZ: {
-        "Secret_Milk_Dunk.png":         "Milk Dunk",
-        "Secret_Churro_Cantina.png":    "Churro Cantina",
-        "Secret_Cold_Served.png":       "Cold Served",
-        "Secret_Off_The_Line.png":      "Off The Line",
-        "Secret_High_Voltage.png":      "High Voltage",
-        "Secret_Golden_Waffle.png":     "Golden Waffle",
-        "Secret_Cookie_Bro.png":        "Cookie Bro",
-        "Secret_Graveyard_Scoop.png":     "Graveyard Scoop",
-        "Secret_Checkered_Oreo.png":      "Checkered Oreo",
-        "Secret_Marshmallow_Blaze.png":   "Marshmallow Blaze",
-        "Secret_Waffle_Loops.png":        "Waffle Loops",
-        "Secret_Bubble_Gum_Rules.png":    "Bubble Gum Rules",
-        "Secret_Smokey_Marshmallow.png":  "Smokey Marshmallow",
-        "Secret_Liberty_Churro.png":      "Liberty Churro",
-        "Secret_Frosted_Crate.png":       "Frosted Crate",
-        "Secret_Jackpot_Waffle.png":      "Jackpot Waffle",
-        "Secret_Stadium_Marshmallow.png": "Stadium Marshmallow",
-        "Secret_Cosmic_Melt.png":         "Cosmic Melt",
-        "Secret_Twinkie_Cash.png":        "Twinkie Cash",
-        "Secret_Cabaret_Cone.png":        "Cabaret Cone",
-        "Secret_Unicorn_Twinkie.png":     "Unicorn Twinkie",
-        "Secret_Waffle_Nothing.png":      "Waffle Nothing",
-        "Secret_Grinning_Oreo.png":       "Grinning Oreo",
-    },
+    # SECRET_RAREZ has no names block: the tier is retired and its art lives
+    # in traits/secret_rarez_retired. secret_rare_number() reads the folder
+    # rather than this table, so restoring the folder restores the tier's
+    # numbering on its own; display names fall back from the filenames, which
+    # for "Secret_Milk_Dunk.png" gives "Secret Milk Dunk".
 }
 
 
