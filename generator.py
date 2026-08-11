@@ -276,7 +276,6 @@ TRAIT_NAMES = {
         "Sugar.png":                        "Sugar",
         "Sweet_Castle_2.png":               "Sweet Castle 2",
         "Sweet_Shop.png":                   "Sweet Shop",
-        "Sweetardio (16).png":              "Sweet Store",
         "Sweetardio.png":                   "Sweetardio",
         "Sweetardio_116 (20).png":          "Mars",
         "The_Set.png":                      "The Set",

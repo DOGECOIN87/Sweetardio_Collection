@@ -95,11 +95,6 @@
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
-  "Sweetardio (16).png": [
-   "Blue.png",
-   "layer-Eyes_Cyan (1).png",
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
-  ],
   "Sweetardio_116 (20).png": [
    "Blue.png"
   ],
@@ -384,9 +379,6 @@
    "Cerise.png": 0.81,
    "layer-Eyes_Cyan (1).png": 0.958,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.967
-  },
-  "Sweetardio (16).png": {
-   "Cerise.png": 0.723
   },
   "Sweetardio.png": {
    "Blue.png": 0.918,

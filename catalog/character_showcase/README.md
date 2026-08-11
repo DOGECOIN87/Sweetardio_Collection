@@ -36,6 +36,6 @@ Regenerate: `python3 asset_assessment/render_showcase.py`
 | smores | Toasted.png | eye |
 | sugar_cube | Smuckers_Blue.png | solver |
 | sugar_doughnut | Bored_Apes.png | solver |
-| vanilla_ice_cream | Sweetardio (16).png | solver |
+| vanilla_ice_cream | Emblem.png | eye |
 | waffle | art_mattrick_001-1-2 (1).png | solver |
 | zebra_cake | Cookboy.png | solver |
