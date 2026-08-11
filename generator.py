@@ -661,7 +661,12 @@ CHAR_Y_ADJUST = {
     "chocolate_ice_cream": -18,
     "cyan_sherbert_ice_cream": -21,
     "pink_sherbert_ice_cream": -21,
-    "chocolate_sandwich_cookie": 50,
+    # Centred characters use CHAR_Y_ADJUST only when they WEAR FOOTWEAR (bare,
+    # CENTERED_FOOTWEARLESS_DY places them instead), so this value is purely
+    # the shod position. At 50 the cookie sat 52px below its six siblings,
+    # which land in a 953-959 band, and its body sank into the slippers
+    # instead of resting on them. -6 puts it at 955, with the group.
+    "chocolate_sandwich_cookie": -6,
     "sugar_cube": 42,
     "gold_waffle": -18,        # measured separately from the plain waffle; the
                                # key must stay distinct or the "waffle" substring
@@ -838,6 +843,21 @@ def body_after_skin(char_name, fname):
 # It composes on top of any character CHAR_SCALE, so a scaled character still
 # gets a proportionally adjusted arm.
 ARM_SCALE_PIVOT = (694, 1040)
+
+# Arms composite at a FIXED canvas row and are NOT repositioned per character.
+# Tried and reverted (2026-08): shifting the arm to follow each body -- by a
+# fraction of body height, by a fixed distance above the body's base, and by
+# how far the body's base differs from the cast median. All three fixed the
+# short characters whose weapon hung past their bottom edge and all three broke
+# something worse, because the FACE is pinned at a fixed canvas position while
+# bodies are not: on the squat bodies (sugar cube, ding dong, marshmallow) every
+# variant rode the weapon up over the eyes, ~13,000 px of gun across the face.
+#
+# Worth knowing if this is revisited: ARM_SCALE_PIVOT (694, 1040) is a SCALING
+# pivot, not a hand line -- y=1040 is outside most of the arm art entirely
+# (Cash spans 625..908, the sabers 122..1302), so it is not a usable anchor.
+# A real fix needs a per-arm hand marker, or per-character arm offsets authored
+# by eye, not a formula over the body bbox.
 ARM_SCALE = {
     "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
 }
@@ -1574,7 +1594,10 @@ def generate_random_combination(force_bg=None, force_arm="auto",
         # saber on everyone else. Native size keeps the trait consistent across
         # the mint; the slightly oversized fists on a small character read as
         # cartoon, not as an error.
-        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
+        layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm),
+                       "offset": apply_offset,
+                       "dy": y_adjust + bg_extra_y,
+                       "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 11. Sticker
     if sticker:

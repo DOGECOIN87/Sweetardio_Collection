@@ -56,11 +56,20 @@ from audit_placement import char_table, measure, BALL_CENTER  # noqa: E402
 # (character, check); "*" matches any case. Waived entries are still printed —
 # they just do not fail the run, so the exit status stays meaningful.
 WAIVED = {
-    ("chocolate_sandwich_cookie", "vertical"):
-        "applies to its FOOTWEAR and GORBHOUSE cases, where CHAR_Y_ADJUST +50 "
-        "is tuned to the FRONT disc: the back wafer sits lower, so the bbox "
-        "reads ~56px below the group. Its bare case is bottom-aligned with the "
-        "rest of the centred group and needs no waiver — confirmed by render.",
+    # The vertical waiver that used to sit here was WRONG and hid a real
+    # defect for a whole phase. It claimed CHAR_Y_ADJUST +50 was "tuned to the
+    # front disc" and that the bbox read ~56px low only because the back wafer
+    # hangs lower. Measured per x-slice, the body's bottom is 950 / 961 / 944
+    # left-to-right -- a 17px spread, nowhere near 56 -- so there is no lower
+    # wafer to explain it. The cookie really was sitting 56px into its slippers
+    # while its six siblings rested on top, which is visible in any render of
+    # the shod centred group. CHAR_Y_ADJUST is now -6 and it lands on the group
+    # median with no waiver.
+    #
+    # The horizontal waiver below IS legitimate, and the contrast is the useful
+    # part: there the face hole centres on x=690 exactly while the bbox centre
+    # reads 634, so the measurement genuinely misleads. Verify a waiver against
+    # the geometry it claims, not against its own plausibility.
     ("chocolate_sandwich_cookie", "horizontal"):
         "two-part asset: the back wafer sits left of the front disc, so the bbox "
         "centre reads ~54px left. The face-carrying disc is on the column — "
