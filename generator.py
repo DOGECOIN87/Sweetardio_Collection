@@ -917,6 +917,44 @@ def armed_lift(char_file, arm_file, cscale):
     return ARMED_LIFT if overhang > 0 else 0
 
 
+# ---- per-character arm offset ----
+# Authored BY EYE, per character, which is the only thing that works here: four
+# attempts at a formula over the body bbox were reverted (see below), because a
+# bounding box cannot tell where a character's hands should be.
+#
+# Negative raises the arm on that body. Applied to the arm layer ONLY, so it
+# does move the weapon relative to the body -- the difference from the reverted
+# formulas is that each value is checked against that specific character's face
+# instead of being derived for all 27 at once.
+#
+# ding_dong: its arm centre sat at 92.2 % of body height against a cast band of
+# 67-88 %, second lowest of the 27, because it is a short round body (636px)
+# and the arm composites at a fixed canvas row.
+ARM_CHAR_DY = {
+    "ding_dong": -40,   # 92.2 % -> 85.9 %, in line with the doughnuts (86.1 %)
+}
+
+# Per-(character, arm) overrides, which WIN over the per-character value above.
+# Needed because arms differ in pose, so one number per character cannot fit
+# them all on a short body:
+#   Dual Uzis are held lowest of any weapon -- still at 95.6 % of the ding
+#     dong's body height even after -40 -- so they take -55.
+#   Cash is the opposite: the fists hold the notes fanned UPWARD at chest
+#     height, so it was never sitting low, and -40 put the notes across the
+#     eyes (0 px of overlap at 0, 489 px at -40). It opts out at 0.
+ARM_CHAR_ARM_DY = {
+    ("ding_dong", "Sweetardio_115 (11).png"): -55,   # Dual Uzis
+    ("ding_dong", "Arms_Cash.png"): 0,
+}
+
+
+def arm_char_dy(char_name, arm_file):
+    """Vertical offset for THIS character holding THIS arm, authored by eye."""
+    if (char_name, arm_file) in ARM_CHAR_ARM_DY:
+        return ARM_CHAR_ARM_DY[(char_name, arm_file)]
+    return ARM_CHAR_DY.get(char_name, 0)
+
+
 ARM_SCALE = {
     "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
 }
@@ -1663,7 +1701,8 @@ def generate_random_combination(force_bg=None, force_arm="auto",
         # cartoon, not as an error.
         layers.append({"path": os.path.join(TRAITS_DIR, ARMZ, arm),
                        "offset": apply_offset,
-                       "dy": y_adjust + bg_extra_y,
+                       "dy": (y_adjust + bg_extra_y
+                              + arm_char_dy(char_name, arm)),
                        "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
     # 11. Sticker

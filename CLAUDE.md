@@ -284,6 +284,24 @@ falls outside most of the arm art (Cash spans 625–908, the sabers 122–1302).
 cannot be used to anchor position. A real per-arm fix needs a hand marker
 authored into the art, not a formula over a bbox.
 
+When the lift is not enough for **one** character, the sanctioned lever is
+`ARM_CHAR_DY` (per character) and `ARM_CHAR_ARM_DY` (per character × arm, and
+it wins). These move the arm relative to the body — the thing the five formulas
+were reverted for — and they are allowed only because each value is **authored
+by eye against that one character's face**, never derived across the cast.
+
+`ding_dong` is the only entry: a 636px round body whose arm centre sat at
+92.2 % of body height against a cast band of 67–88 %. It takes −40, except
+
+- **Dual Uzis −55.** They hang lowest of any arm and were still at 95.6 % after
+  −40. The owner's rule: *−55 is only suitable for dual uzis.*
+- **Cash 0.** The fists hold notes fanned *upward* at chest height, so it was
+  never low; −40 put 489px of banknote across the eyes (0px at dy 0).
+
+That split is the point: one number per character cannot fit arms that differ
+in pose, so any new entry needs the whole 11-arm strip rendered and looked at.
+With these values 0 of 11 weapons touch `ding_dong`'s eyes.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
