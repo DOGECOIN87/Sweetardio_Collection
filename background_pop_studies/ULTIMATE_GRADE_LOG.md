@@ -1,6 +1,6 @@
 # ULTIMATE GRADE LOG - Sweetardio background pop
 
-Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 46 plates
+Engine: `background_pop_studies/grade.py` · source `traits/backgroundz_originals` -> output `traits/backgroundz` · 47 plates
 
 Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of darkest body 54 / brightest body 206), stage saturation 0.30 (body mean 0.629), split-tone COOL (bodies measure +62.3 warm). Every parameter below is a continuous function of the plate's measured L/S/busyness/temperature.
 
@@ -52,6 +52,7 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 | Whitehouse_Lawn_Overlay.png | 98.1 | 54.3 | 0.516 | +50.2 | 34.2 | 1 | 0.825 | 0.127 | 0.666 | 1.000 | 0.160 | 0.100 | 1.000 | 6.96 | 0.350 | 0.143 | 0.100 | Y | 110.2 | 0.319 | +26.3 |
 | Why_So_Cereal.png | 60.8 | 51.5 | 0.739 | -57.9 | 18.0 | 100 | 0.660 | 0.150 | 0.509 | 0.001 | 0.000 | 0.000 | 0.874 | 6.09 | 0.306 | 0.108 | 0.100 |  | 88.4 | 0.459 | -50.5 |
 | Winning.png | 70.9 | 59.4 | 0.414 | +25.2 | 14.1 | 100 | 0.703 | 0.199 | 0.786 | 0.906 | 0.145 | 0.091 | 0.278 | 1.74 | 0.097 | 0.116 | 0.100 |  | 92.5 | 0.202 | +16.5 |
+| Arcade_Quilt.png | 51.4 | 36.0 | 0.731 | -48.6 | 8.8 | 100 | 0.621 | 0.296 | 0.513 | 0.033 | 0.005 | 0.003 | 0.148 | 3.42 | 0.052 | 0.103 | 0.100 |  | 84.9 | 0.497 | -43.2 |
 
 ## Cohesion summary (opaque-pixel means)
 

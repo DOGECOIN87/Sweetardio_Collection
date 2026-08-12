@@ -320,6 +320,40 @@ the character does not cover — a plain high-pass reads film grain and ranks
 smooth plates as busy. Never make it a fixed amplitude: the setting a busy
 plate needs turns a quiet one into a grey cloud.
 
+### Adding a plate
+
+The source goes to `traits/backgroundz_originals/` **first**, then
+`grade.py --only <name>` writes the graded copy into `traits/backgroundz/`.
+Four things follow, and none of them are optional:
+
+- **`--only` REWRITES `ULTIMATE_GRADE_LOG.md` with just that plate**, dropping
+  every other row. Keep the new row, restore the log, and merge it back in —
+  the file is the record of what every approved plate was graded with, and the
+  engine is not bit-identical across numpy/Pillow versions, so the other rows
+  cannot simply be regenerated.
+- Add the filename to `TRAIT_NAMES[BACKGROUNDZ]` in `generator.py`, or the
+  metadata falls back to the filename.
+- Rebuild **both** compat maps — `build_char_compat.py` (camouflage blocks)
+  and `build_eyez_compat.py` (colour-clash blocks). A plate absent from them is
+  simply never filtered.
+- Run `verify_separation.py`; the plate should be at 0 at-risk pairings.
+
+A plate with no entry in `rarity_weights.json`'s `backgroundz.target` draws at
+gain 1.0 alongside the other unpinned plates. That is cheap for the plates
+(worst pinned deviation measured 0.18 → 0.36, inside the ±0.6 the calibration
+can resolve) but **it is not free for the eyes**: a new plate re-randomises
+every downstream draw, and if the plate colour-clashes with an eye it also
+removes that eye from part of the pool. `Arcade_Quilt` blocks Blue and Cerise,
+and Side Eye rose ~0.6 points on average across three seeds.
+
+Measure both before deciding, on **more than one seed** —
+`calibrate_rarity.py --check --seed N`. Side Eye already read +0.31 / +1.70 /
++1.25 at seeds 4444 / 909090 / 7 *before* this plate existed, because the
+gains are fitted to seed 4444 alone. A single-seed reading cannot tell a new
+plate's effect from that fit.
+
+Most recent: `Arcade_Quilt.png` (2026-08).
+
 ## Verification tools
 
 ```bash

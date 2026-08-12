@@ -8,6 +8,10 @@
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
+  "Arcade_Quilt.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
   "Bored_Apes.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
@@ -124,6 +128,10 @@
  "weights": {
   "Abduction.png": {
    "Cerise.png": 0.742
+  },
+  "Arcade_Quilt.png": {
+   "layer-Eyes_Cyan (1).png": 0.658,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.645
   },
   "Ayotollah.png": {
    "Blue.png": 0.895,
