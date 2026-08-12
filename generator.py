@@ -306,7 +306,7 @@ TRAIT_NAMES = {
         "Starburst.png":                    "Starburst",
         "Emblem.png":                       "Emblem",
         "Store.png":                        "Store",
-        "Arcade_Quilt.png":                 "Arcade Quilt",
+        "Swolex.png":                       "Swolex",
     },
     SKINZ: {
         "layer-Skin_Alien (2).png":                 "Alien",

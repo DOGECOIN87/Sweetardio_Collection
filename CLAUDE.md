@@ -343,7 +343,7 @@ gain 1.0 alongside the other unpinned plates. That is cheap for the plates
 (worst pinned deviation measured 0.18 → 0.36, inside the ±0.6 the calibration
 can resolve) but **it is not free for the eyes**: a new plate re-randomises
 every downstream draw, and if the plate colour-clashes with an eye it also
-removes that eye from part of the pool. `Arcade_Quilt` blocks Blue and Cerise,
+removes that eye from part of the pool. `Swolex` blocks Blue and Cerise,
 and Side Eye rose ~0.6 points on average across three seeds.
 
 Measure both before deciding, on **more than one seed** —
@@ -352,7 +352,7 @@ Measure both before deciding, on **more than one seed** —
 gains are fitted to seed 4444 alone. A single-seed reading cannot tell a new
 plate's effect from that fit.
 
-Most recent: `Arcade_Quilt.png` (2026-08).
+Most recent: `Swolex.png` (2026-08).
 
 ## Verification tools
 

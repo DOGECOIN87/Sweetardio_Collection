@@ -19,7 +19,7 @@
  "weights": {
   "Nutty_Bar": {
    "Abduction.png": 1.364,
-   "Arcade_Quilt.png": 1.235,
+   "Swolex.png": 1.235,
    "Ayotollah.png": 0.964,
    "Baked.png": 1.261,
    "Bored_Apes.png": 1.727,
@@ -88,7 +88,7 @@
   },
   "Twinkie": {
    "Abduction.png": 2.131,
-   "Arcade_Quilt.png": 1.99,
+   "Swolex.png": 1.99,
    "Ayotollah.png": 1.727,
    "Baked.png": 1.575,
    "Bored_Apes.png": 2.205,
@@ -157,7 +157,7 @@
   },
   "brownie_bite": {
    "Abduction.png": 1.472,
-   "Arcade_Quilt.png": 1.346,
+   "Swolex.png": 1.346,
    "Ayotollah.png": 1.082,
    "Baked.png": 1.371,
    "Bored_Apes.png": 1.829,
@@ -226,7 +226,7 @@
   },
   "chocolate_chip_cookie": {
    "Abduction.png": 1.356,
-   "Arcade_Quilt.png": 1.227,
+   "Swolex.png": 1.227,
    "Ayotollah.png": 0.956,
    "Baked.png": 1.253,
    "Bored_Apes.png": 1.719,
@@ -295,7 +295,7 @@
   },
   "chocolate_doughnut": {
    "Abduction.png": 1.556,
-   "Arcade_Quilt.png": 1.432,
+   "Swolex.png": 1.432,
    "Ayotollah.png": 1.172,
    "Baked.png": 1.456,
    "Bored_Apes.png": 1.908,
@@ -364,7 +364,7 @@
   },
   "chocolate_frosted_poptart": {
    "Abduction.png": 1.63,
-   "Arcade_Quilt.png": 1.508,
+   "Swolex.png": 1.508,
    "Ayotollah.png": 1.252,
    "Baked.png": 1.532,
    "Bored_Apes.png": 1.979,
@@ -433,7 +433,7 @@
   },
   "chocolate_ice_cream": {
    "Abduction.png": 1.375,
-   "Arcade_Quilt.png": 1.247,
+   "Swolex.png": 1.247,
    "Ayotollah.png": 0.977,
    "Baked.png": 1.273,
    "Bored_Apes.png": 1.738,
@@ -502,7 +502,7 @@
   },
   "chocolate_sandwich_cookie": {
    "Abduction.png": 1.176,
-   "Arcade_Quilt.png": 1.127,
+   "Swolex.png": 1.127,
    "Ayotollah.png": 0.622,
    "Baked.png": 0.946,
    "Bored_Apes.png": 1.324,
@@ -567,7 +567,7 @@
   },
   "churro": {
    "Abduction.png": 1.702,
-   "Arcade_Quilt.png": 1.552,
+   "Swolex.png": 1.552,
    "Ayotollah.png": 1.271,
    "Baked.png": 1.234,
    "Bored_Apes.png": 1.895,
@@ -636,7 +636,7 @@
   },
   "cyan_frosted_poptart": {
    "Abduction.png": 1.037,
-   "Arcade_Quilt.png": 1.027,
+   "Swolex.png": 1.027,
    "Ayotollah.png": 1.823,
    "Baked.png": 1.673,
    "Bored_Apes.png": 1.125,
@@ -704,7 +704,7 @@
   },
   "cyan_sherbert_ice_cream": {
    "Abduction.png": 1.398,
-   "Arcade_Quilt.png": 1.364,
+   "Swolex.png": 1.364,
    "Ayotollah.png": 2.142,
    "Baked.png": 1.998,
    "Bored_Apes.png": 1.48,
@@ -773,7 +773,7 @@
   },
   "ding_dong": {
    "Abduction.png": 1.281,
-   "Arcade_Quilt.png": 1.15,
+   "Swolex.png": 1.15,
    "Ayotollah.png": 0.873,
    "Baked.png": 1.176,
    "Bored_Apes.png": 1.648,
@@ -841,7 +841,7 @@
   },
   "glazed_doughnut": {
    "Abduction.png": 1.748,
-   "Arcade_Quilt.png": 1.599,
+   "Swolex.png": 1.599,
    "Ayotollah.png": 1.32,
    "Baked.png": 1.283,
    "Bored_Apes.png": 1.939,
@@ -910,7 +910,7 @@
   },
   "gold_waffle": {
    "Abduction.png": 1.996,
-   "Arcade_Quilt.png": 1.852,
+   "Swolex.png": 1.852,
    "Ayotollah.png": 1.584,
    "Baked.png": 1.429,
    "Bored_Apes.png": 2.071,
@@ -979,7 +979,7 @@
   },
   "marshmallow": {
    "Abduction.png": 1.845,
-   "Arcade_Quilt.png": 1.773,
+   "Swolex.png": 1.773,
    "Ayotollah.png": 1.153,
    "Baked.png": 1.05,
    "Bored_Apes.png": 1.824,
@@ -1048,7 +1048,7 @@
   },
   "neopolitan_ice_cream": {
    "Abduction.png": 1.425,
-   "Arcade_Quilt.png": 1.268,
+   "Swolex.png": 1.268,
    "Ayotollah.png": 0.97,
    "Baked.png": 0.93,
    "Bored_Apes.png": 1.626,
@@ -1117,7 +1117,7 @@
   },
   "oatmeal_cream_pie": {
    "Abduction.png": 1.634,
-   "Arcade_Quilt.png": 1.512,
+   "Swolex.png": 1.512,
    "Ayotollah.png": 1.256,
    "Baked.png": 1.536,
    "Bored_Apes.png": 1.983,
@@ -1186,7 +1186,7 @@
   },
   "og_gummy_bear": {
    "Abduction.png": 1.096,
-   "Arcade_Quilt.png": 0.927,
+   "Swolex.png": 0.927,
    "Ayotollah.png": 1.152,
    "Baked.png": 1.253,
    "Bored_Apes.png": 1.309,
@@ -1255,7 +1255,7 @@
   },
   "og_poptart": {
    "Abduction.png": 1.854,
-   "Arcade_Quilt.png": 1.707,
+   "Swolex.png": 1.707,
    "Ayotollah.png": 1.433,
    "Baked.png": 1.273,
    "Bored_Apes.png": 1.93,
@@ -1324,7 +1324,7 @@
   },
   "pink_sherbert_ice_cream": {
    "Abduction.png": 1.529,
-   "Arcade_Quilt.png": 1.374,
+   "Swolex.png": 1.374,
    "Ayotollah.png": 1.083,
    "Baked.png": 1.044,
    "Bored_Apes.png": 1.726,
@@ -1393,7 +1393,7 @@
   },
   "rice_crispy_treat": {
    "Abduction.png": 1.753,
-   "Arcade_Quilt.png": 1.603,
+   "Swolex.png": 1.603,
    "Ayotollah.png": 1.325,
    "Baked.png": 1.161,
    "Bored_Apes.png": 1.83,
@@ -1462,7 +1462,7 @@
   },
   "smores": {
    "Abduction.png": 1.768,
-   "Arcade_Quilt.png": 1.619,
+   "Swolex.png": 1.619,
    "Ayotollah.png": 1.341,
    "Baked.png": 1.304,
    "Bored_Apes.png": 1.958,
@@ -1531,7 +1531,7 @@
   },
   "sugar_cube": {
    "Abduction.png": 1.754,
-   "Arcade_Quilt.png": 1.682,
+   "Swolex.png": 1.682,
    "Ayotollah.png": 1.051,
    "Baked.png": 0.808,
    "Bored_Apes.png": 1.616,
@@ -1600,7 +1600,7 @@
   },
   "sugar_doughnut": {
    "Abduction.png": 1.691,
-   "Arcade_Quilt.png": 1.54,
+   "Swolex.png": 1.54,
    "Ayotollah.png": 1.258,
    "Baked.png": 1.221,
    "Bored_Apes.png": 1.884,
@@ -1669,7 +1669,7 @@
   },
   "vanilla_ice_cream": {
    "Abduction.png": 1.555,
-   "Arcade_Quilt.png": 1.48,
+   "Swolex.png": 1.48,
    "Ayotollah.png": 1.063,
    "Baked.png": 1.024,
    "Bored_Apes.png": 1.709,
@@ -1738,7 +1738,7 @@
   },
   "waffle": {
    "Abduction.png": 1.718,
-   "Arcade_Quilt.png": 1.568,
+   "Swolex.png": 1.568,
    "Ayotollah.png": 1.288,
    "Baked.png": 1.332,
    "Bored_Apes.png": 1.91,
@@ -1807,7 +1807,7 @@
   },
   "zebra_cake": {
    "Abduction.png": 1.596,
-   "Arcade_Quilt.png": 1.522,
+   "Swolex.png": 1.522,
    "Ayotollah.png": 1.013,
    "Baked.png": 0.974,
    "Bored_Apes.png": 1.664,
