@@ -844,7 +844,9 @@ def body_after_skin(char_name, fname):
 # gets a proportionally adjusted arm.
 ARM_SCALE_PIVOT = (694, 1040)
 
-# Arms composite at a FIXED canvas row and are NOT repositioned per character.
+# Arms composite at a FIXED canvas row and are NOT repositioned RELATIVE TO
+# THE BODY. (The whole figure does rise when armed -- see ARMED_LIFT above --
+# but that moves body and arm together and changes nothing between them.)
 # Tried and reverted (2026-08): shifting the arm to follow each body -- by a
 # fraction of body height, by a fixed distance above the body's base, and by
 # how far the body's base differs from the cast median. All three fixed the
@@ -865,7 +867,13 @@ ARM_SCALE_PIVOT = (694, 1040)
 # Uzis doing the same thing to the sugar cube (844px of gun over its eyes).
 #
 # The owner's call, after seeing all four rendered: no clamp. A weapon hanging
-# below a short body looks better than any of the corrections.
+# below a short body looks better than any of the corrections that move it.
+#
+# What DID work was the owner's own suggestion: stop trying to move the arm and
+# raise the whole figure instead (ARMED_LIFT). It solves what the four attempts
+# were chasing -- the figure no longer looks sunk through its own shadow --
+# without touching a single relationship inside the figure, which is precisely
+# why it cannot reproduce any of their failures.
 #
 # Worth knowing if this is ever revisited: ARM_SCALE_PIVOT (694, 1040) is a
 # SCALING pivot, not a hand line -- y=1040 is outside most of the arm art
@@ -873,6 +881,42 @@ ARM_SCALE_PIVOT = (694, 1040)
 # anchor. Every approach here failed the same way, by inferring where the hands
 # are from a bounding box. A real fix needs a per-arm HAND MARKER authored into
 # the art, or per-character arm offsets authored by eye -- not a formula.
+# ---- armed figures ride slightly higher ----
+# A held weapon is drawn to hang below the fists, so on the short bodies the
+# gun reached past the character's own feet -- up to 117px, and 109px below the
+# CONTACT SHADOW, which excludes arms and so reads as the floor. The figure
+# looked like it had sunk through the ground it was standing on.
+#
+# This lifts the WHOLE figure -- body, face, arm, footwear, and therefore the
+# shadow derived from them -- by a flat amount whenever a weapon is held, so
+# the arm's pose on the body is untouched. That is the difference from the four
+# attempts that were reverted: every one of those moved the arm RELATIVE to the
+# body, and all four either rode the gun up over the eyes on the squat
+# characters or destroyed the sabers' blade-down pose. Moving both together
+# cannot do either, because it changes no relationship inside the figure.
+#
+# Only characters whose weapon actually overhangs are lifted; a character whose
+# arm already sits inside its own footprint (the ice creams, churro, the Nutty
+# Bar, Twinkie) is left exactly where it was.
+ARMED_LIFT = 70
+
+
+def armed_lift(char_file, arm_file, cscale):
+    """Px to raise a whole figure that is holding a weapon. 0 when the weapon
+    does not reach past the body's base."""
+    if not ARMED_LIFT or not char_file or not arm_file:
+        return 0
+    try:
+        _, _, _, by = _opaque_bbox(os.path.join(TRAITS_DIR, CHARACTERZ,
+                                                char_file))
+        _, _, _, ay = _opaque_bbox(os.path.join(TRAITS_DIR, ARMZ, arm_file))
+    except (OSError, ValueError):
+        return 0
+    piv = CHAR_SCALE_PIVOT[1]
+    overhang = ay - (piv + (by - piv) * cscale)
+    return ARMED_LIFT if overhang > 0 else 0
+
+
 ARM_SCALE = {
     "Sweetardio_115 (11).png": 0.8,   # dual Uzis: 861px span dwarfs small bodies
 }
@@ -1523,6 +1567,14 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     if not body_files:
         raise ValueError(f"No art in traits/{CHARACTERZ} for character "
                          f"{char_name!r}")
+
+    # Raise the whole figure when it holds a weapon (see ARMED_LIFT). Applied
+    # to y_adjust BEFORE any layer is built, so the body, skin ball, eyes,
+    # mouth, footwear and the arm all take it together and nothing inside the
+    # figure shifts relative to anything else. The grounding shadow is derived
+    # from those layers, so it rises with them.
+    if arm:
+        y_adjust -= armed_lift(body_files[0], arm, cscale)
     for f in body_files:
         layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
         if body_after_skin(char_name, f):

@@ -256,6 +256,34 @@ keeps `audit_face_holes.py` and `verify_face_coverage.py` out of it.
 occludes it, so the face reads as set *into* the recess. It lands exactly on
 that rim, so fix the matte line first or the shadow deepens it.
 
+## An armed figure rides 70px higher, as one piece
+
+`ARMED_LIFT` in `generator.py` raises the WHOLE figure — body, skin ball, eyes,
+mouth, footwear, and the arm — whenever a weapon is held and that weapon
+overhangs the body's base. 18 of the 27 qualify with a rifle; the ones whose
+arm already sits inside their own footprint (the ice creams, churro, Nutty Bar,
+Twinkie) are untouched.
+
+The reason it is applied to `y_adjust` before any layer is built, rather than
+to the arm, is the whole point. **Four earlier attempts moved the arm relative
+to the body and all four were reverted**: anchoring it to a fraction of body
+height, to a fixed distance above the base, to the cast-median base, and a
+one-sided overhang clamp. Every one of them either rode the gun up over the
+eyes on the squat bodies — the face is pinned at a fixed canvas position while
+bodies are not — or destroyed the sabers' blade-down pose, because a bounding
+box cannot tell a weapon that hangs low by design from one that hangs low by
+accident.
+
+Moving body and arm together cannot cause either failure, since it changes no
+relationship inside the figure. Verified: across 27 characters × 11 arms, every
+part moves by exactly the same 70px, and the highest body top is y=132, well
+clear of the frame.
+
+`ARM_SCALE_PIVOT (694, 1040)` is a **scaling** pivot, not a hand line — y=1040
+falls outside most of the arm art (Cash spans 625–908, the sabers 122–1302). It
+cannot be used to anchor position. A real per-arm fix needs a hand marker
+authored into the art, not a formula over a bbox.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
