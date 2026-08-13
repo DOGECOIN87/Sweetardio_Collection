@@ -39,6 +39,9 @@
   "Cookboy.png": [
    "Blue.png"
   ],
+  "Diner_Booth.png": [
+   "Blue.png"
+  ],
   "Emblem.png": [
    "Blue.png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
@@ -218,6 +221,11 @@
    "layer-Eyes_Cyan (1).png": 0.955,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.963
   },
+  "Diner_Booth.png": {
+   "Cerise.png": 0.767,
+   "layer-Eyes_Cyan (1).png": 0.958,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.952
+  },
   "Drained_The_Swamp.png": {
    "Blue.png": 0.86,
    "Cerise.png": 0.846,
@@ -291,7 +299,7 @@
   },
   "Legendary_Simplex.png": {
    "layer-Eyes_Cyan (1).png": 0.691,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.648
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.652
   },
   "Legendary_Tenders.png": {
    "Cerise.png": 0.742,
@@ -305,6 +313,12 @@
    "Cerise.png": 0.708,
    "layer-Eyes_Cyan (1).png": 0.653,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.637
+  },
+  "Marshmallow_Sky.png": {
+   "Blue.png": 0.832,
+   "Cerise.png": 0.658,
+   "layer-Eyes_Cyan (1).png": 0.975,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.966
   },
   "Midnight_Snack (1).png": {
    "Blue.png": 0.909,
@@ -437,6 +451,12 @@
    "Cerise.png": 0.811,
    "layer-Eyes_Cyan (1).png": 0.945,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.954
+  },
+  "Vending_Bay.png": {
+   "Blue.png": 0.091,
+   "Cerise.png": 0.742,
+   "layer-Eyes_Cyan (1).png": 0.645,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.456
   },
   "Wheres_My_$_B1tch (1).png": {
    "Blue.png": 0.213,
