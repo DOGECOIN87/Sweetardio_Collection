@@ -8,10 +8,6 @@
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
-  "Swolex.png": [
-   "Blue.png",
-   "Cerise.png"
-  ],
   "Bored_Apes.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
@@ -42,6 +38,10 @@
   ],
   "Cookboy.png": [
    "Blue.png"
+  ],
+  "Emblem.png": [
+   "Blue.png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
   "Gummy_Bears.png": [
    "Cerise.png"
@@ -102,6 +102,10 @@
   "Sweetardio_116 (20).png": [
    "Blue.png"
   ],
+  "Swolex.png": [
+   "Blue.png",
+   "Cerise.png"
+  ],
   "Toasted.png": [
    "Blue.png"
   ],
@@ -129,10 +133,6 @@
   "Abduction.png": {
    "Cerise.png": 0.742
   },
-  "Swolex.png": {
-   "layer-Eyes_Cyan (1).png": 0.658,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.645
-  },
   "Ayotollah.png": {
    "Blue.png": 0.895,
    "Cerise.png": 0.803,
@@ -146,7 +146,7 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.932
   },
   "Bored_Apes.png": {
-   "Cerise.png": 0.778
+   "Cerise.png": 0.777
   },
   "Bouquet_Drip.png": {
    "Cerise.png": 0.784
@@ -209,8 +209,8 @@
   "Cookboy_Silver.png": {
    "Blue.png": 0.091,
    "Cerise.png": 0.742,
-   "layer-Eyes_Cyan (1).png": 0.461,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.291
+   "layer-Eyes_Cyan (1).png": 0.432,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.297
   },
   "Crumble_Trail.png": {
    "Blue.png": 0.941,
@@ -219,10 +219,10 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.963
   },
   "Drained_The_Swamp.png": {
-   "Blue.png": 0.851,
-   "Cerise.png": 0.844,
-   "layer-Eyes_Cyan (1).png": 0.869,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.848
+   "Blue.png": 0.86,
+   "Cerise.png": 0.846,
+   "layer-Eyes_Cyan (1).png": 0.874,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.855
   },
   "Druski.png": {
    "Blue.png": 0.786,
@@ -231,10 +231,8 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.941
   },
   "Emblem.png": {
-   "Blue.png": 0.183,
-   "Cerise.png": 0.739,
-   "layer-Eyes_Cyan (1).png": 0.56,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.485
+   "Cerise.png": 0.705,
+   "layer-Eyes_Cyan (1).png": 0.636
   },
   "Empty_Fridge.png": {
    "Blue.png": 0.961,
@@ -321,11 +319,11 @@
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.908
   },
   "Neon_Backroom.png": {
-   "Cerise.png": 0.66
+   "Cerise.png": 0.65
   },
   "Neon_Strip.png": {
-   "layer-Eyes_Cyan (1).png": 0.664,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.634
+   "layer-Eyes_Cyan (1).png": 0.67,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.644
   },
   "Pink_Abyss.png": {
    "Blue.png": 0.844,
@@ -399,6 +397,10 @@
    "layer-Eyes_Cyan (1).png": 0.89,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.863
   },
+  "Swolex.png": {
+   "layer-Eyes_Cyan (1).png": 0.654,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.613
+  },
   "Tampa_Bay_Pete.png": {
    "Blue.png": 0.091,
    "Cerise.png": 0.691,
@@ -456,10 +458,10 @@
    "Cerise.png": 0.735
   },
   "Winning.png": {
-   "Blue.png": 0.937,
-   "Cerise.png": 0.837,
-   "layer-Eyes_Cyan (1).png": 0.905,
-   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.907
+   "Blue.png": 0.879,
+   "Cerise.png": 0.844,
+   "layer-Eyes_Cyan (1).png": 0.812,
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.815
   },
   "art_mattrick_001-1-2 (1).png": {
    "Blue.png": 0.3,
