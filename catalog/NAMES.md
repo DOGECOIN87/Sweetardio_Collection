@@ -5,6 +5,9 @@ shows for it. Generated from `TRAIT_NAMES` in `generator.py` — the same
 lookup `extract_metadata()` uses, so this file and a token's attributes
 cannot disagree. Regenerate with `asset_assessment/dump_trait_names.py`.
 
+A **†** marks a name that deliberately does not describe its art; see
+[Deliberate names](#deliberate-names) at the end.
+
 ## Characters (27)
 
 | Name | File |
@@ -52,7 +55,7 @@ cannot disagree. Regenerate with `asset_assessment/dump_trait_names.py`.
 | Celestial | `Celestial.png` |
 | Cereal Killer | `Cereal_Killer.png` |
 | Choco Falls | `Choco_Falls.png` |
-| Coder Chick | `Coder_Chick.png` |
+| Coder Chick † | `Coder_Chick.png` |
 | Cookboy | `Cookboy.png` |
 | Cookboy Black Enamel | `Cookboy_Black_Enamel.png` |
 | Cookboy Chocolate | `Cookboy_Chocolate.png` |
@@ -61,7 +64,7 @@ cannot disagree. Regenerate with `asset_assessment/dump_trait_names.py`.
 | Cookie Money | `art_mattrick_001-1-2 (1).png` |
 | Crumble Trail | `Crumble_Trail.png` |
 | Drained The Swamp | `Drained_The_Swamp.png` |
-| Druski | `Druski.png` |
+| Druski † | `Druski.png` |
 | Emblem | `Emblem.png` |
 | Empty Fridge | `Empty_Fridge.png` |
 | Flavor Explosion | `Flavor_Explosion.png` |
@@ -115,7 +118,7 @@ filename prefix is what `is_legendary_bg()` matches on.
 | Legendary Just Aliens | `Legendary_Just_Aliens.png` |
 | Legendary Opengotchi | `Legendary_Opengotchi.png` |
 | Legendary Simplex | `Legendary_Simplex.png` |
-| Legendary Tenders | `Legendary_Tenders.png` |
+| Legendary Tenders † | `Legendary_Tenders.png` |
 
 ## Backgrounds — overlays (2)
 
@@ -177,7 +180,7 @@ Background value on their own.
 | Dual Uzis | `Sweetardio_115 (11).png` |
 | Katana | `Armz_Katana.png` |
 | Knives | `Armz_Knives.png` |
-| Military Brat | `layer-layer-layer-layer-Military_Brat.png` |
+| Military Brat † | `layer-layer-layer-layer-Military_Brat.png` |
 | Nerf Blaster | `layer-layer-layer-layer-Nerf_Blaster.png` |
 | Pink Saber | `Sweetardio_114 (5).png` |
 
@@ -257,3 +260,18 @@ tier as it stood.
 | 21 | Secret Unicorn Twinkie | `Secret_Unicorn_Twinkie.png` |
 | 22 | Secret Waffle Loops | `Secret_Waffle_Loops.png` |
 | 23 | Secret Waffle Nothing | `Secret_Waffle_Nothing.png` |
+
+## Deliberate names
+
+Every asset was checked by eye against its art in 2026-08. These are the
+names that do **not** describe what is in the frame and are staying that
+way on the owner's call. They are listed here so the next audit reads this
+instead of re-opening them — unlike the four ice creams, which were named
+after flavours they were not and did need correcting (see `CLAUDE.md`).
+
+| Name | Class | Why it stays |
+|------|-------|--------------|
+| Coder Chick | `backgroundz` | Pastel unicorn wallpaper. Kept on the owner's call. |
+| Druski | `backgroundz` | A blonde woman with a flag and confetti; the comedian himself is not in frame. Kept — the still comes from his content. |
+| Legendary Tenders | `backgroundz` | The word NOTHING repeated over a star field. Kept on the owner's call; the Legendary_ prefix is load-bearing either way. |
+| Military Brat | `armz` | Two cartoon gloves, one pointing, one open — no weapon. It is the de-facto unarmed arm (lifts 3 of 27 figures against the AK15's 18). Kept on the owner's call. |

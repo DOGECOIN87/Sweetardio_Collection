@@ -141,6 +141,22 @@ Renaming also invalidates `char_compat.json` (rebuild it) and therefore the
 rarity gains, because a changed blocklist changes the draw — re-run
 `calibrate_rarity.py` and regenerate `catalog/RARITY.md`.
 
+### Four other names do not describe their art, and stay anyway
+
+The whole cast was checked by eye against its art in 2026-08 — all 27
+characters, 69 plates, 10 eyes, 9 mouths, 11 arms, 5 footwear pairs and 23
+stickers. Beyond the ice creams, four names do not match what is in the frame,
+and **all four are deliberate and were confirmed as keepers**:
+`Coder Chick` (a pastel unicorn wallpaper), `Druski` (a still from his content
+that he is not in), `Legendary Tenders` (the word NOTHING over a star field)
+and the `Military Brat` arm (two cartoon gloves, no weapon — it is the de-facto
+unarmed arm, lifting 3 of 27 figures against the AK15's 18).
+
+They live in `INTENTIONAL` in `asset_assessment/dump_trait_names.py` and are
+marked **†** in `catalog/NAMES.md`. **Read that list before "fixing" a name.**
+The ice creams needed correcting because the art contradicted the flavour;
+these are the owner's naming, which is a different thing.
+
 ## Character art is resolved by exact base name
 
 `char_base_name()` in `generator.py` is the one definition of a character's
