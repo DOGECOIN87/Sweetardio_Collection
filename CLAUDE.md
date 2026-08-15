@@ -365,7 +365,16 @@ python3 asset_assessment/audit_placement.py       # what CHAR_Y_ADJUST should be
 python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeline
 python3 asset_assessment/register_eyes.py --report        # eye size + baseline
 python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
+python3 asset_assessment/verify_trait_names.py    # do the names still resolve
 ```
+
+`verify_trait_names.py` is the gate on the *names*: it fails on a `TRAIT_NAMES`
+entry whose asset is gone (the rename bug that left four ice creams misnamed),
+an asset with no entry, two assets in a class sharing a display name, and a
+`CHAR_Y_ADJUST` / `EXCLUDE_WAT_CHARS` key that matches no character or is
+shadowed by a longer one. Run it after any rename. It cannot tell you a name
+*describes* its art badly — only looking at the art does that, which is why
+`catalog/NAMES.md` and the `traitsheet_*` sheets exist side by side.
 
 `verify_placement.py` exits non-zero if any character is off its group, drifts
 horizontally off the face column, or has a face hole away from the ball centre.

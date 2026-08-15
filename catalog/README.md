@@ -12,7 +12,11 @@ the sheet, the index and a token's attributes always agree.
 
 Regenerate after adding/removing assets with
 `asset_assessment/render_traitsheet.py <sheet>` (see that file's docstring
-for the full list of sheet keys) and `asset_assessment/dump_trait_names.py`.
+for the full list of sheet keys) and `asset_assessment/dump_trait_names.py`,
+then run `asset_assessment/verify_trait_names.py` — it fails on a name that no
+longer resolves to an asset, an asset with no name, or two assets in a class
+sharing one. Reading the sheet against `NAMES.md` is still the only way to
+catch a name that resolves fine but describes the art wrongly.
 
 | Sheet | Class | Items |
 |-------|-------|------:|

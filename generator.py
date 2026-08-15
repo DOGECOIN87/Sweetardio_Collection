@@ -650,10 +650,11 @@ def is_centered(char_name):
 CHAR_Y_ADJUST = {
     "poptart": -65,
     "twinkie": 45,
-    # The five regenerated ice creams (vanilla, neopolitan, rocky road, cyan
+    # The five regenerated ice creams (vanilla, neopolitan, chocolate, cyan
     # and pink sherbert) all measure the same body, so they take the same trim
     # onto the shared 1111 cone-tip line. The three still on the old art keep
-    # their own values below.
+    # their own values below. "rocky road" named the third of these until the
+    # ice cream names were corrected against their art; it is not a character.
     "vanilla_ice_cream": -18,
     "neopolitan_ice_cream": -21,
     # -18 follows the CHOCOLATE body. It was mis-named pink_sherbert until the
