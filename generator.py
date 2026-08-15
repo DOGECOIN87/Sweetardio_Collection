@@ -245,7 +245,6 @@ TRAIT_NAMES = {
         "Bubble_Trouble.png":               "Bubble Trouble",
         "Cabaret_Alley.png":                "Cabaret Alley",
         "Candy_Tundra.png":                 "Candy Tundra",
-        "Celestial.png":                    "Celestial",
         "Cereal_Killer.png":                "Cereal Killer",
         "Choco_Falls.png":                  "Choco Falls",
         "Coder_Chick.png":                  "Coder Chick",
@@ -255,19 +254,16 @@ TRAIT_NAMES = {
         "Druski.png":                       "Druski",
         "Flavor_Explosion.png":             "Flavor Explosion",
         "Goo_Lagoon.png":                   "Goo Lagoon",
-        "Gummy_Bears.png":                  "Gummy Bears",
         "He_Needs_Some_Milk.png":           "He Needs Some Milk",
         "Im_Not_Sorry.png":                 "I'm Not Sorry",
         "Legendary_Just_Aliens.png":        "Legendary Just Aliens",
         "Legendary_Opengotchi.png":         "Legendary Opengotchi",
         "Legendary_Simplex.png":            "Legendary Simplex",
         "Legendary_Tenders.png":            "Legendary Tenders",
-        "M&Ms.png":                         "M&Ms",
         "Midnight_Snack (1).png":           "Midnight Snack",
         "Nabisco.png":                      "Nabisco",
         "Tampa_Bay_Pete.png":               "Tampa Bay Pete",
         "Pink_Abyss.png":                   "Pink Abyss",
-        "Pixie_Stix.png":                   "Pixie Stix",
         "Psychedelics.png":                 "Psychedelics",
         "RIP_Gorbagana.png":                "RIP Gorbagana",
         "Smuckers_Blue.png":                "Smuckers Blue",
@@ -288,25 +284,25 @@ TRAIT_NAMES = {
         "Whitehouse_Lawn.png":              "Whitehouse Lawn",
         "Why_So_Cereal.png":                "Why So Cereal",
         "Winning.png":                      "Winning",
-        "art_mattrick_001-1-2 (1).png":     "Cookie Money",
+        "Cookie_Dough.png":                 "Cookie Dough",
         "art_mattrick_001-15-2 (1).png":    "In Cook We Trust",
         "soft_serve.png":                   "Soft Serve",
         "Abduction.png":                    "Abduction",
         "Bored_Apes.png":                   "Bored Apes",
-        "Bouquet_Drip.png":                 "Bouquet Drip",
+        "Tooth_Decay.png":                  "Tooth Decay",
         "Empty_Fridge.png":                 "Empty Fridge",
         "Graham.png":                       "Graham",
         "Hurshey.png":                      "Hurshey",
-        "Neon_Backroom.png":                "Neon Backroom",
-        "Neon_Strip.png":                   "Neon Strip",
+        "The_2023_Las_Vegas_Incident.png":  "The 2023 Las Vegas Incident",
+        "The_Miami_Mall_Incident.png":      "The Miami Mall Incident",
         "Cookboy_Chocolate.png":            "Cookboy Chocolate",
-        "Cookboy_Gold.png":                 "Cookboy Gold",
-        "Cookboy_Black_Enamel.png":         "Cookboy Black Enamel",
-        "Cookboy_Silver.png":               "Cookboy Silver",
         "Starburst.png":                    "Starburst",
         "Emblem.png":                       "Emblem",
         "Store.png":                        "Store",
         "Swolex.png":                       "Swolex",
+        "Clouds.png":                       "Clouds",
+        "Room.png":                         "Room",
+        "The_Board.png":                    "The Board",
     },
     SKINZ: {
         "layer-Skin_Alien (2).png":                 "Alien",
@@ -1203,6 +1199,9 @@ GROUND_SHADOW = {
 # grain. Grain is not what the eye compares a doughnut against; mid-scale
 # structure is. Band-passed, Celestial drops to 2.6 (second quietest) and
 # Toasted rises to 17.4, which is what the renders show.
+# (Celestial was retired in 2026-08 and is in traits/backgroundz_retired. The
+# measurement stands as the reason this metric is a band-pass; it just cannot
+# be re-run against that plate without restoring it.)
 SUBJECT_SEPARATION = {
     "wide_blur": 170,     # px; radius of the recession field
     "wide_gain": 2.3,     # saturates the field at the silhouette edge

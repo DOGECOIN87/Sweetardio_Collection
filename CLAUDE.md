@@ -368,7 +368,28 @@ Measure both before deciding, on **more than one seed** —
 gains are fitted to seed 4444 alone. A single-seed reading cannot tell a new
 plate's effect from that fit.
 
-Most recent: `Swolex.png` (2026-08).
+Most recent: `Room.png`, `Clouds.png`, `The_Board.png` and a replacement
+`Swolex.png` (2026-08).
+
+### Removing a plate
+
+The inverse, and the folder it goes to is not optional. `grade.py` grades
+**everything** in `traits/backgroundz_originals` into `traits/backgroundz`
+with no skip list, so a retired plate whose source stays there silently
+reappears at the next full regrade. Move the ungraded source to
+`traits/backgroundz_retired/` (see its README), delete the graded copy, drop
+the `TRAIT_NAMES` entry, rebuild **all three** compat maps, and re-solve
+`calibrate_rarity.py` — its docstring is explicit that the gains are void
+whenever an asset is added or retired.
+
+Keep the plate's row in `ULTIMATE_GRADE_LOG.md`. It is the only record of the
+parameters it was graded with, and the engine cannot reproduce them exactly on
+a newer numpy/Pillow, so the row is what makes a restore possible.
+
+Two other things point at plates by filename and will not be caught by any
+gate: `catalog/character_showcase/pairings.json` pins one plate per character,
+and `background_pop_studies/make_proofs.py` names plates in its proof list.
+Seven retirements broke four showcase pairings and one proof.
 
 ## Verification tools
 

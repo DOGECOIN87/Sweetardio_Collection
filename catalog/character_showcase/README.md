@@ -8,6 +8,8 @@ Six pairings the solver got wrong were replaced after rendering them — the sol
 
 Note the ice cream plates were chosen against the ART, so when the four mis-named ice creams were corrected the pairings travelled with the bodies, not with the names.
 
+Four pairings were re-solved when their plates left the collection (M&Ms, Gummy Bears, Cookboy Silver and Pixie Stix). The re-solve repeated the original lesson: scored on contrast alone it handed all four the same two plates, and its pick for the oatmeal cream pie put the cookie straight over the face in Tooth Decay — the same collision the Oreo had. That one was placed by eye instead. A fifth row changed name only: the waffle's plate is the same art, renamed to Cookie_Dough.png.
+
 Regenerate: `python3 asset_assessment/render_showcase.py`
 
 | character | background | chosen by |
@@ -16,10 +18,10 @@ Regenerate: `python3 asset_assessment/render_showcase.py`
 | Twinkie | UAP_Taskforce.png | solver |
 | brownie_bite | Cereal_Killer.png | solver |
 | chocolate_chip_cookie | Wheres_My_$_B1tch (1).png | solver |
-| chocolate_doughnut | M&Ms.png | eye |
+| chocolate_doughnut | Why_So_Cereal.png | solver |
 | chocolate_frosted_poptart | He_Needs_Some_Milk.png | solver |
 | chocolate_ice_cream | art_mattrick_001-15-2 (1).png | solver |
-| chocolate_sandwich_cookie | Gummy_Bears.png | eye |
+| chocolate_sandwich_cookie | Straight_of_America (1).png | solver |
 | churro | Legendary_Just_Aliens.png | solver |
 | cyan_frosted_poptart | Crumble_Trail.png | solver |
 | cyan_sherbert_ice_cream | Nabisco.png | solver |
@@ -28,14 +30,14 @@ Regenerate: `python3 asset_assessment/render_showcase.py`
 | gold_waffle | Abduction.png | solver |
 | marshmallow | Legendary_Opengotchi.png | solver |
 | neopolitan_ice_cream | Hurshey.png | eye |
-| oatmeal_cream_pie | Cookboy_Silver.png | solver |
+| oatmeal_cream_pie | Store.png | eye |
 | og_gummy_bear | Candy_Tundra.png | solver |
-| og_poptart | Pixie_Stix.png | eye |
+| og_poptart | Legendary_Simplex.png | solver |
 | pink_sherbert_ice_cream | soft_serve.png | solver |
 | rice_crispy_treat | Cabaret_Alley.png | solver |
 | smores | Toasted.png | eye |
 | sugar_cube | Smuckers_Blue.png | solver |
 | sugar_doughnut | Bored_Apes.png | solver |
 | vanilla_ice_cream | Emblem.png | eye |
-| waffle | art_mattrick_001-1-2 (1).png | solver |
+| waffle | Cookie_Dough.png | solver |
 | zebra_cake | Cookboy.png | solver |

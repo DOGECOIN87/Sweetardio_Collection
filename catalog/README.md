@@ -20,8 +20,8 @@ catch a name that resolves fine but describes the art wrongly.
 
 | Sheet | Class | Items |
 |-------|-------|------:|
-| `traitsheet_backgroundz.png` | Backgroundz (plates + overlays, no Legendary) | 65 |
-| `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 69 |
+| `traitsheet_backgroundz.png` | Backgroundz (plates + overlays, no Legendary) | 61 |
+| `traitsheet_backgroundz_all.png` | Backgroundz — all, incl. Legendary | 65 |
 | `traitsheet_backgroundz_legendary.png` | Backgroundz — Legendary | 4 |
 | `traitsheet_characterz.png` | Characterz | 27 |
 | `traitsheet_skinz.png` | Skinz | 3 |
@@ -35,9 +35,11 @@ catch a name that resolves fine but describes the art wrongly.
 Three of those counts read lower than the file count of distinct traits, and
 each for its own reason:
 
-- **Backgrounds.** Of the 69 files, two are `BG_OVERLAY_PAIRS` overlays
+- **Backgrounds.** Of the 65 files, two are `BG_OVERLAY_PAIRS` overlays
   (Mars, Whitehouse Lawn) that only ever draw on top of their partner plate,
-  so the collection holds **63 standard + 4 legendary = 67 pickable plates**.
+  so the collection holds **59 standard + 4 legendary = 63 pickable plates**.
+  Seven plates were retired in 2026-08 and three added; the retired sources
+  are in `traits/backgroundz_retired` (see the README there).
 - **Footwear.** 11 PNGs are 5 wearable pairs: each is a `_Base` plus one or
   more `_Overlay` (Shiba has a left and a right).
 - **Secret Rarez.** The tier is retired and `traits/secret_rarez` is empty, so

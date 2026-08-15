@@ -42,7 +42,9 @@ ARMS = "traits/armz/layer-layer-layer-layer-Shy-1.png"
 # vertical offset (generator.py EXCLUDE_WAT_CHARS rule).
 PHASE1 = [
     ("Cookboy", "after_skinz_brownie_bite", True, None),
-    ("Celestial", "after_skinz_marshmallow", True, None),
+    # was Celestial (retired 2026-08); Coder_Chick takes the bright-on-bright
+    # slot -- same job, a quiet pale pastel plate under a white body.
+    ("Coder_Chick", "after_skinz_marshmallow", True, None),
     ("Why_So_Cereal", "after_skinz_glazed_doughnut", True, None),
     ("Sweetardio", "after_skinz_chocolate_chip_cookie", True, None),
     ("Sweet_Castle_2", "before_skinz_cyan_sherbert_ice_cream", False,

@@ -10,7 +10,7 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 | Ayotollah.png | 61.7 | 56.4 | 0.412 | +34.0 | 14.1 | 100 | 0.664 | 0.212 | 0.789 | 0.969 | 0.155 | 0.097 | 0.268 | 1.87 | 0.094 | 0.109 | 0.100 |  | 86.7 | 0.263 | +25.5 |
 | Blue_Fur.png | 50.4 | 21.5 | 0.621 | -56.7 | 8.3 | 100 | 0.617 | 0.320 | 0.580 | 0.003 | 0.000 | 0.000 | 0.000 | 0.00 | 0.000 | 0.102 | 0.100 |  | 86.3 | 0.447 | -56.9 |
 | Bored_Apes.png | 68.1 | 37.0 | 0.385 | -8.1 | 10.7 | 100 | 0.691 | 0.281 | 0.829 | 0.491 | 0.079 | 0.049 | 0.245 | 3.08 | 0.086 | 0.113 | 0.100 |  | 94.2 | 0.289 | -13.4 |
-| Bouquet_Drip.png | 107.0 | 46.6 | 0.305 | -23.3 | 10.5 | 100 | 0.869 | 0.255 | 0.987 | 0.281 | 0.045 | 0.028 | 0.237 | 3.08 | 0.083 | 0.152 | 0.100 |  | 116.1 | 0.273 | -24.5 |
+| Tooth_Decay.png | 107.0 | 46.6 | 0.305 | -23.3 | 10.5 | 100 | 0.869 | 0.255 | 0.987 | 0.281 | 0.045 | 0.028 | 0.237 | 3.08 | 0.083 | 0.152 | 0.100 |  | 116.1 | 0.273 | -24.5 |
 | Bubble_Trouble.png | 27.7 | 28.3 | 0.930 | -14.6 | 6.7 | 100 | 0.550 | 0.320 | 0.450 | 0.399 | 0.064 | 0.040 | 0.000 | 0.00 | 0.000 | 0.100 | 0.100 |  | 58.9 | 0.671 | -25.5 |
 | Candy_Land.png | 116.5 | 57.3 | 0.436 | +31.0 | 12.7 | 100 | 0.921 | 0.229 | 0.756 | 0.952 | 0.152 | 0.095 | 0.098 | 0.68 | 0.034 | 0.161 | 0.100 |  | 120.0 | 0.273 | +13.9 |
 | Celestial.png | 144.4 | 34.4 | 0.319 | -47.6 | 9.2 | 100 | 1.097 | 0.320 | 0.955 | 0.038 | 0.006 | 0.004 | 0.000 | 0.00 | 0.000 | 0.179 | 0.100 |  | 135.9 | 0.307 | -42.0 |
@@ -25,8 +25,8 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 | Hurshey.png | 54.0 | 33.6 | 0.479 | +31.9 | 12.9 | 100 | 0.632 | 0.262 | 0.704 | 0.957 | 0.153 | 0.096 | 0.366 | 3.08 | 0.128 | 0.104 | 0.100 |  | 84.6 | 0.253 | +25.5 |
 | Liberty_Cook_Dime.png | 134.0 | 77.0 | 0.000 | +0.0 | 15.4 | 94 | 1.026 | 0.121 | 1.000 | 0.606 | 0.097 | 0.061 | 0.489 | 3.41 | 0.171 | 0.174 | 0.100 |  | 134.0 | 0.060 | -2.9 |
 | Nabisco.png | 19.8 | 25.3 | 0.391 | +6.8 | 5.8 | 100 | 0.550 | 0.320 | 0.820 | 0.699 | 0.112 | 0.070 | 0.000 | 0.00 | 0.000 | 0.100 | 0.100 |  | 47.4 | 0.215 | +7.5 |
-| Neon_Backroom.png | 70.0 | 38.6 | 0.439 | -23.9 | 12.5 | 100 | 0.699 | 0.265 | 0.751 | 0.273 | 0.044 | 0.027 | 0.342 | 3.08 | 0.120 | 0.115 | 0.100 |  | 95.6 | 0.332 | -25.8 |
-| Neon_Strip.png | 63.4 | 36.5 | 0.340 | -18.9 | 12.4 | 100 | 0.671 | 0.266 | 0.911 | 0.339 | 0.054 | 0.034 | 0.338 | 3.08 | 0.118 | 0.110 | 0.100 |  | 91.8 | 0.300 | -27.3 |
+| The_2023_Las_Vegas_Incident.png | 70.0 | 38.6 | 0.439 | -23.9 | 12.5 | 100 | 0.699 | 0.265 | 0.751 | 0.273 | 0.044 | 0.027 | 0.342 | 3.08 | 0.120 | 0.115 | 0.100 |  | 95.6 | 0.332 | -25.8 |
+| The_Miami_Mall_Incident.png | 63.4 | 36.5 | 0.340 | -18.9 | 12.4 | 100 | 0.671 | 0.266 | 0.911 | 0.339 | 0.054 | 0.034 | 0.338 | 3.08 | 0.118 | 0.110 | 0.100 |  | 91.8 | 0.300 | -27.3 |
 | NFTs_Arent_Dead.png | 43.4 | 44.0 | 0.526 | -29.9 | 13.4 | 100 | 0.588 | 0.275 | 0.656 | 0.199 | 0.032 | 0.020 | 0.177 | 1.11 | 0.062 | 0.100 | 0.100 |  | 75.7 | 0.415 | -40.0 |
 | NFTs_Arent_Dead_2.png | 38.4 | 43.3 | 0.580 | -29.2 | 12.4 | 100 | 0.567 | 0.295 | 0.610 | 0.208 | 0.033 | 0.021 | 0.063 | 0.39 | 0.022 | 0.100 | 0.100 |  | 71.2 | 0.450 | -39.5 |
 | Tampa_Bay_Pete.png | 62.4 | 54.0 | 0.188 | -4.7 | 12.0 | 100 | 0.667 | 0.252 | 1.000 | 0.540 | 0.086 | 0.054 | 0.034 | 0.21 | 0.012 | 0.109 | 0.100 |  | 87.7 | 0.209 | -10.8 |
@@ -52,7 +52,10 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 | Whitehouse_Lawn_Overlay.png | 98.1 | 54.3 | 0.516 | +50.2 | 34.2 | 1 | 0.825 | 0.127 | 0.666 | 1.000 | 0.160 | 0.100 | 1.000 | 6.96 | 0.350 | 0.143 | 0.100 | Y | 110.2 | 0.319 | +26.3 |
 | Why_So_Cereal.png | 60.8 | 51.5 | 0.739 | -57.9 | 18.0 | 100 | 0.660 | 0.150 | 0.509 | 0.001 | 0.000 | 0.000 | 0.874 | 6.09 | 0.306 | 0.108 | 0.100 |  | 88.4 | 0.459 | -50.5 |
 | Winning.png | 70.9 | 59.4 | 0.414 | +25.2 | 14.1 | 100 | 0.703 | 0.199 | 0.786 | 0.906 | 0.145 | 0.091 | 0.278 | 1.74 | 0.097 | 0.116 | 0.100 |  | 92.5 | 0.202 | +16.5 |
-| Swolex.png | 51.4 | 36.0 | 0.731 | -48.6 | 8.8 | 100 | 0.621 | 0.296 | 0.513 | 0.033 | 0.005 | 0.003 | 0.148 | 3.42 | 0.052 | 0.103 | 0.100 |  | 84.9 | 0.497 | -43.2 |
+| Swolex.png | 41.6 | 37.8 | 0.841 | -43.5 | 8.8 | 100 | 0.580 | 0.296 | 0.461 | 0.066 | 0.011 | 0.007 | 0.150 | 3.46 | 0.052 | 0.100 | 0.100 |  | 76.2 | 0.558 | -43.6 |
+| Clouds.png | 156.7 | 38.2 | 0.155 | +18.5 | 8.4 | 100 | 1.196 | 0.300 | 1.000 | 0.842 | 0.135 | 0.084 | 0.127 | 3.42 | 0.044 | 0.180 | 0.100 |  | 142.6 | 0.131 | +12.0 |
+| The_Board.png | 64.9 | 38.6 | 0.446 | +30.2 | 6.2 | 100 | 0.677 | 0.318 | 0.743 | 0.946 | 0.151 | 0.095 | 0.011 | 0.99 | 0.004 | 0.111 | 0.100 |  | 90.7 | 0.329 | +19.6 |
+| Room.png | 121.5 | 57.2 | 0.130 | -10.2 | 8.8 | 100 | 0.949 | 0.223 | 1.000 | 0.462 | 0.074 | 0.046 | 0.149 | 3.42 | 0.052 | 0.165 | 0.100 |  | 124.6 | 0.137 | -11.8 |
 
 ## Cohesion summary (opaque-pixel means)
 
@@ -64,10 +67,18 @@ Targets derived from Phase 1 measurements: mid-key anchor L* = 130 (midpoint of 
 
 L spread (std) 34.8 -> 24.0; S spread 0.23 -> 0.16; temp spread 33.0 -> 27.8.
 
-Note: the 16 plates added 2026-07 (Abduction, Bored_Apes, Bouquet_Drip,
-Empty_Fridge, Graham, Hurshey, Neon_Backroom,
-Neon_Strip, the four Cookboy foil colourways, Starburst, Emblem and Store) were graded in a later run and their rows merged into
+Note: the 16 plates added 2026-07 (Abduction, Bored_Apes, Tooth_Decay,
+Empty_Fridge, Graham, Hurshey, The_2023_Las_Vegas_Incident,
+The_Miami_Mall_Incident, the four Cookboy foil colourways, Starburst, Emblem and Store) were graded in a later run and their rows merged into
 the table above; the cohesion summary describes the original batch only.
+
+Note: seven plates were retired 2026-08 (Celestial, Cookboy_Black_Enamel,
+Cookboy_Gold, Cookboy_Silver, Gummy_Bears, M&Ms, Pixie_Stix) and their rows
+are **kept on purpose**. The ungraded sources are in `traits/backgroundz_retired`,
+so a retired plate can be restored — and the row below is the only record of
+the parameters it was graded with, which the engine cannot reproduce exactly on
+a newer numpy/Pillow. A row here does not mean the plate is in the collection;
+`traits/backgroundz` is what mints.
 
 The engine is deterministic for a given environment but is NOT bit-identical
 across numpy/Pillow versions: re-running the full batch on a newer stack

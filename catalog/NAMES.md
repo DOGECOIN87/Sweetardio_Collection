@@ -40,7 +40,7 @@ A **†** marks a name that deliberately does not describe its art; see
 | Waffle | `after_skinz_waffle.png` |
 | Zebra Cake | `before_skinz_zebra_cake.png` |
 
-## Backgrounds — standard (63)
+## Backgrounds — standard (59)
 
 | Name | File |
 |------|------|
@@ -48,20 +48,16 @@ A **†** marks a name that deliberately does not describe its art; see
 | Ayatollah | `Ayotollah.png` |
 | Baked | `Baked.png` |
 | Bored Apes | `Bored_Apes.png` |
-| Bouquet Drip | `Bouquet_Drip.png` |
 | Bubble Trouble | `Bubble_Trouble.png` |
 | Cabaret Alley | `Cabaret_Alley.png` |
 | Candy Tundra | `Candy_Tundra.png` |
-| Celestial | `Celestial.png` |
 | Cereal Killer | `Cereal_Killer.png` |
 | Choco Falls | `Choco_Falls.png` |
+| Clouds | `Clouds.png` |
 | Coder Chick † | `Coder_Chick.png` |
 | Cookboy | `Cookboy.png` |
-| Cookboy Black Enamel | `Cookboy_Black_Enamel.png` |
 | Cookboy Chocolate | `Cookboy_Chocolate.png` |
-| Cookboy Gold | `Cookboy_Gold.png` |
-| Cookboy Silver | `Cookboy_Silver.png` |
-| Cookie Money | `art_mattrick_001-1-2 (1).png` |
+| Cookie Dough | `Cookie_Dough.png` |
 | Crumble Trail | `Crumble_Trail.png` |
 | Drained The Swamp | `Drained_The_Swamp.png` |
 | Druski † | `Druski.png` |
@@ -70,21 +66,17 @@ A **†** marks a name that deliberately does not describe its art; see
 | Flavor Explosion | `Flavor_Explosion.png` |
 | Goo Lagoon | `Goo_Lagoon.png` |
 | Graham | `Graham.png` |
-| Gummy Bears | `Gummy_Bears.png` |
 | He Needs Some Milk | `He_Needs_Some_Milk.png` |
 | Hurshey | `Hurshey.png` |
 | I'm Not Sorry | `Im_Not_Sorry.png` |
 | In Cook We Trust | `art_mattrick_001-15-2 (1).png` |
-| M&Ms | `M&Ms.png` |
 | Mars | `Sweetardio_116 (20).png` |
 | Midnight Snack | `Midnight_Snack (1).png` |
 | Nabisco | `Nabisco.png` |
-| Neon Backroom | `Neon_Backroom.png` |
-| Neon Strip | `Neon_Strip.png` |
 | Pink Abyss | `Pink_Abyss.png` |
-| Pixie Stix | `Pixie_Stix.png` |
 | Psychedelics | `Psychedelics.png` |
 | RIP Gorbagana | `RIP_Gorbagana.png` |
+| Room | `Room.png` |
 | Smuckers Blue | `Smuckers_Blue.png` |
 | Snack Pack | `Snack_Pack.png` |
 | Soft Serve | `soft_serve.png` |
@@ -97,8 +89,12 @@ A **†** marks a name that deliberately does not describe its art; see
 | Sweetardio | `Sweetardio.png` |
 | Swolex | `Swolex.png` |
 | Tampa Bay Pete | `Tampa_Bay_Pete.png` |
+| The 2023 Las Vegas Incident | `The_2023_Las_Vegas_Incident.png` |
+| The Board | `The_Board.png` |
+| The Miami Mall Incident | `The_Miami_Mall_Incident.png` |
 | The Set | `The_Set.png` |
 | Toasted | `Toasted.png` |
+| Tooth Decay | `Tooth_Decay.png` |
 | Tootsie Blue | `Tootsie_Blue.png` |
 | Tootsie Cerise | `Tootsie_Cerise.png` |
 | UAP Taskforce | `UAP_Taskforce.png` |

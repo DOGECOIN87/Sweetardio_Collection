@@ -3,10 +3,16 @@
  "src": "traits/backgroundz",
  "strength": 0.8,
  "blocked": {
+  "Clouds.png": [
+   "layer-Bunny_Slippers"
+  ],
   "Coder_Chick.png": [
    "layer-Bunny_Slippers"
   ],
-  "Cookboy_Silver.png": [
+  "Cookie_Dough.png": [
+   "layer-Bunny_Slippers"
+  ],
+  "Room.png": [
    "layer-Bunny_Slippers"
   ],
   "Smuckers_Blue.png": [
@@ -15,13 +21,13 @@
   "Straight_of_America (1).png": [
    "layer-Bunny_Slippers"
   ],
+  "Swolex.png": [
+   "Cookie_Monster_Slippers"
+  ],
   "Vanilla_Lane (1).png": [
    "layer-Bunny_Slippers"
   ],
   "Wheres_My_$_B1tch (1).png": [
-   "layer-Bunny_Slippers"
-  ],
-  "art_mattrick_001-1-2 (1).png": [
    "layer-Bunny_Slippers"
   ],
   "art_mattrick_001-15-2 (1).png": [
@@ -53,12 +59,6 @@
    "layer-Pepe": 1.261,
    "layer-Shiba": 1.549
   },
-  "Bouquet_Drip.png": {
-   "Cookie_Monster_Slippers": 1.104,
-   "layer-Bunny_Slippers": 1.223,
-   "layer-Pepe": 1.386,
-   "layer-Shiba": 1.353
-  },
   "Bubble_Trouble.png": {
    "Cookie_Monster_Slippers": 0.736,
    "layer-Bunny_Slippers": 1.463,
@@ -77,12 +77,6 @@
    "layer-Pepe": 1.523,
    "layer-Shiba": 1.219
   },
-  "Celestial.png": {
-   "Cookie_Monster_Slippers": 1.204,
-   "layer-Bunny_Slippers": 0.936,
-   "layer-Pepe": 1.719,
-   "layer-Shiba": 1.02
-  },
   "Cereal_Killer.png": {
    "Cookie_Monster_Slippers": 0.839,
    "layer-Bunny_Slippers": 1.283,
@@ -95,6 +89,11 @@
    "layer-Pepe": 1.171,
    "layer-Shiba": 0.842
   },
+  "Clouds.png": {
+   "Cookie_Monster_Slippers": 1.922,
+   "layer-Pepe": 1.719,
+   "layer-Shiba": 0.774
+  },
   "Coder_Chick.png": {
    "Cookie_Monster_Slippers": 1.988,
    "layer-Pepe": 1.552,
@@ -106,28 +105,16 @@
    "layer-Pepe": 1.27,
    "layer-Shiba": 1.81
   },
-  "Cookboy_Black_Enamel.png": {
-   "Cookie_Monster_Slippers": 1.305,
-   "layer-Bunny_Slippers": 1.54,
-   "layer-Pepe": 1.597,
-   "layer-Shiba": 1.877
-  },
   "Cookboy_Chocolate.png": {
    "Cookie_Monster_Slippers": 1.595,
    "layer-Bunny_Slippers": 0.616,
    "layer-Pepe": 1.094,
    "layer-Shiba": 0.803
   },
-  "Cookboy_Gold.png": {
-   "Cookie_Monster_Slippers": 1.726,
-   "layer-Bunny_Slippers": 0.52,
-   "layer-Pepe": 1.145,
-   "layer-Shiba": 0.68
-  },
-  "Cookboy_Silver.png": {
-   "Cookie_Monster_Slippers": 1.482,
-   "layer-Pepe": 1.975,
-   "layer-Shiba": 1.596
+  "Cookie_Dough.png": {
+   "Cookie_Monster_Slippers": 1.402,
+   "layer-Pepe": 1.786,
+   "layer-Shiba": 1.454
   },
   "Crumble_Trail.png": {
    "Cookie_Monster_Slippers": 1.737,
@@ -177,12 +164,6 @@
    "layer-Pepe": 1.166,
    "layer-Shiba": 0.777
   },
-  "Gummy_Bears.png": {
-   "Cookie_Monster_Slippers": 0.861,
-   "layer-Bunny_Slippers": 1.257,
-   "layer-Pepe": 1.042,
-   "layer-Shiba": 1.31
-  },
   "He_Needs_Some_Milk.png": {
    "Cookie_Monster_Slippers": 1.238,
    "layer-Bunny_Slippers": 1.242,
@@ -225,12 +206,6 @@
    "layer-Pepe": 1.28,
    "layer-Shiba": 1.674
   },
-  "M&Ms.png": {
-   "Cookie_Monster_Slippers": 0.74,
-   "layer-Bunny_Slippers": 1.365,
-   "layer-Pepe": 1.101,
-   "layer-Shiba": 1.417
-  },
   "Midnight_Snack (1).png": {
    "Cookie_Monster_Slippers": 1.65,
    "layer-Bunny_Slippers": 0.647,
@@ -243,29 +218,11 @@
    "layer-Pepe": 1.333,
    "layer-Shiba": 1.267
   },
-  "Neon_Backroom.png": {
-   "Cookie_Monster_Slippers": 0.789,
-   "layer-Bunny_Slippers": 1.376,
-   "layer-Pepe": 1.27,
-   "layer-Shiba": 1.427
-  },
-  "Neon_Strip.png": {
-   "Cookie_Monster_Slippers": 0.942,
-   "layer-Bunny_Slippers": 1.343,
-   "layer-Pepe": 1.351,
-   "layer-Shiba": 1.429
-  },
   "Pink_Abyss.png": {
    "Cookie_Monster_Slippers": 1.305,
    "layer-Bunny_Slippers": 0.841,
    "layer-Pepe": 1.16,
    "layer-Shiba": 0.899
-  },
-  "Pixie_Stix.png": {
-   "Cookie_Monster_Slippers": 1.149,
-   "layer-Bunny_Slippers": 0.984,
-   "layer-Pepe": 0.985,
-   "layer-Shiba": 1.039
   },
   "Psychedelics.png": {
    "Cookie_Monster_Slippers": 1.699,
@@ -278,6 +235,11 @@
    "layer-Bunny_Slippers": 0.676,
    "layer-Pepe": 1.088,
    "layer-Shiba": 0.908
+  },
+  "Room.png": {
+   "Cookie_Monster_Slippers": 1.249,
+   "layer-Pepe": 1.76,
+   "layer-Shiba": 1.489
   },
   "Smuckers_Blue.png": {
    "layer-Bunny_Slippers": 1.532,
@@ -337,11 +299,34 @@
    "layer-Pepe": 1.041,
    "layer-Shiba": 0.821
   },
+  "Swolex.png": {
+   "layer-Bunny_Slippers": 1.458,
+   "layer-Pepe": 0.967,
+   "layer-Shiba": 1.508
+  },
   "Tampa_Bay_Pete.png": {
    "Cookie_Monster_Slippers": 1.121,
    "layer-Bunny_Slippers": 1.374,
    "layer-Pepe": 1.455,
    "layer-Shiba": 1.591
+  },
+  "The_2023_Las_Vegas_Incident.png": {
+   "Cookie_Monster_Slippers": 0.789,
+   "layer-Bunny_Slippers": 1.376,
+   "layer-Pepe": 1.27,
+   "layer-Shiba": 1.427
+  },
+  "The_Board.png": {
+   "Cookie_Monster_Slippers": 1.54,
+   "layer-Bunny_Slippers": 0.685,
+   "layer-Pepe": 0.909,
+   "layer-Shiba": 0.746
+  },
+  "The_Miami_Mall_Incident.png": {
+   "Cookie_Monster_Slippers": 0.942,
+   "layer-Bunny_Slippers": 1.343,
+   "layer-Pepe": 1.351,
+   "layer-Shiba": 1.429
   },
   "The_Set.png": {
    "Cookie_Monster_Slippers": 1.703,
@@ -354,6 +339,12 @@
    "layer-Bunny_Slippers": 1.214,
    "layer-Pepe": 1.281,
    "layer-Shiba": 1.266
+  },
+  "Tooth_Decay.png": {
+   "Cookie_Monster_Slippers": 1.104,
+   "layer-Bunny_Slippers": 1.223,
+   "layer-Pepe": 1.386,
+   "layer-Shiba": 1.353
   },
   "Tootsie_Blue.png": {
    "Cookie_Monster_Slippers": 0.744,
@@ -400,11 +391,6 @@
    "layer-Bunny_Slippers": 0.742,
    "layer-Pepe": 1.061,
    "layer-Shiba": 1.002
-  },
-  "art_mattrick_001-1-2 (1).png": {
-   "Cookie_Monster_Slippers": 1.402,
-   "layer-Pepe": 1.786,
-   "layer-Shiba": 1.454
   },
   "art_mattrick_001-15-2 (1).png": {
    "Cookie_Monster_Slippers": 1.444,

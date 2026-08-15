@@ -16,8 +16,8 @@
     "picked_by": "solver"
   },
   "chocolate_doughnut": {
-    "plate": "M&Ms.png",
-    "picked_by": "eye"
+    "plate": "Why_So_Cereal.png",
+    "picked_by": "solver"
   },
   "chocolate_frosted_poptart": {
     "plate": "He_Needs_Some_Milk.png",
@@ -28,8 +28,8 @@
     "picked_by": "solver"
   },
   "chocolate_sandwich_cookie": {
-    "plate": "Gummy_Bears.png",
-    "picked_by": "eye"
+    "plate": "Straight_of_America (1).png",
+    "picked_by": "solver"
   },
   "churro": {
     "plate": "Legendary_Just_Aliens.png",
@@ -64,16 +64,16 @@
     "picked_by": "eye"
   },
   "oatmeal_cream_pie": {
-    "plate": "Cookboy_Silver.png",
-    "picked_by": "solver"
+    "plate": "Store.png",
+    "picked_by": "eye"
   },
   "og_gummy_bear": {
     "plate": "Candy_Tundra.png",
     "picked_by": "solver"
   },
   "og_poptart": {
-    "plate": "Pixie_Stix.png",
-    "picked_by": "eye"
+    "plate": "Legendary_Simplex.png",
+    "picked_by": "solver"
   },
   "pink_sherbert_ice_cream": {
     "plate": "soft_serve.png",
@@ -100,7 +100,7 @@
     "picked_by": "eye"
   },
   "waffle": {
-    "plate": "art_mattrick_001-1-2 (1).png",
+    "plate": "Cookie_Dough.png",
     "picked_by": "solver"
   },
   "zebra_cake": {
