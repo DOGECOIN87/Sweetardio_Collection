@@ -76,6 +76,26 @@ See `SKIN_ENHANCE_PROMPTS.md`, `EYEZ_ENHANCE_PROMPTS.md` and
 `MOUTHZ_ENHANCE_PROMPTS.md` for the prompts they accompany, and
 `asset_assessment/register_trait.py` for putting results back on the canvas.
 
+## Highlights sheet
+
+`highlights_25.png` is the opposite of the sample batch: 25 tokens **picked**,
+not sampled. 200 were rendered off the production pipeline at seed 8215 and
+scored — colourfulness, the luma gap between the body and the ring of plate
+around it, distance from the family mid-key, and how loud the plate is behind
+the head — and the top of that ranking was then curated by eye.
+
+```bash
+python3 asset_assessment/render_highlights.py
+```
+
+The score only prunes. Left to itself it returns eight marshmallows on dark
+plates, because a pale body on a busy dark frame wins every contrast measure
+going; the picks span 23 of the 27 characters instead. The indices in that
+script are positions in the seeded run, so the sheet reproduces exactly until
+an asset changes — adding or retiring any trait re-randomises every draw after
+it, and the list then points at different tokens. Re-curate rather than
+trusting stale indices.
+
 ## Sample batch sheet
 
 `sample_batch_100.png` is an inspection sheet: 100 random tokens straight off
