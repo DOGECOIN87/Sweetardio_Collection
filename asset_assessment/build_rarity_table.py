@@ -38,7 +38,7 @@ METADATA_DIR = "output/mint/metadata"
 OUT = "catalog/RARITY.md"
 # canonical metadata order; presence-optional traits last
 ALWAYS = ["Character", "Background", "Skin", "Eyes", "Mouth"]
-OPTIONAL = ["Footwear", "Arms", "Sticker"]
+OPTIONAL = ["Footwear", "Arms", "Sticker", "Artist"]
 
 
 def load_tokens(d):
@@ -124,6 +124,12 @@ def main():
           "accident.")
     table("Mouths", "Mouth")
     table("Skins", "Skin")
+    table("Artist", "Artist",
+          "Guest artists, credited on the Artist Series tokens only. The "
+          "display name of the PLATE is the piece's title; this is the person "
+          "who drew it, which for Duhnut Candy Man is a different string and "
+          "appears nowhere else a collector can see. Minted with both "
+          "artists' permission.")
     table("Arms", "Arms", "Exact counts.")
     table("Footwear", "Footwear", "Exact counts.")
 

@@ -154,6 +154,17 @@ Calibrated, so the shares are chosen rather than left to the plate blocklist —
 | Black | 1683 | 37.87% |
 | White | 2444 | 55.00% |
 
+## Artist
+
+Guest artists, credited on the Artist Series tokens only. The display name of the PLATE is the piece's title; this is the person who drew it, which for Duhnut Candy Man is a different string and appears nowhere else a collector can see. Minted with both artists' permission.
+
+20 of 4444 carry this trait (0.5%); 4424 do not.
+
+| trait | count | share |
+|---|---:|---:|
+| Radbro Webring | 10 | 0.23% |
+| Emily Cartoons | 10 | 0.23% |
+
 ## Arms
 
 Exact counts.

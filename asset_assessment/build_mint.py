@@ -165,11 +165,47 @@ ARTIST_CHARS = {
     ],
 }
 
+# Who actually drew each plate. The piece's TITLE is its display name in
+# TRAIT_NAMES; this is the person, which is a different string for one of the
+# two and would otherwise appear nowhere a collector can see.
+#
+# Credit lived only in the games repo (src/content/artistRares.ts) and the
+# landing-page placard it feeds. That is the half that can change or go away;
+# the token metadata is the half that travels to the launchpad, to wallets and
+# to every marketplace that indexes the collection, so the credit belongs in
+# both. Emily Cartoons' name in particular appeared in no metadata at all —
+# her signature is painted into the art and vanishes at thumbnail size.
+#
+# Minted with the permission of both artists (confirmed by the owner, 2026-08).
+ARTIST_CREDIT = {
+    "Artist_Radbro_Webring.png": "Radbro Webring",
+    "Artist_Duhnut_Candy_Man.png": "Emily Cartoons",
+}
+
 # Artist tokens carry NO arm, footwear or sticker. Each plate is a finished
 # artwork with its own subject, title lettering and artist signature; a weapon
 # across the lettering or a corner sticker over the signature is the one thing
 # that reliably ruins it. The character alone is what the curation is for.
 ARTIST_BARE = True
+
+
+def _with_artist_credit(meta, plate):
+    """Insert the Artist attribute directly after Background, so the credit
+    reads next to the piece it belongs to rather than at the end of the list.
+
+    Only the 20 Artist Series tokens carry it, which is also why it doubles as
+    a rarity signal: a marketplace shows Artist as a trait held by 20 of 4444.
+    """
+    artist = ARTIST_CREDIT.get(plate)
+    if not artist:
+        sys.exit(f"{plate}: no ARTIST_CREDIT entry — an Artist Series plate "
+                 f"must name the person who drew it")
+    out = []
+    for a in meta:
+        out.append(a)
+        if a["trait_type"] == "Background":
+            out.append({"trait_type": "Artist", "value": artist})
+    return out
 
 
 def _render_one(job):
@@ -495,6 +531,8 @@ def main():
             seen.add(sig(t))
             t["legendary"] = leg is not None and i not in is_art
             t["artist"] = i in is_art
+            if i in is_art:
+                meta = _with_artist_credit(meta, leg)
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
