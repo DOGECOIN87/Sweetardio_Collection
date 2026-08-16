@@ -291,7 +291,11 @@ TRAIT_NAMES = {
         "Sugar.png":                        "Sugar",
         "Sweet_Castle_2.png":               "Sweet Castle",
         "Sweet_Shop.png":                   "Sweet Shop",
-        "Sweetardio.png":                   "Sweetardio",
+        # The glazed conveyor plate. Renamed from "Sweetardio" 2026-08 — the
+        # FILE keeps its name on purpose: it is the key in all three compat
+        # maps, in rarity_weights and in ULTIMATE_GRADE_LOG, and a display
+        # name is the only part a collector ever sees.
+        "Sweetardio.png":                   "Off the Line",
         "Sweetardio_116 (20).png":          "Mars",
         "The_Set.png":                      "The Set",
         "Toasted.png":                      "Toasted",

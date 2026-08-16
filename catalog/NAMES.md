@@ -40,7 +40,7 @@ A **†** marks a name that deliberately does not describe its art; see
 | Waffle | `after_skinz_waffle.png` |
 | Zebra Cake | `before_skinz_zebra_cake.png` |
 
-## Backgrounds — standard (59)
+## Backgrounds — standard (61)
 
 | Name | File |
 |------|------|
@@ -61,6 +61,7 @@ A **†** marks a name that deliberately does not describe its art; see
 | Crumble Trail | `Crumble_Trail.png` |
 | Drained The Swamp | `Drained_The_Swamp.png` |
 | Druski † | `Druski.png` |
+| Duhnut Candy Man | `Artist_Duhnut_Candy_Man.png` |
 | Emblem | `Emblem.png` |
 | Empty Fridge | `Empty_Fridge.png` |
 | Flavor Explosion | `Flavor_Explosion.png` |
@@ -73,9 +74,11 @@ A **†** marks a name that deliberately does not describe its art; see
 | Mars | `Sweetardio_116 (20).png` |
 | Midnight Snack | `Midnight_Snack (1).png` |
 | Nabisco | `Nabisco.png` |
+| Off the Line | `Sweetardio.png` |
 | Pink Abyss | `Pink_Abyss.png` |
 | Psychedelics | `Psychedelics.png` |
 | RIP Gorbagana | `RIP_Gorbagana.png` |
+| Radbro Webring | `Artist_Radbro_Webring.png` |
 | Room | `Room.png` |
 | Smuckers Blue | `Smuckers_Blue.png` |
 | Snack Pack | `Snack_Pack.png` |
@@ -86,7 +89,6 @@ A **†** marks a name that deliberately does not describe its art; see
 | Sugar | `Sugar.png` |
 | Sweet Castle | `Sweet_Castle_2.png` |
 | Sweet Shop | `Sweet_Shop.png` |
-| Sweetardio | `Sweetardio.png` |
 | Swolex | `Swolex.png` |
 | Tampa Bay Pete | `Tampa_Bay_Pete.png` |
 | The 2023 Las Vegas Incident | `The_2023_Las_Vegas_Incident.png` |

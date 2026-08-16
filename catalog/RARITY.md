@@ -81,7 +81,7 @@ The four `Legendary` plates are slot-allocated at exactly 50 each and never appe
 | Crumble Trail | 56 | 1.26% |
 | Coder Chick | 60 | 1.35% |
 | The Board | 63 | 1.42% |
-| Sweetardio | 67 | 1.51% |
+| Off the Line | 67 | 1.51% |
 | Ayatollah | 69 | 1.55% |
 | Graham | 71 | 1.60% |
 | Swolex | 72 | 1.62% |
