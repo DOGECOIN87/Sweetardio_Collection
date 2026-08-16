@@ -41,3 +41,19 @@ mint folder could be left correct. Deleting that subfolder loses nothing.
 | `Gummy_Bears.png` | owner's cull |
 | `M&Ms.png` | owner's cull |
 | `Pixie_Stix.png` | owner's cull |
+| `Sweetardio (16).png` | never shipped — see below |
+
+`Sweetardio (16).png` is the one entry here that was **never in the collection**
+to begin with, so it is the only one with no graded copy to delete, no
+`TRAIT_NAMES` entry to drop and no effect on the draw. It sat in
+`backgroundz_originals` with no counterpart in `traits/backgroundz`, which is
+precisely the state this folder exists to prevent: the next full `grade.py` run
+would have minted it as an extra plate under a fallback display name and voided
+the calibration, with nothing gating it.
+
+It is a finished, on-brand plate — the Sweetardio storefront interior, a
+companion shot to the `Sweetardio` conveyor plate — not a broken asset. It is
+retired because it was never graded in, not because anything is wrong with it.
+Bringing it back is the standard restore at the top of this file, plus a
+re-render, since a new plate re-randomises every downstream draw. Note it would
+also need a display name that is not `Store`, which `Store.png` already holds.
