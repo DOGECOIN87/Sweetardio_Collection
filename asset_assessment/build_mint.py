@@ -42,6 +42,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from collections import Counter
 
 sys.path.insert(0, ".")
@@ -171,6 +172,19 @@ ARTIST_CHARS = {
 ARTIST_BARE = True
 
 
+def _render_one(job):
+    """Composite one token. Module-level so multiprocessing can pickle it.
+
+    Takes (layers, out_path) and consumes NO randomness — that is the property
+    that lets the render fan out across processes without changing a pixel of
+    the output. Trait selection has already happened, on the single seeded
+    stream, by the time a job reaches here.
+    """
+    layers, out_path = job
+    g.create_image(layers, out_path)
+    return out_path
+
+
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
     t["character"] = char
@@ -223,6 +237,9 @@ def main():
                          "is ~1.1 GB instead of ~9.8 GB. png is the lossless "
                          "escape hatch; the build is deterministic either way, "
                          "so the seed is the archival master, not the files.")
+    ap.add_argument("--jobs", type=int, default=0,
+                    help="render processes (default: all cores). Rendering is "
+                         "RNG-free, so this changes speed only, never output.")
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
@@ -412,7 +429,12 @@ def main():
         forced_stk[s] = sticker_files[i % len(sticker_files)]
 
     # ---- compose every token ----
+    # Layer lists are COLLECTED here and rendered afterwards, possibly in
+    # parallel. Trait selection is the only RNG consumer, so keeping it in this
+    # one serial loop keeps the stream — and therefore the whole mint — exactly
+    # as deterministic as it was when rendering happened inline.
     manifest, seen = {}, set()
+    render_jobs = []
     for i in range(N):
         if args.render and i and i % 250 == 0:
             print(f"  composed {i}/{N}…", flush=True)
@@ -429,7 +451,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.{args.format}"))
+                render_jobs.append((layers, os.path.join(img_dir, f"{i + 1}.{args.format}")))
             continue
 
         leg = forced_bg[i]
@@ -476,11 +498,42 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.{args.format}"))
+                render_jobs.append((layers, os.path.join(img_dir, f"{i + 1}.{args.format}")))
             break
         else:
             sys.exit(f"token {i+1}: no unique combo for arm={farm} wat={fwat} "
                      f"stk={fstk} leg={leg}")
+
+    # ---- render pass ----
+    # create_image() is a pure function of its layer list: it consumes no RNG,
+    # so tokens can be composited in any order, in any number of processes,
+    # and come out byte-identical. Compositing is ~870 ms of the ~1250 ms per
+    # token (big gaussians over a 1393x1393 canvas for the separation pocket
+    # and the shadows) with WebP encode the other ~380 ms, and all of it ran on
+    # ONE core of four.
+    if render_jobs:
+        jobs = args.jobs or (os.cpu_count() or 1)
+        print(f"rendering {len(render_jobs)} tokens on {jobs} process(es)…",
+              flush=True)
+        t0 = time.time()
+        if jobs > 1:
+            import multiprocessing as mp
+            with mp.Pool(jobs) as pool:
+                for k, _ in enumerate(
+                        pool.imap_unordered(_render_one, render_jobs, chunksize=8), 1):
+                    if k % 250 == 0:
+                        el = time.time() - t0
+                        print(f"  rendered {k}/{len(render_jobs)}… "
+                              f"({el/k:.2f}s/token, ~{(len(render_jobs)-k)*el/k/60:.0f} min left)",
+                              flush=True)
+        else:
+            for k, job in enumerate(render_jobs, 1):
+                _render_one(job)
+                if k % 250 == 0:
+                    print(f"  rendered {k}/{len(render_jobs)}…", flush=True)
+        el = time.time() - t0
+        print(f"rendered {len(render_jobs)} tokens in {el/60:.1f} min "
+              f"({el/len(render_jobs):.2f}s/token)")
 
     # ---- write OpenSea token metadata + manifest ----
     os.makedirs("output/mint/metadata", exist_ok=True)
