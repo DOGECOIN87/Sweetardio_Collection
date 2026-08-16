@@ -217,6 +217,12 @@ def main():
     ap.add_argument("--leg-each", type=int, default=50)
     ap.add_argument("--artist-each", type=int, default=10,
                     help="tokens per Artist Series plate (exact)")
+    ap.add_argument("--format", choices=("webp", "png"), default="webp",
+                    help="token image format. webp (default) is ~9x smaller "
+                         "than png at visually-lossless quality — a 4444 mint "
+                         "is ~1.1 GB instead of ~9.8 GB. png is the lossless "
+                         "escape hatch; the build is deterministic either way, "
+                         "so the seed is the archival master, not the files.")
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
@@ -423,7 +429,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
+                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.{args.format}"))
             continue
 
         leg = forced_bg[i]
@@ -470,7 +476,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
+                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.{args.format}"))
             break
         else:
             sys.exit(f"token {i+1}: no unique combo for arm={farm} wat={fwat} "
@@ -483,7 +489,7 @@ def main():
         if t.get("secret_rare"):
             name = g.secret_rare_token_name(t["secret_rare"])
         token = g.token_metadata(t["attributes"], token_id=tid,
-                                 image=f"{tid}.png", name=name)
+                                 image=f"{tid}.{args.format}", name=name)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)
     # compact manifest (drop the embedded attributes to keep it small)

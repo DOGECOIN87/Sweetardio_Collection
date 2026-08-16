@@ -23,7 +23,7 @@ which is numpy-based, so the build fails at import without it. The wider
 ## 2. Generate the collection
 
 ```bash
-python3 asset_assessment/build_mint.py --n 4444 --leg-each 50 --seed 4444 --render
+python3 asset_assessment/build_mint.py --n 4444 --leg-each 50 --artist-each 10 --seed 4444 --render
 ```
 
 This writes everything under `output/` (which is git-ignored — it is a
@@ -31,17 +31,41 @@ regenerated artifact, not committed):
 
 | Path | Contents |
 |------|----------|
-| `output/mint/images/<id>.png`    | 4,444 token images, `1.png` … `4444.png` (1393×1393) |
+| `output/mint/images/<id>.webp`   | 4,444 token images, `1.webp` … `4444.webp` (1393×1393) |
 | `output/mint/metadata/<id>.json` | 4,444 OpenSea-format metadata files, `1.json` … `4444.json` |
 | `output/mint_manifest.json`      | compact trait manifest (one row per token) |
 | `output/mint/rarity_report.txt`  | full rarity distribution report |
 
-> Rendering is serial and costs roughly **1.5 s and 2.3 MB per token** — about
-> **2 hours and 10 GB** for the full 4,444 on a 4-core container. Check the
-> free space before starting. Drop `--render` if you only want the metadata +
-> report first to review rarity (~20 s), then re-run with `--render` to produce
-> the images; the allocation is identical either way, since the render rides
-> the same seeded RNG stream.
+> Rendering is serial and costs roughly **1.25 s and 0.25 MB per token** —
+> about **1.5 hours and 1.1 GB** for the full 4,444 on a 4-core container.
+> Drop `--render` if you only want the metadata + report first to review
+> rarity (~20 s), then re-run with `--render` to produce the images; the
+> allocation is identical either way, since the render rides the same seeded
+> RNG stream.
+
+### Image format
+
+`--format webp` (the default) or `--format png`. WebP q92 measured **7.8-10.5x
+smaller** than PNG on real tokens — 2.1-3.3 MB down to 0.20-0.43 MB, so the
+mint is ~1.1 GB instead of ~9.8 GB — at PSNR 41-43 dB, which is visually
+lossless: mean per-channel error is ~1/255, and a hard zoom on a face shows the
+thin line mouths, the eye catchlights and the skin-ball gradient intact. It is
+also *faster* to write than PNG (1.25 s vs 1.53 s per token), because
+compressing a 1393x1393 RGBA as PNG costs more than encoding WebP.
+
+Two things this does NOT affect:
+
+- **Layering.** Trait assets stay PNG with their alpha; compositing happens in
+  memory and the format only encodes the finished flat image. Z-order, the
+  face hole, the shadows and the separation pocket are unchanged.
+- **Your master copy.** The build is deterministic, so the archival master is
+  this repo plus the seed, not the rendered files — `--format png` regenerates
+  a lossless set at any time. Metadata follows the flag, so `image` reads
+  `<id>.webp` or `<id>.png` to match.
+
+The composited token is opaque (the plate fills the frame), so the alpha
+channel is dropped on WebP — but only after checking it really is opaque, so a
+future transparent output still round-trips.
 
 ## 3. Metadata format (launchmynft.io)
 
@@ -51,7 +75,7 @@ Each `<id>.json` is a standard token object:
 {
   "name": "Sweetardio Collection #1",
   "description": "Sweetardio Collection — 4,444 hand-crafted sweet degens. ...",
-  "image": "1.png",
+  "image": "1.webp",
   "attributes": [
     { "trait_type": "Character",  "value": "Oatmeal Cream Pie" },
     { "trait_type": "Background", "value": "Bubble Trouble" },
@@ -75,7 +99,7 @@ trait is **omitted** rather than written as "None":
 | Arms     | 707 (15.9%) |
 | Footwear | 533 (12.0%) |
 
-The `image` field is the bare filename (`<id>.png`). launchmynft.io pairs each
+The `image` field is the bare filename (`<id>.webp`, or `<id>.png` under `--format png`). launchmynft.io pairs each
 JSON with the matching image by name; if your launchpad needs an `ipfs://CID/`
 prefix instead, it is added at upload time — no need to change the files.
 
@@ -112,6 +136,23 @@ from the token metadata itself.
 
 - **Legendary backgrounds:** each `Legendary_*` plate appears **exactly 50×**
   (4 × 50 = 200). They never appear via the normal random background pick.
+- **Artist Series (`--artist-each`, default 10):** the two guest-artist plates,
+  `Radbro Webring` and `Duhnut Candy Man`, appear **exactly 10× each** — the
+  rarest backgrounds in the set at 0.23%, below every other plate. Like the
+  Legendaries they are slot-allocated and never enter the weighted pick.
+
+  These are finished 1/1 artworks rather than backdrops, so two things differ
+  from every other plate. Their **pairings are curated, not drawn**: each lists
+  exactly ten characters in `ARTIST_CHARS`, so all ten of its tokens are a
+  different character, picked by eye for tonal contrast against that plate
+  (Radbro is dark and cool, so the warm/metallic bodies carry; Duhnut is bright
+  cyan, the inverse). And artist tokens carry **no arm, footwear or sticker** —
+  a weapon crosses the title lettering and the corner sticker lands on the
+  artist's signature. The optional-trait counts still hit exactly; holding back
+  20 slots of 4,444 leaves far more than the 707 armed tokens need.
+
+  Credit for these two lives in the games repo (`src/content/artistRares.ts`),
+  not in token metadata, which has no artist field.
 - **Arms (707 = 15.9% armed, 84.1% empty-handed):**
   AK15 **20** (rarest) · Blue/Pink/Cyan Saber **25 each** · Dual Uzis **40** ·
   AR47 **55** · Knives **64** · Military Brat **85** · Nerf Blaster **110** ·

@@ -1968,11 +1968,42 @@ def _subject_separation(bg_img, sil_alpha, cfg):
     return out
 
 
-def create_image(layers, output_name=None, metadata=None):
-    """Composite all layers and write the PNG.
+# ---- output encoding ----
+# WebP q92 measured 7.8-10.5x smaller than PNG on real tokens (2.1-3.3 MB ->
+# 0.20-0.43 MB) at PSNR 41-43 dB, i.e. visually lossless: mean per-channel
+# error ~1/255, and a hard zoom on the face shows the thin line mouths, the eye
+# catchlights and the ball gradient intact. That takes a 4444 mint from ~9.8 GB
+# to ~1.1 GB, which is the difference that matters when uploading and pinning.
+#
+# Nothing about LAYERING changes with the format: the trait assets stay PNG
+# with their alpha, compositing happens in memory, and this encodes only the
+# finished flat image.
+WEBP_QUALITY = 92
+
+
+def _save_image(img, path, opts=None):
+    """Write a composited token. Format follows the extension."""
+    opts = dict(opts or {})
+    if os.path.splitext(path)[1].lower() == ".webp":
+        # A composited token is opaque — the plate fills the frame — so the
+        # alpha channel is dead weight. Dropped only when that actually holds,
+        # never assumed, so a future transparent output still round-trips.
+        if img.mode == "RGBA" and img.getchannel("A").getextrema() == (255, 255):
+            img = img.convert("RGB")
+        opts.setdefault("quality", WEBP_QUALITY)
+        opts.setdefault("method", 6)
+        img.save(path, "WEBP", **opts)
+    else:
+        img.save(path, **opts)
+
+
+def create_image(layers, output_name=None, metadata=None, image_opts=None):
+    """Composite all layers and write the image. The output FORMAT follows the
+    extension of output_name: '.webp' encodes WebP (see WEBP_QUALITY), anything
+    else is left to Pillow, which means PNG for a '.png' name.
     If metadata is provided (a list of {"trait_type", "value"} dicts as
     returned by extract_metadata()), a matching .json sidecar is saved
-    next to the PNG with OpenSea-compatible attributes."""
+    next to the image with OpenSea-compatible attributes."""
     if output_name is None:
         import time
         if not os.path.exists("output"):
@@ -2085,7 +2116,7 @@ def create_image(layers, output_name=None, metadata=None):
         if img is not None:
             base_img.alpha_composite(img)
 
-    base_img.save(output_name)
+    _save_image(base_img, output_name, image_opts)
 
     if metadata is not None:
         json_path = os.path.splitext(output_name)[0] + ".json"
