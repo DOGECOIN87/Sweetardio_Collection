@@ -1557,12 +1557,30 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             if base and base.lower() == chosen_wat.lower():
                 layers.append({"path": os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f), "offset": False})
                 break
-    
+
+    # 2b. Gorbhouse BASE — the trash cans' back half, behind the character.
+    # It is authored exactly like every other footwear base (top y=822 against
+    # Bunny's 825 and Cookie Monster's 822) and was simply never composited,
+    # so the cans read as two objects parked in front of the body instead of
+    # something it stands in.
+    if gets_gorbhouse:
+        gorbhouse_base = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_base.png")
+        if os.path.exists(gorbhouse_base):
+            layers.append({"path": gorbhouse_base, "offset": False})
+
     # Determine if we should apply offset
     # Rule: If no footwear AND (not ice cream, not twinkie, not churro)
+    #
+    # THE GORBHOUSE IS FOOTWEAR AND MUST COUNT AS SUCH HERE. It is chosen in
+    # its own roll rather than through chosen_wat, and it used to be left out
+    # of this test, which sent a character wearing trash cans down the
+    # footwear-LESS path: the body took VERTICAL_OFFSET (150px) plus its
+    # footwearless_dy and landed at bottom ~1105 where every other footwear
+    # puts it at ~956. The cans then inherited that same dy and rode down with
+    # it, so the pair stayed 150px below where the art was authored to meet.
     no_offset_char = any(ex.lower() in char_name.lower()
                          for ex in NO_OFFSET_CHARS)
-    apply_offset = not chosen_wat and not no_offset_char
+    apply_offset = not chosen_wat and not gets_gorbhouse and not no_offset_char
     y_adjust = char_y_adjust(char_name)
     cscale = char_scale(char_name)
     # Baseless/round characters sit centred ONLY when they have nothing under
@@ -1688,7 +1706,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
         if not os.path.exists(gorbhouse_path):
             gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
         if os.path.exists(gorbhouse_path):
-            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+            # Pinned to the canvas exactly like the WAT overlays above, NOT
+            # carried on the character's dy. Every footwear asset in the set is
+            # authored to one ground line (top y=818-825), so the placement
+            # that keeps it there is a fixed one; riding the body's y_adjust
+            # moved the cans per character (top 934-954 across the six) and
+            # broke the very alignment the shared line exists to guarantee.
+            layers.append({"path": gorbhouse_path, "offset": False})
 
     # 10. Armz (after ALL footwear overlays — WAT and gorbhouse — so a held
     # katana/knife reads on top of the footwear; tracks the character's scale)
