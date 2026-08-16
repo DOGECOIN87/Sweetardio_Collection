@@ -8,6 +8,15 @@
    "layer-Eyes_Cyan (1).png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
+  "Artist_Duhnut_Candy_Man.png": [
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
+  ],
+  "Artist_Radbro_Webring.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
+  ],
   "Bored_Apes.png": [
    "Blue.png",
    "layer-Eyes_Cyan (1).png",
@@ -116,6 +125,13 @@
  "weights": {
   "Abduction.png": {
    "Cerise.png": 0.742
+  },
+  "Artist_Duhnut_Candy_Man.png": {
+   "Blue.png": 0.634,
+   "Cerise.png": 0.719
+  },
+  "Artist_Radbro_Webring.png": {
+   "Cerise.png": 0.758
   },
   "Ayotollah.png": {
    "Blue.png": 0.895,

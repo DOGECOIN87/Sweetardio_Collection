@@ -15,33 +15,33 @@ Every value below is read straight from the shipped token metadata.
 
 | character | count | share | tier |
 |---|---:|---:|---|
+| OG Gummy Bear | 60 | 1.35% | chase |
 | Churro | 60 | 1.35% | chase |
 | Gold Waffle | 60 | 1.35% | chase |
 | Zebra Cake | 60 | 1.35% | chase |
-| OG Gummy Bear | 60 | 1.35% | chase |
 | Cyan Frosted Pop Tart | 130 | 2.93% | uncommon |
-| Ding Dong | 130 | 2.93% | uncommon |
-| S'mores | 130 | 2.93% | uncommon |
-| Marshmallow | 130 | 2.93% | uncommon |
 | Rice Crispy Treat | 130 | 2.93% | uncommon |
-| Nutty Bar | 130 | 2.93% | uncommon |
+| Ding Dong | 130 | 2.93% | uncommon |
 | Chocolate Sandwich Cookie | 130 | 2.93% | uncommon |
+| Nutty Bar | 130 | 2.93% | uncommon |
 | Waffle | 130 | 2.93% | uncommon |
-| Oatmeal Cream Pie | 130 | 2.93% | uncommon |
 | Twinkie | 130 | 2.93% | uncommon |
-| Chocolate Frosted Pop Tart | 181 | 4.07% | common |
-| OG Pop Tart | 186 | 4.19% | common |
-| Cyan Sherbert Ice Cream | 197 | 4.43% | common |
-| Neapolitan Ice Cream | 200 | 4.50% | common |
-| Pink Sherbert Ice Cream | 203 | 4.57% | common |
-| Chocolate Ice Cream | 207 | 4.66% | common |
-| Vanilla Ice Cream | 213 | 4.79% | common |
-| Sugar Cube | 239 | 5.38% | common |
-| Brownie Bite | 248 | 5.58% | common |
-| Chocolate Chip Cookie | 249 | 5.60% | common |
-| Glazed Doughnut | 250 | 5.63% | common |
-| Sugar Doughnut | 255 | 5.74% | common |
-| Chocolate Doughnut | 276 | 6.21% | common |
+| S'mores | 130 | 2.93% | uncommon |
+| Oatmeal Cream Pie | 130 | 2.93% | uncommon |
+| Marshmallow | 130 | 2.93% | uncommon |
+| OG Pop Tart | 183 | 4.12% | common |
+| Chocolate Ice Cream | 185 | 4.16% | common |
+| Cyan Sherbert Ice Cream | 187 | 4.21% | common |
+| Vanilla Ice Cream | 188 | 4.23% | common |
+| Neapolitan Ice Cream | 191 | 4.30% | common |
+| Chocolate Frosted Pop Tart | 195 | 4.39% | common |
+| Pink Sherbert Ice Cream | 204 | 4.59% | common |
+| Sugar Cube | 220 | 4.95% | common |
+| Chocolate Chip Cookie | 238 | 5.36% | common |
+| Glazed Doughnut | 271 | 6.10% | common |
+| Chocolate Doughnut | 278 | 6.26% | common |
+| Brownie Bite | 280 | 6.30% | common |
+| Sugar Doughnut | 284 | 6.39% | common |
 
 ## Backgrounds
 
@@ -49,69 +49,71 @@ The four `Legendary` plates are slot-allocated at exactly 50 each and never appe
 
 | trait | count | share |
 |---|---:|---:|
+| Radbro Webring | 10 | 0.23% |
+| Duhnut Candy Man | 10 | 0.23% |
+| Cookie Dough | 20 | 0.45% |
+| Goo Lagoon | 22 | 0.50% |
+| Toasted | 23 | 0.52% |
 | In Cook We Trust | 24 | 0.54% |
 | Abduction | 24 | 0.54% |
-| Goo Lagoon | 24 | 0.54% |
-| Toasted | 25 | 0.56% |
-| Cookie Dough | 25 | 0.56% |
-| Winning | 26 | 0.59% |
-| Sweet Castle | 26 | 0.59% |
-| Bubble Trouble | 28 | 0.63% |
-| Snack Pack | 43 | 0.97% |
-| RIP Gorbagana | 45 | 1.01% |
-| Psychedelics | 47 | 1.06% |
+| Winning | 28 | 0.63% |
+| Sweet Castle | 28 | 0.63% |
+| Bubble Trouble | 29 | 0.65% |
+| Psychedelics | 43 | 0.97% |
+| Sweet Shop | 43 | 0.97% |
+| Midnight Snack | 44 | 0.99% |
+| Cabaret Alley | 46 | 1.04% |
+| Snack Pack | 47 | 1.06% |
+| Cereal Killer | 48 | 1.08% |
+| Whitehouse Lawn | 49 | 1.10% |
 | Candy Tundra | 49 | 1.10% |
-| Choco Falls | 49 | 1.10% |
-| Whitehouse Lawn | 50 | 1.13% |
+| Mars | 49 | 1.10% |
+| Flavor Explosion | 49 | 1.10% |
 | Legendary Just Aliens | 50 | 1.13% |
 | Legendary Simplex | 50 | 1.13% |
 | Legendary Tenders | 50 | 1.13% |
 | Legendary Opengotchi | 50 | 1.13% |
-| The Miami Mall Incident | 50 | 1.13% |
+| The Miami Mall Incident | 51 | 1.15% |
+| Choco Falls | 51 | 1.15% |
 | Empty Fridge | 52 | 1.17% |
-| Midnight Snack | 52 | 1.17% |
-| Cabaret Alley | 52 | 1.17% |
-| Cereal Killer | 53 | 1.19% |
-| Coder Chick | 53 | 1.19% |
-| Mars | 54 | 1.22% |
+| Pink Abyss | 53 | 1.19% |
+| RIP Gorbagana | 55 | 1.24% |
 | Crumble Trail | 56 | 1.26% |
-| Pink Abyss | 57 | 1.28% |
-| Flavor Explosion | 57 | 1.28% |
-| Sweet Shop | 63 | 1.42% |
-| The Set | 64 | 1.44% |
-| The Board | 70 | 1.58% |
-| Sweetardio | 71 | 1.60% |
+| Coder Chick | 60 | 1.35% |
+| The Board | 63 | 1.42% |
+| Sweetardio | 67 | 1.51% |
+| Ayatollah | 69 | 1.55% |
 | Graham | 71 | 1.60% |
-| Ayatollah | 71 | 1.60% |
-| Vanilla Lane | 75 | 1.69% |
-| Cookboy Chocolate | 75 | 1.69% |
-| Hurshey | 80 | 1.80% |
-| Druski | 81 | 1.82% |
-| Baked | 82 | 1.85% |
-| I'm Not Sorry | 85 | 1.91% |
-| Tootsie Blue | 87 | 1.96% |
-| Starburst | 89 | 2.00% |
-| The 2023 Las Vegas Incident | 93 | 2.09% |
-| Drained The Swamp | 93 | 2.09% |
-| Smuckers Blue | 94 | 2.12% |
-| Store | 95 | 2.14% |
-| Why So Cereal | 95 | 2.14% |
-| Sugar | 95 | 2.14% |
-| Nabisco | 95 | 2.14% |
-| Swolex | 95 | 2.14% |
-| Cookboy | 96 | 2.16% |
-| Bored Apes | 96 | 2.16% |
-| Soft Serve | 99 | 2.23% |
-| Clouds | 99 | 2.23% |
-| Tooth Decay | 103 | 2.32% |
-| Where's My $ B1tch | 106 | 2.39% |
-| Tootsie Cerise | 110 | 2.48% |
+| Swolex | 72 | 1.62% |
+| Vanilla Lane | 74 | 1.67% |
+| Starburst | 77 | 1.73% |
+| Druski | 78 | 1.76% |
+| Cookboy Chocolate | 78 | 1.76% |
+| Tootsie Blue | 80 | 1.80% |
+| I'm Not Sorry | 80 | 1.80% |
+| Bored Apes | 83 | 1.87% |
+| Hurshey | 83 | 1.87% |
+| Smuckers Blue | 83 | 1.87% |
+| Baked | 85 | 1.91% |
+| Tootsie Cerise | 85 | 1.91% |
+| Nabisco | 87 | 1.96% |
+| The Set | 89 | 2.00% |
+| Cookboy | 91 | 2.05% |
+| UAP Taskforce | 94 | 2.12% |
+| Clouds | 96 | 2.16% |
+| The 2023 Las Vegas Incident | 96 | 2.16% |
+| Drained The Swamp | 97 | 2.18% |
+| Why So Cereal | 99 | 2.23% |
+| Store | 106 | 2.39% |
+| Sugar | 107 | 2.41% |
 | Tampa Bay Pete | 111 | 2.50% |
-| Emblem | 111 | 2.50% |
-| UAP Taskforce | 111 | 2.50% |
-| Room | 116 | 2.61% |
-| Straight of America | 120 | 2.70% |
-| He Needs Some Milk | 126 | 2.84% |
+| Emblem | 117 | 2.63% |
+| Tooth Decay | 119 | 2.68% |
+| Room | 123 | 2.77% |
+| Where's My $ B1tch | 127 | 2.86% |
+| Straight of America | 129 | 2.90% |
+| Soft Serve | 132 | 2.97% |
+| He Needs Some Milk | 133 | 2.99% |
 
 ## Eyes
 
@@ -119,38 +121,38 @@ Calibrated, so the shares are chosen rather than left to the plate blocklist —
 
 | trait | count | share |
 |---|---:|---:|
-| Cyborg | 131 | 2.95% |
-| Blue | 223 | 5.02% |
+| Cyborg | 146 | 3.29% |
+| Blue | 229 | 5.15% |
 | Cerise | 306 | 6.89% |
-| Cyan | 313 | 7.04% |
-| Alien | 442 | 9.95% |
-| Side Eye | 530 | 11.93% |
-| Beady | 542 | 12.20% |
-| Smug | 580 | 13.05% |
-| Clueless | 665 | 14.96% |
-| Googly | 712 | 16.02% |
+| Cyan | 314 | 7.07% |
+| Alien | 434 | 9.77% |
+| Beady | 531 | 11.95% |
+| Side Eye | 542 | 12.20% |
+| Smug | 579 | 13.03% |
+| Clueless | 664 | 14.94% |
+| Googly | 699 | 15.73% |
 
 ## Mouths
 
 | trait | count | share |
 |---|---:|---:|
-| Lollipop | 178 | 4.01% |
-| Smoke | 222 | 5.00% |
-| Diamond Grill | 311 | 7.00% |
-| Fang | 401 | 9.02% |
-| Tasty | 489 | 11.00% |
-| Awkward Smile | 577 | 12.98% |
-| Smirk | 666 | 14.99% |
-| Sad | 755 | 16.99% |
-| Flat | 845 | 19.01% |
+| Lollipop | 181 | 4.07% |
+| Smoke | 226 | 5.09% |
+| Diamond Grill | 315 | 7.09% |
+| Fang | 403 | 9.07% |
+| Tasty | 488 | 10.98% |
+| Awkward Smile | 575 | 12.94% |
+| Smirk | 667 | 15.01% |
+| Sad | 750 | 16.88% |
+| Flat | 839 | 18.88% |
 
 ## Skins
 
 | trait | count | share |
 |---|---:|---:|
-| Alien | 314 | 7.07% |
-| Black | 1656 | 37.26% |
-| White | 2474 | 55.67% |
+| Alien | 317 | 7.13% |
+| Black | 1683 | 37.87% |
+| White | 2444 | 55.00% |
 
 ## Arms
 
@@ -181,9 +183,9 @@ Exact counts.
 | trait | count | share |
 |---|---:|---:|
 | Gorbhouse Slippers | 100 | 2.25% |
+| Cookie Monster Slippers | 108 | 2.43% |
 | Bunny Slippers | 108 | 2.43% |
 | Pepe Slippers | 108 | 2.43% |
-| Cookie Monster Slippers | 108 | 2.43% |
 | Shiba Slippers | 109 | 2.45% |
 
 ## Stickers

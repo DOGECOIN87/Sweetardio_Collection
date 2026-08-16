@@ -144,6 +144,19 @@ LEGENDARY_BG_PREFIX = "Legendary_"
 
 def is_legendary_bg(filename):
     return os.path.basename(filename).startswith(LEGENDARY_BG_PREFIX)
+
+# Artist Series plates: 1/1-style guest-artist artworks used as backgrounds.
+# Like the Legendaries they are slot-allocated to an EXACT quota by
+# build_mint.py and never enter the weighted random pick, so their cap holds.
+ARTIST_BG_PREFIX = "Artist_"
+
+def is_artist_bg(filename):
+    return os.path.basename(filename).startswith(ARTIST_BG_PREFIX)
+
+def is_quota_bg(filename):
+    """True for any plate whose count is fixed by the allocator rather than
+    drawn by weight — the Legendaries and the Artist Series."""
+    return is_legendary_bg(filename) or is_artist_bg(filename)
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -240,6 +253,12 @@ TRAIT_NAMES = {
         "zebra_cake":                       "Zebra Cake",
     },
     BACKGROUNDZ: {
+        # Artist Series — guest-artist plates, slot-allocated to an exact
+        # quota like the Legendaries. The display name is the piece's title as
+        # its artist gave it; attribution lives in the Sweetarded-Games repo
+        # at src/content/artistRares.ts.
+        "Artist_Duhnut_Candy_Man.png":      "Duhnut Candy Man",
+        "Artist_Radbro_Webring.png":        "Radbro Webring",
         "Ayotollah.png":                    "Ayatollah",
         "Baked.png":                        "Baked",
         "Bubble_Trouble.png":               "Bubble Trouble",
@@ -1376,10 +1395,10 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             bg_files = get_files(bg_dir)
         # overlays pair with their parent plate; they are never a background
         bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
-        # Legendary_* plates are 1/1-style rares: they appear ONLY via the
-        # mint allocator's fixed per-plate quota (force_bg), never in the
-        # normal weighted random pick, so their hard caps stay exact.
-        bg_files = [f for f in bg_files if not is_legendary_bg(f)]
+        # Legendary_* and Artist_* plates are 1/1-style rares: they appear ONLY
+        # via the mint allocator's fixed per-plate quota (force_bg), never in
+        # the normal weighted random pick, so their hard caps stay exact.
+        bg_files = [f for f in bg_files if not is_quota_bg(f)]
         if not bg_files:
             raise ValueError("No background assets found")
         # character <-> background pairing. Hard rule: drop plates this

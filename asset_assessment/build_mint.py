@@ -131,6 +131,46 @@ CHARACTER_COUNTS = {
 PINNED_CHARS = frozenset(CHARACTER_COUNTS)
 
 
+# ---- Artist Series: guest-artist plates on hand-picked characters ----
+# These are finished 1/1 artworks, not backdrops, so the pairing is CURATED
+# rather than drawn: each plate lists exactly as many characters as it has
+# tokens, so every one of its tokens is a different character.
+#
+# Picked by eye off a 27-character contact sheet rendered on each plate
+# (asset_assessment/, see the commit that added this), on the one thing that
+# decides whether a character reads in front of a busy illustration: tonal
+# contrast against that plate.
+#
+#   Radbro Webring    is dark, cool teal/purple with a black mass at centre,
+#                     so the WARM, light and metallic bodies carry. The cyan
+#                     bodies and the dark chocolates sink into it.
+#   Duhnut Candy Man  is bright cyan over a cream sticker outline, so it is
+#                     the exact inverse: the DARK, saturated bodies read and
+#                     the creams and whites wash out against it.
+#
+# Pinned characters are allowed here and are pre-credited against
+# CHARACTER_COUNTS below, so a curated appearance costs the character one of
+# its pinned tokens rather than adding a 141st.
+ARTIST_CHARS = {
+    "Artist_Radbro_Webring.png": [
+        "gold_waffle", "Twinkie", "churro", "marshmallow", "sugar_cube",
+        "glazed_doughnut", "waffle", "rice_crispy_treat", "sugar_doughnut",
+        "og_poptart",
+    ],
+    "Artist_Duhnut_Candy_Man.png": [
+        "chocolate_sandwich_cookie", "ding_dong", "chocolate_doughnut",
+        "chocolate_ice_cream", "brownie_bite", "chocolate_frosted_poptart",
+        "Nutty_Bar", "oatmeal_cream_pie", "chocolate_chip_cookie", "smores",
+    ],
+}
+
+# Artist tokens carry NO arm, footwear or sticker. Each plate is a finished
+# artwork with its own subject, title lettering and artist signature; a weapon
+# across the lettering or a corner sticker over the signature is the one thing
+# that reliably ruins it. The character alone is what the curation is for.
+ARTIST_BARE = True
+
+
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
     t["character"] = char
@@ -175,6 +215,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=4444)
     ap.add_argument("--leg-each", type=int, default=50)
+    ap.add_argument("--artist-each", type=int, default=10,
+                    help="tokens per Artist Series plate (exact)")
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
@@ -192,6 +234,13 @@ def main():
     if leg_total > args.n:
         sys.exit(f"{len(legs)} legendaries x {args.leg_each} = {leg_total} "
                  f"exceeds n={args.n}")
+
+    arts = sorted(f for f in os.listdir(bg_dir)
+                  if f.endswith(".png") and g.is_artist_bg(f))
+    art_total = len(arts) * args.artist_each
+    if leg_total + art_total > args.n:
+        sys.exit(f"{len(arts)} artist plates x {args.artist_each} = {art_total} "
+                 f"plus {leg_total} legendary exceeds n={args.n}")
 
     # 1/1 secret rares: one standalone token each, never composited
     # Secret rares are RETIRED: traits/secret_rarez is gone, its 23 assets
@@ -238,17 +287,42 @@ def main():
         forced_bg[s] = leg
     is_leg = set(leg_slots)
 
+    # 1a) Artist Series -> exact quota each, on the curated character list.
+    #     Both the plate AND the character are forced, so unlike a legendary
+    #     slot there is nothing here to re-roll: the pairing is the point.
+    art_picks = []
+    for plate in arts:
+        chars = ARTIST_CHARS.get(plate)
+        if not chars:
+            sys.exit(f"{plate}: no ARTIST_CHARS entry — every Artist_ plate "
+                     f"needs a curated character list")
+        for i in range(args.artist_each):
+            art_picks.append((plate, chars[i % len(chars)]))
+    art_pool = [s for s in avail if s not in is_leg]
+    art_slots = random.sample(art_pool, len(art_picks))
+    random.shuffle(art_picks)
+    for s, (plate, ch) in zip(art_slots, art_picks):
+        forced_bg[s] = plate
+        forced_char[s] = ch
+    is_art = set(art_slots)
+
     # 1b) rare characters -> exact counts on NON-legendary slots. Legendary
     #     slots re-roll the character when it camouflages against the plate,
     #     which a forced character could never satisfy, so they are excluded.
-    char_free = [s for s in avail if s not in is_leg]
+    #     Artist slots already carry a forced character and are excluded too,
+    #     but any pinned character they used is PRE-CREDITED here so its total
+    #     still lands exactly on its CHARACTER_COUNTS target.
+    art_credit = Counter(forced_char[s] for s in art_slots)
+    char_free = [s for s in avail if s not in is_leg and s not in is_art]
     random.shuffle(char_free)
-    char_total = sum(CHARACTER_COUNTS.values())
+    char_need = {c: max(0, cnt - art_credit.get(c, 0))
+                 for c, cnt in CHARACTER_COUNTS.items()}
+    char_total = sum(char_need.values())
     if char_total > len(char_free):
         sys.exit(f"CHARACTER_COUNTS total {char_total} exceeds the "
                  f"{len(char_free)} non-legendary slots available")
     cur = 0
-    for cname, cnt in CHARACTER_COUNTS.items():
+    for cname, cnt in char_need.items():
         for s in char_free[cur:cur + cnt]:
             forced_char[s] = cname
         cur += cnt
@@ -276,8 +350,13 @@ def main():
         sig_slots.extend(chunk)
     sig_set = set(sig_slots)
 
-    # 3) generic arms -> any composable slot without an arm yet
-    free_for_arm = [s for s in avail if forced_arm[s] is None]
+    # 3) generic arms -> any composable slot without an arm yet.
+    #    Artist slots are held back (ARTIST_BARE): a weapon lands across the
+    #    plate's title lettering, which is the artist's own signature on the
+    #    piece. Arms still hit their exact counts — holding back 20 of 4444
+    #    leaves far more free slots than the 707 armed tokens need.
+    free_for_arm = [s for s in avail if forced_arm[s] is None
+                    and not (ARTIST_BARE and s in is_art)]
     random.shuffle(free_for_arm)
     cur = 0
     for arm, cnt in GENERIC_ARM_COUNTS.items():
@@ -302,7 +381,8 @@ def main():
             return g.gets_gorbhouse_overlay(c)
         return True
 
-    free_for_wat = [s for s in avail if s not in is_leg and s not in sig_set]
+    free_for_wat = [s for s in avail if s not in is_leg and s not in sig_set
+                    and not (ARTIST_BARE and s in is_art)]
     random.shuffle(free_for_wat)
     taken = set()
     # rarest first, so the most constrained type picks from the widest pool
@@ -316,9 +396,12 @@ def main():
             forced_wat[s] = wat
             taken.add(s)
 
-    # 5) stickers -> any composable slot, spread evenly across every sticker
+    # 5) stickers -> any composable slot, spread evenly across every sticker.
+    #    Artist slots are held back for the same reason as arms: the corner
+    #    sticker sits exactly where these two plates carry their signature.
+    stk_pool = [s for s in avail if not (ARTIST_BARE and s in is_art)]
     sticker_files = g.get_files(g.STICKERZ)
-    stk_slots = random.sample(avail, min(STICKER_TOTAL, len(avail)))
+    stk_slots = random.sample(stk_pool, min(STICKER_TOTAL, len(stk_pool)))
     for i, s in enumerate(stk_slots):
         forced_stk[s] = sticker_files[i % len(sticker_files)]
 
@@ -361,7 +444,13 @@ def main():
                 force_sticker=fstk if fstk is not None else None,
                 exclude_chars=PINNED_CHARS,
             )
-            if leg is not None and camo(char, leg):
+            # Camouflage re-roll applies to LEGENDARY slots only. An artist
+            # slot forces its character as well as its plate, so there is
+            # nothing left to re-roll — the pairing was picked by eye, which
+            # is a stricter filter than the camo measure anyway. Testing it
+            # here would also KeyError, since leg_stats covers only the
+            # legendaries.
+            if leg is not None and i not in is_art and camo(char, leg):
                 continue                           # re-roll camouflaging char
 
             meta = g.extract_metadata(layers, char)
@@ -376,7 +465,8 @@ def main():
             if sig(t) in seen:
                 continue
             seen.add(sig(t))
-            t["legendary"] = leg is not None
+            t["legendary"] = leg is not None and i not in is_art
+            t["artist"] = i in is_art
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
@@ -442,6 +532,24 @@ def main():
     p(f"  -> all exactly {args.leg_each}? {'YES' if not bad else 'NO ' + str(bad)}")
     p(f"  legendary tokens: {sum(leg_d.values())} "
       f"({100*sum(leg_d.values())/N:.1f}%)\n")
+
+    if arts:
+        art_d = {f: sum(1 for t in manifest.values() if t["bg"] == f) for f in arts}
+        art_bad = {f: c for f, c in art_d.items() if c != args.artist_each}
+        p(f"ARTIST SERIES (target {args.artist_each} each, curated pairings, "
+          f"no arm/footwear/sticker):")
+        for f in arts:
+            pairs = [t["character"] for t in manifest.values() if t["bg"] == f]
+            p(f"  {g.trait_name(g.BACKGROUNDZ, f):28} {art_d[f]}")
+            for c in sorted(set(pairs)):
+                p(f"      {c}")
+        p(f"  -> all exactly {args.artist_each}? "
+          f"{'YES' if not art_bad else 'NO ' + str(art_bad)}")
+        art_extra = [t for t in manifest.values() if t.get("artist")
+                     and (t["arm"] or t["wat"] or t["sticker"])]
+        p(f"  -> all bare? {'YES' if not art_extra else 'NO (%d)' % len(art_extra)}")
+        p(f"  artist tokens: {sum(art_d.values())} "
+          f"({100*sum(art_d.values())/N:.1f}%)\n")
 
     char_d = dist("character")
     if CHARACTER_COUNTS:
