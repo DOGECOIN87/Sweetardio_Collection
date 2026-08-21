@@ -109,12 +109,30 @@ filmstrip; only a numeric check catches it.
 
 | state | motion |
 |---|---|
-| `clear` | none — a clear sky is a still |
+| `clear` | none — a clear sky is a still, and costs the plate nothing |
 | `overcast` | cloud shadow drifting across the plate |
 | `fog` | haze density rolling through, thickening and thinning |
 | `rain` | two depth bands falling down-and-right, near band 2x faster |
 | `snow` | slow fall with a sideways sway, one cycle per loop |
 | `storm` | heavy rain, plus a lightning strike and its echo |
+
+**A motionless state is never exported as an animation.** Encoding N
+identical frames of a still spends a downscale and a lossy round-trip to
+say nothing at all — so `clear` goes out as a lossless PNG at full mint
+resolution instead. `verify_sky.py` gates this: a state declaring no motion
+must apply **no spatial op**, so it can tone-grade the plate but never
+soften or resample it, and at `day` it must return the mint bit-for-bit.
+
+The same rule belongs in the service: check `is_identity()` FIRST and serve
+the **original minted bytes** rather than re-encoding them. The dynamic
+layer must not cost image quality in the state where it is doing nothing —
+and that is the state most holders are in most of the time.
+
+Worth knowing: the dark phases *do* soften the plate's micro-contrast
+(measured 54% of the mint's brightness-normalised detail at `night`), but
+that is the **sky grade** — deliberate flattening, black lift and a strong
+shadow tint — and nothing to do with the weather trait. `SKY_STATES` is
+where to dial it if it goes too far.
 
 The loops are built on a torus: particles travel a **whole number of tiles**
 per loop, sway uses an integer number of cycles, and the fog field is rolled

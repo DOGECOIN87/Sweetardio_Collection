@@ -20,7 +20,12 @@ state, for every sample token it finds:
      moved alpha would move the face geometry downstream.
   4. Something actually happened in the plate region -- a pass that silently
      did nothing would otherwise sail through checks 1-3.
-  5. Every weather loop is SEAMLESS: the frame at t=1 is bit-identical to
+  5. A weather state that declares no motion applies NO spatial op, so it
+     can tone-grade the plate but never soften or resample it -- and at
+     `day` it returns the mint bit-for-bit. The dynamic layer must not cost
+     image quality in the state where it is doing nothing, which is the
+     state most holders are in most of the time.
+  6. Every weather loop is SEAMLESS: the frame at t=1 is bit-identical to
      the frame at t=0. A visible jump at the wrap is the one thing that
      makes an ambient effect look cheap, and it is invisible in a filmstrip
      -- only a numeric check catches it.
@@ -103,7 +108,19 @@ def main():
                 elif n_plate and same_plate:
                     failures.append(f"{tag}: pass did nothing to the plate")
 
-    # 5. seamless loops
+    # 5. a motionless weather state must be spatially free
+    for weather in skymod.WEATHER_STATES:
+        if not skymod.has_motion(weather):
+            if skymod.is_spatial(weather):
+                failures.append(f"{weather}: declares no motion but applies "
+                                f"a spatial op — it would soften the plate")
+            if not skymod.is_identity("day", weather):
+                failures.append(f"day+{weather}: motionless state is not the "
+                                f"identity grade")
+            print(f"  '{weather}' is motionless: no spatial op, "
+                  f"identity at day")
+
+    # 6. seamless loops
     base = Image.open(toks[0][1]).convert("RGBA").resize(
         (512, 512), Image.Resampling.LANCZOS)
     mask = Image.open(toks[0][2]).convert("L").resize(

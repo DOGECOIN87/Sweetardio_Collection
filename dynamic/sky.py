@@ -381,8 +381,40 @@ def _combine(sky, wet):
         hi_amt=sky.get("hi_amt", 0.0))
 
 
+# Ops that alter the plate SPATIALLY -- blur, particles, a drifting field.
+# 'clear' declares none of them, which is what makes it free: a clear sky
+# can tone-grade the plate but it can never soften or resample it.
+_SPATIAL_KEYS = ("diffuse", "particles", "drift", "flash")
+
+
+def has_motion(weather):
+    """True if this weather state actually moves.
+
+    A state with no motion must never be exported as an animation. Encoding
+    N identical frames of a still costs resolution and a lossy round-trip
+    to say nothing at all -- see animate.py.
+    """
+    wet = WEATHER_STATES[weather]
+    return bool(wet.get("particles") or wet.get("flash")
+                or wet.get("drift", 0.0) > 1e-4)
+
+
+def is_spatial(weather):
+    """True if this weather state blurs, resamples or draws over the plate."""
+    wet = WEATHER_STATES[weather]
+    return (wet.get("diffuse", 0.0) > 0.05
+            or bool(wet.get("particles")) or bool(wet.get("flash"))
+            or wet.get("drift", 0.0) > 1e-4)
+
+
 def is_identity(phase, weather):
-    """True if this grade is a no-op -- day + clear, and nothing else."""
+    """True if this grade is a no-op -- day + clear, and nothing else.
+
+    A service should check this FIRST and serve the original minted bytes
+    unchanged rather than re-encoding them. The dynamic layer must never
+    cost image quality in the state where it is doing nothing, and that is
+    the state most holders are in most of the time.
+    """
     sky, wet = SKY_STATES[phase], WEATHER_STATES[weather]
     p = _combine(sky, wet)
     return (abs(p["exposure"] - 1.0) < 1e-4 and abs(p["contrast"]) < 1e-4

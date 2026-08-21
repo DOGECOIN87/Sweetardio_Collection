@@ -13,9 +13,15 @@ worth shipping.
 
 Outputs, into dynamic/proof/anim/:
 
-  weather_<state>.webp   the seamless loop (animated WebP, wide support)
-  weather_<state>.png    a filmstrip of 6 frames, for reading on paper
-  weather_all.png        every state's filmstrip stacked
+  weather_<state>.webp        the seamless loop, for states that move
+  weather_<state>.png         a LOSSLESS still, for states that do not
+  weather_<state>_strip.png   a filmstrip of 6 frames, for reading on paper
+  weather_all.png             every moving state's filmstrip stacked
+
+A state with no motion is never exported as an animation. Encoding N
+identical frames of a still spends a downscale and a lossy round-trip to
+say nothing at all -- and `clear` is the state most holders are in most of
+the time, so it must cost the plate nothing.
 
 From the repo root:
 
@@ -101,6 +107,8 @@ def main():
     ap.add_argument("--size", type=int, default=512)
     ap.add_argument("--ms", type=int, default=55, help="frame duration")
     ap.add_argument("--cell", type=int, default=210)
+    ap.add_argument("--quality", type=int, default=88,
+                    help="WebP quality for the states that DO move")
     ap.add_argument("--only", nargs="*", default=None)
     args = ap.parse_args()
 
@@ -118,13 +126,30 @@ def main():
           f"({args.frames * args.ms / 1000:.2f}s loop)  size={args.size}")
 
     for wx in states:
+        # A STATE WITH NO MOTION IS NEVER EXPORTED AS AN ANIMATION.
+        # Encoding N identical frames of a still spends a downscale and a
+        # lossy round-trip to say nothing at all. 'clear' is the common
+        # case and it must cost the plate nothing, so it goes out as a
+        # lossless PNG at full mint resolution instead.
+        if not skymod.has_motion(wx):
+            still = skymod.apply_sky(base, protect, args.phase, wx,
+                                     seed=args.token)
+            out = os.path.join(ANIM, f"weather_{wx}.png")
+            still.save(out, optimize=True)
+            same = skymod.is_identity(args.phase, wx)
+            print(f"  {wx:<9} STILL — no motion; lossless PNG at "
+                  f"{still.width}px"
+                  + ("  (bit-identical to the mint)" if same else "")
+                  + f"   {os.path.getsize(out) / 1024:.0f} KB")
+            continue
+
         frames, t_grade, t_frame = loop_frames(
             base, protect, args.phase, wx, args.frames, args.token, args.size)
         webp = os.path.join(ANIM, f"weather_{wx}.webp")
         rgb = [f.convert("RGB") for f in frames]
         rgb[0].save(webp, save_all=True, append_images=rgb[1:],
-                    duration=args.ms, loop=0, quality=74, method=4)
-        strip = os.path.join(ANIM, f"weather_{wx}.png")
+                    duration=args.ms, loop=0, quality=args.quality, method=6)
+        strip = os.path.join(ANIM, f"weather_{wx}_strip.png")
         strips.append(filmstrip(frames, f"{wx.upper()}  ·  {args.phase}",
                                 MOTION.get(wx, ""), args.cell, strip))
         kb = os.path.getsize(webp) / 1024
