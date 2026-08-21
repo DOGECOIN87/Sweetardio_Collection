@@ -13,6 +13,9 @@ worth shipping.
 
 Outputs, into dynamic/proof/anim/:
 
+  weather_<state>.mp4         H.264/yuv420p — the animation_url format
+                              Solana marketplaces and wallets handle most
+                              reliably
   weather_<state>.webp        the seamless loop, for states that move
   weather_<state>.png         a LOSSLESS still, for states that do not
   weather_<state>_strip.png   a filmstrip of 6 frames, for reading on paper
@@ -32,6 +35,8 @@ From the repo root:
 
 import argparse
 import os
+import shutil
+import subprocess
 import sys
 import time
 
@@ -55,6 +60,63 @@ MOTION = {
     "snow": "slow fall with a sideways sway, one cycle per loop",
     "storm": "heavy rain, plus a lightning strike and its echo",
 }
+
+
+def _ffmpeg():
+    """A usable ffmpeg, from PATH or from the imageio-ffmpeg wheel."""
+    exe = shutil.which("ffmpeg")
+    if exe:
+        return exe
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
+def write_mp4(frames, path, fps):
+    """H.264 in yuv420p -- the format Solana marketplaces and wallets
+    handle most reliably for `animation_url`.
+
+    yuv420p and even dimensions are not optional: a stream in yuv444p or
+    with an odd dimension is exactly what a hardware decoder or a phone
+    refuses, and it fails as a black frame rather than as an error. The
+    loop is already seamless, so players that repeat it show no jump.
+    """
+    exe = _ffmpeg()
+    if exe is None:
+        return None
+    w, h = frames[0].size
+    if w % 2 or h % 2:                      # H.264 needs even dimensions
+        w, h = w - w % 2, h - h % 2
+        frames = [f.crop((0, 0, w, h)) for f in frames]
+    cmd = [exe, "-y", "-loglevel", "error",
+           "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}",
+           "-r", f"{fps:.4f}", "-i", "-", "-an",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "20",
+           "-profile:v", "main", "-pix_fmt", "yuv420p",
+           "-movflags", "+faststart", path]
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    for f in frames:
+        proc.stdin.write(f.convert("RGB").tobytes())
+    proc.stdin.close()
+    if proc.wait() != 0:
+        raise RuntimeError(proc.stderr.read().decode()[:400])
+    return path
+
+
+def write_gif(frames, path, ms):
+    """GIF is the widest-supported animated format and the worst-looking:
+    256 colours per frame band these graded plates visibly. Emitted only as
+    a fallback for a surface that will not take video."""
+    rgb = [f.convert("RGB") for f in frames]
+    pal = rgb[0].quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+    q = [im.quantize(palette=pal, dither=Image.Dither.FLOYDSTEINBERG)
+         for im in rgb]
+    q[0].save(path, save_all=True, append_images=q[1:], duration=ms,
+              loop=0, optimize=True, disposal=2)
+    return path
 
 
 def _font(size):
@@ -109,6 +171,9 @@ def main():
     ap.add_argument("--cell", type=int, default=210)
     ap.add_argument("--quality", type=int, default=88,
                     help="WebP quality for the states that DO move")
+    ap.add_argument("--formats", nargs="*", default=["webp", "mp4"],
+                    choices=["webp", "mp4", "gif"],
+                    help="mp4 is the safest bet for marketplaces/wallets")
     ap.add_argument("--only", nargs="*", default=None)
     args = ap.parse_args()
 
@@ -145,16 +210,34 @@ def main():
 
         frames, t_grade, t_frame = loop_frames(
             base, protect, args.phase, wx, args.frames, args.token, args.size)
-        webp = os.path.join(ANIM, f"weather_{wx}.webp")
-        rgb = [f.convert("RGB") for f in frames]
-        rgb[0].save(webp, save_all=True, append_images=rgb[1:],
-                    duration=args.ms, loop=0, quality=args.quality, method=6)
+        fps = 1000.0 / args.ms
+        wrote = []
+        if "webp" in args.formats:
+            path = os.path.join(ANIM, f"weather_{wx}.webp")
+            rgb = [f.convert("RGB") for f in frames]
+            rgb[0].save(path, save_all=True, append_images=rgb[1:],
+                        duration=args.ms, loop=0, quality=args.quality,
+                        method=6)
+            wrote.append(path)
+        if "mp4" in args.formats:
+            path = write_mp4(frames, os.path.join(ANIM, f"weather_{wx}.mp4"),
+                             fps)
+            if path:
+                wrote.append(path)
+            elif wx == states[0]:
+                print("  (no ffmpeg — skipping mp4; "
+                      "pip install imageio-ffmpeg)")
+        if "gif" in args.formats:
+            wrote.append(write_gif(
+                frames, os.path.join(ANIM, f"weather_{wx}.gif"), args.ms))
+
         strip = os.path.join(ANIM, f"weather_{wx}_strip.png")
         strips.append(filmstrip(frames, f"{wx.upper()}  ·  {args.phase}",
                                 MOTION.get(wx, ""), args.cell, strip))
-        kb = os.path.getsize(webp) / 1024
+        sizes = "  ".join(f"{os.path.splitext(p)[1][1:]} "
+                          f"{os.path.getsize(p) / 1024:.0f}KB" for p in wrote)
         print(f"  {wx:<9} grade {t_grade * 1000:5.0f} ms once + "
-              f"{t_frame * 1000:4.0f} ms/frame   {kb:6.0f} KB  {webp}")
+              f"{t_frame * 1000:4.0f} ms/frame   {sizes}")
 
     if len(strips) > 1:
         w = max(s.width for s in strips)

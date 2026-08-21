@@ -141,6 +141,37 @@ rather than set by hand, so streaks always point along the direction they
 actually travel — on the square canvas that lands at 1/3, down and to the
 right, matching the cast-shadow convention.
 
+## Will the loops play on marketplaces and wallets?
+
+Partly, and the format decides it. Solana metadata carries an animated
+asset in `animation_url`, with `properties.category` and a mime-typed entry
+in `properties.files[]`.
+
+| format | verdict |
+|---|---|
+| **MP4 (H.264, yuv420p)** | the safest bet, and also the smallest here — 80–261KB against WebP's 300–726KB |
+| animated WebP | plays in every browser, but marketplace *image pipelines* commonly re-encode and flatten it to frame 1 |
+| GIF | universally supported and the worst-looking: 256 colours band these graded plates, and it came out at ~6MB a loop |
+| HTML | richest, least supported — wallets sandbox or refuse it |
+
+`write_mp4()` pins yuv420p and even dimensions deliberately. A stream in
+yuv444p or with an odd dimension is what a hardware decoder or a phone
+refuses, and it fails as a **black frame** rather than as an error.
+
+Three things hold regardless of format:
+
+- **`image` must stay a still PNG.** Every grid, thumbnail, search result
+  and notification uses `image`. Animation only ever plays in the detail
+  view, often only on hover or click.
+- **Caching is the real ceiling, not playback.** Marketplaces cache media
+  hard, and Solana has no ERC-4906-style "metadata changed" event to nudge
+  them. A loop showing *live* weather will show whatever the weather was
+  when they cached it. Live state belongs on your own site; a marketplace
+  gets a good-looking snapshot.
+- **Test one token before committing 4,444.** Support differs per surface
+  and changes without notice; this table is a starting point, not a
+  guarantee.
+
 ## Locale is a property of the token
 
 The holder's location is **not knowable** from a render request — it arrives
