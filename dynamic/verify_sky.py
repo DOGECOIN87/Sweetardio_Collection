@@ -20,6 +20,10 @@ state, for every sample token it finds:
      moved alpha would move the face geometry downstream.
   4. Something actually happened in the plate region -- a pass that silently
      did nothing would otherwise sail through checks 1-3.
+  5. Every weather loop is SEAMLESS: the frame at t=1 is bit-identical to
+     the frame at t=0. A visible jump at the wrap is the one thing that
+     makes an ambient effect look cheap, and it is invisible in a filmstrip
+     -- only a numeric check catches it.
 
 Exits non-zero on any failure.
 
@@ -99,6 +103,22 @@ def main():
                 elif n_plate and same_plate:
                     failures.append(f"{tag}: pass did nothing to the plate")
 
+    # 5. seamless loops
+    base = Image.open(toks[0][1]).convert("RGBA").resize(
+        (512, 512), Image.Resampling.LANCZOS)
+    mask = Image.open(toks[0][2]).convert("L").resize(
+        (512, 512), Image.Resampling.LANCZOS)
+    for weather in skymod.WEATHER_STATES:
+        st = skymod.grade_static(base, "blue_dusk", weather)
+        a = np.asarray(skymod.frame(st, mask, t=0.0, seed=1), dtype=int)
+        b = np.asarray(skymod.frame(st, mask, t=1.0, seed=1), dtype=int)
+        checked += 2
+        if not np.array_equal(a, b):
+            failures.append(f"{weather}: loop is not seamless "
+                            f"(max delta {int(np.abs(a - b).max())})")
+    print(f"  loop seamlessness checked for "
+          f"{len(skymod.WEATHER_STATES)} weather states")
+
     print(f"\n{checked} renders checked "
           f"({len(skymod.SKY_STATES)} phases x "
           f"{len(skymod.WEATHER_STATES)} weather x {len(toks)} tokens)")
@@ -108,7 +128,8 @@ def main():
             print("  " + f)
         sys.exit(1)
     print("OK — every grade left the character, stickers, overlays and "
-          "alpha bit-identical to the mint.")
+          "alpha bit-identical to the mint, and every weather loop is "
+          "seamless.")
 
 
 if __name__ == "__main__":

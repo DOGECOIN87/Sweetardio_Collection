@@ -156,7 +156,8 @@ WEATHER_STATES = {
     "clear": dict(),
 
     "overcast": dict(
-        exposure=0.90, contrast=-0.14, lift=0.020, sat=0.82, diffuse=1.6),
+        exposure=0.90, contrast=-0.14, lift=0.020, sat=0.82, diffuse=1.6,
+        drift=0.030),
 
     # Fog is the strongest of the six and nearly free: the protect mask
     # means the plate can be hazed while the character is not, which is
@@ -164,7 +165,7 @@ WEATHER_STATES = {
     # a single pixel of it changing.
     "fog": dict(
         exposure=0.96, contrast=-0.30, lift=0.135, sat=0.52, diffuse=3.6,
-        haze=(0.72, 0.755, 0.80), haze_amt=0.34),
+        haze=(0.72, 0.755, 0.80), haze_amt=0.34, drift=0.055),
 
     "rain": dict(
         exposure=0.78, contrast=-0.05, lift=0.028, sat=0.72, diffuse=0.8,
@@ -177,7 +178,7 @@ WEATHER_STATES = {
     "storm": dict(
         exposure=0.54, contrast=0.10, lift=0.015, sat=0.60, diffuse=1.0,
         sh_tint=(0.05, 0.06, 0.13), sh_amt=0.22,
-        particles="rain", density=1.9),
+        particles="rain", density=1.9, flash=True),
 }
 
 
@@ -243,109 +244,171 @@ def _tone(rgb, exposure, contrast, lift, sat, sh_tint, sh_amt,
     return rgb
 
 
-def _particles(size, kind, density, seed):
-    """A soft particle field as a float 0..1 array.
+# ------------------------------------------------------------- animation
+#
+# Weather is the half of the trait that MOVES, and the useful structural
+# fact is that almost none of the cost moves with it: the tone grade, the
+# haze and the diffusion are byte-for-byte identical in every frame of a
+# loop. Only the particle field and a couple of cheap modulations change.
+#
+# So a loop renders as ONE graded plate plus N cheap frames -- which is also
+# exactly how a live client-side view would work: ship a single graded still
+# and run the particles in a canvas. The expensive half is static; the half
+# that animates is nearly free.
+#
+# Every motion here LOOPS SEAMLESSLY, because a visible jump at the wrap is
+# the one thing that makes an ambient effect look cheap:
+#
+#   rain / snow  particles live on a torus of (w+2m) x (h+2m) and travel a
+#                WHOLE number of tiles per loop, so frame N == frame 0
+#   snow sway    sinusoidal, an integer number of cycles per loop
+#   fog / cloud  a blurred noise field rolled by exactly its own width
+#   lightning    bumps placed away from the loop boundary
+#
+# The rain lean is DERIVED from that tile geometry rather than set by hand,
+# so the streaks always point along the direction they actually travel. On
+# the square canvas it works out at 1/3 -- down and to the right, matching
+# the collection's cast-shadow convention rather than fighting it.
+_MARGIN = 80
+_RAIN_TILES = (1, 3)     # (across, down) tiles travelled per loop
+_SNOW_TILES = (0, 1)
+_SNOW_SWAY_CYCLES = 1     # integer -> seamless
+
+_NOISE_CACHE = {}
+
+
+def _noise_field(h, w, seed, blur):
+    """A soft zero-mean noise field, cached. Rolling it is seamless."""
+    key = (h, w, seed, round(blur, 2))
+    if key not in _NOISE_CACHE:
+        rng = np.random.default_rng(seed)
+        small = rng.random((max(2, h // 40), max(2, w // 40)))
+        img = Image.fromarray(
+            (small * 255).astype(np.uint8), "L").resize(
+                (w, h), Image.Resampling.BICUBIC).filter(
+                    ImageFilter.GaussianBlur(blur))
+        f = np.asarray(img, dtype=_F) / _F(255.0)
+        _NOISE_CACHE[key] = f - f.mean()
+    return _NOISE_CACHE[key]
+
+
+def _flash(t):
+    """Lightning as a function of loop position: a hard strike and its
+    weaker echo, both well away from t=0 so the loop point stays clean."""
+    a = 0.0
+    for centre, width, amp in ((0.34, 0.018, 1.0), (0.39, 0.013, 0.5)):
+        a += amp * float(np.exp(-((t - centre) / width) ** 2))
+    return min(a, 1.0)
+
+
+def _particles(size, kind, density, seed, t=0.0):
+    """A soft particle field as a float 0..1 array, at loop position t.
 
     Deliberately STYLIZED, not photoreal. The cast is flat cartoon over lit
-    spheres; photoreal rain in front of a Twinkie looks like a compositing
+    spheres; photoreal rain in front of a Twinkie reads as a compositing
     error. Soft, chunky, low-opacity marks sit with the art.
 
-    Two depth bands -- far ones small, faint and blurred, near ones larger
-    and sharper -- which is what gives the plate depth. Both are behind the
-    character regardless, because the caller masks the whole effect layer.
+    Two depth bands -- far ones small, faint and blurred, near ones larger,
+    sharper and moving at twice the speed. That parallax is what gives the
+    plate depth. Both are behind the character regardless, because the
+    caller masks the whole effect layer.
 
     Seeded by token id, so a given token's rain always falls the same way.
     It is that token's weather, not a different random field every refresh.
     """
     w, h = size
+    m = _MARGIN
+    tile_w, tile_h = w + 2 * m, h + 2 * m
     rng = np.random.default_rng(seed)
-    out = np.zeros((h, w), dtype=np.float32)
+    out = np.zeros((h, w), dtype=_F)
 
-    # (count, size, opacity, blur) per band
     if kind == "rain":
         bands = [(int(260 * density), 34, 0.16, 2.6),
                  (int(90 * density), 66, 0.30, 1.1)]
+        across, down = _RAIN_TILES
     else:
         bands = [(int(300 * density), 5, 0.30, 2.4),
                  (int(110 * density), 11, 0.55, 1.0)]
+        across, down = _SNOW_TILES
 
-    for count, extent, opacity, blur in bands:
+    # streaks point along their own velocity vector
+    lean = (tile_w * across) / float(tile_h * down)
+
+    for depth, (count, extent, opacity, blur) in enumerate(bands):
+        speed = depth + 1          # near band twice as fast -> parallax
         layer = Image.new("L", (w, h), 0)
         draw = ImageDraw.Draw(layer)
-        xs = rng.integers(-extent, w + extent, count)
-        ys = rng.integers(-extent, h + extent, count)
+        x0 = rng.random(count) * tile_w
+        y0 = rng.random(count) * tile_h
+        xs = (x0 + tile_w * across * speed * t) % tile_w - m
+        ys = (y0 + tile_h * down * speed * t) % tile_h - m
+
         if kind == "rain":
-            # Falling down and to the right, matching the collection's
-            # cast-shadow convention rather than fighting it.
-            lean = 0.27
             lens = rng.integers(int(extent * 0.6), extent, count)
             for x, y, ln in zip(xs, ys, lens):
                 draw.line([(x, y), (x + ln * lean, y + ln)],
                           fill=255, width=2)
         else:
+            phase = rng.random(count) * 2.0 * np.pi
+            xs = xs + np.sin(2.0 * np.pi * _SNOW_SWAY_CYCLES * t
+                             + phase) * (extent * 1.6)
             rads = rng.integers(max(2, extent // 3), extent, count)
             for x, y, r in zip(xs, ys, rads):
                 draw.ellipse([x - r, y - r, x + r, y + r], fill=255)
+
         layer = layer.filter(ImageFilter.GaussianBlur(blur))
-        out = np.maximum(out, np.asarray(layer, dtype=np.float32)
-                         / 255.0 * opacity)
+        out = np.maximum(out, np.asarray(layer, dtype=_F)
+                         / _F(255.0) * _F(opacity))
     return out
 
 
-def apply_sky(base, protect, phase="day", weather="clear",
-              seed=0, strength=1.0):
-    """Grade the background of a finished token render.
+def _combine(sky, wet):
+    """Merge the sky and weather tables into one parameter set.
 
-    base     : RGBA PIL image -- the minted token, unmodified.
-    protect  : L PIL image    -- the mask create_image(mask_path=...) wrote.
-    phase    : a key of SKY_STATES (from solar.sun_phase()).
-    weather  : a key of WEATHER_STATES.
-    seed     : token id; makes the particle field stable per token.
-    strength : 0..1 global dial on the whole effect, for previewing.
-
-    Returns a new RGBA image the same size. The character is untouched.
+    Exposure and saturation multiply, contrast and lift add, so weather
+    modifies whatever the sky already did -- rain at night comes out darker
+    than rain at noon without either table knowing the other exists.
     """
-    if phase not in SKY_STATES:
-        raise KeyError(f"unknown sky phase {phase!r}")
-    if weather not in WEATHER_STATES:
-        raise KeyError(f"unknown weather {weather!r}")
+    return dict(
+        exposure=sky.get("exposure", 1.0) * wet.get("exposure", 1.0),
+        contrast=sky.get("contrast", 0.0) + wet.get("contrast", 0.0),
+        lift=sky.get("lift", 0.0) + wet.get("lift", 0.0),
+        sat=sky.get("sat", 1.0) * wet.get("sat", 1.0),
+        vignette=sky.get("vignette", 0.0),
+        sh_tint=sky.get("sh_tint", (0.06, 0.09, 0.20)),
+        sh_amt=sky.get("sh_amt", 0.0) + wet.get("sh_amt", 0.0),
+        hi_tint=sky.get("hi_tint", (0.90, 0.94, 1.00)),
+        hi_amt=sky.get("hi_amt", 0.0))
 
+
+def is_identity(phase, weather):
+    """True if this grade is a no-op -- day + clear, and nothing else."""
     sky, wet = SKY_STATES[phase], WEATHER_STATES[weather]
-    if base.mode != "RGBA":
-        base = base.convert("RGBA")
-    if protect.size != base.size:
-        protect = protect.resize(base.size, Image.Resampling.LANCZOS)
-
-    # Combine the two tables. Exposure and saturation multiply, contrast and
-    # lift add, so weather modifies whatever the sky already did.
-    exposure = sky.get("exposure", 1.0) * wet.get("exposure", 1.0)
-    contrast = sky.get("contrast", 0.0) + wet.get("contrast", 0.0)
-    lift = sky.get("lift", 0.0) + wet.get("lift", 0.0)
-    sat = sky.get("sat", 1.0) * wet.get("sat", 1.0)
-    vignette = sky.get("vignette", 0.0)
-    sh_tint = sky.get("sh_tint", (0.06, 0.09, 0.20))
-    sh_amt = sky.get("sh_amt", 0.0) + wet.get("sh_amt", 0.0)
-    hi_tint = sky.get("hi_tint", (0.90, 0.94, 1.00))
-    hi_amt = sky.get("hi_amt", 0.0)
-
-    # DAY + CLEAR is the identity grade, and it is also the single most
-    # requested state -- most holders, most of the time, are in daylight. It
-    # must cost nothing rather than spend a full pass computing a no-op.
-    if strength <= 1e-4 or (
-            abs(exposure - 1.0) < 1e-4 and abs(contrast) < 1e-4
-            and lift < 1e-5 and abs(sat - 1.0) < 1e-4
-            and sh_amt < 1e-4 and hi_amt < 1e-4 and abs(vignette) < 1e-4
+    p = _combine(sky, wet)
+    return (abs(p["exposure"] - 1.0) < 1e-4 and abs(p["contrast"]) < 1e-4
+            and p["lift"] < 1e-5 and abs(p["sat"] - 1.0) < 1e-4
+            and p["sh_amt"] < 1e-4 and p["hi_amt"] < 1e-4
+            and abs(p["vignette"]) < 1e-4
             and wet.get("haze_amt", 0.0) < 1e-4
             and wet.get("diffuse", 0.0) <= 0.05
-            and not wet.get("particles")):
-        return base.copy()
+            and not wet.get("particles"))
 
-    arr = np.asarray(base, dtype=_F) / _F(255.0)
+
+def grade_static(base, phase="day", weather="clear"):
+    """The frame-invariant half: tone, haze and diffusion.
+
+    Split out because it is the whole cost of a render and it does not
+    change across a loop. Call once, then pass the result to frame() as
+    many times as there are frames.
+    """
+    sky, wet = SKY_STATES[phase], WEATHER_STATES[weather]
+    p = _combine(sky, wet)
+    arr = np.asarray(base.convert("RGBA"), dtype=_F) / _F(255.0)
     rgb, alpha = arr[..., :3].copy(), arr[..., 3]
-    h, w = rgb.shape[:2]
 
-    fx = _tone(rgb.copy(), exposure, contrast, lift, sat,
-               sh_tint, sh_amt, hi_tint, hi_amt)
+    fx = _tone(rgb.copy(), p["exposure"], p["contrast"], p["lift"],
+               p["sat"], p["sh_tint"], p["sh_amt"], p["hi_tint"],
+               p["hi_amt"])
 
     # Fog: lerp the plate toward the haze colour. The character is excluded
     # by the mask, so this alone reads as depth.
@@ -359,18 +422,41 @@ def apply_sky(base, protect, phase="day", weather="clear",
                 ImageFilter.GaussianBlur(wet["diffuse"]))
         fx = np.asarray(blurred, dtype=_F) / _F(255.0)
 
+    return {"fx": fx, "rgb": rgb, "alpha": alpha, "p": p, "wet": wet}
+
+
+def frame(static, protect, t=0.0, seed=0, strength=1.0):
+    """One frame of a loop, from a cached grade_static() result."""
+    fx = static["fx"].copy()
+    rgb, alpha, p, wet = (static["rgb"], static["alpha"],
+                          static["p"], static["wet"])
+    h, w = rgb.shape[:2]
+
+    # Drifting density: what makes fog and overcast read as WEATHER rather
+    # than as a flat filter. Rolling the field is seamless by construction.
+    if wet.get("drift", 0.0) > 1e-4:
+        field = _noise_field(h, w, seed | 1, max(h, w) / 22.0)
+        rolled = np.roll(field, int(round(t * w)), axis=1)
+        fx = fx + rolled[..., None] * _F(wet["drift"])
+
     # Particles, screened in so they glow rather than paint over.
     if wet.get("particles"):
-        p = _particles((w, h), wet["particles"],
-                       wet.get("density", 1.0), seed)[..., None]
+        part = _particles((w, h), wet["particles"],
+                          wet.get("density", 1.0), seed, t)[..., None]
         tint = _c((0.80, 0.86, 0.98) if wet["particles"] == "rain"
                   else (1.0, 1.0, 1.0))
-        fx = fx + (tint - fx) * p
+        fx = fx + (tint - fx) * part
+
+    # Lightning, on the plate only like everything else here.
+    if wet.get("flash") and t > 0.0:
+        a = _flash(t)
+        if a > 1e-3:
+            fx = fx + (_c((0.86, 0.90, 1.0)) - fx) * _F(a * 0.55)
 
     # Vignette, tinted with the shadow colour so it belongs to the phase.
-    if abs(vignette) > 1e-4:
-        v = (_vig_field(h, w) * _F(vignette))[..., None]
-        fx = fx * (1.0 - v) + _c(sh_tint) * v * _F(0.5)
+    if abs(p["vignette"]) > 1e-4:
+        v = (_vig_field(h, w) * _F(p["vignette"]))[..., None]
+        fx = fx * (1.0 - v) + _c(p["sh_tint"]) * v * _F(0.5)
 
     # Filmic shoulder then clip, matching grade.py's tail so a plate that
     # passes through both passes never hard-clips twice.
@@ -379,15 +465,48 @@ def apply_sky(base, protect, phase="day", weather="clear",
     fx[over] = s + (1 - s) * np.tanh((fx[over] - s) / (1 - s))
     fx = np.clip(fx, 0.0, 1.0)
 
-    # THE RULE: blend only where the plate is exposed. p == 1 is character,
+    # THE RULE: blend only where the plate is exposed. pr == 1 is character,
     # sticker or overlay and comes through untouched.
-    p = (np.asarray(protect.convert("L"), dtype=_F) / _F(255.0))
-    p = np.clip(p + (1.0 - p) * _F(1.0 - strength), 0.0, 1.0)[..., None]
-    out = rgb * p + fx * (1.0 - p)
+    pr = np.asarray(protect.convert("L"), dtype=_F) / _F(255.0)
+    pr = np.clip(pr + (1.0 - pr) * _F(1.0 - strength), 0.0, 1.0)[..., None]
+    out = rgb * pr + fx * (1.0 - pr)
 
     return Image.fromarray(
         (np.dstack([np.clip(out, 0, 1), alpha[..., None]]) * 255.0 + 0.5)
         .astype(np.uint8), "RGBA")
+
+
+def apply_sky(base, protect, phase="day", weather="clear",
+              seed=0, strength=1.0, t=0.0):
+    """Grade the background of a finished token render (a single still).
+
+    base     : RGBA PIL image -- the minted token, unmodified.
+    protect  : L PIL image    -- the mask create_image(mask_path=...) wrote.
+    phase    : a key of SKY_STATES (from solar.sun_phase()).
+    weather  : a key of WEATHER_STATES.
+    seed     : token id; makes the particle field stable per token.
+    strength : 0..1 global dial on the whole effect, for previewing.
+    t        : 0..1 position in the weather loop.
+
+    Returns a new RGBA image the same size. The character is untouched.
+    """
+    if phase not in SKY_STATES:
+        raise KeyError(f"unknown sky phase {phase!r}")
+    if weather not in WEATHER_STATES:
+        raise KeyError(f"unknown weather {weather!r}")
+    if base.mode != "RGBA":
+        base = base.convert("RGBA")
+    if protect.size != base.size:
+        protect = protect.resize(base.size, Image.Resampling.LANCZOS)
+
+    # DAY + CLEAR is the identity grade, and it is also the single most
+    # requested state -- most holders, most of the time, are in daylight. It
+    # must cost nothing rather than spend a full pass computing a no-op.
+    if strength <= 1e-4 or is_identity(phase, weather):
+        return base.copy()
+
+    return frame(grade_static(base, phase, weather), protect,
+                 t=t, seed=seed, strength=strength)
 
 
 def describe(phase, weather):

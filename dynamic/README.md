@@ -89,6 +89,40 @@ spheres, and photoreal rain in front of a Twinkie reads as a compositing
 error. They are seeded by token id, so a token's rain always falls the same
 way: it is *that token's* weather, not a new random field every refresh.
 
+## Weather animates; the grade does not
+
+`animate.py` renders each weather state as a seamless loop. The structural
+point is that **almost none of the cost moves**: the tone grade, the haze
+and the diffusion are identical in every frame, so a loop is ONE graded
+plate plus N cheap frames — measured at ~40ms once, then ~35ms per frame at
+512px.
+
+That is also the production path. A live view does not need a video: it
+needs the single graded still plus a particle pass in a canvas, which is
+what makes an `animation_url` page small enough to be worth shipping. The
+exported loops run 160–460KB at 512px.
+
+Every motion loops **seamlessly**, and `verify_sky.py` gates it — the frame
+at t=1 must be bit-identical to the frame at t=0. A jump at the wrap is the
+one thing that makes an ambient effect look cheap, and it is invisible in a
+filmstrip; only a numeric check catches it.
+
+| state | motion |
+|---|---|
+| `clear` | none — a clear sky is a still |
+| `overcast` | cloud shadow drifting across the plate |
+| `fog` | haze density rolling through, thickening and thinning |
+| `rain` | two depth bands falling down-and-right, near band 2x faster |
+| `snow` | slow fall with a sideways sway, one cycle per loop |
+| `storm` | heavy rain, plus a lightning strike and its echo |
+
+The loops are built on a torus: particles travel a **whole number of tiles**
+per loop, sway uses an integer number of cycles, and the fog field is rolled
+by exactly its own width. The rain lean is *derived* from that tile geometry
+rather than set by hand, so streaks always point along the direction they
+actually travel — on the square canvas that lands at 1/3, down and to the
+right, matching the cast-shadow convention.
+
 ## Locale is a property of the token
 
 The holder's location is **not knowable** from a render request — it arrives
@@ -109,6 +143,7 @@ pip install pillow numpy scipy
 python3 dynamic/solar.py                          # one instant, six cities
 python3 dynamic/render.py --tokens 3 --sheet      # mint samples + sheets
 python3 dynamic/render.py --variety 6             # one token per plate
+python3 dynamic/animate.py                        # weather loops (webp)
 python3 dynamic/verify_sky.py                     # THE GATE
 ```
 

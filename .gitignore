@@ -9,3 +9,5 @@ background_pop_studies/GRADE1_GRADE_LOG.md
 # --tokens 3 --variety 6); only the contact SHEETS are the design record.
 dynamic/proof/token_*.png
 dynamic/proof/var_*.png
+dynamic/proof/anim/weather_*.png
+!dynamic/proof/anim/weather_all.png
