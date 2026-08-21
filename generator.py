@@ -1925,11 +1925,14 @@ def _subject_separation(bg_img, sil_alpha, cfg):
     return out
 
 
-def create_image(layers, output_name=None, metadata=None):
+def create_image(layers, output_name=None, metadata=None, mask_path=None):
     """Composite all layers and write the PNG.
     If metadata is provided (a list of {"trait_type", "value"} dicts as
     returned by extract_metadata()), a matching .json sidecar is saved
-    next to the PNG with OpenSea-compatible attributes."""
+    next to the PNG with OpenSea-compatible attributes.
+
+    mask_path, if given, additionally writes the PROTECT MASK for the
+    dynamic sky pass (dynamic/sky.py) -- see the note where it is saved."""
     if output_name is None:
         import time
         if not os.path.exists("output"):
@@ -2041,8 +2044,29 @@ def create_image(layers, output_name=None, metadata=None):
         img = _render_layer(layer_info)
         if img is not None:
             base_img.alpha_composite(img)
+            fg_mask = ImageChops.lighter(fg_mask, img.getchannel("A"))
 
     base_img.save(output_name)
+
+    # Protect mask for the dynamic sky pass (dynamic/sky.py): the union of
+    # every layer EXCEPT the background plate -- i.e. exactly the pixels a
+    # time-of-day or weather grade must never touch. fg_mask has already
+    # accumulated the character stack (body, skin, eyes, mouth, arms,
+    # footwear); the loop above adds the stickers and the paired background
+    # overlays, which are foreground figures riding on their plate rather
+    # than part of the stage.
+    #
+    # It is written HERE, at composite time, because this is the only place
+    # the silhouette is known for free. Recovering it from the finished PNG
+    # would mean segmenting the art; recovering it by re-running the
+    # pipeline costs a full ~2s composite and all 441MB of traits/. Written
+    # once at mint-build time, it makes the dynamic render a two-input op on
+    # two PNGs.
+    #
+    # Anti-aliased edges are preserved as intermediate values, so the sky
+    # blend feathers across the silhouette instead of stair-stepping it.
+    if mask_path is not None:
+        fg_mask.save(mask_path)
 
     if metadata is not None:
         json_path = os.path.splitext(output_name)[0] + ".json"

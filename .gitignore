@@ -4,3 +4,8 @@ __pycache__/
 background_pop_studies/grade1_out/
 background_pop_studies/samples/compare_*.png
 background_pop_studies/GRADE1_GRADE_LOG.md
+
+# dynamic/ proof inputs are regenerated artifacts (python3 dynamic/render.py
+# --tokens 3 --variety 6); only the contact SHEETS are the design record.
+dynamic/proof/token_*.png
+dynamic/proof/var_*.png
