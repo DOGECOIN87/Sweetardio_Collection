@@ -545,8 +545,25 @@ def _particles(size, kind, density, seed, t=0.0):
 
     across, down = cfg["tiles"]
     streak = cfg["shape"] == "streak"
-    # streaks point along their own velocity vector
-    lean = (tile_w * across) / float(tile_h * down)
+    # Streaks point along their own velocity vector. Only computed for a
+    # streak, because the expression divides by `down` and a kind that
+    # travels PURELY SIDEWAYS has down=0 -- a starfield scroll is the first
+    # thing that would, and every kind that existed before fell downward,
+    # so this divided by zero and nothing had ever run it.
+    #
+    # A streak is drawn as (x + ln*lean, y + ln), i.e. parameterised on its
+    # vertical travel, so a streak with down=0 has no length to draw along.
+    # That is a real constraint rather than an oversight: a purely
+    # horizontal streak needs the other parameterisation, and no kind wants
+    # one yet. Say so rather than dividing by zero at render time.
+    lean = 0.0
+    if streak:
+        if not down:
+            raise ValueError(
+                f"particle kind {kind!r} draws streaks but travels purely "
+                f"sideways (tiles={cfg['tiles']}); a streak is drawn along "
+                f"its vertical travel, so it needs down >= 1")
+        lean = (tile_w * across) / float(tile_h * down)
 
     for depth, (count, extent, opacity, blur) in enumerate(cfg["bands"]):
         count = int(count * density)
