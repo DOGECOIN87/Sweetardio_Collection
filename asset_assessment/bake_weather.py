@@ -32,7 +32,6 @@ finished PNG:
     python3 asset_assessment/bake_weather.py
 
     python3 asset_assessment/bake_weather.py --limit 8      # a proof run
-    python3 asset_assessment/bake_weather.py --phase night
     python3 asset_assessment/bake_weather.py --force        # re-bake all
 
 Resumable: a token whose loop already exists is skipped, so an interrupted
@@ -62,13 +61,12 @@ CLEAR = os.path.join(MINT, "images_clear")
 MASKS = os.path.join(MINT, "masks")
 ANIM = os.path.join(MINT, "anim")
 
-# The phase every weather state was art-directed and approved at -- every
-# proof sheet, filmstrip and contact sheet in dynamic/proof was judged
-# here. Baking at a single phase is deliberate: with the weather permanent
-# and the sky permanent, a second random axis would double the render cost
-# and halve how legible the weather trait is, for variety nobody asked for.
-# --phase changes it; it is not a per-token roll.
-DEFAULT_PHASE = "blue_dusk"
+# `day` is the identity grade: the exact light the other 4,000 tokens are
+# minted at. So a weather token differs from the rest of the collection by
+# WEATHER ONLY, which is the whole trait. It was briefly baked at blue
+# dusk, which made the animated tier a different hour as well -- a change
+# to everybody's art that nobody asked for.
+DEFAULT_PHASE = "day"
 
 
 def source_for(tid):

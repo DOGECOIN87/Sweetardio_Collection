@@ -52,7 +52,7 @@ This is what retired `overcast`: it sat 3.3 from `rain` and 4.8 from
 From the repo root:
 
     python3 asset_assessment/make_weather_contact.py
-    python3 asset_assessment/make_weather_contact.py --plates 8 --phase night
+    python3 asset_assessment/make_weather_contact.py --plates 8
     python3 asset_assessment/make_weather_contact.py --no-sheet   # numbers
 
 Writes dynamic/proof/contact_weather.png and dynamic/proof/WEATHER_DISTINCTNESS.md.
@@ -250,7 +250,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--plates", type=int, default=6,
                     help="how many DIFFERENT plates to render each state on")
-    ap.add_argument("--phase", default="blue_dusk",
+    ap.add_argument("--phase", default="day",
                     choices=list(skymod.SKY_STATES))
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--cell", type=int, default=300)

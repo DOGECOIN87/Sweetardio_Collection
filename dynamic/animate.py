@@ -29,8 +29,8 @@ doing nothing, which is what `clear` was.
 
 From the repo root:
 
-    python3 dynamic/animate.py                       # all seven, blue dusk
-    python3 dynamic/animate.py --phase night --size 640
+    python3 dynamic/animate.py                       # all seven
+    python3 dynamic/animate.py --size 640
     python3 dynamic/animate.py --only blizzard tornado
 """
 
@@ -167,7 +167,7 @@ def filmstrip(frames, label, motion, cell, out_path, picks=6):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--token", type=int, default=1)
-    ap.add_argument("--phase", default="blue_dusk",
+    ap.add_argument("--phase", default="day",
                     choices=list(skymod.SKY_STATES))
     ap.add_argument("--frames", type=int, default=36)
     ap.add_argument("--size", type=int, default=512)

@@ -103,33 +103,28 @@ FACE_UNDERSIDE = (601 + 250 / 2) / 1393
 # should catch a state that has drifted into burying the background, not
 # fire because a plate was busy.
 #
-# CHECKED AT BOTH ENDS OF THE DAY, because the hazing states get steadily
-# worse as the sky darkens and a day-only check would never see it:
-# lerping an already-dark plate toward a bright haze crushes its relative
-# contrast far harder than doing the same to a bright one. Measured across
-# all eight phases, every state fell monotonically from noon to night --
-# fog 43% -> 23%, blizzard 50% -> 31%, tornado 68% -> 48% -- so `night` is
-# the binding case and `day` is kept as the guard against a future state
-# that does not follow that shape.
+# RE-MEASURED AT `day`, which is now the only phase there is. The old
+# floors were set from `night`, where every hazing state scored far worse
+# -- lerping an already-dark plate toward a bright haze crushes its
+# relative contrast much harder than doing the same to a bright one, and
+# the fall from noon to night was monotonic across all seven states. With
+# the time-of-day trait retired those numbers describe a render nobody
+# will ever see, and leaving them would have left every floor about twice
+# as loose as it should be.
 #
-# Floors are set ~20% under the NIGHT measurement, over three tokens:
-# fog 23, rain 87, snow 85, storm 116, blizzard 31, tornado 48,
-# flooded 31.
+# Floors are ~20% under the worst of three tokens at day:
+# fog 41, rain 89, snow 85, storm 116, blizzard 51, tornado 71, flooded 56.
 #
 # fog and blizzard are the loosest because obscuring IS the state; they
 # earn it by doing it in a BAND along the ground instead of over the whole
-# frame, which is what took fog from 24% to 45% at day and gave the upper
-# half of every plate back. storm scores above 100% because its own
-# particles add high-frequency energy on top of the plate's.
-PLATE_DETAIL_PHASES = ("day", "night")
+# frame, which is what took fog from 24% to 45% and gave the upper half of
+# every plate back. storm scores above 100%, and flooded and tornado score
+# well for how much they change, because particles, refraction and a
+# mirrored surface ADD high-frequency energy rather than hazing it away.
+PLATE_DETAIL_PHASES = ("day",)
 PLATE_DETAIL_FLOOR = {
-    "fog": 0.18, "rain": 0.76, "snow": 0.72,
-    "storm": 0.92, "blizzard": 0.25, "tornado": 0.40,
-    # flooded refracts and MIRRORS the plate rather than hazing it, so it
-    # moves the background's contrast around instead of removing it --
-    # 58% at noon against fog's 43%, despite changing far more. Night is
-    # where it costs, like every state that tints: 31%.
-    "flooded": 0.25,
+    "fog": 0.33, "rain": 0.71, "snow": 0.68, "storm": 0.93,
+    "blizzard": 0.41, "tornado": 0.57, "flooded": 0.45,
 }
 
 
@@ -267,7 +262,7 @@ def main():
     mask = Image.open(toks[0][2]).convert("L").resize(
         (512, 512), Image.Resampling.LANCZOS)
     for weather in skymod.WEATHER_STATES:
-        st = skymod.grade_static(base, "blue_dusk", weather)
+        st = skymod.grade_static(base, "day", weather)
         a = np.asarray(skymod.frame(st, mask, t=0.0, seed=1), dtype=int)
         b = np.asarray(skymod.frame(st, mask, t=1.0, seed=1), dtype=int)
         checked += 2

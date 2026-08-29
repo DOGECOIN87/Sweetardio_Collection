@@ -15,9 +15,15 @@ renderer and 444 files.
     444 of 4,444 (10%) carry weather:
       rain 110 · snow 95 · fog 80 · storm 75 · blizzard 40 · flooded 30 · tornado 14
 
-`solar.py` and the eight sky phases still exist and still work, but they
-are no longer on the mint path — everything bakes at one phase (see
-`bake_weather.py`, `DEFAULT_PHASE`).
+**There is no time-of-day trait either.** It was the other half of this
+module and it is gone: eight sky phases driven by `solar.py`'s NOAA solar
+position, so a token looked different at dawn than at midnight. The
+collection ships **one lighting condition** — `day`, which is defined to be
+the identity, i.e. exactly the light every plate was approved at and every
+one of the 123 trait assets is authored to.
+
+So a weather token differs from the other 4,000 by **weather and nothing
+else**. That is the whole trait.
 
 ## The rule
 
@@ -83,39 +89,44 @@ Two consequences:
 ## The key light does not move
 
 `CLAUDE.md` pins the key to the upper left and all 123 trait assets are
-authored to it. A night render that *relit* the scene would take every
-character out of register with the cast. So solar altitude drives exposure,
-contrast, saturation, split-tone and vignette — **never a new light
-direction**. What falls down-and-right (rain lean, vignette weighting)
-follows the existing convention rather than fighting it.
+authored to it. Nothing here relights the scene: weather drives exposure,
+contrast, saturation and split-tone — **never a new light direction**.
+What falls down-and-right (the rain and blizzard lean, the tornado's lit
+flank, the cast shadow convention) follows it rather than fighting it.
 
-## Altitude, not the clock
+## Why there is no time-of-day trait
 
-`solar.py` is the NOAA solar position algorithm: closed form, so the
-time-of-day half needs **no API, no key and no rate limit**. Only weather
-needs a network call.
+There was one, and it was good: `solar.py` was the NOAA solar position
+algorithm, so the phase came from real astronomy rather than a table of
+sunset times — 18:00 is a different sky in Reykjavik and in Singapore, and
+−6° is blue hour everywhere, always. Dawn and dusk sit at the same altitude
+and were split on the sign of dAlt/dt, because morning light is rose and
+evening light amber.
 
-18:00 is a different sky in Reykjavik and Singapore, and a different sky in
-June and December. −6° is blue hour everywhere, always. That is why the
-phase bands are the standard astronomical twilight definitions and not a
-table of sunset times.
+None of it ships. Changing the hour changes **everybody's art**, including
+the 4,000 tokens that have no weather at all, and that is not a trait —
+it is a filter over a collection that was already approved at one light.
+`solar.py`, `ladder.py`, the seven non-identity grade tables and their
+proof sheets are deleted rather than left commented out; they are in git if
+a night edition is ever wanted.
 
-Dawn and dusk sit at the **same** altitude, so they are split on the sign of
-dAlt/dt. It is the most visible distinction in the grade table — morning
-light is rose and paler, evening light amber and deeper.
+What survives is the `phase` parameter on every entry point. It costs
+nothing, it keeps `is_identity()` meaning what it says, and it is where a
+second lighting condition would go back.
 
 ## `day` is deliberately the identity grade
 
 It is the grade the plates were approved at in `ULTIMATE_GRADE_LOG.md`, and
-it covers most of every holder's waking hours. The dynamic layer should read
-as a reward for checking in at dusk, not as a filter permanently laid over
-the owner's art.
+it is now the only one. A token with no weather short-circuits the whole
+pass — `is_identity()` returns True and `apply_sky()` hands back a copy
+rather than spending a full grade computing a no-op.
 
-It is also the most-requested state, so it short-circuits: **3ms**, versus
-~550ms for a grade that actually runs. Two identities do most of the rest of
-the saving — a *scalar* exposure applied as a luma ratio is just a scalar
-multiply, and saturation-about-luma is luma-preserving, so the split-tone
-reuses that luma instead of recomputing it.
+The tone machinery is still very much live, but it is driven by the
+**weather** table now rather than the sky one: every state sets exposure,
+contrast, lift and saturation, and `_tone()` is where they land. Two
+identities keep it cheap — a *scalar* exposure applied as a luma ratio is
+just a scalar multiply, and saturation-about-luma is luma-preserving, so
+the split-tone reuses that luma instead of recomputing it.
 
 ## There is no `clear` state
 
@@ -338,7 +349,6 @@ before anyone owned anything.
 ```bash
 pip install pillow numpy scipy
 
-python3 dynamic/solar.py                          # one instant, six cities
 python3 dynamic/render.py --tokens 3 --sheet      # mint samples + sheets
 python3 dynamic/render.py --variety 6             # one token per plate
 python3 dynamic/animate.py                        # weather loops (mp4/webp)
@@ -396,10 +406,11 @@ measure 36KB mean, ~156MB across 4,444.
 `dynamic/proof/sheet_*.png` are committed as the design record; the
 `token_*` / `var_*` inputs are regenerated artifacts and are git-ignored.
 
-## What the pivot settled, and what is still open
+## What the two pivots settled, and what is still open
 
-Three of the four things this file used to list as undecided were
-consequences of the weather being live. They are not questions any more:
+Everything this file used to list as undecided was a consequence of the
+weather being live, or of there being a time-of-day trait. Both are gone,
+and so are the questions:
 
 - **Canonical or alternate view?** Settled. `image` is the *weathered*
   still at the full 1393 canvas and `animation_url` is the loop. The still
@@ -414,22 +425,23 @@ consequences of the weather being live. They are not questions any more:
   counts, not derived from a feed, so `tornado` is not US-skewed by which
   countries publish an alerts API — it is 14 tokens because
   `WEATHER_COUNTS` says 14.
+- **Which phase, or a phase per token?** Gone. There is one lighting
+  condition and it is the identity, so a weather token differs from the
+  rest of the collection by weather alone.
+- **The night grade's brightness gap.** Moot — there is no night grade.
 
 Still open:
 
-1. **One phase for all 444, or a second random axis?** Everything bakes at
-   `blue_dusk` — the phase every proof sheet and contact sheet was judged
-   at. Rolling the phase per token would multiply the variety and add a
-   second rarity dimension, at the cost of doubling how many distinct
-   looks a buyer has to learn and making the weather itself harder to read
-   at a glance. `bake_weather.py --phase` changes it globally; making it
-   per-token is a small change and a real design decision.
-2. **`isMutable`.** Solana has no `baseURI` — each NFT carries its own
+1. **`isMutable`.** Solana has no `baseURI` — each NFT carries its own
    `uri`, so the metadata must be right **before** mint or retrofitted one
    transaction per token. Nothing about a baked token changes after mint,
    which is an argument for locking it; keeping it mutable is still the
    only escape hatch if a URI ever has to move.
-3. Whether the night grade's brightness gap is a bug or the look — see
-   `sheet_variety_night.png`. Across the plate family it reads as a
-   deliberate spotlight; on busy mid-key plates it reads flatter. Only
-   matters if the phase is ever rolled per token.
+2. **Whether 444 is the right number, and the split inside it.** The tier
+   is 10% of the supply and `WEATHER_COUNTS` sets its shape — rain 110
+   down to tornado 14. Both are one edit and a re-mint away while nothing
+   is on chain.
+3. **One real token on each surface.** `verify_media.py` proves the files
+   and the JSON are not the reason if an animation fails to play. It
+   cannot prove Phantom, Magic Eden or Tensor play them, and nothing run
+   offline can.

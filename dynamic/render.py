@@ -8,10 +8,14 @@ Two jobs:
      mint-build step, in miniature: build_mint.py would do the same thing
      by passing mask_path= to create_image().
 
-  2. `--sheet` grades those tokens across all eight sky phases and all
-     seven weather states (plus the unweathered mint) and lays the results
-     out as contact sheets, so the art direction can be judged on pixels
-     rather than on a parameter table.
+  2. `--sheet` grades those tokens across all seven weather states (plus
+     the unweathered mint) and lays the results out as a contact sheet, so
+     the art direction can be judged on pixels rather than on a parameter
+     table.
+
+     There used to be a phase sheet and a six-cities sheet here as well.
+     Both demonstrated the time-of-day trait, which is retired -- the
+     collection ships one lighting condition.
 
 From the repo root:
 
@@ -32,13 +36,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 import generator as gen
 from dynamic import sky as skymod
-from dynamic import solar
 
 PROOF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "proof")
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-PHASE_ORDER = ["high_noon", "day", "golden_dawn", "golden_dusk",
-               "blue_dawn", "blue_dusk", "twilight", "night"]
 # None (a clear sky) first as the reference, then the ordinary states, then
 # the two severe ones -- so a weather sheet reads as the tiering it is
 # rather than as a row of equal options. None renders the mint unchanged,
@@ -160,8 +161,9 @@ def main():
     ap.add_argument("--cell", type=int, default=420)
     ap.add_argument("--variety", type=int, default=0,
                     help="mint N tokens on N DIFFERENT plates and sheet them")
-    ap.add_argument("--variety-phases", nargs="*",
-                    default=["golden_dusk", "night"])
+    ap.add_argument("--variety-phases", nargs="*", default=["day"],
+                    help="retained so the variety sheet keeps its shape; "
+                         "there is only one phase now")
     ap.add_argument("--token", type=int, default=1,
                     help="which minted sample to grade for the sheets")
     args = ap.parse_args()
@@ -185,49 +187,18 @@ def main():
     tid = args.token
     suffix = "" if tid == 1 else f"_t{tid}"
 
-    # --- sheet 1: all eight sky phases, clear weather -------------------
-    cells, t0 = [], time.time()
-    for ph in PHASE_ORDER:
-        img = skymod.apply_sky(base, mask, ph, None, seed=tid,
-                               strength=args.strength)
-        tag = "  (canonical mint)" if ph == "day" else ""
-        cells.append((ph.replace("_", " ") + tag, img))
-    per = (time.time() - t0) / len(PHASE_ORDER)
-    p1 = contact_sheet(cells, 4, args.cell,
-                       "Sweetardio — time of day  (background only; "
-                       "every other trait is bit-identical to the mint)",
-                       os.path.join(PROOF_DIR, f"sheet_phases{suffix}.png"))
-    print(f"{p1}   [{per * 1000:.0f} ms per render]")
-
     # --- sheet 2: weather, at dusk where it reads most clearly ----------
-    cells = []
+    cells, t0 = [], time.time()
     for wx in WEATHER_ORDER:
-        img = skymod.apply_sky(base, mask, "blue_dusk", wx, seed=tid,
+        img = skymod.apply_sky(base, mask, "day", wx, seed=tid,
                                strength=args.strength)
-        cells.append((f"blue dusk + {wx or 'no weather (the mint)'}", img))
+        cells.append((wx or "no weather — the mint, unchanged", img))
+    per = (time.time() - t0) / len(WEATHER_ORDER)
     p2 = contact_sheet(cells, 4, args.cell,
                        "Sweetardio — weather  (particles fall BEHIND the "
                        "character; fog hazes the plate, not the figure)",
                        os.path.join(PROOF_DIR, f"sheet_weather{suffix}.png"))
-    print(p2)
-
-    # --- sheet 3: the same hour, six cities ----------------------------
-    now = datetime.datetime(2026, 8, 21, 18, 0,
-                            tzinfo=datetime.timezone.utc)
-    cities = [("Reykjavik", 64.15, -21.94), ("London", 51.51, -0.13),
-              ("New York", 40.71, -74.01), ("Singapore", 1.35, 103.82),
-              ("Tokyo", 35.68, 139.65), ("Sydney", -33.87, 151.21)]
-    cells = []
-    for name, la, lo in cities:
-        ph, alt = solar.sun_phase(la, lo, now)
-        img = skymod.apply_sky(base, mask, ph, None, seed=tid,
-                               strength=args.strength)
-        cells.append((f"{name} — {ph.replace('_', ' ')} ({alt:+.0f}°)", img))
-    p3 = contact_sheet(cells, 3, args.cell,
-                       f"Sweetardio — one token, one instant "
-                       f"({now:%d %b %Y %H:%M} UTC), six holders",
-                       os.path.join(PROOF_DIR, f"sheet_cities{suffix}.png"))
-    print(p3)
+    print(f"{p2}   [{per * 1000:.0f} ms per render]")
 
 
 if __name__ == "__main__":

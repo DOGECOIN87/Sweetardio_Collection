@@ -55,22 +55,6 @@ def _c(triple):
     return np.asarray(triple, dtype=_F)
 
 
-# The radial falloff field depends only on the canvas size, and the canvas is
-# a fixed 1393 for this collection -- so it is computed once per size and
-# reused, rather than rebuilt (via a pair of 31MB int64 mgrid arrays) on
-# every single render.
-_VIG_CACHE = {}
-
-
-def _vig_field(h, w):
-    if (h, w) not in _VIG_CACHE:
-        ny = np.linspace(-1.0, 1.0, h, dtype=_F)[:, None]
-        nx = np.linspace(-1.0, 1.0, w, dtype=_F)[None, :]
-        d = np.sqrt(nx * nx + ny * ny) / _F(np.sqrt(2.0))
-        _VIG_CACHE[(h, w)] = smoothstep((d - 0.55) / 0.45) ** 1.2
-    return _VIG_CACHE[(h, w)]
-
-
 def luma(rgb):
     return (_LUMA[0] * rgb[..., 0] + _LUMA[1] * rgb[..., 1]
             + _LUMA[2] * rgb[..., 2])
@@ -83,60 +67,24 @@ def smoothstep(x):
 
 # ------------------------------------------------------------------ sky
 #
-# Eight states, keyed by the phase names solar.sun_phase() returns.
+# ONE STATE. The collection ships a single lighting condition -- the one
+# every plate was approved at in ULTIMATE_GRADE_LOG.md and every one of the
+# 123 trait assets is authored to -- and `day` is defined to be the
+# identity: it changes nothing at all.
 #
-#   exposure  multiplier on luma (hue-safe: applied as a luma ratio)
-#   contrast  signed S-curve blend; negative FLATTENS, which is what low
-#             light actually does -- night is not just a darker day
-#   lift      raises blacks (haze/scatter); the giveaway for fog and snow
-#   sat       chroma multiplier
-#   sh_tint / sh_amt   colour pulled into the shadows
-#   hi_tint / hi_amt   colour pulled into the highlights
-#   vignette  added corner falloff, tinted with sh_tint
+# There used to be eight. high_noon, golden dawn and dusk, blue dawn and
+# dusk, twilight and night were a real time-of-day trait driven by
+# solar.py's NOAA solar position, and they are RETIRED: the collection is
+# not changing anybody's hour. Keeping seven tuned grade tables and a whole
+# verification axis for something that never renders is the failure this
+# codebase's own history keeps recording, so they are gone rather than
+# commented out. They are in git if a night edition is ever wanted.
 #
-# DAY IS DELIBERATELY IDENTITY. It is the grade the plates were approved at
-# in ULTIMATE_GRADE_LOG.md, and it covers most of every holder's daylight
-# hours. The dynamic layer should read as a reward for checking in at dusk,
-# not as a filter permanently laid over the owner's art.
+# The `phase` parameter survives on every entry point. It costs nothing,
+# it keeps is_identity() meaning what it says, and it is where a second
+# lighting condition would go back if one is ever added.
 SKY_STATES = {
-    "high_noon": dict(
-        exposure=1.06, contrast=0.04, lift=0.0, sat=0.97,
-        sh_tint=(0.10, 0.14, 0.24), sh_amt=0.05,
-        hi_tint=(0.98, 0.99, 1.00), hi_amt=0.06, vignette=-0.02),
-
-    "day": dict(),  # identity -- the canonical mint
-
-    # Dawn and dusk sit at the SAME solar altitude and are the most visible
-    # split in the table, so they get separate grades: morning light is
-    # rose and paler (cold ground, less dust in the air), evening light is
-    # amber and deeper.
-    "golden_dawn": dict(
-        exposure=0.87, contrast=0.03, lift=0.015, sat=1.04,
-        sh_tint=(0.17, 0.14, 0.23), sh_amt=0.17,
-        hi_tint=(1.00, 0.83, 0.78), hi_amt=0.26, vignette=0.05),
-    "golden_dusk": dict(
-        exposure=0.85, contrast=0.07, lift=0.0, sat=1.11,
-        sh_tint=(0.21, 0.11, 0.16), sh_amt=0.18,
-        hi_tint=(1.00, 0.74, 0.40), hi_amt=0.32, vignette=0.07),
-
-    "blue_dawn": dict(
-        exposure=0.66, contrast=-0.03, lift=0.03, sat=0.84,
-        sh_tint=(0.07, 0.10, 0.24), sh_amt=0.32,
-        hi_tint=(0.64, 0.74, 0.97), hi_amt=0.24, vignette=0.11),
-    "blue_dusk": dict(
-        exposure=0.60, contrast=-0.05, lift=0.01, sat=0.79,
-        sh_tint=(0.05, 0.07, 0.21), sh_amt=0.36,
-        hi_tint=(0.52, 0.63, 0.95), hi_amt=0.28, vignette=0.13),
-
-    "twilight": dict(
-        exposure=0.45, contrast=-0.08, lift=0.012, sat=0.66,
-        sh_tint=(0.04, 0.06, 0.17), sh_amt=0.45,
-        hi_tint=(0.55, 0.65, 0.92), hi_amt=0.30, vignette=0.17),
-
-    "night": dict(
-        exposure=0.30, contrast=-0.12, lift=0.008, sat=0.55,
-        sh_tint=(0.03, 0.05, 0.14), sh_amt=0.54,
-        hi_tint=(0.60, 0.70, 0.95), hi_amt=0.34, vignette=0.21),
+    "day": dict(),  # identity -- the canonical mint, and the only one
 }
 
 # ------------------------------------------------------------- weather
@@ -958,7 +906,6 @@ def _combine(sky, wet):
         contrast=sky.get("contrast", 0.0) + wet.get("contrast", 0.0),
         lift=sky.get("lift", 0.0) + wet.get("lift", 0.0),
         sat=sky.get("sat", 1.0) * wet.get("sat", 1.0),
-        vignette=sky.get("vignette", 0.0),
         sh_tint=wet.get("sh_tint", sky.get("sh_tint", (0.06, 0.09, 0.20))),
         sh_amt=sky.get("sh_amt", 0.0) + wet.get("sh_amt", 0.0),
         hi_tint=sky.get("hi_tint", (0.90, 0.94, 1.00)),
@@ -1054,7 +1001,6 @@ def is_identity(phase, weather):
     return (abs(p["exposure"] - 1.0) < 1e-4 and abs(p["contrast"]) < 1e-4
             and p["lift"] < 1e-5 and abs(p["sat"] - 1.0) < 1e-4
             and p["sh_amt"] < 1e-4 and p["hi_amt"] < 1e-4
-            and abs(p["vignette"]) < 1e-4
             and wet.get("haze_amt", 0.0) < 1e-4
             and wet.get("diffuse", 0.0) <= 0.05
             and not wet.get("particles") and not wet.get("blown")
@@ -1176,11 +1122,6 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
         a = _flash(t)
         if a > 1e-3:
             fx = fx + (_c((0.86, 0.90, 1.0)) - fx) * _F(a * 0.55)
-
-    # Vignette, tinted with the shadow colour so it belongs to the phase.
-    if abs(p["vignette"]) > 1e-4:
-        v = (_vig_field(h, w) * _F(p["vignette"]))[..., None]
-        fx = fx * (1.0 - v) + _c(p["sh_tint"]) * v * _F(0.5)
 
     # Filmic shoulder then clip, matching grade.py's tail so a plate that
     # passes through both passes never hard-clips twice.
