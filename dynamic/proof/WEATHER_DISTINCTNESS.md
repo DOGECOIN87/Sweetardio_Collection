@@ -3,14 +3,13 @@
 Mean CIE76 dE over the exposed plate, averaged across 6 different plates.
 Seed 4444. Plates: RIP_Gorbagana, Sweetardio_116 (20), UAP_Taskforce, Legendary_Opengotchi, Winning, Emblem.
 
-Closest ALREADY-APPROVED pair: `overcast` / `rain` at dE 3.3 — context, not the bar.
+Closest ALREADY-APPROVED pair: `rain` / `snow` at dE 7.3 — context, not the bar.
 DISTINCT_DE is 6.0, set deliberately above it: a new state entering a capped
 table has to separate harder than a pair that has been in the set from the start and
 is distinguished elsewhere in the matrix.
 
 | state | plate detail kept | plate chroma kept |
 |---|---|---|
-| `overcast` | 70% | 82% |
 | `fog` | 29% | 86% |
 | `rain` | 79% | 71% |
 | `snow` | 81% | 66% |
@@ -31,13 +30,12 @@ what the weather costs, not what the hour of day costs. The per-state floors liv
 
 Full matrix (dE):
 
-| | overcast | fog | rain | snow | storm | blizzard | tornado | flooded |
-|---|---|---|---|---|---|---|---|---|
-| **overcast** | — | 18.2 | 3.3 | 4.8 | 12.4 | 36.5 | 13.8 | 9.8 |
-| **fog** | 18.2 | — | 20.9 | 14.4 | 29.7 | 18.4 | 22.6 | 13.8 |
-| **rain** | 3.3 | 20.9 | — | 7.3 | 9.4 | 39.1 | 14.2 | 11.7 |
-| **snow** | 4.8 | 14.4 | 7.3 | — | 16.1 | 32.2 | 13.7 | 8.0 |
-| **storm** | 12.4 | 29.7 | 9.4 | 16.1 | — | 47.6 | 18.8 | 19.4 |
-| **blizzard** | 36.5 | 18.4 | 39.1 | 32.2 | 47.6 | — | 34.7 | 29.7 |
-| **tornado** | 13.8 | 22.6 | 14.2 | 13.7 | 18.8 | 34.7 | — | 13.7 |
-| **flooded** | 9.8 | 13.8 | 11.7 | 8.0 | 19.4 | 29.7 | 13.7 | — |
+| | fog | rain | snow | storm | blizzard | tornado | flooded |
+|---|---|---|---|---|---|---|---|
+| **fog** | — | 20.9 | 14.4 | 29.7 | 18.4 | 22.6 | 13.8 |
+| **rain** | 20.9 | — | 7.3 | 9.4 | 39.1 | 14.2 | 11.7 |
+| **snow** | 14.4 | 7.3 | — | 16.1 | 32.2 | 13.7 | 8.0 |
+| **storm** | 29.7 | 9.4 | 16.1 | — | 47.6 | 18.8 | 19.4 |
+| **blizzard** | 18.4 | 39.1 | 32.2 | 47.6 | — | 34.7 | 29.7 |
+| **tornado** | 22.6 | 14.2 | 13.7 | 18.8 | 34.7 | — | 13.7 |
+| **flooded** | 13.8 | 11.7 | 8.0 | 19.4 | 29.7 | 13.7 | — |

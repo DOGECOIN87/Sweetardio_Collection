@@ -115,19 +115,32 @@ That is the state most holders are in most of the time, so it must cost the
 plate nothing at all — and now it provably does, because there is nothing
 there to run.
 
-## Five ordinary states, then three that are an event
+## Four ordinary states, then three that are an event
 
 Open-Meteo (free, no key, takes lat/lon directly) returns ~100 WMO codes.
-`weather.py` collapses them: **five** named states cover the ordinary sky,
+`weather.py` collapses them: **four** named states cover the ordinary sky,
 past which they stop reading as distinct traits and start reading as noise
 — drizzle and light rain are the same trait however different the code is.
 Call once per *distinct locale* bucketed to ~25km and cache 30 min — 4,444
 tokens is a few hundred real cities.
 
+**`overcast` was the fifth and is retired.** It was the weakest state in
+the table by every measure taken here: dE 3.3 from `rain` and 4.8 from
+`snow` on the plate, closer to both than `DISTINCT_DE` would let a *new*
+state be. And what it drew was a mild grey grade with a drifting shadow —
+a filter over the art rather than weather happening in it. Every state
+that survived puts something **in** the frame: a fog bank, falling
+particles, a drift, a funnel, a waterline. A cloudy sky puts nothing
+there, and it is what most of the world has most of the time, so it was
+also the state most likely to sit permanently over a holder's plate for
+nothing. WMO 2 and 3 map to `None` now, alongside the clear codes — the
+honest mapping for a sky the art has nothing to draw for is the same as
+for a sky with nothing in it.
+
 **`blizzard` and `tornado` sit outside that ceiling on purpose**, because
-they are not more of the same. A holder sees `overcast` most weeks of the
-year and a blizzard a handful of times, so a state that reads as an EVENT
-does not add to the noise the ceiling exists to stop. What they must not do
+they are not more of the same. A holder sees `rain` most weeks of the year
+and a blizzard a handful of times, so a state that reads as an EVENT does
+not add to the noise the ceiling exists to stop. What they must not do
 is arrive by accident, and each is gated on more than a code — in opposite
 directions:
 
@@ -267,7 +280,6 @@ filmstrip; only a numeric check catches it.
 
 | state | motion |
 |---|---|
-| `overcast` | cloud shadow drifting across the plate |
 | `fog` | a ground bank whose top edge rolls; the sky above stays sharp |
 | `rain` | two depth bands falling down-and-right, near band 2x faster |
 | `snow` | slow fall with a sideways sway, one cycle per loop |
@@ -379,7 +391,7 @@ every pair, and exits non-zero if a state is not distinct from the one it
 is most likely to be confused with. Current numbers, at dusk over 6 plates:
 `blizzard`/`snow` **44.8**, `tornado`/`storm` **19.3**, against a bar of
 6.0 — which sits deliberately above the closest already-approved pair
-(`overcast`/`rain`, 3.3 at dusk, because the dusk grade dominates both).
+(the tightest surviving pair at dusk, where the grade dominates them all).
 
 **`build_mint.py --masks` is not optional if this ships.** `create_image()`
 has taken `mask_path=` since the prototype landed and the mint did not pass

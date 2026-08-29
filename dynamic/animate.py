@@ -54,7 +54,6 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 # What each state is actually doing, for the filmstrip captions -- and so
 # the motion design is written down somewhere other than the numbers.
 MOTION = {
-    "overcast": "cloud shadow drifting across the plate",
     "fog": "a ground bank whose top edge rolls; the sky above stays sharp",
     "rain": "two depth bands falling down-and-right, near band 2x faster",
     "snow": "slow fall with a sideways sway, one cycle per loop",

@@ -43,7 +43,7 @@ PHASE_ORDER = ["high_noon", "day", "golden_dawn", "golden_dusk",
 # the two severe ones -- so a weather sheet reads as the tiering it is
 # rather than as a row of equal options. None renders the mint unchanged,
 # which is exactly what it should be compared against.
-WEATHER_ORDER = [None, "overcast", "fog", "rain", "snow", "storm",
+WEATHER_ORDER = [None, "fog", "rain", "snow", "storm",
                  "blizzard", "tornado", "flooded"]
 
 

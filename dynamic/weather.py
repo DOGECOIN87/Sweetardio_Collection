@@ -25,8 +25,12 @@ WHAT COLLAPSES AND WHAT DOES NOT
 The ~100 codes carry distinctions the art cannot show: drizzle and light
 rain are the same trait no matter how different the code is, and a holder
 cannot see the difference between "slight" and "moderate" rain falling
-behind a Twinkie. So the five ordinary states, plus None, take the whole
+behind a Twinkie. So the four ordinary states, plus None, take the whole
 table between them.
+
+None takes MORE than the clear codes: cloud cover (2, 3) maps there too,
+because `overcast` was retired and the honest mapping for a sky the art
+has nothing to draw for is the same as for a sky with nothing in it.
 
 The two severe states are gated on more than a code, and for opposite
 reasons:
@@ -72,7 +76,7 @@ import urllib.request
 
 # ------------------------------------------------------------ the table
 #
-# Every code Open-Meteo documents, mapped to one of the five ordinary
+# Every code Open-Meteo documents, mapped to one of the four ordinary
 # states or to None. Written out in full rather than as ranges: the table
 # is the specification, and a range hides which codes exist. Anything not
 # listed falls back to FALLBACK, which is also what an unreachable API
@@ -80,8 +84,13 @@ import urllib.request
 WMO_STATES = {
     0: None,            # clear sky        -> no weather layer at all
     1: None,            # mainly clear     -> no weather layer at all
-    2: "overcast",      # partly cloudy
-    3: "overcast",      # overcast
+    # Cloud cover has no state to draw since `overcast` was retired, and
+    # the honest mapping for "we have nothing to show for this" is the same
+    # one a clear sky gets: no weather layer, serve the mint. Routing them
+    # to fog or rain instead would be inventing weather the sky does not
+    # have, on roughly a third of the planet at any moment.
+    2: None,            # partly cloudy    -> no weather layer at all
+    3: None,            # overcast         -> no weather layer at all
 
     45: "fog",          # fog
     48: "fog",          # depositing rime fog
@@ -289,7 +298,9 @@ def stable_state(token_id, weights=None):
 # uniformly: most of the time it is clear or cloudy, and the two severe
 # states stay rare enough to be worth seeing.
 DEFAULT_MIX = {
-    None: 40, "overcast": 23, "rain": 16, "fog": 7,
+    # None absorbs overcast's share: clear and cloudy are the same render
+    # now, and between them they are most of the weather on earth.
+    None: 63, "rain": 16, "fog": 7,
     "snow": 8, "storm": 4, "blizzard": 1, "tornado": 1, "flooded": 1,
 }
 
@@ -311,7 +322,7 @@ def main():
         for state, codes in by_state.items():
             label = "None" if state is None else state
             print(f"  {label:9} {', '.join(str(c) for c in codes)}"
-                  + ("   (clear sky — serve the mint unchanged)"
+                  + ("   (no weather layer — serve the mint unchanged)"
                      if state is None else ""))
         print(f"\n  blizzard  snow + wind >= {BLIZZARD_WIND_KMH:.0f} km/h "
               f"(codes {sorted(HEAVY_SNOW)}) "

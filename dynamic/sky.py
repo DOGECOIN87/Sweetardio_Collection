@@ -152,13 +152,24 @@ SKY_STATES = {
 # them -- see is_identity(). That is the state most holders are in most of
 # the time, and it must cost the plate nothing at all.
 #
-# The first FIVE are the ordinary sky. Five is the ceiling there: past that
+# The first FOUR are the ordinary sky, and that is the ceiling: past it
 # they stop reading as distinct and start reading as noise -- drizzle and
 # light rain are the same trait however different the code is.
 #
+# `overcast` was the fifth and is RETIRED. It was the weakest state in the
+# table by every measure taken here: it sat dE 3.3 from `rain` and 4.8 from
+# `snow` on the plate, closer to both than DISTINCT_DE would let a new
+# state be, and what it actually drew was a mild grey grade with a drifting
+# shadow -- a filter over the art rather than weather happening in it. The
+# states that survived all put something IN the frame: a fog bank, falling
+# particles, a drift, a funnel, a waterline. A cloudy sky puts nothing
+# there, and a cloudy sky is what most of the world has most of the time,
+# so it was also the state most likely to be permanently laid over a
+# holder's plate for nothing. weather.py maps its WMO codes to None now.
+#
 # The last two are SEVERE, and they are a different kind of thing rather
 # than more of the same. They are allowed past the ordinary-sky ceiling
-# because they are not competing with it: a holder sees `overcast` most
+# because they are not competing with it: a holder sees `rain` most
 # weeks of the year and `blizzard` a handful of times, so a state that
 # reads as an EVENT does not add to the noise the ceiling exists to stop.
 # What they must not do is arrive by accident, which is why weather.py
@@ -169,17 +180,13 @@ SKY_STATES = {
 # additive on contrast/lift), so rain at night is darker than rain at noon
 # without either table knowing about the other.
 #
-#   diffuse   px of blur -- overcast and fog genuinely soften a scene
+#   diffuse   px of blur -- fog and driven snow genuinely soften a scene
 #   haze/amt  colour the plate is lerped toward (fog)
 #   sh_tint   shadow colour; a weather state that declares one OVERRIDES
 #             the phase's, because severe weather changes what colour the
 #             shadows are and not merely how much of them there is
 #   particles which sprite pass to run, and how dense
 WEATHER_STATES = {
-    "overcast": dict(
-        exposure=0.90, contrast=-0.14, lift=0.020, sat=0.82, diffuse=1.6,
-        drift=0.030),
-
     # Fog ROLLS ALONG THE GROUND; it is not a filter over the whole frame.
     # Flat full-frame haze was the single biggest reason the plate stopped
     # being readable -- it took the background's detail down to 24% of the
@@ -1117,8 +1124,8 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
     else:
         fx = static["fx"].copy()
 
-    # Drifting density: what makes fog and overcast read as WEATHER rather
-    # than as a flat filter. Rolling the field is seamless by construction.
+    # Drifting density: what makes fog read as WEATHER rather than as a
+    # flat filter. Rolling the field is seamless by construction.
     if wet.get("drift", 0.0) > 1e-4:
         field = _noise_field(h, w, seed | 1, max(h, w) / 22.0)
         rolled = np.roll(field, int(round(t * w)), axis=1)

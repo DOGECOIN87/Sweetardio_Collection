@@ -49,9 +49,12 @@ state, for every sample token it finds:
      and cannot turn off, so a weather state is not allowed to bury it.
      Each state declares how much of the plate's own detail it promises to
      leave, and this measures the promise against the render. The budgets
-     differ per state on purpose -- fog is meant to hide things and
-     overcast is not -- so this catches a state drifting past its OWN
-     intent, not a state being stronger than its neighbour.
+     differ per state on purpose -- fog is meant to hide things and rain
+     is not -- so this catches a state drifting past its OWN intent, not a
+     state being stronger than its neighbour. The table is checked BOTH
+     ways: a state with no floor fails, and a floor for a state that no
+     longer exists fails too, so a retired state cannot leave a rule
+     behind that looks like it is still being enforced.
   9. Every state weather.py can PRODUCE is a state sky.py can grade. The
      two tables are written independently -- one from the WMO code list,
      one from the art direction -- and a mapping to a state that does not
@@ -111,8 +114,8 @@ FACE_UNDERSIDE = (601 + 250 / 2) / 1393
 # that does not follow that shape.
 #
 # Floors are set ~20% under the NIGHT measurement, over three tokens:
-# overcast 72, fog 23, rain 87, snow 85, storm 116, blizzard 31,
-# tornado 48, flooded 31.
+# fog 23, rain 87, snow 85, storm 116, blizzard 31, tornado 48,
+# flooded 31.
 #
 # fog and blizzard are the loosest because obscuring IS the state; they
 # earn it by doing it in a BAND along the ground instead of over the whole
@@ -121,7 +124,7 @@ FACE_UNDERSIDE = (601 + 250 / 2) / 1393
 # particles add high-frequency energy on top of the plate's.
 PLATE_DETAIL_PHASES = ("day", "night")
 PLATE_DETAIL_FLOOR = {
-    "overcast": 0.62, "fog": 0.18, "rain": 0.76, "snow": 0.72,
+    "fog": 0.18, "rain": 0.76, "snow": 0.72,
     "storm": 0.92, "blizzard": 0.25, "tornado": 0.40,
     # flooded refracts and MIRRORS the plate rather than hazing it, so it
     # moves the background's contrast around instead of removing it --
@@ -302,6 +305,24 @@ def main():
               f"floor {FUNNEL_MIN_VISIBLE * 100:.0f}%")
 
     # 8. the plate stays readable
+    #
+    # The table is validated BEFORE it is used, both ways. A stale entry is
+    # not a reporting problem here -- apply_sky() raises KeyError on a
+    # state that no longer exists, so iterating the floors first would
+    # crash with a stack trace instead of naming the retired state, which
+    # is exactly what happened the first time `overcast` was removed.
+    missing_floor = sorted(set(skymod.WEATHER_STATES) - set(PLATE_DETAIL_FLOOR))
+    if missing_floor:
+        failures.append(f"{missing_floor} declare no plate-detail floor — "
+                        f"a new state must say what it leaves of the plate")
+    stale_floor = sorted(set(PLATE_DETAIL_FLOOR) - set(skymod.WEATHER_STATES))
+    if stale_floor:
+        failures.append(f"{stale_floor} have a plate-detail floor but are "
+                        f"not weather states — a retired state left its "
+                        f"rule behind")
+    measurable = [(w, f) for w, f in PLATE_DETAIL_FLOOR.items()
+                  if w in skymod.WEATHER_STATES]
+
     worst_leg = None
     for idx, bpath, mpath in toks:
         base_i = Image.open(bpath).convert("RGBA")
@@ -316,7 +337,7 @@ def main():
                 failures.append(f"token {idx} {ph}: reference plate has no "
                                 f"detail to measure against")
                 continue
-            for weather, floor in PLATE_DETAIL_FLOOR.items():
+            for weather, floor in measurable:
                 out = np.asarray(skymod.apply_sky(base_i, mask_i, ph,
                                                   weather, seed=idx, t=0.25))
                 kept = (plate_detail(out[..., :3].astype(np.float64),
@@ -334,10 +355,6 @@ def main():
               f"{worst_leg[2]} on token {worst_leg[3]} — "
               f"{worst_leg[4] * 100:.0f}% kept "
               f"(floor {worst_leg[5] * 100:.0f}%)")
-    missing_floor = sorted(set(skymod.WEATHER_STATES) - set(PLATE_DETAIL_FLOOR))
-    if missing_floor:
-        failures.append(f"{missing_floor} declare no plate-detail floor — "
-                        f"a new state must say what it leaves of the plate")
 
     # 9. weather.py can only ask for states sky.py actually has
     producible = {p for p in (set(wxmod.WMO_STATES.values())

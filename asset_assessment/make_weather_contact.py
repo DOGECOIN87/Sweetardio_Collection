@@ -39,13 +39,15 @@ construction (that is the rule verify_sky.py gates), so including it would
 divide every distance by the same constant and flatter every pair.
 
 DISTINCT_DE is the bar, and it is deliberately set ABOVE the closest pair
-the collection already ships -- at blue dusk `overcast` and `rain` sit
-about 3.3 apart, because the dusk grade dominates both. That is fine for a
-pair that has been in the set from the start and is separated elsewhere in
-the table; it is not a standard a NEW state should be allowed to meet. An
-eighth state has to earn a place in a capped table. Every run prints the
+the collection already ships, because the dusk grade dominates every state
+and drags them together. That is tolerable for a pair that has been in the
+set from the start and is separated elsewhere in the table; it is not a
+standard a NEW state should be allowed to meet. Every run prints the
 closest approved pair next to the bar, so the bar can be re-read rather
 than trusted.
+
+This is what retired `overcast`: it sat 3.3 from `rain` and 4.8 from
+`snow`, closer to both than this bar would let a new state be.
 
 From the repo root:
 
@@ -81,7 +83,7 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 # The six that describe the ordinary sky, and the two that are an event.
 # None is a clear sky -- the mint itself, and the reference every other
 # state is measured against. There is no 'clear' state to render.
-ORDINARY = ["overcast", "fog", "rain", "snow", "storm"]
+ORDINARY = ["fog", "rain", "snow", "storm"]
 SEVERE = ["blizzard", "tornado", "flooded"]
 
 # Which existing state each new one is at risk of duplicating. Being far
