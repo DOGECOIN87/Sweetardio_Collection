@@ -38,7 +38,7 @@ METADATA_DIR = "output/mint/metadata"
 OUT = "catalog/RARITY.md"
 # canonical metadata order; presence-optional traits last
 ALWAYS = ["Character", "Background", "Skin", "Eyes", "Mouth"]
-OPTIONAL = ["Footwear", "Arms", "Sticker"]
+OPTIONAL = ["Footwear", "Arms", "Sticker", "Weather"]
 
 
 def load_tokens(d):
@@ -84,7 +84,7 @@ def main():
         "Always-present traits (character, background, skin, eyes, mouth) are "
         "drawn by calibrated weight and land within ~0.2 points of target "
         "\u2014 roughly the sampling floor at this supply. Optional traits "
-        "(arms, footwear, stickers) and the legendary plates are "
+        "(arms, footwear, stickers, weather) and the legendary plates are "
         "slot-allocated to EXACT counts.\n",
         "Every value below is read straight from the shipped token metadata.\n")
 
@@ -126,6 +126,13 @@ def main():
     table("Skins", "Skin")
     table("Arms", "Arms", "Exact counts.")
     table("Footwear", "Footwear", "Exact counts.")
+    table("Weather", "Weather",
+          "**The animated tier.** A token with a Weather trait carries a "
+          "seamless MP4 loop in `animation_url` as well as its still, and "
+          "the still shows the weather too. Exact counts, and kept OFF the "
+          "legendary plates \u2014 the point of a 1-of-50 background is that "
+          "you can see it, and every weather state sits in front of it. So "
+          "no token is both Legendary and animated.")
 
     stk = sum(1 for t in toks if "Sticker" in t)
     distinct = len({t["Sticker"] for t in toks if "Sticker" in t})
