@@ -146,7 +146,10 @@ The fix is not a weaker effect, it is a **placed** one:
   the whole plate so a pale funnel would read against it. Now the funnel
   carries itself — an opaque column with a **lit rim** on its upper-left
   flank — so it separates by local contrast on a bright plate and a dark
-  one alike, and the supercell grade can stay light.
+  one alike, and the supercell grade can stay light. The debris it throws
+  across the plate adds high-frequency detail rather than removing it,
+  which is why the tornado now scores *better* than the states that only
+  haze.
 
 | | detail kept | chroma kept | | detail | chroma |
 |---|---|---|---|---|---|
@@ -173,6 +176,15 @@ other weather changes the whole plate uniformly; a funnel is an object
 standing in it, which is why it reads as the rarest thing in the set. Three
 things follow, and none of them are optional:
 
+- It is **lit at 45° from the upper left**, like everything else in the
+  collection. Two components: the cylinder turning away from the light
+  across its width, and the light coming from *above* down its length.
+  With only the first it was lit from due left — correct in x, flat in y,
+  and measurably brighter at the bottom than the top. Measured over the
+  trunk it now grades 0.71 upper-left → 0.55 lower-right, and the rim
+  fades toward the tip where the light rakes past rather than catching it.
+  (It was briefly lit from the *right*: the polarity was written when the
+  funnel's tint was dark and did not follow when the tint went pale.)
 - It is **placed off the face column**. The character composites at a fixed
   canvas position around x=690 of 1393 and the mask puts the whole effect
   behind it, so a centred funnel is a tornado you cannot see. It is seeded

@@ -157,7 +157,7 @@ SKY_STATES = {
 # light rain are the same trait however different the code is.
 #
 # The last two are SEVERE, and they are a different kind of thing rather
-# than more of the same. They are allowed to break the six-state ceiling
+# than more of the same. They are allowed past the ordinary-sky ceiling
 # because they are not competing with it: a holder sees `overcast` most
 # weeks of the year and `blizzard` a handful of times, so a state that
 # reads as an EVENT does not add to the noise the ceiling exists to stop.
@@ -257,7 +257,7 @@ WEATHER_STATES = {
         # tornado throws things a long way from itself, and it is what
         # tells the eye the whole scene is inside the event rather than
         # watching one from a safe distance.
-        blown="debris", blown_density=1.0),
+        blown="debris", blown_density=2.5),
 }
 
 # What each particle field is lerped TOWARD. Rain is a cold near-white,
@@ -425,9 +425,14 @@ _PARTICLE_KINDS = {
     # snow -- debris is heavy and does not travel as flat as a snowflake.
     # Sparse on purpose: this is the only DARK particle field, and dark
     # marks over a plate cost legibility far faster than bright ones.
+    # Three bands rather than two: the far haze of grit, the mid field,
+    # and a near band of large pieces moving at three times the far band's
+    # speed. The third band is what stops it reading as texture -- a
+    # tornado throws whole objects, not only dust.
     "debris": dict(
-        tiles=(2, 1), shape="streak", width=4, sway=0.0, margin=200,
-        bands=((170, 22, 0.28, 2.4), (65, 40, 0.44, 1.2))),
+        tiles=(2, 1), shape="streak", width=4, sway=0.0, margin=220,
+        bands=((240, 20, 0.26, 2.6), (95, 40, 0.42, 1.3),
+               (26, 76, 0.58, 0.7))),
 }
 
 _SNOW_SWAY_CYCLES = 1     # integer -> seamless
@@ -683,21 +688,41 @@ def _funnel(size, density, seed, t=0.0):
                                 * (_F(17.0) * v - _F(_TORNADO_SPINS2 * t))
                                 + _F(1.7) * phase))
 
-    # Cylinder shading, key light upper left. `lit` is 1 on the left flank
-    # and 0 on the right, and the column's tint is PALER than the plate --
-    # so the lit flank must take MORE of it, not less. (It took less while
-    # the tint was still dark, and the polarity did not follow the tint
-    # when that changed, which lit the funnel from the right and put it out
-    # of register with all 123 trait assets.)
-    lit = np.clip(_F(0.5) - _F(0.5) * u, 0.0, 1.0)
+    # Cylinder shading from the key light, which CLAUDE.md pins to the
+    # upper left at roughly 45 degrees. Two components, because one is not
+    # a direction:
+    #
+    #   across  1 on the left flank, 0 on the right -- the cylinder turning
+    #           away from the light
+    #   down    1 at the cloud deck, falling toward the tip -- the light
+    #           coming from ABOVE as well as from the side
+    #
+    # With only `across` the funnel was lit from due left: correct in x,
+    # flat in y, and measurably brighter at the BOTTOM than the top once
+    # the taper was accounted for. Every other asset in the collection is
+    # lit at 45 degrees, so a column lit from the side alone sits wrong
+    # next to them even when nobody can say why.
+    #
+    # The column's tint is PALER than the plate, so the lit side must take
+    # MORE of it, not less. (It took less while the tint was still dark,
+    # and the polarity did not follow the tint when that changed -- which
+    # lit the funnel from the RIGHT, the one direction the collection
+    # never uses.)
+    across = np.clip(_F(0.5) - _F(0.5) * u, 0.0, 1.0)
+    down = np.clip(_F(1.0) - v, 0.0, 1.0)
+    lit = np.clip(_F(0.62) * across + _F(0.38) * down, 0.0, 1.0)
 
-    shade = (_F(0.45) + _F(0.55) * band) * (_F(0.70) + _F(0.30) * lit)
+    shade = (_F(0.45) + _F(0.55) * band) * (_F(0.62) + _F(0.38) * lit)
     out = body * _F(_TORNADO_OPACITY)
 
     # The lit edge: a narrow band on the left flank only. This is what
     # carries the funnel on a plate that has NOT been darkened, so the
     # tone grade can stay light enough to leave the background readable.
-    rim = body * smoothstep((-u - _F(0.42)) / _F(0.34)) * _F(_TORNADO_RIM)
+    # ...and the rim rides the same key: strongest where the flank faces
+    # up and to the left, fading toward the tip where the light rakes past
+    # rather than catching it.
+    rim = (body * smoothstep((-u - _F(0.42)) / _F(0.34))
+           * (_F(1.0) - _F(0.45) * v) * _F(_TORNADO_RIM))
 
     # Ground dust where the tip meets the plate, broken up by the same
     # noise field the drifting states use so it is not a clean ellipse.

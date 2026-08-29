@@ -12,10 +12,11 @@ that actually decide whether a new state ships:
      rendered down a column of DIFFERENT plates here, not one.
 
   2. Is it a different TRAIT, or a second copy of one that already exists?
-     This is the whole risk in adding to a table whose own docstring says
-     six is the ceiling. Blizzard's failure mode is that it reads as snow
-     again; tornado's is that it reads as storm. That is not an eyeball
-     judgement -- it is a distance, so this measures it.
+     This is the whole risk in adding to a table whose own docstring puts
+     a ceiling on how many ordinary states there can be. Blizzard's
+     failure mode is that it reads as snow again; tornado's is that it
+     reads as storm. That is not an eyeball judgement -- it is a distance,
+     so this measures it.
 
   3. Does it leave the BACKGROUND readable? The plate is a trait the holder
      chose and cannot switch off, so a state that buries it is taking
@@ -31,13 +32,13 @@ construction (that is the rule verify_sky.py gates), so including it would
 divide every distance by the same constant and flatter every pair.
 
 DISTINCT_DE is the bar, and it is deliberately set ABOVE the closest pair
-the collection already ships -- at blue dusk `clear` and `overcast` sit
-about 2.7 apart, because the dusk grade dominates both. That is fine for a
+the collection already ships -- at blue dusk `overcast` and `rain` sit
+about 3.3 apart, because the dusk grade dominates both. That is fine for a
 pair that has been in the set from the start and is separated elsewhere in
-the table; it is not a standard a NEW state should be allowed to meet. A
-ninth state has to earn a place in a table whose own docstring says six is
-the ceiling. Every run prints the closest approved pair next to the bar, so
-the bar can be re-read rather than trusted.
+the table; it is not a standard a NEW state should be allowed to meet. An
+eighth state has to earn a place in a capped table. Every run prints the
+closest approved pair next to the bar, so the bar can be re-read rather
+than trusted.
 
 From the repo root:
 
@@ -284,9 +285,9 @@ def main():
 
     pair = distinctness(grid, states, plate_masks)
 
-    # Reported, not used as the threshold: the closest pair among the six
-    # approved before these two existed. It is context for DISTINCT_DE,
-    # which sits deliberately above it -- see the header.
+    # Reported, not used as the threshold: the closest pair among the
+    # ordinary states, which were approved before these two existed. It is
+    # context for DISTINCT_DE, which sits deliberately above it.
     approved = [(get(pair, a, b), a, b)
                 for a, b in itertools.combinations(ORDINARY, 2)
                 if get(pair, a, b) is not None]
@@ -308,10 +309,10 @@ def main():
         p(f"Closest ALREADY-APPROVED pair: `{a}` / `{b}` at dE {d:.1f} — "
           f"context, not the bar.")
         p(f"DISTINCT_DE is {DISTINCT_DE:.1f}, set deliberately above it: a "
-          f"new state entering a table")
-        p(f"whose ceiling is six has to separate harder than a pair that "
-          f"has been in the set")
-        p(f"from the start and is distinguished elsewhere in the matrix.")
+          f"new state entering a capped")
+        p(f"table has to separate harder than a pair that has been in the "
+          f"set from the start and")
+        p(f"is distinguished elsewhere in the matrix.")
         p()
 
     p("| state | plate detail kept | plate chroma kept |")
