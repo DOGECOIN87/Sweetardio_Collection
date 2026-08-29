@@ -29,6 +29,18 @@ state, for every sample token it finds:
      the frame at t=0. A visible jump at the wrap is the one thing that
      makes an ambient effect look cheap, and it is invisible in a filmstrip
      -- only a numeric check catches it.
+  7. The tornado funnel is actually VISIBLE. It is the one effect with a
+     position, and the protect mask puts it behind a character that sits
+     at a fixed canvas position -- so a funnel seeded toward the middle is
+     a tornado nobody can see. Nothing else in the pass can fail this way,
+     because nothing else has a location. Measured as the fraction of the
+     funnel's own weight that survives the mask, per token per seed.
+  8. Every state weather.py can PRODUCE is a state sky.py can grade. The
+     two tables are written independently -- one from the WMO code list,
+     one from the art direction -- and a mapping to a state that does not
+     exist raises a KeyError at render time, on somebody's token, rather
+     than here. This is the same class of check verify_trait_names.py
+     runs over the trait tables, for the same reason.
 
 Exits non-zero on any failure.
 
@@ -44,9 +56,17 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dynamic import sky as skymod
+from dynamic import weather as wxmod
 
 PROOF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "proof")
 OPAQUE = 255
+
+# How much of the tornado funnel has to clear the character. Measured at
+# 73% worst case over 3 tokens x 12 seeds when the placement was set, so
+# this is a floor with room under it, not a value fitted to the current
+# numbers -- it should catch a funnel walked back toward the middle, not
+# fire on a slightly wider body.
+FUNNEL_MIN_VISIBLE = 0.60
 
 
 def tokens():
@@ -135,6 +155,49 @@ def main():
                             f"(max delta {int(np.abs(a - b).max())})")
     print(f"  loop seamlessness checked for "
           f"{len(skymod.WEATHER_STATES)} weather states")
+
+    # 7. the funnel is not hidden behind the character
+    worst = None
+    for idx, bpath, mpath in toks:
+        pr = (np.asarray(Image.open(mpath).convert("L"), dtype=np.float32)
+              / 255.0)
+        h, w = pr.shape
+        for seed in range(1, 13):
+            col, _ = skymod._funnel((w, h), 1.0, seed, 0.25)
+            total = float(col.sum())
+            if total <= 0.0:
+                failures.append(f"token {idx} seed {seed}: funnel is empty")
+                continue
+            vis = float((col * (1.0 - pr)).sum()) / total
+            checked += 1
+            if worst is None or vis < worst[0]:
+                worst = (vis, idx, seed)
+            if vis < FUNNEL_MIN_VISIBLE:
+                failures.append(
+                    f"token {idx} seed {seed}: only {vis * 100:.0f}% of the "
+                    f"funnel clears the character (need "
+                    f"{FUNNEL_MIN_VISIBLE * 100:.0f}%)")
+    if worst:
+        print(f"  funnel visibility: worst {worst[0] * 100:.0f}% "
+              f"(token {worst[1]}, seed {worst[2]}), "
+              f"floor {FUNNEL_MIN_VISIBLE * 100:.0f}%")
+
+    # 8. weather.py can only ask for states sky.py actually has
+    producible = (set(wxmod.WMO_STATES.values()) | set(wxmod.DEFAULT_MIX)
+                  | {wxmod.FALLBACK, "blizzard", "tornado"})
+    unknown = sorted(producible - set(skymod.WEATHER_STATES))
+    if unknown:
+        failures.append(f"weather.py can produce {unknown}, which sky.py "
+                        f"cannot grade")
+    else:
+        print(f"  all {len(producible)} states weather.py can produce are "
+              f"gradeable")
+    # and classify() must never invent the one state it cannot know about
+    tornadoes = [c for c in wxmod.WMO_STATES
+                 if wxmod.classify(c, 200.0) == "tornado"]
+    if tornadoes:
+        failures.append(f"classify() returned 'tornado' for WMO {tornadoes}; "
+                        f"there is no WMO code for a tornado")
 
     print(f"\n{checked} renders checked "
           f"({len(skymod.SKY_STATES)} phases x "

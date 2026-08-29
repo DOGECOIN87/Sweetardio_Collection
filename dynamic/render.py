@@ -8,9 +8,10 @@ Two jobs:
      mint-build step, in miniature: build_mint.py would do the same thing
      by passing mask_path= to create_image().
 
-  2. `--sheet` grades those tokens across all eight sky phases and all six
-     weather states and lays the results out as contact sheets, so the art
-     direction can be judged on pixels rather than on a parameter table.
+  2. `--sheet` grades those tokens across all eight sky phases and all
+     eight weather states and lays the results out as contact sheets, so
+     the art direction can be judged on pixels rather than on a parameter
+     table.
 
 From the repo root:
 
@@ -38,7 +39,10 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
 PHASE_ORDER = ["high_noon", "day", "golden_dawn", "golden_dusk",
                "blue_dawn", "blue_dusk", "twilight", "night"]
-WEATHER_ORDER = ["clear", "overcast", "fog", "rain", "snow", "storm"]
+# Ordinary states first, then the two severe ones, so a weather sheet
+# reads as the tiering it is rather than as eight equal options.
+WEATHER_ORDER = ["clear", "overcast", "fog", "rain", "snow", "storm",
+                 "blizzard", "tornado"]
 
 
 def _font(size):
@@ -199,7 +203,7 @@ def main():
         img = skymod.apply_sky(base, mask, "blue_dusk", wx, seed=tid,
                                strength=args.strength)
         cells.append((f"blue dusk + {wx}", img))
-    p2 = contact_sheet(cells, 3, args.cell,
+    p2 = contact_sheet(cells, 4, args.cell,
                        "Sweetardio — weather  (particles fall BEHIND the "
                        "character; fog hazes the plate, not the figure)",
                        os.path.join(PROOF_DIR, f"sheet_weather{suffix}.png"))

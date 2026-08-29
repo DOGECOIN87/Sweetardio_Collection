@@ -540,9 +540,13 @@ def _funnel(size, density, seed, t=0.0):
     v, xs = _grid(h, w)
     rng = np.random.default_rng(seed ^ 0x70F0AD)
 
-    # left or right quarter, never the face column
+    # Left or right edge, never the face column. The offsets are far
+    # enough out that the funnel's widest point still clears a wide body:
+    # at 0.36 the trunk spans 0.00-0.28 of the canvas against a character
+    # that starts around 0.25, and verify_sky.py measures what actually
+    # survives the protect mask rather than trusting that arithmetic.
     side = -1.0 if rng.random() < 0.5 else 1.0
-    cx0 = _F(w * (0.5 + side * (0.25 + 0.06 * rng.random())))
+    cx0 = _F(w * (0.5 + side * (0.28 + 0.08 * rng.random())))
     phase = _F(rng.random() * 2.0 * np.pi)
     tip = _F(0.70 + 0.08 * rng.random())
 

@@ -31,11 +31,15 @@ Rarity model (all counts are EXACT, hit by pre-allocating token slots):
 Outputs:
   output/mint_manifest.json          token id -> traits
   output/mint/metadata/<id>.json     OpenSea-compatible token metadata
+  output/mint/images/<id>.png        with --render
+  output/mint/masks/<id>.png         with --render --masks; the protect mask
+                                     the dynamic sky pass grades against
   a full trait-distribution report (also -> output/mint/rarity_report.txt)
 Reproducible by --seed.
 
 Usage (from repo root):
   python3 asset_assessment/build_mint.py [--n 4444] [--leg-each 50] [--seed 4444]
+  python3 asset_assessment/build_mint.py --render --masks
 """
 
 import argparse
@@ -178,12 +182,40 @@ def main():
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
+    ap.add_argument("--masks", action="store_true",
+                    help="with --render, also write each token's PROTECT "
+                         "MASK to output/mint/masks/ for dynamic/sky.py")
     args = ap.parse_args()
     random.seed(args.seed)
 
     img_dir = "output/mint/images"
+    # The protect mask for the dynamic sky pass (dynamic/sky.py): the union
+    # of every layer except the background plate, i.e. exactly the pixels a
+    # time-of-day or weather grade must never touch.
+    #
+    # IT HAS TO BE WRITTEN HERE, at mint-build time, because this is the
+    # only place the silhouette is known for free. Recovering it from the
+    # finished PNG means segmenting the art; recovering it by re-running
+    # the pipeline costs a full ~2s composite and all 441MB of traits/ per
+    # request, which is why the dynamic layer is a grade over two PNGs and
+    # not a re-render. Skip it at mint and the whole feature has no input.
+    #
+    # It is opt-in because it is not free: the masks run 28-60KB each, so a
+    # 4,444 mint adds ~150MB beside the images.
+    mask_dir = "output/mint/masks"
     if args.render:
         os.makedirs(img_dir, exist_ok=True)
+        if args.masks:
+            os.makedirs(mask_dir, exist_ok=True)
+    elif args.masks:
+        sys.exit("--masks needs --render: the mask is a by-product of the "
+                 "composite, so there is nothing to write without it")
+
+    def render(layers, tid):
+        g.create_image(
+            layers, os.path.join(img_dir, f"{tid}.png"),
+            mask_path=(os.path.join(mask_dir, f"{tid}.png")
+                       if args.masks else None))
 
     bg_dir = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ)
     legs = sorted(f for f in os.listdir(bg_dir)
@@ -340,7 +372,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
+                render(layers, i + 1)
             continue
 
         leg = forced_bg[i]
@@ -380,7 +412,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                g.create_image(layers, os.path.join(img_dir, f"{i + 1}.png"))
+                render(layers, i + 1)
             break
         else:
             sys.exit(f"token {i+1}: no unique combo for arm={farm} wat={fwat} "

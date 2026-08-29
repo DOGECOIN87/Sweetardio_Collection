@@ -28,9 +28,9 @@ the time, so it must cost the plate nothing.
 
 From the repo root:
 
-    python3 dynamic/animate.py                       # all six, blue dusk
+    python3 dynamic/animate.py                       # all eight, blue dusk
     python3 dynamic/animate.py --phase night --size 640
-    python3 dynamic/animate.py --only rain snow
+    python3 dynamic/animate.py --only blizzard tornado
 """
 
 import argparse
@@ -59,6 +59,10 @@ MOTION = {
     "rain": "two depth bands falling down-and-right, near band 2x faster",
     "snow": "slow fall with a sideways sway, one cycle per loop",
     "storm": "heavy rain, plus a lightning strike and its echo",
+    "blizzard": "driven snow, three tiles across for every one down, "
+                "under a gusting whiteout",
+    "tornado": "the funnel snakes once, its banding climbs three times, "
+               "and the debris orbits twice",
 }
 
 
