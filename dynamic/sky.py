@@ -141,10 +141,18 @@ SKY_STATES = {
 
 # ------------------------------------------------------------- weather
 #
-# Eight visual states in two tiers, collapsed from Open-Meteo's ~100 WMO
+# Seven visual states in two tiers, collapsed from Open-Meteo's ~100 WMO
 # codes by weather.py.
 #
-# The first SIX are the ordinary sky. Six is the ceiling there: past that
+# THERE IS NO 'clear' STATE. A clear sky is the absence of weather, not a
+# weather worth grading: the minted token already IS the clear-sky render,
+# so a state that reproduced it would be a name for doing nothing. Pass
+# weather=None instead, which every function here accepts, and a service
+# should serve the ORIGINAL MINTED BYTES rather than re-encode a copy of
+# them -- see is_identity(). That is the state most holders are in most of
+# the time, and it must cost the plate nothing at all.
+#
+# The first FIVE are the ordinary sky. Five is the ceiling there: past that
 # they stop reading as distinct and start reading as noise -- drizzle and
 # light rain are the same trait however different the code is.
 #
@@ -168,19 +176,26 @@ SKY_STATES = {
 #             shadows are and not merely how much of them there is
 #   particles which sprite pass to run, and how dense
 WEATHER_STATES = {
-    "clear": dict(),
-
     "overcast": dict(
         exposure=0.90, contrast=-0.14, lift=0.020, sat=0.82, diffuse=1.6,
         drift=0.030),
 
-    # Fog is the strongest of the six and nearly free: the protect mask
-    # means the plate can be hazed while the character is not, which is
-    # literal atmospheric perspective -- the character pops forward without
-    # a single pixel of it changing.
+    # Fog ROLLS ALONG THE GROUND; it is not a filter over the whole frame.
+    # Flat full-frame haze was the single biggest reason the plate stopped
+    # being readable -- it took the background's detail down to 24% of the
+    # mint's and its chroma to 41%, over the entire plate, for a trait the
+    # holder did not choose and cannot turn off. Banded, the same haze is
+    # denser than it was where it sits and the upper half of the plate is
+    # given back untouched.
+    #
+    # `band` gates the haze AND the diffusion together, so the fog bank is
+    # soft and the sky above it stays sharp. The bank's top edge undulates
+    # and rolls, which is what makes it read as fog rather than as a
+    # gradient someone laid over the bottom of the picture.
     "fog": dict(
-        exposure=0.96, contrast=-0.30, lift=0.135, sat=0.52, diffuse=3.6,
-        haze=(0.72, 0.755, 0.80), haze_amt=0.34, drift=0.055),
+        exposure=0.98, contrast=-0.16, lift=0.070, sat=0.74, diffuse=4.2,
+        haze=(0.72, 0.755, 0.80), haze_amt=0.62, drift=0.040,
+        band=dict(top=0.52, feather=0.30, amp=0.075)),
 
     "rain": dict(
         exposure=0.78, contrast=-0.05, lift=0.028, sat=0.72, diffuse=0.8,
@@ -206,10 +221,19 @@ WEATHER_STATES = {
     # pixel. That contrast is the whole read, and it is the same trick fog
     # plays, at the other end of the scale.
     "blizzard": dict(
-        exposure=1.10, contrast=-0.30, lift=0.170, sat=0.20, diffuse=2.6,
-        haze=(0.90, 0.93, 0.96), haze_amt=0.44,
-        sh_tint=(0.66, 0.70, 0.76), sh_amt=0.18,
-        particles="blizzard", density=2.4, drift=0.048),
+        exposure=1.06, contrast=-0.17, lift=0.075, sat=0.52, diffuse=2.0,
+        haze=(0.90, 0.93, 0.96), haze_amt=0.52,
+        sh_tint=(0.66, 0.70, 0.76), sh_amt=0.10,
+        particles="blizzard", density=1.9, drift=0.042,
+        band=dict(top=0.52, feather=0.34, amp=0.070),
+        # Snow SETTLES. The driven snow is the event and the drift along
+        # the bottom is the evidence it has been going on a while, which
+        # is what separates a blizzard from heavy snow at a glance. Its
+        # surface undulates like real drifts rather than sitting level,
+        # and it is opaque where it lies -- but it lies in the bottom
+        # eighth of the frame, so it costs the plate almost nothing.
+        accum=dict(top=0.88, feather=0.045, amp=0.030,
+                   tint=(0.94, 0.96, 0.98), amount=0.94)),
 
     # The tornado is the one state that is a SHAPE rather than a field.
     # Every other weather here changes the whole plate uniformly; a funnel
@@ -218,11 +242,22 @@ WEATHER_STATES = {
     #
     # The tone half is a supercell, not a night: green-brown, lifted and
     # flat, with the saturation pulled out of everything the funnel is not.
+    # The funnel carries this state, so the tone half does not have to.
+    # It used to darken and desaturate the whole plate hard enough to make
+    # the funnel visible -- 14% of the plate's chroma survived, the worst
+    # in the set -- which is the wrong lever: the funnel now has a LIT RIM
+    # (see TORNADO_RIM_TINT) and reads by local contrast instead, so the
+    # supercell grade can stay light enough to leave the background alone.
     "tornado": dict(
-        exposure=0.60, contrast=-0.05, lift=0.030, sat=0.42, diffuse=1.3,
-        haze=(0.30, 0.31, 0.22), haze_amt=0.34,
-        sh_tint=(0.11, 0.12, 0.07), sh_amt=0.26,
-        particles="tornado", density=1.0, drift=0.036),
+        exposure=0.80, contrast=-0.04, lift=0.022, sat=0.74, diffuse=0.7,
+        haze=(0.34, 0.35, 0.26), haze_amt=0.14,
+        sh_tint=(0.13, 0.14, 0.09), sh_amt=0.18,
+        particles="tornado", density=1.0, drift=0.030,
+        # Debris blown ACROSS THE PLATE, not just orbiting the trunk. A
+        # tornado throws things a long way from itself, and it is what
+        # tells the eye the whole scene is inside the event rather than
+        # watching one from a safe distance.
+        blown="debris", blown_density=1.0),
 }
 
 # What each particle field is lerped TOWARD. Rain is a cold near-white,
@@ -232,7 +267,8 @@ PARTICLE_TINT = {
     "rain": (0.80, 0.86, 0.98),
     "snow": (1.00, 1.00, 1.00),
     "blizzard": (1.00, 1.00, 1.00),
-    "tornado": (0.60, 0.59, 0.54),
+    "tornado": (0.78, 0.78, 0.75),
+    "debris": (0.15, 0.13, 0.10),
 }
 
 # The funnel is the one particle field that cannot be drawn in a single
@@ -243,6 +279,16 @@ PARTICLE_TINT = {
 # DARKER than everything. Give them one shared tint and whichever one loses
 # the argument turns into a row of pale bubbles floating beside the trunk.
 TORNADO_DEBRIS_TINT = (0.13, 0.12, 0.10)
+
+# The lit edge of the funnel. A funnel that separates only by being paler
+# than the sky needs the sky kept dark to be seen, and a dark sky is a
+# background nobody can read -- which is the whole reason the tone half of
+# `tornado` is as gentle as it is. A RIM is local contrast instead: a
+# bright edge reads against a light plate and a dark one alike, so the
+# funnel stops depending on how murky the grade is. It sits on the upper
+# LEFT flank, the collection's key light.
+TORNADO_RIM_TINT = (0.86, 0.87, 0.84)
+_TORNADO_RIM = 0.46
 
 
 def _tone(rgb, exposure, contrast, lift, sat, sh_tint, sh_amt,
@@ -373,9 +419,81 @@ _PARTICLE_KINDS = {
     "blizzard": dict(
         tiles=(3, 1), shape="streak", width=3, sway=0.0, margin=200,
         bands=((420, 26, 0.34, 2.0), (150, 52, 0.62, 0.9))),
+
+    # Torn-up ground blown across the frame. Two tiles across for every
+    # one down, so it leans shallower than rain and steeper than driven
+    # snow -- debris is heavy and does not travel as flat as a snowflake.
+    # Sparse on purpose: this is the only DARK particle field, and dark
+    # marks over a plate cost legibility far faster than bright ones.
+    "debris": dict(
+        tiles=(2, 1), shape="streak", width=4, sway=0.0, margin=200,
+        bands=((170, 22, 0.28, 2.4), (65, 40, 0.44, 1.2))),
 }
 
 _SNOW_SWAY_CYCLES = 1     # integer -> seamless
+
+_GRID_CACHE = {}
+
+
+def _grid(h, w):
+    """(v, x) broadcast grids: v is 0..1 top to bottom, x is pixels.
+
+    Cached for the same reason _vig_field is -- the canvas is a fixed size
+    and rebuilding a pair of full-frame float arrays per frame is pure
+    memory traffic.
+    """
+    if (h, w) not in _GRID_CACHE:
+        _GRID_CACHE[(h, w)] = (np.linspace(0.0, 1.0, h, dtype=_F)[:, None],
+                               np.arange(w, dtype=_F)[None, :])
+    return _GRID_CACHE[(h, w)]
+
+
+# ------------------------------------------------------------ ground band
+#
+# Weather that sits in a BAND along the bottom of the plate rather than
+# over all of it. Fog rolls along the ground and snow settles on it, and
+# both were previously applied flat across the whole frame -- which is the
+# single biggest reason the plate stopped being readable. A band puts the
+# effect where the effect actually is and gives the upper two-thirds of
+# the background back.
+#
+# The top edge undulates, because a fog bank with a straight edge reads as
+# a gradient and a snow line with one reads as a rectangle. It is a sum of
+# three sines in x, each advancing an INTEGER number of cycles per loop, so
+# the bank rolls and still wraps exactly.
+#
+#   top      where the band's top edge sits, 0 = top of frame, 1 = bottom
+#   feather  how far above that it fades out, in fractions of height
+#   amp      how far the top edge undulates
+_BAND_HARMONICS = ((1.0, 1, 0.60), (2.3, 2, 0.28), (4.1, 3, 0.12))
+
+_UNDULATE_CACHE = {}
+
+
+def _undulate(w, seed, t):
+    """A 1 x w wave along the bottom edge's top line, at loop position t."""
+    t = float(t) % 1.0
+    key = (w, seed, round(t, 6))
+    if key not in _UNDULATE_CACHE:
+        if len(_UNDULATE_CACHE) > 512:
+            _UNDULATE_CACHE.clear()
+        rng = np.random.default_rng(seed ^ 0xBA4D)
+        xs = np.linspace(0.0, 1.0, w, dtype=_F)[None, :]
+        out = np.zeros((1, w), dtype=_F)
+        for freq, cycles, amp in _BAND_HARMONICS:
+            out += _F(amp) * np.sin(
+                _F(2.0 * np.pi) * (_F(freq) * xs + _F(cycles * t))
+                + _F(rng.random() * 2.0 * np.pi))
+        _UNDULATE_CACHE[key] = out
+    return _UNDULATE_CACHE[key]
+
+
+def _band_field(h, w, cfg, seed, t):
+    """0 above the band, 1 inside it, feathered across the undulating top."""
+    v, _ = _grid(h, w)
+    top = _F(cfg["top"]) + _undulate(w, seed, t) * _F(cfg.get("amp", 0.0))
+    return smoothstep((v - top) / _F(cfg["feather"]))
+
 
 _NOISE_CACHE = {}
 
@@ -494,25 +612,9 @@ _TORNADO_SWAY_CYCLES = 1
 _TORNADO_SPINS = 3        # coarse helical bands climbing the trunk
 _TORNADO_SPINS2 = 6       # a finer band on top, so it reads as debris
 _TORNADO_TURNS = 2
-_TORNADO_OPACITY = 0.84
-_TORNADO_SKIRT = 0.42
+_TORNADO_OPACITY = 0.96
+_TORNADO_SKIRT = 0.62
 _TORNADO_DEBRIS = 0.62
-
-_GRID_CACHE = {}
-
-
-def _grid(h, w):
-    """(v, x) broadcast grids: v is 0..1 top to bottom, x is pixels.
-
-    Cached for the same reason _vig_field is -- the canvas is a fixed size
-    and rebuilding a pair of full-frame float arrays per frame is pure
-    memory traffic.
-    """
-    if (h, w) not in _GRID_CACHE:
-        _GRID_CACHE[(h, w)] = (np.linspace(0.0, 1.0, h, dtype=_F)[:, None],
-                               np.arange(w, dtype=_F)[None, :])
-    return _GRID_CACHE[(h, w)]
-
 
 def _funnel_axis(v, cx0, phase, s, w, t):
     """The snaking centreline, as a function of height.
@@ -528,15 +630,22 @@ def _funnel_axis(v, cx0, phase, s, w, t):
 
 
 def _funnel(size, density, seed, t=0.0):
-    """The tornado, as (column, debris) float 0..1 arrays at loop position t.
+    """The tornado, as (amount, shade, rim, debris) arrays at position t.
 
-    Each is in the same form as _particles() returns -- how much of each
-    pixel is lerped toward a tint -- so the protect mask puts both behind
-    the character like every other effect here. They come back separately
-    only because they are lerped toward OPPOSITE tints; see
-    TORNADO_DEBRIS_TINT for why one colour cannot do both.
+    `amount` is how much of each pixel the funnel covers and `shade` is how
+    bright the funnel is there -- they are SEPARATE because a funnel is an
+    opaque object with form on it, and folding the form into the coverage
+    makes a half-transparent one instead. That was the first version, and
+    over a light plate it read as a smudge on the lens rather than as a
+    tornado: the shading multiplied the coverage down to about half in the
+    core, so the plate showed straight through the trunk.
+
+    `rim` and `debris` are separate again because they are lerped toward
+    DIFFERENT tints from the column -- see TORNADO_RIM_TINT and
+    TORNADO_DEBRIS_TINT for why one colour cannot do the job.
     """
     w, h = size
+    t = float(t) % 1.0
     v, xs = _grid(h, w)
     rng = np.random.default_rng(seed ^ 0x70F0AD)
 
@@ -574,11 +683,21 @@ def _funnel(size, density, seed, t=0.0):
                                 * (_F(17.0) * v - _F(_TORNADO_SPINS2 * t))
                                 + _F(1.7) * phase))
 
-    # cylinder shading, key light upper left
+    # Cylinder shading, key light upper left. `lit` is 1 on the left flank
+    # and 0 on the right, and the column's tint is PALER than the plate --
+    # so the lit flank must take MORE of it, not less. (It took less while
+    # the tint was still dark, and the polarity did not follow the tint
+    # when that changed, which lit the funnel from the right and put it out
+    # of register with all 123 trait assets.)
     lit = np.clip(_F(0.5) - _F(0.5) * u, 0.0, 1.0)
 
-    out = body * (_F(0.45) + _F(0.55) * band) * (_F(1.0) - _F(0.30) * lit)
-    out *= _F(_TORNADO_OPACITY)
+    shade = (_F(0.45) + _F(0.55) * band) * (_F(0.70) + _F(0.30) * lit)
+    out = body * _F(_TORNADO_OPACITY)
+
+    # The lit edge: a narrow band on the left flank only. This is what
+    # carries the funnel on a plate that has NOT been darkened, so the
+    # tone grade can stay light enough to leave the background readable.
+    rim = body * smoothstep((-u - _F(0.42)) / _F(0.34)) * _F(_TORNADO_RIM)
 
     # Ground dust where the tip meets the plate, broken up by the same
     # noise field the drifting states use so it is not a clean ellipse.
@@ -589,6 +708,9 @@ def _funnel(size, density, seed, t=0.0):
     n = _noise_field(h, w, seed | 3, max(h, w) / 26.0)
     skirt *= np.clip(_F(1.0) + _F(2.4) * np.roll(
         n, int(round(t * w)), axis=1), 0.0, 1.6)
+    # Ground dust is lit from open sky rather than shaded by the trunk, so
+    # where the skirt is the thicker of the two it brings its own shade.
+    shade = np.where(skirt > out, _F(0.92), shade)
     np.maximum(out, skirt, out=out)
 
     # Debris orbiting the trunk and rising, drawn with PIL because a few
@@ -632,7 +754,18 @@ def _funnel(size, density, seed, t=0.0):
             layer.filter(ImageFilter.GaussianBlur(max(0.6, w / 995.0))),
             dtype=_F) / _F(255.0) * _F(_TORNADO_DEBRIS)
 
-    return np.clip(out, 0.0, 1.0, out=out), deb
+    return (np.clip(out, 0.0, 1.0, out=out),
+            np.clip(shade, 0.0, 1.0), np.clip(rim, 0.0, 1.0, out=rim), deb)
+
+
+def _wet(weather):
+    """The weather table for a state name, or an empty one for None.
+
+    None is a clear sky: no weather, not a weather that happens to do
+    nothing. Every entry point takes it, so a caller never has to name a
+    state to say there isn't one.
+    """
+    return {} if weather is None else WEATHER_STATES[weather]
 
 
 def _combine(sky, wet):
@@ -682,30 +815,34 @@ def has_motion(weather):
 
     A state with no motion must never be exported as an animation. Encoding
     N identical frames of a still costs resolution and a lossy round-trip
-    to say nothing at all -- see animate.py.
+    to say nothing at all -- see animate.py. Since `clear` became None
+    rather than a state, every NAMED state moves; this stays as the guard
+    that keeps it that way.
     """
-    wet = WEATHER_STATES[weather]
-    return bool(wet.get("particles") or wet.get("flash")
-                or wet.get("drift", 0.0) > 1e-4)
+    wet = _wet(weather)
+    return bool(wet.get("particles") or wet.get("blown") or wet.get("flash")
+                or wet.get("band") or wet.get("drift", 0.0) > 1e-4)
 
 
 def is_spatial(weather):
     """True if this weather state blurs, resamples or draws over the plate."""
-    wet = WEATHER_STATES[weather]
+    wet = _wet(weather)
     return (wet.get("diffuse", 0.0) > 0.05
-            or bool(wet.get("particles")) or bool(wet.get("flash"))
+            or bool(wet.get("particles")) or bool(wet.get("blown"))
+            or bool(wet.get("flash")) or bool(wet.get("band"))
             or wet.get("drift", 0.0) > 1e-4)
 
 
 def is_identity(phase, weather):
-    """True if this grade is a no-op -- day + clear, and nothing else.
+    """True if this grade is a no-op -- day with no weather, and nothing else.
 
-    A service should check this FIRST and serve the original minted bytes
+    A service should check this FIRST and serve the ORIGINAL MINTED BYTES
     unchanged rather than re-encoding them. The dynamic layer must never
     cost image quality in the state where it is doing nothing, and that is
-    the state most holders are in most of the time.
+    the state most holders are in most of the time -- which is exactly why
+    there is no `clear` state to render instead.
     """
-    sky, wet = SKY_STATES[phase], WEATHER_STATES[weather]
+    sky, wet = SKY_STATES[phase], _wet(weather)
     p = _combine(sky, wet)
     return (abs(p["exposure"] - 1.0) < 1e-4 and abs(p["contrast"]) < 1e-4
             and p["lift"] < 1e-5 and abs(p["sat"] - 1.0) < 1e-4
@@ -713,17 +850,24 @@ def is_identity(phase, weather):
             and abs(p["vignette"]) < 1e-4
             and wet.get("haze_amt", 0.0) < 1e-4
             and wet.get("diffuse", 0.0) <= 0.05
-            and not wet.get("particles"))
+            and not wet.get("particles") and not wet.get("blown")
+            and not wet.get("accum"))
 
 
-def grade_static(base, phase="day", weather="clear"):
+def grade_static(base, phase="day", weather=None):
     """The frame-invariant half: tone, haze and diffusion.
 
     Split out because it is the whole cost of a render and it does not
     change across a loop. Call once, then pass the result to frame() as
     many times as there are frames.
+
+    A BANDED state returns two plates rather than one -- the tone grade
+    alone, and the tone grade with the full haze and diffusion on it --
+    because the band that mixes them undulates per frame while the two
+    endpoints do not. That keeps the expensive half (one tone pass, one
+    blur) out of the loop exactly as before; only a lerp moves.
     """
-    sky, wet = SKY_STATES[phase], WEATHER_STATES[weather]
+    sky, wet = SKY_STATES[phase], _wet(weather)
     p = _combine(sky, wet)
     arr = np.asarray(base.convert("RGBA"), dtype=_F) / _F(255.0)
     rgb, alpha = arr[..., :3].copy(), arr[..., 3]
@@ -731,28 +875,47 @@ def grade_static(base, phase="day", weather="clear"):
     fx = _tone(rgb.copy(), p["exposure"], p["contrast"], p["lift"],
                p["sat"], p["sh_tint"], p["sh_amt"], p["hi_tint"],
                p["hi_amt"])
+    dry = fx.copy() if wet.get("band") else None
 
-    # Fog: lerp the plate toward the haze colour. The character is excluded
-    # by the mask, so this alone reads as depth.
+    # Haze: lerp the plate toward the haze colour. The character is
+    # excluded by the mask, so this alone reads as depth.
     if wet.get("haze_amt", 0.0) > 1e-4:
         fx += (_c(wet["haze"]) - fx) * _F(wet["haze_amt"])
 
-    # Diffusion: overcast and fog genuinely soften a scene.
+    # Diffusion: fog and driven snow genuinely soften a scene.
     if wet.get("diffuse", 0.0) > 0.05:
         blurred = Image.fromarray(
             (np.clip(fx, 0, 1) * 255).astype(np.uint8), "RGB").filter(
                 ImageFilter.GaussianBlur(wet["diffuse"]))
         fx = np.asarray(blurred, dtype=_F) / _F(255.0)
 
-    return {"fx": fx, "rgb": rgb, "alpha": alpha, "p": p, "wet": wet}
+    return {"fx": fx, "dry": dry, "rgb": rgb, "alpha": alpha,
+            "p": p, "wet": wet}
 
 
 def frame(static, protect, t=0.0, seed=0, strength=1.0):
     """One frame of a loop, from a cached grade_static() result."""
-    fx = static["fx"].copy()
+    # t WRAPS HERE, once, for everything downstream. The tile and roll
+    # motions were already exact at t=1 because they go through a modulo,
+    # but anything built from sin(2*pi*(k*x + c*t)) is not: adding a whole
+    # 2*pi inside a sine is not the identity in floating point, and it came
+    # out as a 1/255 jump at the loop point on fog and on the funnel --
+    # invisible in a filmstrip, and exactly what verify_sky.py's
+    # bit-identical seamlessness check exists to catch.
+    t = float(t) % 1.0
     rgb, alpha, p, wet = (static["rgb"], static["alpha"],
                           static["p"], static["wet"])
     h, w = rgb.shape[:2]
+
+    # A banded state mixes the dry tone grade into the hazed, blurred one
+    # only where the band lies, so the plate above the bank keeps its own
+    # detail and colour. An unbanded state is the hazed plate outright,
+    # exactly as before.
+    if wet.get("band") is not None and static.get("dry") is not None:
+        b = _band_field(h, w, wet["band"], seed | 5, t)[..., None]
+        fx = static["dry"] * (1.0 - b) + static["fx"] * b
+    else:
+        fx = static["fx"].copy()
 
     # Drifting density: what makes fog and overcast read as WEATHER rather
     # than as a flat filter. Rolling the field is seamless by construction.
@@ -770,12 +933,36 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
         kind = wet["particles"]
         dens = wet.get("density", 1.0)
         if kind == "tornado":
-            col, deb = _funnel((w, h), dens, seed, t)
-            fx = fx + (_c(PARTICLE_TINT[kind]) - fx) * col[..., None]
+            col, shade, rim, deb = _funnel((w, h), dens, seed, t)
+            # The column's colour varies per pixel (banding and the
+            # cylinder's own key light), so its tint is an ARRAY, not a
+            # constant -- everything else here lerps toward one colour.
+            tint = _c(PARTICLE_TINT[kind]) * shade[..., None]
+            fx = fx + (tint - fx) * col[..., None]
+            fx = fx + (_c(TORNADO_RIM_TINT) - fx) * rim[..., None]
             fx = fx + (_c(TORNADO_DEBRIS_TINT) - fx) * deb[..., None]
         else:
             part = _particles((w, h), kind, dens, seed, t)[..., None]
             fx = fx + (_c(PARTICLE_TINT[kind]) - fx) * part
+
+    # A second, independent particle field blown across the whole plate.
+    # Separate from `particles` because the tornado runs both at once: a
+    # funnel that is a shape, and the debris it has thrown everywhere else.
+    if wet.get("blown"):
+        kind = wet["blown"]
+        blown = _particles((w, h), kind, wet.get("blown_density", 1.0),
+                           seed ^ 0x51DE, t)[..., None]
+        fx = fx + (_c(PARTICLE_TINT[kind]) - fx) * blown
+
+    # Settled snow along the bottom. It goes on AFTER the particles,
+    # because snow lying on the ground is in front of the snow still
+    # falling, and it is on the plate only like everything else -- the
+    # mask keeps it behind the character rather than piled against it.
+    if wet.get("accum"):
+        acc = wet["accum"]
+        a = (_band_field(h, w, acc, seed | 9, t)
+             * _F(acc.get("amount", 1.0)))[..., None]
+        fx = fx + (_c(acc["tint"]) - fx) * a
 
     # Lightning, on the plate only like everything else here.
     if wet.get("flash") and t > 0.0:
@@ -806,14 +993,15 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
         .astype(np.uint8), "RGBA")
 
 
-def apply_sky(base, protect, phase="day", weather="clear",
+def apply_sky(base, protect, phase="day", weather=None,
               seed=0, strength=1.0, t=0.0):
     """Grade the background of a finished token render (a single still).
 
     base     : RGBA PIL image -- the minted token, unmodified.
     protect  : L PIL image    -- the mask create_image(mask_path=...) wrote.
     phase    : a key of SKY_STATES (from solar.sun_phase()).
-    weather  : a key of WEATHER_STATES.
+    weather  : a key of WEATHER_STATES, or None for a clear sky -- there
+               is no 'clear' state, because the mint already is one.
     seed     : token id; makes the particle field stable per token.
     strength : 0..1 global dial on the whole effect, for previewing.
     t        : 0..1 position in the weather loop.
@@ -822,16 +1010,17 @@ def apply_sky(base, protect, phase="day", weather="clear",
     """
     if phase not in SKY_STATES:
         raise KeyError(f"unknown sky phase {phase!r}")
-    if weather not in WEATHER_STATES:
+    if weather is not None and weather not in WEATHER_STATES:
         raise KeyError(f"unknown weather {weather!r}")
     if base.mode != "RGBA":
         base = base.convert("RGBA")
     if protect.size != base.size:
         protect = protect.resize(base.size, Image.Resampling.LANCZOS)
 
-    # DAY + CLEAR is the identity grade, and it is also the single most
-    # requested state -- most holders, most of the time, are in daylight. It
-    # must cost nothing rather than spend a full pass computing a no-op.
+    # DAY with no weather is the identity grade, and it is also the single
+    # most requested state -- most holders, most of the time, are in clear
+    # daylight. It must cost nothing rather than spend a full pass
+    # computing a no-op.
     if strength <= 1e-4 or is_identity(phase, weather):
         return base.copy()
 
@@ -840,5 +1029,11 @@ def apply_sky(base, protect, phase="day", weather="clear",
 
 
 def describe(phase, weather):
-    """Display strings for the two dynamic metadata attributes."""
-    return (phase.replace("_", " ").title(), weather.title())
+    """Display strings for the two dynamic metadata attributes.
+
+    A clear sky is reported as "Clear" even though there is no state by
+    that name -- the absence of weather still has to read as something in
+    a metadata field.
+    """
+    return (phase.replace("_", " ").title(),
+            "Clear" if weather is None else weather.title())

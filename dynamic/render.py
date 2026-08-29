@@ -9,9 +9,9 @@ Two jobs:
      by passing mask_path= to create_image().
 
   2. `--sheet` grades those tokens across all eight sky phases and all
-     eight weather states and lays the results out as contact sheets, so
-     the art direction can be judged on pixels rather than on a parameter
-     table.
+     seven weather states (plus the unweathered mint) and lays the results
+     out as contact sheets, so the art direction can be judged on pixels
+     rather than on a parameter table.
 
 From the repo root:
 
@@ -39,9 +39,11 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
 PHASE_ORDER = ["high_noon", "day", "golden_dawn", "golden_dusk",
                "blue_dawn", "blue_dusk", "twilight", "night"]
-# Ordinary states first, then the two severe ones, so a weather sheet
-# reads as the tiering it is rather than as eight equal options.
-WEATHER_ORDER = ["clear", "overcast", "fog", "rain", "snow", "storm",
+# None (a clear sky) first as the reference, then the ordinary states, then
+# the two severe ones -- so a weather sheet reads as the tiering it is
+# rather than as a row of equal options. None renders the mint unchanged,
+# which is exactly what it should be compared against.
+WEATHER_ORDER = [None, "overcast", "fog", "rain", "snow", "storm",
                  "blizzard", "tornado"]
 
 
@@ -98,7 +100,7 @@ def variety_sheet(n, phases, cell_px, seed, strength):
     for ph in phases:
         cells = []
         for plate, char, base, mask in made:
-            img = skymod.apply_sky(base, mask, ph, "clear",
+            img = skymod.apply_sky(base, mask, ph, None,
                                    seed=hash(plate) & 0xffff,
                                    strength=strength)
             cells.append((f"{plate[:26]}", img))
@@ -186,7 +188,7 @@ def main():
     # --- sheet 1: all eight sky phases, clear weather -------------------
     cells, t0 = [], time.time()
     for ph in PHASE_ORDER:
-        img = skymod.apply_sky(base, mask, ph, "clear", seed=tid,
+        img = skymod.apply_sky(base, mask, ph, None, seed=tid,
                                strength=args.strength)
         tag = "  (canonical mint)" if ph == "day" else ""
         cells.append((ph.replace("_", " ") + tag, img))
@@ -202,7 +204,7 @@ def main():
     for wx in WEATHER_ORDER:
         img = skymod.apply_sky(base, mask, "blue_dusk", wx, seed=tid,
                                strength=args.strength)
-        cells.append((f"blue dusk + {wx}", img))
+        cells.append((f"blue dusk + {wx or 'no weather (the mint)'}", img))
     p2 = contact_sheet(cells, 4, args.cell,
                        "Sweetardio — weather  (particles fall BEHIND the "
                        "character; fog hazes the plate, not the figure)",
@@ -218,7 +220,7 @@ def main():
     cells = []
     for name, la, lo in cities:
         ph, alt = solar.sun_phase(la, lo, now)
-        img = skymod.apply_sky(base, mask, ph, "clear", seed=tid,
+        img = skymod.apply_sky(base, mask, ph, None, seed=tid,
                                strength=args.strength)
         cells.append((f"{name} — {ph.replace('_', ' ')} ({alt:+.0f}°)", img))
     p3 = contact_sheet(cells, 3, args.cell,

@@ -74,10 +74,24 @@ the saving — a *scalar* exposure applied as a luma ratio is just a scalar
 multiply, and saturation-about-luma is luma-preserving, so the split-tone
 reuses that luma instead of recomputing it.
 
-## Six ordinary states, then two that are an event
+## There is no `clear` state
+
+A clear sky is the **absence of weather**, not a weather worth grading. The
+minted token already *is* the clear-sky render, so a `clear` state would be
+a name for doing nothing — and worse, something a service might re-encode a
+copy of the mint to serve. `weather.py` returns `None` for WMO 0 and 1,
+every function in `sky.py` takes `None` where a state name goes, and
+`is_identity()` is what tells a service to hand back **the original minted
+bytes**.
+
+That is the state most holders are in most of the time, so it must cost the
+plate nothing at all — and now it provably does, because there is nothing
+there to run.
+
+## Five ordinary states, then two that are an event
 
 Open-Meteo (free, no key, takes lat/lon directly) returns ~100 WMO codes.
-`weather.py` collapses them: **six** is the ceiling for the ordinary sky,
+`weather.py` collapses them: **five** named states cover the ordinary sky,
 past which they stop reading as distinct traits and start reading as noise
 — drizzle and light rain are the same trait however different the code is.
 Call once per *distinct locale* bucketed to ~25km and cache 30 min — 4,444
@@ -110,11 +124,49 @@ unclaimed token a deterministic sky from its id — off a fixed hash, not
 python's `hash()`, which is salted per process and would hand the same
 token a different sky on every restart.
 
-**Fog is the strongest of the six and nearly free**: the mask means the
-plate can be hazed while the character is not, which is literal atmospheric
+## The weather sits in a band; the plate stays readable
+
+**The background is a trait the holder chose and cannot switch off**, so a
+state that buries it is taking something away rather than adding to it.
+Fog, blizzard and the tornado were all first written as full-frame grades
+and all three failed that test — measured against the same sky with no
+weather, fog left **24%** of the plate's own detail and **41%** of its
+chroma, blizzard 40%/22%, the tornado 57%/**14%**, across the whole frame.
+
+The fix is not a weaker effect, it is a **placed** one:
+
+- **Fog rolls along the ground.** `band` gates its haze *and* its diffusion
+  to a bank in the lower half, whose top edge undulates and rolls. Denser
+  than it was where it actually sits, and the sky above it is untouched.
+- **Blizzard settles.** The whiteout is banded the same way, and `accum`
+  lays a drift along the bottom eighth with an undulating surface. The
+  driven snow is the event; the drift is the evidence it has been going a
+  while, which is what separates a blizzard from heavy snow at a glance.
+- **The tornado stopped darkening the sky to be seen.** It used to crush
+  the whole plate so a pale funnel would read against it. Now the funnel
+  carries itself — an opaque column with a **lit rim** on its upper-left
+  flank — so it separates by local contrast on a bright plate and a dark
+  one alike, and the supercell grade can stay light.
+
+| | detail kept | chroma kept | | detail | chroma |
+|---|---|---|---|---|---|
+| fog | 24% | 41% | → | **45%** | **63%** |
+| blizzard | 40% | 22% | → | **66%** | **43%** |
+| tornado | 57% | 14% | → | **82%** | **35%** |
+
+`verify_sky.py` holds a `PLATE_DETAIL_FLOOR` per state and fails if one
+drifts past its own. It is checked at **`day` and `night`**, because every
+hazing state gets steadily worse as the sky darkens — lerping an
+already-dark plate toward a bright haze crushes its relative contrast far
+harder than doing the same to a bright one. Measured across all eight
+phases the fall is monotonic (fog 43%→23%, blizzard 50%→31%, tornado
+68%→48%), so night is the binding case.
+
+**Fog is nearly free and always was**: the mask means the plate can be
+hazed while the character is not, which is literal atmospheric
 perspective. The character pops forward without a pixel of it changing.
 `blizzard` is the same trick at the other end of the scale — the plate goes
-most of the way to white while the character does not move a pixel.
+toward white while the character does not move a pixel.
 
 **The tornado is the one state that is a shape rather than a field.** Every
 other weather changes the whole plate uniformly; a funnel is an object
@@ -161,21 +213,21 @@ filmstrip; only a numeric check catches it.
 
 | state | motion |
 |---|---|
-| `clear` | none — a clear sky is a still, and costs the plate nothing |
 | `overcast` | cloud shadow drifting across the plate |
-| `fog` | haze density rolling through, thickening and thinning |
+| `fog` | a ground bank whose top edge rolls; the sky above stays sharp |
 | `rain` | two depth bands falling down-and-right, near band 2x faster |
 | `snow` | slow fall with a sideways sway, one cycle per loop |
 | `storm` | heavy rain, plus a lightning strike and its echo |
-| `blizzard` | driven snow, three tiles across for every one down, under a gusting whiteout |
-| `tornado` | the funnel snakes once, its banding climbs three times, the debris orbits twice |
+| `blizzard` | driven snow over a whiteout band, on settled drifts |
+| `tornado` | the funnel snakes once, its banding climbs three times, the debris orbits twice and more blows past |
 
 **A motionless state is never exported as an animation.** Encoding N
 identical frames of a still spends a downscale and a lossy round-trip to
-say nothing at all — so `clear` goes out as a lossless PNG at full mint
-resolution instead. `verify_sky.py` gates this: a state declaring no motion
-must apply **no spatial op**, so it can tone-grade the plate but never
-soften or resample it, and at `day` it must return the mint bit-for-bit.
+say nothing at all. Since a clear sky became `None` rather than a state,
+**every named state moves**, and `verify_sky.py` gates it from both sides:
+no weather must apply no spatial op and must return the mint bit-for-bit at
+`day`, and a named state that did not move would be a state for doing
+nothing — which is exactly what `clear` was.
 
 The same rule belongs in the service: check `is_identity()` FIRST and serve
 the **original minted bytes** rather than re-encoding them. The dynamic
@@ -206,7 +258,7 @@ in `properties.files[]`.
 
 | format | verdict |
 |---|---|
-| **MP4 (H.264, yuv420p)** | the safest bet, and also the smallest here — 80–377KB against WebP's 296–900KB |
+| **MP4 (H.264, yuv420p)** | the safest bet, and also the smallest here — 80–400KB against WebP's 300–987KB |
 | animated WebP | plays in every browser, but marketplace *image pipelines* commonly re-encode and flatten it to frame 1 |
 | GIF | universally supported and the worst-looking: 256 colours band these graded plates, and it came out at ~6MB a loop |
 | HTML | richest, least supported — wallets sandbox or refuse it |
@@ -267,7 +319,7 @@ every pair, and exits non-zero if a state is not distinct from the one it
 is most likely to be confused with. Current numbers, at dusk over 6 plates:
 `blizzard`/`snow` **44.8**, `tornado`/`storm` **19.3**, against a bar of
 6.0 — which sits deliberately above the closest already-approved pair
-(`clear`/`overcast`, 2.7 at dusk, because the dusk grade dominates both).
+(`overcast`/`rain`, 3.3 at dusk, because the dusk grade dominates both).
 
 **`build_mint.py --masks` is not optional if this ships.** `create_image()`
 has taken `mask_path=` since the prototype landed and the mint did not pass

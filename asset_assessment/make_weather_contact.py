@@ -17,6 +17,13 @@ that actually decide whether a new state ships:
      again; tornado's is that it reads as storm. That is not an eyeball
      judgement -- it is a distance, so this measures it.
 
+  3. Does it leave the BACKGROUND readable? The plate is a trait the holder
+     chose and cannot switch off, so a state that buries it is taking
+     something away rather than adding to it. Every state is scored on how
+     much of the plate's own detail and chroma survives, against the
+     unweathered mint. verify_sky.py holds the per-state floors; this is
+     where the numbers are written down and looked at.
+
 The measurement is mean CIE76 dE over the PLATE REGION ONLY, between every
 pair of states on the same plate at the same phase, averaged over plates.
 Plate region only because the character is bit-identical in every state by
@@ -50,7 +57,7 @@ import random
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -64,7 +71,9 @@ LOG = os.path.join(PROOF, "WEATHER_DISTINCTNESS.md")
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
 # The six that describe the ordinary sky, and the two that are an event.
-ORDINARY = ["clear", "overcast", "fog", "rain", "snow", "storm"]
+# None is a clear sky -- the mint itself, and the reference every other
+# state is measured against. There is no 'clear' state to render.
+ORDINARY = ["overcast", "fog", "rain", "snow", "storm"]
 SEVERE = ["blizzard", "tornado"]
 
 # Which existing state each new one is at risk of duplicating. Being far
@@ -76,6 +85,20 @@ CONFUSABLE = {"blizzard": "snow", "tornado": "storm"}
 # names. See the calibration note in the header -- the closest already
 # approved pair is reported next to it every run.
 DISTINCT_DE = 6.0
+
+
+def _detail(rgb8, plate):
+    """Brightness-normalised band-pass energy -- the same measure
+    verify_sky.py gates on, so the record and the gate cannot disagree."""
+    a = rgb8[..., :3].astype(np.float64)
+    y = 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
+    img = Image.fromarray(np.clip(y, 0, 255).astype(np.uint8), "L")
+    near = np.asarray(img.filter(ImageFilter.GaussianBlur(2.0)),
+                      dtype=np.float64)
+    far = np.asarray(img.filter(ImageFilter.GaussianBlur(8.0)),
+                     dtype=np.float64)
+    return float(np.abs(near - far)[plate].mean()
+                 / max(float(y[plate].mean()), 1.0))
 
 
 def _font(size):
@@ -108,6 +131,17 @@ def plate_de(a, b, plate):
     """Mean dE between two renders, over the exposed plate only."""
     d = _to_lab(a[..., :3]) - _to_lab(b[..., :3])
     return float(np.sqrt((d * d).sum(-1))[plate].mean())
+
+
+def plate_chroma(rgb, plate):
+    """Mean sRGB chroma over the exposed plate -- max channel minus min.
+
+    Crude next to a Lab chroma and deliberately so: it is a RATIO against
+    the same measure on the mint, so the units cancel and what is left is
+    "how much of the background's colour is still there".
+    """
+    a = rgb[..., :3].astype(np.float64)
+    return float((a.max(-1) - a.min(-1))[plate].mean())
 
 
 # ------------------------------------------------------------------ input
@@ -150,13 +184,15 @@ def build_sheet(grid, states, labels, cell, phase, path):
     h = top + rows * (cell + cap) + pad * (rows + 1) + extra
     sheet = Image.new("RGB", (w, h), (16, 17, 21))
     draw = ImageDraw.Draw(sheet)
+    named = [s for s in states if s is not None]
     draw.text((pad + 2, 16),
-              f"Sweetardio — {len(states)} weather states across "
+              f"Sweetardio — {len(named)} weather states across "
               f"{cols} plates  ·  {phase.replace('_', ' ')}",
               font=_font(25), fill=(238, 240, 246))
     draw.text((pad + 2, 47),
               "background only; body, face, arms, footwear and stickers are "
-              "bit-identical to the mint in every cell",
+              "bit-identical to the mint in every cell. Top row is the "
+              "unweathered plate, for comparison.",
               font=_font(15), fill=(150, 156, 172))
 
     y = top + pad
@@ -171,8 +207,9 @@ def build_sheet(grid, states, labels, cell, phase, path):
             x = pad + c * (cell + pad)
             sheet.paste(grid[(state, c)].convert("RGB").resize(
                 (cell, cell), Image.Resampling.LANCZOS), (x, y))
+        name = state or "no weather — the mint, unchanged"
         draw.text((pad + 2, y + cell + 6),
-                  f"{state}   ·   " + "   ".join(l[:22] for l in labels),
+                  f"{name}   ·   " + "   ".join(l[:22] for l in labels),
                   font=_font(16), fill=(176, 182, 198))
         y += cell + cap + pad
     # This sheet is a committed design record, and at eight rows of graded
@@ -220,11 +257,30 @@ def main():
     print(f"grading {len(states)} states x {len(toks)} plates at "
           f"{args.phase}")
     grid = {}
-    for state in states:
+    for state in [None] + states:
         for c, (_, base, mask, tid) in enumerate(toks):
             grid[(state, c)] = skymod.apply_sky(base, mask, args.phase,
                                                 state, seed=tid, t=0.25)
-        print(f"  {state}", flush=True)
+        print(f"  {state or 'no weather (the mint)'}", flush=True)
+
+    # Legibility, measured against THE SAME PHASE WITH NO WEATHER, not
+    # against the mint. The weather is what is on trial here; folding in
+    # the sky grade would charge `fog` for the fact that dusk is darker
+    # than noon and make the number mean two things at once. At `day` the
+    # two baselines are the same image anyway, which is why this agrees
+    # with verify_sky.py's floors -- those are measured at day.
+    legib = {}
+    for state in states:
+        det, chr_ = [], []
+        for c, (_, base, mask, tid) in enumerate(toks):
+            plate = np.asarray(mask) == 0
+            ref = np.asarray(grid[(None, c)])
+            out = np.asarray(grid[(state, c)])
+            d0 = _detail(ref, plate)
+            det.append(_detail(out, plate) / d0 if d0 else 1.0)
+            c0 = plate_chroma(ref, plate)
+            chr_.append(plate_chroma(out, plate) / c0 if c0 else 1.0)
+        legib[state] = (min(det), min(chr_))
 
     pair = distinctness(grid, states, plate_masks)
 
@@ -257,6 +313,20 @@ def main():
           f"has been in the set")
         p(f"from the start and is distinguished elsewhere in the matrix.")
         p()
+
+    p("| state | plate detail kept | plate chroma kept |")
+    p("|---|---|---|")
+    for state in states:
+        d, c = legib[state]
+        p(f"| `{state}` | {d * 100:.0f}% | {c * 100:.0f}% |")
+    p()
+    p(f"Worst of the {len(toks)} plates, against the SAME PHASE WITH NO "
+      f"WEATHER — so the number is")
+    p("what the weather costs, not what the hour of day costs. The "
+      "per-state floors live in")
+    p("`verify_sky.py`'s `PLATE_DETAIL_FLOOR`, which fails the build if a "
+      "state drifts past its own.")
+    p()
 
     p("| new state | vs | dE | vs whole table (min) | verdict |")
     p("|---|---|---|---|---|")
@@ -292,7 +362,8 @@ def main():
     print(f"\nwrote {os.path.relpath(LOG, ROOT)}")
 
     if not args.no_sheet:
-        path = build_sheet(grid, states, labels, args.cell, args.phase, SHEET)
+        path = build_sheet(grid, [None] + states, labels, args.cell,
+                           args.phase, SHEET)
         print(f"wrote {os.path.relpath(path, ROOT)}")
 
     if failures:

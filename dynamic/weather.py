@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
-"""Open-Meteo's WMO codes, collapsed to the eight states sky.py grades.
+"""Open-Meteo's WMO codes, collapsed to the seven states sky.py grades.
 
 sky.py's weather table has said "collapsed from Open-Meteo's ~100 WMO codes
 by weather.py" since it was written; this is that file. It is the only part
 of the dynamic trait that touches the network -- solar.py is closed-form
 astronomy, so time of day needs no API, no key and no rate limit.
 
+A CLEAR SKY IS None, NOT A STATE. The minted token already is the clear-sky
+render, so there is nothing for a `clear` state to draw; every function
+here returns None for it and sky.py takes None everywhere a state name
+goes. A service seeing None should serve the ORIGINAL MINTED BYTES rather
+than re-encode a copy of them.
+
 Open-Meteo is the service because it is free for this scale, needs no key,
 and takes a lat/lon directly rather than a place id, which matters when the
 input is a claimed locale rather than a city from a list.
 
     from dynamic import weather
-    state = weather.fetch(51.51, -0.13)          # -> 'rain'
+    state = weather.fetch(51.51, -0.13)          # -> 'rain', or None
     state = weather.classify(75, wind_kmh=48)    # -> 'blizzard'
 
 WHAT COLLAPSES AND WHAT DOES NOT
@@ -19,8 +25,8 @@ WHAT COLLAPSES AND WHAT DOES NOT
 The ~100 codes carry distinctions the art cannot show: drizzle and light
 rain are the same trait no matter how different the code is, and a holder
 cannot see the difference between "slight" and "moderate" rain falling
-behind a Twinkie. So the six ordinary states take the whole table between
-them.
+behind a Twinkie. So the five ordinary states, plus None, take the whole
+table between them.
 
 The two severe states are gated on more than a code, and for opposite
 reasons:
@@ -62,13 +68,14 @@ import urllib.request
 
 # ------------------------------------------------------------ the table
 #
-# Every code Open-Meteo documents, mapped to one of the six ordinary
-# states. Written out in full rather than as ranges: the table is the
-# specification, and a range hides which codes exist. Anything not listed
-# falls back to FALLBACK, which is also what an unreachable API returns.
+# Every code Open-Meteo documents, mapped to one of the five ordinary
+# states or to None. Written out in full rather than as ranges: the table
+# is the specification, and a range hides which codes exist. Anything not
+# listed falls back to FALLBACK, which is also what an unreachable API
+# returns.
 WMO_STATES = {
-    0: "clear",         # clear sky
-    1: "clear",         # mainly clear
+    0: None,            # clear sky        -> no weather layer at all
+    1: None,            # mainly clear     -> no weather layer at all
     2: "overcast",      # partly cloudy
     3: "overcast",      # overcast
 
@@ -101,7 +108,10 @@ WMO_STATES = {
     99: "storm",        # thunderstorm with heavy hail
 }
 
-FALLBACK = "clear"
+# What an unreachable API, an unknown code or a failed call returns: no
+# weather. It has to be the state that costs the plate nothing, because it
+# is the one served when the service knows nothing.
+FALLBACK = None
 
 # Snow codes heavy enough that ordinary wind turns them into a whiteout,
 # versus the rest, which need a wind that would blow lying snow around by
@@ -121,8 +131,9 @@ BLIZZARD_GALE_KMH = 55.0        # with any snow at all
 
 
 def classify(code, wind_kmh=0.0):
-    """One WMO code (+ wind) -> one of the six ordinary states, or blizzard.
+    """One WMO code (+ wind) -> an ordinary state, a blizzard, or None.
 
+    None is a clear sky: no weather layer, serve the mint unchanged.
     NEVER returns 'tornado'; there is no WMO code for one. See from_alert().
     """
     state = WMO_STATES.get(int(code), FALLBACK)
@@ -263,7 +274,7 @@ def stable_state(token_id, weights=None):
 # uniformly: most of the time it is clear or cloudy, and the two severe
 # states stay rare enough to be worth seeing.
 DEFAULT_MIX = {
-    "clear": 40, "overcast": 24, "rain": 16, "fog": 7,
+    None: 40, "overcast": 24, "rain": 16, "fog": 7,
     "snow": 8, "storm": 4, "blizzard": 1, "tornado": 1,
 }
 
@@ -281,16 +292,20 @@ def main():
         for code, state in sorted(WMO_STATES.items()):
             by_state.setdefault(state, []).append(code)
         print(f"{len(WMO_STATES)} WMO codes -> "
-              f"{len(by_state)} of the eight states\n")
+              f"{len(by_state) - 1} states plus None\n")
         for state, codes in by_state.items():
-            print(f"  {state:9} {', '.join(str(c) for c in codes)}")
+            label = "None" if state is None else state
+            print(f"  {label:9} {', '.join(str(c) for c in codes)}"
+                  + ("   (clear sky — serve the mint unchanged)"
+                     if state is None else ""))
         print(f"\n  blizzard  snow + wind >= {BLIZZARD_WIND_KMH:.0f} km/h "
               f"(codes {sorted(HEAVY_SNOW)}) "
               f"or >= {BLIZZARD_GALE_KMH:.0f} km/h (any snow)")
         print("  tornado   NOT derivable from a WMO code — needs an alert "
               "feed; see from_alert()")
         print("\nstable_state() for tokens 1-12 (the no-locale fallback):")
-        print("  " + "  ".join(f"{i}:{stable_state(i)}" for i in range(1, 13)))
+        print("  " + "  ".join(f"{i}:{stable_state(i) or 'clear'}"
+                               for i in range(1, 13)))
 
     if args.lat is not None and args.lon is not None:
         print(f"\nlive: {args.lat:.3f},{args.lon:.3f} "

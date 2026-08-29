@@ -21,14 +21,15 @@ Outputs, into dynamic/proof/anim/:
   weather_<state>_strip.png   a filmstrip of 6 frames, for reading on paper
   weather_all.png             every moving state's filmstrip stacked
 
-A state with no motion is never exported as an animation. Encoding N
-identical frames of a still spends a downscale and a lossy round-trip to
-say nothing at all -- and `clear` is the state most holders are in most of
-the time, so it must cost the plate nothing.
+There is no `clear` state to export: a clear sky is the absence of weather
+and the minted PNG already is it, so nothing here should ever re-encode a
+copy of the mint. The motionless branch below stays as the guard that
+keeps it that way -- a named state that did not move would be a state for
+doing nothing, which is what `clear` was.
 
 From the repo root:
 
-    python3 dynamic/animate.py                       # all eight, blue dusk
+    python3 dynamic/animate.py                       # all seven, blue dusk
     python3 dynamic/animate.py --phase night --size 640
     python3 dynamic/animate.py --only blizzard tornado
 """
@@ -53,16 +54,14 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 # What each state is actually doing, for the filmstrip captions -- and so
 # the motion design is written down somewhere other than the numbers.
 MOTION = {
-    "clear": "no motion — a clear sky is a still",
     "overcast": "cloud shadow drifting across the plate",
-    "fog": "haze density rolling through, thickening and thinning",
+    "fog": "a ground bank whose top edge rolls; the sky above stays sharp",
     "rain": "two depth bands falling down-and-right, near band 2x faster",
     "snow": "slow fall with a sideways sway, one cycle per loop",
     "storm": "heavy rain, plus a lightning strike and its echo",
-    "blizzard": "driven snow, three tiles across for every one down, "
-                "under a gusting whiteout",
+    "blizzard": "driven snow over a whiteout band, on settled drifts",
     "tornado": "the funnel snakes once, its banding climbs three times, "
-               "and the debris orbits twice",
+               "the debris orbits twice and more blows past",
 }
 
 
@@ -197,9 +196,9 @@ def main():
     for wx in states:
         # A STATE WITH NO MOTION IS NEVER EXPORTED AS AN ANIMATION.
         # Encoding N identical frames of a still spends a downscale and a
-        # lossy round-trip to say nothing at all. 'clear' is the common
-        # case and it must cost the plate nothing, so it goes out as a
-        # lossless PNG at full mint resolution instead.
+        # lossy round-trip to say nothing at all. No named state should
+        # reach this branch any more -- it is the guard, and verify_sky.py
+        # fails if one does.
         if not skymod.has_motion(wx):
             still = skymod.apply_sky(base, protect, args.phase, wx,
                                      seed=args.token)

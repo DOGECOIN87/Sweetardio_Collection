@@ -73,7 +73,9 @@ def main():
     ap.add_argument("--param", default="sh_amt")
     ap.add_argument("--values", nargs="+", type=float,
                     default=[0.54, 0.42, 0.30, 0.20, 0.10])
-    ap.add_argument("--weather", default="clear")
+    ap.add_argument("--weather", default=None,
+                    help="a WEATHER_STATES key; omit for a clear sky, which "
+                         "is the absence of a state rather than one of them")
     ap.add_argument("--token", type=int, default=1)
     ap.add_argument("--cell", type=int, default=430)
     args = ap.parse_args()
