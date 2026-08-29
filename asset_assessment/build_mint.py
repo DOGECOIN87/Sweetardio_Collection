@@ -185,6 +185,18 @@ def main():
     ap.add_argument("--masks", action="store_true",
                     help="with --render, also write each token's PROTECT "
                          "MASK to output/mint/masks/ for dynamic/sky.py")
+    # Solana metadata that is a BUSINESS decision, not a rendering one, so
+    # none of it has a default: royalties and payout addresses are the
+    # owner's to set. Passing --animation is what turns the dynamic loops
+    # from files nobody can find into something a wallet will play -- it
+    # also builds properties.files[] and category, which the bare field
+    # needs on Solana. See generator.token_metadata().
+    ap.add_argument("--animation", default=None, metavar="TEMPLATE",
+                    help="animation_url template, '{id}' substituted — "
+                         "e.g. '{id}.mp4' or 'ipfs://CID/{id}.mp4'")
+    ap.add_argument("--symbol", default=None)
+    ap.add_argument("--royalty-bps", type=int, default=None,
+                    help="seller_fee_basis_points, e.g. 500 for 5%%")
     args = ap.parse_args()
     random.seed(args.seed)
 
@@ -424,8 +436,12 @@ def main():
         name = None
         if t.get("secret_rare"):
             name = g.secret_rare_token_name(t["secret_rare"])
-        token = g.token_metadata(t["attributes"], token_id=tid,
-                                 image=f"{tid}.png", name=name)
+        token = g.token_metadata(
+            t["attributes"], token_id=tid, image=f"{tid}.png", name=name,
+            animation_url=(args.animation.replace("{id}", str(tid))
+                           if args.animation else None),
+            symbol=args.symbol,
+            seller_fee_basis_points=args.royalty_bps)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)
     # compact manifest (drop the embedded attributes to keep it small)

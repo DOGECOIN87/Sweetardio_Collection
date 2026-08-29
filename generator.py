@@ -512,21 +512,82 @@ COLLECTION_DESCRIPTION = (
 )
 
 
+# Mime types for the file extensions this collection actually emits. Used
+# to type properties.files[] -- a marketplace that reads the file list
+# rather than the bare `image` / `animation_url` fields needs the type to
+# know what it is being handed.
+_MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+         ".webp": "image/webp", ".gif": "image/gif", ".mp4": "video/mp4",
+         ".webm": "video/webm", ".html": "text/html", ".glb": "model/gltf-binary"}
+
+
+def _mime(uri):
+    return _MIME.get(os.path.splitext(str(uri).split("?")[0])[1].lower(),
+                     "application/octet-stream")
+
+
 def token_metadata(attributes, token_id=None, image=None,
-                   name=None, description=None):
+                   name=None, description=None, animation_url=None,
+                   symbol=None, seller_fee_basis_points=None,
+                   creators=None, external_url=None):
     """Wrap an attributes list (from extract_metadata) into a complete,
     OpenSea-compatible token metadata object.
 
     token_id : int  -> default name becomes "Sweetardio Collection #<id>".
     image    : str  -> image URI/path (e.g. "ipfs://CID/123.png" or "123.png").
-    Keys are ordered name, description, image, attributes for clean files."""
+
+    animation_url, if given, ALSO builds the Metaplex `properties` block --
+    `files[]` typed by extension and `category: "video"` -- because on
+    Solana the bare field is not enough on its own. Marketplaces and
+    wallets differ in which they read, and a token that carries one without
+    the other plays on some surfaces and not others.
+
+    `image` MUST stay a still even when an animation is attached. Every
+    grid, thumbnail, search result and push notification uses it; animation
+    only ever plays in a detail view, often only on hover or click.
+
+    symbol, seller_fee_basis_points and creators are Metaplex fields with
+    no sensible default -- royalties and payout addresses are the owner's
+    decision, not this function's -- so they are emitted only when passed.
+
+    Keys are ordered name, symbol, description, image, animation_url,
+    external_url, attributes, properties for clean files."""
     meta = {}
     meta["name"] = name or (f"{COLLECTION_NAME} #{token_id}"
                             if token_id is not None else COLLECTION_NAME)
+    if symbol is not None:
+        meta["symbol"] = symbol
     meta["description"] = description or COLLECTION_DESCRIPTION
+    if seller_fee_basis_points is not None:
+        meta["seller_fee_basis_points"] = seller_fee_basis_points
     if image is not None:
         meta["image"] = image
+    if animation_url is not None:
+        meta["animation_url"] = animation_url
+    if external_url is not None:
+        meta["external_url"] = external_url
     meta["attributes"] = attributes
+
+    files = []
+    if image is not None:
+        files.append({"uri": image, "type": _mime(image)})
+    if animation_url is not None:
+        files.append({"uri": animation_url, "type": _mime(animation_url)})
+    props = {}
+    if files:
+        props["files"] = files
+    if animation_url is not None:
+        # Not a typed field of the Metaplex standard -- it rides the
+        # JsonMetadata type's open index signature -- but it is what makes
+        # a surface treat the token as playable rather than as a still with
+        # an extra URL hanging off it. Convention, and load-bearing.
+        props["category"] = "video"
+    if creators is not None:
+        props["creators"] = creators
+    # Only attach `properties` when there is something in it, so a plain
+    # static mint keeps emitting byte-identical metadata to before.
+    if props and (animation_url is not None or creators is not None):
+        meta["properties"] = props
     return meta
 
 

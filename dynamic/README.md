@@ -334,11 +334,38 @@ in `properties.files[]`.
 yuv444p or with an odd dimension is what a hardware decoder or a phone
 refuses, and it fails as a **black frame** rather than as an error.
 
+`asset_assessment/verify_media.py` now checks that from the bytes, and the
+exports come back: **H.264 Main profile, level 2.2, yuv420p, 512×512,
+faststart (`moov` before `mdat`) on all seven**. Main profile is what makes
+the pixel format provable without decoding anything — `chroma_format_idc`
+only exists in the SPS for the *High* profiles, so Baseline/Main/Extended
+infer 4:2:0 by definition. Level 2.2 is far under the 4.0 where hardware
+support starts thinning.
+
+It also decodes each loop and checks the **encoded** wrap, which
+`verify_sky.py` cannot: that one proves the *source* frames at t=0 and t=1
+are bit-identical, but the encoder is lossy and could still put a visible
+step at the loop point. Measured, the wrap is 1.1–11.3 /255 depending on
+the state and always in proportion to the motion around it.
+
+**None of that proves a marketplace plays them.** Support differs per
+surface and changes without notice; the only honest test is one real token
+on Phantom, Magic Eden and Tensor. What the checks buy is that when it
+fails there, the file and the JSON are not the reason.
+
 Three things hold regardless of format:
 
 - **`image` must stay a still PNG.** Every grid, thumbnail, search result
   and notification uses `image`. Animation only ever plays in the detail
-  view, often only on hover or click.
+  view, often only on hover or click. `verify_media.py` fails a metadata
+  file whose `image` points at an mp4.
+- **The bare `animation_url` is not enough on Solana.** It needs the
+  Metaplex `properties` block beside it — `files[]` typed by mime, and
+  `category: "video"` — because surfaces differ in which they read.
+  `token_metadata(animation_url=...)` builds both together for that
+  reason. Worth knowing: `category` is **not** a typed field of the
+  Metaplex standard. It rides the `JsonMetadata` type's open index
+  signature — convention the marketplaces read, not schema.
 - **Caching is the real ceiling, not playback.** Marketplaces cache media
   hard, and Solana has no ERC-4906-style "metadata changed" event to nudge
   them. A loop showing *live* weather will show whatever the weather was
@@ -374,8 +401,17 @@ python3 dynamic/animate.py                        # weather loops (mp4/webp)
 python3 dynamic/verify_sky.py                     # THE GATE
 
 python3 asset_assessment/make_weather_contact.py  # the approval sheet
-python3 asset_assessment/build_mint.py --render --masks   # mint + masks
+python3 asset_assessment/verify_media.py          # will the loops PLAY
+python3 asset_assessment/build_mint.py --render --masks \
+        --animation '{id}.mp4' --symbol SWEET --royalty-bps 500
 ```
+
+`--animation` is what closes the gap between a correct render and a holder
+seeing it move. Without it the mint emits `name`, `description`, `image`
+and `attributes` and nothing else — no `animation_url`, no `properties` —
+so the loops would have displayed **nowhere**, on any surface, however
+good the files were. `--symbol` and `--royalty-bps` have no defaults on
+purpose: royalties and payout addresses are the owner's decision.
 
 `make_weather_contact.py` is what decides whether a *new* state ships.
 Note that its distinctness number is measured over the **plate region
