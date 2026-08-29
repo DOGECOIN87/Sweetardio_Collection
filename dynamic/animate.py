@@ -62,6 +62,8 @@ MOTION = {
     "blizzard": "driven snow over a whiteout band, on settled drifts",
     "tornado": "the funnel snakes once, its banding climbs three times, "
                "the debris orbits twice and more blows past",
+    "flooded": "the surface rolls and the refraction wobbles beneath it; "
+               "the only state that touches the character",
 }
 
 

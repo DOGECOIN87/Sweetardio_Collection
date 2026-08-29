@@ -14,6 +14,33 @@ sample token, and it is not an approximation — protected pixels come back
 **bit-identical**, and alpha is preserved bit-for-bit, the same discipline
 `shade_skin_balls.py` and `shade_eyes.py` hold to.
 
+### One exception, and it is checked rather than waived
+
+**`flooded` is the only state that touches the character**, below its
+waterline. It has to: water the figure stands *in front of* is a puddle
+backdrop, not a flood, and the ask was a character submerged in it. So the
+water runs **after** the protect blend, over the finished frame.
+
+Everything about the exception is bounded, and `sky.touches_character()`
+makes it a thing code can ask about rather than a name to remember:
+
+- **Above the highest the water can ever reach, the rule still holds
+  exactly** — bit-identical protected pixels, and `verify_sky.py` runs that
+  check instead of skipping the state. Measured: 335,471 protected pixels
+  above the line, unchanged; 176,573 below it, changed on purpose.
+- **Alpha is never touched, at any depth.** That is not a taste question —
+  the whole cast's face geometry is registered to it.
+- **The water stays off the face.** `sky.waterline()` derives its bounds
+  from the config rather than declaring them beside it, and the gate fails
+  if the water reaches the face hole's underside at 0.52 of the canvas.
+  Drowning the one part of the token a holder looks at is not a flood, it
+  is a deleted character.
+
+If you need the old guarantee unconditionally — "no state ever alters a
+minted pixel" — the way to keep it is to not ship this state, not to
+soften it. Half-submerging a character while claiming the art is untouched
+would be the worst of both.
+
 ## Why it is a grade, not a re-render
 
 A full composite is **~2s and needs all 441MB of `traits/`**, so re-running
@@ -88,7 +115,7 @@ That is the state most holders are in most of the time, so it must cost the
 plate nothing at all — and now it provably does, because there is nothing
 there to run.
 
-## Five ordinary states, then two that are an event
+## Five ordinary states, then three that are an event
 
 Open-Meteo (free, no key, takes lat/lon directly) returns ~100 WMO codes.
 `weather.py` collapses them: **five** named states cover the ordinary sky,
@@ -109,13 +136,21 @@ directions:
   snow at the NWS's own 56km/h. The NWS definition proper (56km/h sustained
   plus visibility under 400m for three hours) is a handful of tokens a year
   worldwide — rare enough that nobody would ever see the state.
-- **`tornado` is not derivable from Open-Meteo at all.** There is no WMO
-  code for one and no field that implies one; 99 is a thunderstorm with
-  heavy hail, which is the closest the table gets and is still not a
-  tornado. `classify()` never returns it — it comes from a severe-weather
-  **alert feed** through `from_alert()`, or it is set by hand for a
-  collection-wide event. Reading hail as a tornado would put the rarest
-  state in the set on several thousand hailstorms a year.
+- **`tornado` and `flooded` are not derivable from Open-Meteo at all.**
+  There is no WMO code for either. 99 is a thunderstorm with heavy hail,
+  the closest the table gets to a tornado and still not one; and flooding
+  is a consequence of rain over hours, terrain and drainage rather than a
+  reading of the sky at an instant — the same 20mm floods one valley and
+  not the next. `classify()` never returns either. Both come from a
+  severe-weather **alert feed** through `from_alert()`, or are set by hand
+  for a collection-wide event. Reading hail as a tornado would put the
+  rarest state in the set on several thousand hailstorms a year; reading
+  heavy rain as a flood would put a flood on most of the tropics most of
+  the summer.
+
+  `ALERT_STATES` is ordered **most severe first**, and the order is the
+  point: a tornado warning and a flood warning are routinely active over
+  the same county at the same time, and a token can only be in one state.
 
 `fetch()` never raises. A render request is on the critical path of someone
 looking at their token, so a slow or broken weather service must cost them
@@ -142,6 +177,13 @@ The fix is not a weaker effect, it is a **placed** one:
   lays a drift along the bottom eighth with an undulating surface. The
   driven snow is the event; the drift is the evidence it has been going a
   while, which is what separates a blizzard from heavy snow at a glance.
+- **The flood is placed by definition.** It is the clearest case of the
+  same idea: the water occupies the bottom 40% and the plate above the
+  waterline is untouched. It also *refracts and mirrors* the plate rather
+  than hazing it, so it moves the background's contrast around instead of
+  removing it — 58% of the plate's detail kept at noon against fog's 43%,
+  despite changing far more of the frame, and its chroma comes out *above*
+  100% because the water adds its own colour.
 - **The tornado stopped darkening the sky to be seen.** It used to crush
   the whole plate so a pale funnel would read against it. Now the funnel
   carries itself — an opaque column with a **lit rim** on its upper-left
@@ -232,6 +274,7 @@ filmstrip; only a numeric check catches it.
 | `storm` | heavy rain, plus a lightning strike and its echo |
 | `blizzard` | driven snow over a whiteout band, on settled drifts |
 | `tornado` | the funnel snakes once, its banding climbs three times, the debris orbits twice and more blows past |
+| `flooded` | the surface rolls and the refraction wobbles beneath it |
 
 **A motionless state is never exported as an animation.** Encoding N
 identical frames of a still spends a downscale and a lossy round-trip to
@@ -323,6 +366,11 @@ python3 asset_assessment/build_mint.py --render --masks   # mint + masks
 ```
 
 `make_weather_contact.py` is what decides whether a *new* state ships.
+Note that its distinctness number is measured over the **plate region
+only**, which understates `flooded` badly — the biggest thing that state
+changes is the character, and the character is exactly what that
+measurement excludes. It scores dE 11.7 against `rain` on the plate alone
+and is unmistakable on the sheet.
 `render.py --sheet` grades one token, which cannot answer either question
 that matters: does the state hold across the plate **family**, and is it a
 new trait or a second copy of one the set already has. So it renders every

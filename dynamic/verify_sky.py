@@ -13,6 +13,15 @@ state, for every sample token it finds:
 
   1. Wherever the protect mask is fully opaque, the output is BIT-IDENTICAL
      to the minted PNG. Not "close" -- equal.
+
+     ONE STATE IS EXEMPT, and the exemption is checked rather than waived.
+     `flooded` puts the character IN the water, which cannot be done from
+     behind it -- water the figure stands in front of is a puddle backdrop,
+     not a flood. So for a state where sky.touches_character() is True this
+     asserts the same equality ABOVE the highest the water can ever reach,
+     and separately that the water stays clear of the face. Every other
+     state is held to the whole mask, as before. Alpha (check 3) is never
+     exempt at any depth.
   2. `day` with NO weather returns the mint unchanged in full, since that
      grade is defined to be the identity. There is no `clear` state -- the
      mint already is one -- so this is the None case.
@@ -78,6 +87,13 @@ OPAQUE = 255
 # fire on a slightly wider body.
 FUNNEL_MIN_VISIBLE = 0.60
 
+# The lowest the water may reach before it starts drowning the face. The
+# face hole is FACE_HOLE_WIDTH (250) wide about y=601 of a 1393 canvas, so
+# its underside sits at 0.521; a waterline below this number is under the
+# chin of every character in the cast. Kept here rather than in sky.py
+# because it is a fact about the ART, not about the water.
+FACE_UNDERSIDE = (601 + 250 / 2) / 1393
+
 # The least of the plate's own brightness-normalised micro-contrast each
 # state promises to leave behind, measured against THE SAME PHASE WITH NO
 # WEATHER so the number is what the weather costs and not what the hour
@@ -94,9 +110,9 @@ FUNNEL_MIN_VISIBLE = 0.60
 # the binding case and `day` is kept as the guard against a future state
 # that does not follow that shape.
 #
-# Floors are set ~20% under the NIGHT measurement, over two tokens:
+# Floors are set ~20% under the NIGHT measurement, over three tokens:
 # overcast 72, fog 23, rain 87, snow 85, storm 116, blizzard 31,
-# tornado 48.
+# tornado 48, flooded 31.
 #
 # fog and blizzard are the loosest because obscuring IS the state; they
 # earn it by doing it in a BAND along the ground instead of over the whole
@@ -107,6 +123,11 @@ PLATE_DETAIL_PHASES = ("day", "night")
 PLATE_DETAIL_FLOOR = {
     "overcast": 0.62, "fog": 0.18, "rain": 0.76, "snow": 0.72,
     "storm": 0.92, "blizzard": 0.25, "tornado": 0.40,
+    # flooded refracts and MIRRORS the plate rather than hazing it, so it
+    # moves the background's contrast around instead of removing it --
+    # 58% at noon against fog's 43%, despite changing far more. Night is
+    # where it costs, like every state that tints: 31%.
+    "flooded": 0.25,
 }
 
 
@@ -167,8 +188,19 @@ def main():
                 checked += 1
                 tag = f"token {idx} {phase}+{weather}"
 
-                # 1. character, stickers and overlays untouched
-                if not np.array_equal(out[protected], b[protected]):
+                # 1. character, stickers and overlays untouched -- above
+                #    the waterline only, for the one state that submerges
+                if skymod.touches_character(weather):
+                    top = skymod.waterline(weather)[0]
+                    dry = protected & (
+                        np.arange(b.shape[0])[:, None] < int(top * b.shape[0]))
+                    if not np.array_equal(out[dry], b[dry]):
+                        d = int(np.abs(out[dry].astype(int)
+                                       - b[dry].astype(int)).max())
+                        failures.append(
+                            f"{tag}: protected pixels ABOVE the waterline "
+                            f"changed (max delta {d})")
+                elif not np.array_equal(out[protected], b[protected]):
                     d = int(np.abs(out[protected].astype(int)
                                    - b[protected].astype(int)).max())
                     failures.append(f"{tag}: protected pixels changed "
@@ -186,6 +218,33 @@ def main():
                                         f"the plate")
                 elif n_plate and same_plate:
                     failures.append(f"{tag}: pass did nothing to the plate")
+
+    # 1b. a submerging state must keep the water off the face, and must
+    #     actually reach the character rather than only the plate
+    for weather in skymod.WEATHER_STATES:
+        if not skymod.touches_character(weather):
+            continue
+        top, bottom = skymod.waterline(weather)
+        if bottom <= FACE_UNDERSIDE:
+            failures.append(
+                f"{weather}: water reaches {bottom:.3f}, at or above the "
+                f"face underside {FACE_UNDERSIDE:.3f} — it would drown the "
+                f"one part of the token a holder looks at")
+        if not (0.0 < top < bottom < 1.0):
+            failures.append(f"{weather}: waterline {top:.3f}..{bottom:.3f} "
+                            f"is not inside the canvas")
+        wet_px = 0
+        for idx, bpath, mpath in toks:
+            m = np.asarray(Image.open(mpath).convert("L"))
+            rows = np.arange(m.shape[0])[:, None]
+            wet_px += int(((m >= OPAQUE)
+                           & (rows >= int(bottom * m.shape[0]))).sum())
+        if wet_px == 0:
+            failures.append(f"{weather}: submerges nothing — no protected "
+                            f"pixel falls below the waterline")
+        print(f"  '{weather}' submerges: water {top:.2f}..{bottom:.2f}, "
+              f"face underside {FACE_UNDERSIDE:.2f}, {wet_px:,} character "
+              f"px under water")
 
     # 5. no weather is free; every named state moves
     if skymod.is_spatial(None) or skymod.has_motion(None):
@@ -307,9 +366,13 @@ def main():
         for f in failures[:20]:
             print("  " + f)
         sys.exit(1)
+    subs = [w for w in skymod.WEATHER_STATES if skymod.touches_character(w)]
     print("OK — every grade left the character, stickers, overlays and "
           "alpha bit-identical to the mint, and every weather loop is "
           "seamless.")
+    if subs:
+        print(f"     ({', '.join(subs)} excepted below the waterline, by "
+              f"design, and checked above it.)")
 
 
 if __name__ == "__main__":

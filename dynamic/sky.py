@@ -258,6 +258,45 @@ WEATHER_STATES = {
         # tells the eye the whole scene is inside the event rather than
         # watching one from a safe distance.
         blown="debris", blown_density=2.5),
+
+    # THE ONLY STATE THAT TOUCHES THE CHARACTER. Everything else in this
+    # file composites behind the figure and comes out bit-identical to the
+    # mint; a flood cannot, because water the character is standing in
+    # front of is not a flood, it is a puddle backdrop. So `submerge` runs
+    # AFTER the protect blend, over the finished frame, and only below the
+    # waterline. See _submerge() for what that costs and what still holds.
+    #
+    # The waterline sits at 0.60 of the canvas: the face composites at
+    # y=601 of 1393 (CLAUDE.md, "Canvas and face rule") and every body's
+    # base is lower still, so this is chest-deep on the cast -- the figure
+    # is unmistakably IN the water while its face, the thing a holder
+    # bought, stays above it. Fully submerging the cast would drown the art.
+    #
+    # The tone half is what a flood day actually looks like: the rain has
+    # stopped, the light is flat and the sky is dishwater. The drama is in
+    # the water, not in the grade.
+    "flooded": dict(
+        exposure=0.94, contrast=-0.12, lift=0.030, sat=0.80, diffuse=0.5,
+        haze=(0.44, 0.48, 0.50), haze_amt=0.10,
+        sh_tint=(0.10, 0.15, 0.18), sh_amt=0.14, drift=0.024,
+        submerge=dict(
+            level=0.60,           # waterline, fraction of canvas height
+            amp=0.016,            # how far the surface undulates
+            feather=0.004,        # softness of the waterline itself
+            refract=0.009,        # sideways displacement under water
+            refract_freq=8.0,     # wobbles down the depth
+            refract_cycles=2,     # integer -> seamless
+            reflect=0.46,         # mirrored sky/figure under the surface
+            reflect_fade=0.10,    # how fast that reflection dies with depth
+            tint=(0.15, 0.33, 0.40),
+            tint_amt=0.30,        # at the surface
+            deep_amt=0.72,        # at the bottom of the frame
+            darken=0.40,
+            foam=0.60,            # the bright line where air meets water
+            foam_width=0.005,
+            caustic=0.13,
+            caustic_cycles=1),
+        particles="rain", density=0.7),
 }
 
 # What each particle field is lerped TOWARD. Rain is a cold near-white,
@@ -793,6 +832,96 @@ def _wet(weather):
     return {} if weather is None else WEATHER_STATES[weather]
 
 
+# ------------------------------------------------------------ the flood
+#
+# `flooded` is the only state that touches the character, and this is the
+# function that does it. It runs AFTER the protect blend, on the finished
+# frame, so what it displaces and tints is the composited token -- plate,
+# body, footwear and all -- rather than the plate alone.
+#
+# THAT IS A DELIBERATE BREAK IN THIS MODULE'S ONE RULE, and it is confined
+# to below the waterline. Above the line the rule still holds exactly:
+# every protected pixel comes back bit-identical to the mint, and
+# verify_sky.py checks that separately for a submerging state instead of
+# skipping it. Alpha is never touched at any depth -- that is not a taste
+# question, it is what the whole cast's face geometry is registered to.
+#
+# The water is four things stacked, cheapest first:
+#
+#   refraction   each row under the surface is displaced sideways by a
+#                sine of its depth. It is what makes the submerged half
+#                read as SEEN THROUGH something rather than tinted.
+#   reflection   the frame mirrored about the waterline, strong just under
+#                it and dying within a tenth of the canvas. This is the
+#                half that actually sells water; tint and wobble alone
+#                read as coloured glass.
+#   depth        tint and darkening ramping from the surface to the bottom
+#                of the frame, so the water has a floor rather than a
+#                uniform wash.
+#   foam         a bright line exactly on the boundary. Air meeting water
+#                is the highest-contrast edge in any real flood photo, and
+#                without it the surface is a colour change, not a surface.
+#
+# Everything that varies with t is an integer number of cycles per loop,
+# like every other motion here.
+def _submerge(rgb, cfg, seed, t=0.0):
+    """Put everything below the waterline under water. rgb is (h, w, 3)."""
+    h, w = rgb.shape[:2]
+    t = float(t) % 1.0
+    v, xs = _grid(h, w)
+    rng = np.random.default_rng(seed ^ 0xF10D)
+    phase = _F(rng.random() * 2.0 * np.pi)
+
+    # The surface: a level plus the shared undulation, so it rolls like
+    # the fog bank and the snow drifts do rather than sitting ruler-flat.
+    surf = _F(cfg["level"]) + _undulate(w, seed | 11, t) * _F(cfg["amp"])
+    depth = v - surf                                   # >0 under water
+    under = smoothstep(depth / _F(cfg["feather"]))
+
+    if float(under.max()) <= 0.0:
+        return rgb
+
+    # 1. refraction -- a sideways offset that varies with depth
+    off = (_F(cfg["refract"] * w)
+           * np.sin(_F(2.0 * np.pi) * (_F(cfg["refract_freq"]) * v
+                                       + _F(cfg["refract_cycles"] * t))
+                    + phase))
+    xi = np.clip(np.rint(xs + off), 0, w - 1).astype(np.intp)
+    rows = np.arange(h, dtype=np.intp)[:, None]
+    water = rgb[rows, xi]
+
+    # 2. reflection -- the frame mirrored about the surface, fading down
+    ys = np.clip(np.rint((surf * _F(2.0) - v) * _F(h)),
+                 0, h - 1).astype(np.intp)
+    mirror = rgb[ys, np.clip(xi, 0, w - 1)]
+    r = (_F(cfg["reflect"])
+         * np.exp(-np.maximum(depth, 0.0) / _F(cfg["reflect_fade"])))
+    water = water + (mirror - water) * r[..., None]
+
+    # 3. depth -- tint and darken toward the bottom of the frame
+    k = np.clip(depth / _F(max(1.0 - cfg["level"], 1e-3)), 0.0, 1.0)
+    water = water * (_F(1.0) - _F(cfg["darken"]) * k)[..., None]
+    amt = _F(cfg["tint_amt"]) + (_F(cfg["deep_amt"])
+                                 - _F(cfg["tint_amt"])) * k
+    water = water + (_c(cfg["tint"]) - water) * amt[..., None]
+
+    # Caustics: the bright net of light on a shallow bottom. Rolled by
+    # exactly its own width, so it wraps like every other drifting field.
+    if cfg.get("caustic", 0.0) > 1e-4:
+        n = _noise_field(h, w, seed | 13, max(h, w) / 30.0)
+        rolled = np.roll(n, int(round(t * cfg.get("caustic_cycles", 1) * w)),
+                         axis=1)
+        water = water + (rolled * (_F(1.0) - k) * _F(cfg["caustic"]))[..., None]
+
+    # 4. foam -- the line where air meets water
+    if cfg.get("foam", 0.0) > 1e-4:
+        band = np.exp(-(depth / _F(cfg["foam_width"])) ** 2)
+        water = water + (_F(1.0) - water) * (band * _F(cfg["foam"]))[..., None]
+
+    np.clip(water, 0.0, 1.0, out=water)
+    return rgb * (1.0 - under[..., None]) + water * under[..., None]
+
+
 def _combine(sky, wet):
     """Merge the sky and weather tables into one parameter set.
 
@@ -846,7 +975,8 @@ def has_motion(weather):
     """
     wet = _wet(weather)
     return bool(wet.get("particles") or wet.get("blown") or wet.get("flash")
-                or wet.get("band") or wet.get("drift", 0.0) > 1e-4)
+                or wet.get("band") or wet.get("submerge")
+                or wet.get("drift", 0.0) > 1e-4)
 
 
 def is_spatial(weather):
@@ -855,7 +985,52 @@ def is_spatial(weather):
     return (wet.get("diffuse", 0.0) > 0.05
             or bool(wet.get("particles")) or bool(wet.get("blown"))
             or bool(wet.get("flash")) or bool(wet.get("band"))
+            or bool(wet.get("submerge"))
             or wet.get("drift", 0.0) > 1e-4)
+
+
+def touches_character(weather):
+    """True if this state modifies pixels the protect mask covers.
+
+    THE ONE EXCEPTION to the rule the rest of this module is built on, and
+    it exists so the exception is a thing code can ask about rather than a
+    thing someone has to remember. `flooded` is the only True today.
+
+    A caller that promises a holder their character is untouched should
+    test this, not hardcode a name. verify_sky.py uses it to decide which
+    check to run: a state that does NOT touch the character must come back
+    bit-identical over the whole mask, and one that does must still come
+    back bit-identical ABOVE its waterline.
+    """
+    return bool(_wet(weather).get("submerge"))
+
+
+def waterline(weather):
+    """(highest, lowest) the water can ever reach, as fractions of height.
+
+    DERIVED from the submerge config rather than declared beside it, so it
+    cannot drift from the level the water actually reaches when someone
+    retunes the surface.
+
+    Both ends are load-bearing and verify_sky.py checks both:
+
+      highest  above this line a submerging state is still bound by the
+               module's rule -- protected pixels come back bit-identical.
+      lowest   the water must stay clear of the FACE. The face hole is
+               250px wide about y=601 of a 1393 canvas, so its underside
+               is at 0.52; water over that line drowns the one part of the
+               token a holder actually looks at.
+
+    Returns None for a state that does not submerge.
+    """
+    cfg = _wet(weather).get("submerge")
+    if cfg is None:
+        return None
+    # `under` is exactly zero at or above the surface, so the feather only
+    # matters below it -- subtracted from the top anyway, to be safe rather
+    # than exactly right.
+    return (cfg["level"] - cfg["amp"] - cfg["feather"],
+            cfg["level"] + cfg["amp"])
 
 
 def is_identity(phase, weather):
@@ -876,7 +1051,7 @@ def is_identity(phase, weather):
             and wet.get("haze_amt", 0.0) < 1e-4
             and wet.get("diffuse", 0.0) <= 0.05
             and not wet.get("particles") and not wet.get("blown")
-            and not wet.get("accum"))
+            and not wet.get("accum") and not wet.get("submerge"))
 
 
 def grade_static(base, phase="day", weather=None):
@@ -1012,6 +1187,17 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
     pr = np.asarray(protect.convert("L"), dtype=_F) / _F(255.0)
     pr = np.clip(pr + (1.0 - pr) * _F(1.0 - strength), 0.0, 1.0)[..., None]
     out = rgb * pr + fx * (1.0 - pr)
+
+    # THE EXCEPTION, and the only one. Everything above happened behind the
+    # character; a flood happens in front of the part of it that is under
+    # water. It runs here, on the composited frame, because that is the
+    # only place the character exists to be submerged -- and it is scaled
+    # by `strength` like everything else, so a preview at 0 is still the
+    # mint. Alpha is untouched: see below, it never enters this path.
+    sub_cfg = wet.get("submerge")
+    if sub_cfg is not None and strength > 1e-4:
+        flooded = _submerge(np.clip(out, 0.0, 1.0), sub_cfg, seed, t)
+        out = out + (flooded - out) * _F(strength)
 
     return Image.fromarray(
         (np.dstack([np.clip(out, 0, 1), alpha[..., None]]) * 255.0 + 0.5)

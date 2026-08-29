@@ -17,6 +17,7 @@ is distinguished elsewhere in the matrix.
 | `storm` | 97% | 53% |
 | `blizzard` | 26% | 55% |
 | `tornado` | 45% | 19% |
+| `flooded` | 38% | 112% |
 
 Worst of the 6 plates, against the SAME PHASE WITH NO WEATHER — so the number is
 what the weather costs, not what the hour of day costs. The per-state floors live in
@@ -25,16 +26,18 @@ what the weather costs, not what the hour of day costs. The per-state floors liv
 | new state | vs | dE | vs whole table (min) | verdict |
 |---|---|---|---|---|
 | `blizzard` | `snow` | 32.2 | 18.4 (`fog`) | distinct |
-| `tornado` | `storm` | 18.8 | 13.7 (`snow`) | distinct |
+| `tornado` | `storm` | 18.8 | 13.7 (`flooded`) | distinct |
+| `flooded` | `rain` | 11.7 | 8.0 (`snow`) | distinct |
 
 Full matrix (dE):
 
-| | overcast | fog | rain | snow | storm | blizzard | tornado |
-|---|---|---|---|---|---|---|---|
-| **overcast** | — | 18.2 | 3.3 | 4.8 | 12.4 | 36.5 | 13.8 |
-| **fog** | 18.2 | — | 20.9 | 14.4 | 29.7 | 18.4 | 22.6 |
-| **rain** | 3.3 | 20.9 | — | 7.3 | 9.4 | 39.1 | 14.2 |
-| **snow** | 4.8 | 14.4 | 7.3 | — | 16.1 | 32.2 | 13.7 |
-| **storm** | 12.4 | 29.7 | 9.4 | 16.1 | — | 47.6 | 18.8 |
-| **blizzard** | 36.5 | 18.4 | 39.1 | 32.2 | 47.6 | — | 34.7 |
-| **tornado** | 13.8 | 22.6 | 14.2 | 13.7 | 18.8 | 34.7 | — |
+| | overcast | fog | rain | snow | storm | blizzard | tornado | flooded |
+|---|---|---|---|---|---|---|---|---|
+| **overcast** | — | 18.2 | 3.3 | 4.8 | 12.4 | 36.5 | 13.8 | 9.8 |
+| **fog** | 18.2 | — | 20.9 | 14.4 | 29.7 | 18.4 | 22.6 | 13.8 |
+| **rain** | 3.3 | 20.9 | — | 7.3 | 9.4 | 39.1 | 14.2 | 11.7 |
+| **snow** | 4.8 | 14.4 | 7.3 | — | 16.1 | 32.2 | 13.7 | 8.0 |
+| **storm** | 12.4 | 29.7 | 9.4 | 16.1 | — | 47.6 | 18.8 | 19.4 |
+| **blizzard** | 36.5 | 18.4 | 39.1 | 32.2 | 47.6 | — | 34.7 | 29.7 |
+| **tornado** | 13.8 | 22.6 | 14.2 | 13.7 | 18.8 | 34.7 | — | 13.7 |
+| **flooded** | 9.8 | 13.8 | 11.7 | 8.0 | 19.4 | 29.7 | 13.7 | — |

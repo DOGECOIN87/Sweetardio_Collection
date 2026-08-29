@@ -36,13 +36,17 @@ reasons:
             at the thresholds below.
 
   tornado   is not derivable from Open-Meteo AT ALL. There is no WMO code
-            for it and no field that implies one; code 99 is a
+  flooded   for either, and no field that implies one. Code 99 is a
             thunderstorm with heavy hail, which is the closest the table
-            gets and is still not a tornado. classify() therefore NEVER
-            returns 'tornado'. It comes from a severe-weather ALERT feed
-            instead -- see from_alert() -- or it is set by hand. Treating
-            hail as a tornado would put the rarest state in the set on
-            every hailstorm on earth, several thousand a year.
+            gets to a tornado and is still not one; and flooding is a
+            consequence of rain over hours, terrain and drainage, not a
+            reading of the sky at an instant -- the same 20mm of rain
+            floods one valley and not the next. classify() therefore
+            NEVER returns either. Both come from a severe-weather ALERT
+            feed -- see from_alert() -- or are set by hand. Reading hail
+            as a tornado would put the rarest state in the set on several
+            thousand hailstorms a year; reading heavy rain as a flood
+            would put a flood on most of the tropics most of the summer.
 
 CALLING IT AT COLLECTION SCALE
 
@@ -157,25 +161,36 @@ def classify(code, wind_kmh=0.0):
 # hazard in a human-readable field, so the caller fetches its own feed and
 # hands the event names here. That also makes the state settable by hand
 # for a collection-wide event, which is the other reason to want it.
-_TORNADO_WORDS = ("tornado", "waterspout")
+# Ordered MOST SEVERE FIRST, and the order is the whole point: a tornado
+# warning and a flood warning are routinely active over the same county at
+# the same time, and a token can only be in one state. The tornado wins
+# because it is the rarer and the more specific of the two.
+#
+# "flash flood" is matched by "flood" already; it is not listed twice.
+ALERT_STATES = (
+    (("tornado", "waterspout"), "tornado"),
+    (("flood", "storm surge", "levee"), "flooded"),
+)
 
 
 def from_alert(events, base="storm"):
-    """Upgrade a state to 'tornado' when an alert feed names one.
+    """Upgrade a state when an alert feed names a hazard the art can show.
 
     events : an iterable of alert names/headlines, or a single string.
     base   : the state to keep when no alert matches.
 
-    A tornado warning is always accompanied by a thunderstorm, so `base`
-    is normally what classify() just returned, and the tornado replaces it
-    rather than compounding it.
+    These are the states no weather code can produce, so this is the only
+    way either of them is ever returned. A warning is normally accompanied
+    by the weather that caused it, so `base` is what classify() just
+    returned and the alert REPLACES it rather than compounding it -- a
+    token is in one state at a time.
     """
     if isinstance(events, str):
         events = [events]
-    for e in events or ():
-        low = str(e).lower()
-        if any(word in low for word in _TORNADO_WORDS):
-            return "tornado"
+    text = [str(e).lower() for e in (events or ())]
+    for words, state in ALERT_STATES:
+        if any(word in low for low in text for word in words):
+            return state
     return base
 
 
@@ -274,8 +289,8 @@ def stable_state(token_id, weights=None):
 # uniformly: most of the time it is clear or cloudy, and the two severe
 # states stay rare enough to be worth seeing.
 DEFAULT_MIX = {
-    None: 40, "overcast": 24, "rain": 16, "fog": 7,
-    "snow": 8, "storm": 4, "blizzard": 1, "tornado": 1,
+    None: 40, "overcast": 23, "rain": 16, "fog": 7,
+    "snow": 8, "storm": 4, "blizzard": 1, "tornado": 1, "flooded": 1,
 }
 
 
@@ -301,8 +316,9 @@ def main():
         print(f"\n  blizzard  snow + wind >= {BLIZZARD_WIND_KMH:.0f} km/h "
               f"(codes {sorted(HEAVY_SNOW)}) "
               f"or >= {BLIZZARD_GALE_KMH:.0f} km/h (any snow)")
-        print("  tornado   NOT derivable from a WMO code — needs an alert "
-              "feed; see from_alert()")
+        for words, state in ALERT_STATES:
+            print(f"  {state:9} NOT derivable from a WMO code — needs an "
+                  f"alert feed matching {list(words)}")
         print("\nstable_state() for tokens 1-12 (the no-locale fallback):")
         print("  " + "  ".join(f"{i}:{stable_state(i) or 'clear'}"
                                for i in range(1, 13)))

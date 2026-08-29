@@ -25,6 +25,13 @@ that actually decide whether a new state ships:
      unweathered mint. verify_sky.py holds the per-state floors; this is
      where the numbers are written down and looked at.
 
+`flooded` is measured here like any other state, but it is not like any
+other state: it is the only one that touches the CHARACTER, below its
+waterline. What that costs the character is not something a plate-region
+measurement can see, so it is not the number to judge that state by --
+verify_sky.py checks the part that matters (bit-identical above the line,
+water clear of the face) and the sheet is where you look at the rest.
+
 The measurement is mean CIE76 dE over the PLATE REGION ONLY, between every
 pair of states on the same plate at the same phase, averaged over plates.
 Plate region only because the character is bit-identical in every state by
@@ -75,12 +82,12 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 # None is a clear sky -- the mint itself, and the reference every other
 # state is measured against. There is no 'clear' state to render.
 ORDINARY = ["overcast", "fog", "rain", "snow", "storm"]
-SEVERE = ["blizzard", "tornado"]
+SEVERE = ["blizzard", "tornado", "flooded"]
 
 # Which existing state each new one is at risk of duplicating. Being far
 # from the average of the table is easy and means nothing; being far from
 # your nearest neighbour is the whole question.
-CONFUSABLE = {"blizzard": "snow", "tornado": "storm"}
+CONFUSABLE = {"blizzard": "snow", "tornado": "storm", "flooded": "rain"}
 
 # Mean plate dE below which two states are the same trait wearing two
 # names. See the calibration note in the header -- the closest already
