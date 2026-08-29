@@ -53,8 +53,15 @@ sys.path.insert(0, "asset_assessment")
 import generator as g
 from verify_separation import at_risk, plate_stats   # noqa: E402
 from build_char_compat import char_table              # noqa: E402
+from dynamic import sky as skymod                     # noqa: E402
 
 TRAIT_KEYS = ("character", "bg", "skin", "eye", "mouth", "arm", "wat", "sticker")
+
+# Weather is deliberately NOT in TRAIT_KEYS, so it is not part of the
+# uniqueness signature. Including it would let two tokens that are
+# identical in every other trait both mint, "distinguished" only by their
+# sky -- which is a weaker guarantee than the collection has today. Every
+# token is unique WITHOUT its weather, and the weather is then laid on top.
 
 # ---- arm rarity tiers (filename -> exact mint count) ----
 AK15        = "layer-layer-layer-layer-AK15.png"
@@ -135,6 +142,54 @@ CHARACTER_COUNTS = {
 PINNED_CHARS = frozenset(CHARACTER_COUNTS)
 
 
+# ---- weather (base name -> EXACT mint count) ----
+# 444 of the 4,444 carry an ANIMATED weather state, permanently. This is a
+# trait like any other here, not a live overlay: it is drawn once, baked
+# into the token's own still and loop, and it never changes again.
+#
+# That is the whole difference from the earlier design, and it is what
+# makes the state safe to put in `attributes`. A value that changed with
+# the real sky would be indexed by rarity tools as though it were
+# permanent and be wrong within the hour; a value assigned here IS
+# permanent, so it belongs in the rarity table alongside the arms.
+#
+# Tiered the same way the weapons are, by how much of an event the state
+# is. rain is weather; a tornado is something that happened to you.
+#
+#   ordinary  rain 110, snow 95, fog 80, storm 75   = 360
+#   severe    blizzard 40, flooded 30, tornado 14    =  84
+#
+# tornado lands at 14/4,444 (0.32%), which puts it between the AK15 (20)
+# and nothing else in the set -- the rarest trait the collection has.
+WEATHER_COUNTS = {
+    "rain": 110,
+    "snow": 95,
+    "fog": 80,
+    "storm": 75,
+    "blizzard": 40,
+    "flooded": 30,
+    "tornado": 14,
+}
+WEATHER_TOTAL = sum(WEATHER_COUNTS.values())      # 444
+
+# The allocator and the renderer keep two independent lists of what a
+# weather state is -- one here by rarity, one in dynamic/sky.py by art
+# direction -- so they are checked against each other at import. A state
+# allocated here that sky.py cannot grade would mint 40 tokens pointing at
+# an animation that can never be rendered, and nothing else would notice
+# until bake_weather.py died 400 tokens in. This is the same class of
+# check verify_trait_names.py runs over the trait tables.
+_unknown = sorted(set(WEATHER_COUNTS) - set(skymod.WEATHER_STATES))
+if _unknown:
+    sys.exit(f"WEATHER_COUNTS allocates {_unknown}, which dynamic/sky.py "
+             f"cannot render — states are {sorted(skymod.WEATHER_STATES)}")
+
+# Weather is kept OFF legendary-background slots, for exactly the reason
+# footwear and signature weapons are: the point of a legendary plate is
+# that you can see it, and every weather state is in front of the plate.
+# A tornado over a 1-of-50 background hides the thing that made it rare.
+
+
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
     t["character"] = char
@@ -193,7 +248,12 @@ def main():
     # needs on Solana. See generator.token_metadata().
     ap.add_argument("--animation", default=None, metavar="TEMPLATE",
                     help="animation_url template, '{id}' substituted — "
-                         "e.g. '{id}.mp4' or 'ipfs://CID/{id}.mp4'")
+                         "e.g. '{id}.mp4' or 'ipfs://CID/{id}.mp4'. Applied "
+                         "ONLY to the tokens that drew a weather state; the "
+                         "other 4,000 are stills and must not claim an "
+                         "animation they do not have")
+    ap.add_argument("--no-weather", action="store_true",
+                    help="mint without the animated weather tier at all")
     ap.add_argument("--symbol", default=None)
     ap.add_argument("--royalty-bps", type=int, default=None,
                     help="seller_fee_basis_points, e.g. 500 for 5%%")
@@ -263,6 +323,7 @@ def main():
     forced_stk  = [None] * N    # sticker filename or None
     forced_char = [None] * N    # base character name or None
 
+    forced_wx   = [None] * N    # weather state name or None
     forced_sr   = [None] * N    # secret-rare filename or None
     all_slots = list(range(N))
 
@@ -360,6 +421,21 @@ def main():
             forced_wat[s] = wat
             taken.add(s)
 
+    # 4b) weather -> exact counts on NON-legendary slots. Secret rares are
+    #     standalone art with no plate to weather and no protect mask to
+    #     hold the effect off them, so they are out too.
+    if not args.no_weather:
+        wx_free = [s for s in avail if s not in is_leg]
+        if WEATHER_TOTAL > len(wx_free):
+            sys.exit(f"WEATHER_COUNTS total {WEATHER_TOTAL} exceeds the "
+                     f"{len(wx_free)} non-legendary slots available")
+        random.shuffle(wx_free)
+        cur = 0
+        for wx, cnt in WEATHER_COUNTS.items():
+            for s in wx_free[cur:cur + cnt]:
+                forced_wx[s] = wx
+            cur += cnt
+
     # 5) stickers -> any composable slot, spread evenly across every sticker
     sticker_files = g.get_files(g.STICKERZ)
     stk_slots = random.sample(avail, min(STICKER_TOTAL, len(avail)))
@@ -421,6 +497,14 @@ def main():
                 continue
             seen.add(sig(t))
             t["legendary"] = leg is not None
+            if forced_wx[i] is not None:
+                # Appended rather than built by extract_metadata(), because
+                # weather is not a LAYER -- it is a grade applied to the
+                # finished composite, so there is nothing in the layer
+                # stack for that function to read.
+                t["weather"] = forced_wx[i]
+                meta = list(meta) + [{"trait_type": "Weather",
+                                      "value": forced_wx[i].title()}]
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
@@ -436,11 +520,14 @@ def main():
         name = None
         if t.get("secret_rare"):
             name = g.secret_rare_token_name(t["secret_rare"])
+        # An animation_url ONLY where there is an animation. A static
+        # token that claims one shows a broken player on every surface
+        # that believes it.
+        anim = (args.animation.replace("{id}", str(tid))
+                if args.animation and t.get("weather") else None)
         token = g.token_metadata(
             t["attributes"], token_id=tid, image=f"{tid}.png", name=name,
-            animation_url=(args.animation.replace("{id}", str(tid))
-                           if args.animation else None),
-            symbol=args.symbol,
+            animation_url=anim, symbol=args.symbol,
             seller_fee_basis_points=args.royalty_bps)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)
@@ -448,6 +535,8 @@ def main():
     slim = {}
     for tid, t in manifest.items():
         row = {k: t[k] for k in TRAIT_KEYS + ("legendary",)}
+        if t.get("weather"):
+            row["weather"] = t["weather"]
         if t.get("secret_rare"):
             row["secret_rare"] = t["secret_rare"]
         slim[tid] = row
@@ -508,6 +597,25 @@ def main():
         lo, hi = min(unpinned.values()), max(unpinned.values())
         p(f"OTHER CHARACTERS ({len(unpinned)} sharing the rest, "
           f"{lo}-{hi} each)\n")
+
+    wx_d = Counter(t.get("weather") for t in manifest.values()
+                   if t.get("weather"))
+    if WEATHER_COUNTS and not args.no_weather:
+        wbad = {w: wx_d.get(w, 0) for w, want in WEATHER_COUNTS.items()
+                if wx_d.get(w, 0) != want}
+        total_wx = sum(wx_d.values())
+        p(f"WEATHER (animated, {total_wx}/{N} = {100*total_wx/N:.1f}% of "
+          f"the supply):")
+        for w, want in WEATHER_COUNTS.items():
+            c = wx_d.get(w, 0)
+            p(f"  {w.title():22} {c:4}  {100*c/N:5.2f}%  (target {want})")
+        p(f"  -> all exact? {'YES' if not wbad else 'NO ' + str(wbad)}")
+        leg_wx = sum(1 for t in manifest.values()
+                     if t.get("weather") and t["legendary"])
+        p(f"  on legendary plates: {leg_wx} (must be 0 — weather hides the "
+          f"plate that made them rare)\n")
+        if leg_wx:
+            wbad["legendary_overlap"] = leg_wx
 
     arm_d = dist("arm")
     armed = sum(c for a, c in arm_d.items() if a is not None)

@@ -1,7 +1,23 @@
-# `dynamic/` — time-of-day and weather, on the background only
+# `dynamic/` — the weather pass, baked into 444 tokens
 
-A **prototype**, not a shipped feature. The renderer works and is verified;
-what is not yet decided is where it runs (see *Open decisions*).
+**The weather is not live.** It was designed as a live overlay and it is
+not one any more: `build_mint.py` draws a state once, at exact counts, and
+`bake_weather.py` renders it into that token's own still and loop. From
+then on it is a permanent trait like the arms or the footwear, and the
+files never change.
+
+That pivot deleted more than it added. Gone: the Open-Meteo client, the
+WMO code table, the locale question, the 30-minute cache, the alert feed,
+the "what happens when the API is down" fallback, and the whole worry about
+marketplaces caching a sky that has since changed. What is left is a
+renderer and 444 files.
+
+    444 of 4,444 (10%) carry weather:
+      rain 110 · snow 95 · fog 80 · storm 75 · blizzard 40 · flooded 30 · tornado 14
+
+`solar.py` and the eight sky phases still exist and still work, but they
+are no longer on the mint path — everything bakes at one phase (see
+`bake_weather.py`, `DEFAULT_PHASE`).
 
 ## The rule
 
@@ -105,24 +121,20 @@ reuses that luma instead of recomputing it.
 
 A clear sky is the **absence of weather**, not a weather worth grading. The
 minted token already *is* the clear-sky render, so a `clear` state would be
-a name for doing nothing — and worse, something a service might re-encode a
-copy of the mint to serve. `weather.py` returns `None` for WMO 0 and 1,
-every function in `sky.py` takes `None` where a state name goes, and
-`is_identity()` is what tells a service to hand back **the original minted
-bytes**.
+a name for doing nothing. Every function in `sky.py` takes `None` where a
+state name goes, and `is_identity()` returns True for it.
 
-That is the state most holders are in most of the time, so it must cost the
-plate nothing at all — and now it provably does, because there is nothing
-there to run.
+Under the baked model this is simply the other 4,000 tokens: they are
+minted, they are stills, and nothing in `dynamic/` ever touches them.
 
 ## Four ordinary states, then three that are an event
 
-Open-Meteo (free, no key, takes lat/lon directly) returns ~100 WMO codes.
-`weather.py` collapses them: **four** named states cover the ordinary sky,
-past which they stop reading as distinct traits and start reading as noise
-— drizzle and light rain are the same trait however different the code is.
-Call once per *distinct locale* bucketed to ~25km and cache 30 min — 4,444
-tokens is a few hundred real cities.
+**Four** named states cover the ordinary sky. That was the ceiling when the
+states had to be derived from ~100 WMO codes, and it survives the pivot for
+the same reason it was set: past four they stop reading as distinct traits
+and start reading as noise. As a rarity tier it also happens to be the
+right shape — the ordinary states take 360 of the 444 and the event states
+take 84.
 
 **`overcast` was the fifth and is retired.** It was the weakest state in
 the table by every measure taken here: dE 3.3 from `rain` and 4.8 from
@@ -144,81 +156,15 @@ not add to the noise the ceiling exists to stop. What they must not do
 is arrive by accident, and each is gated on more than a code — in opposite
 directions:
 
-- **`blizzard` is not a WMO code.** It is snow *and* wind, which Open-Meteo
-  returns as separate fields, so it is derived: heavy snow at 35km/h, any
-  snow at the NWS's own 56km/h. The NWS definition proper (56km/h sustained
-  plus visibility under 400m for three hours) is a handful of tokens a year
-  worldwide — rare enough that nobody would ever see the state.
-- **`tornado` and `flooded` are not derivable from Open-Meteo at all.**
-  There is no WMO code for either. 99 is a thunderstorm with heavy hail,
-  the closest the table gets to a tornado and still not one; and flooding
-  is a consequence of rain over hours, terrain and drainage rather than a
-  reading of the sky at an instant — the same 20mm floods one valley and
-  not the next. `classify()` never returns either. Both come from a
-  severe-weather **alert feed** through `from_alert()`, or are set by hand
-  for a collection-wide event. Reading hail as a tornado would put the
-  rarest state in the set on several thousand hailstorms a year; reading
-  heavy rain as a flood would put a flood on most of the tropics most of
-  the summer.
+- **The severe three are not more weather, they are an event.** When the
+  states were derived from a live feed this mattered because `blizzard`
+  needed snow *and* wind, and `tornado` and `flooded` had no WMO code at
+  all — flooding is a consequence of rain over hours, terrain and drainage,
+  not a reading of the sky at an instant. None of that is a problem any
+  more: the states are **allocated**, not derived. `WEATHER_COUNTS` in
+  `build_mint.py` decides how many of each exist, and being un-derivable
+  from a weather API is no longer a reason for a state not to exist.
 
-  `ALERT_STATES` is ordered **most severe first**, and the order is the
-  point: a tornado warning and a flood warning are routinely active over
-  the same county at the same time, and a token can only be in one state.
-
-`fetch()` never raises. A render request is on the critical path of someone
-looking at their token, so a slow or broken weather service must cost them
-the dynamic layer and not the image. `stable_state(token_id)` gives an
-unclaimed token a deterministic sky from its id — off a fixed hash, not
-python's `hash()`, which is salted per process and would hand the same
-token a different sky on every restart.
-
-## The weather sits in a band; the plate stays readable
-
-**The background is a trait the holder chose and cannot switch off**, so a
-state that buries it is taking something away rather than adding to it.
-Fog, blizzard and the tornado were all first written as full-frame grades
-and all three failed that test — measured against the same sky with no
-weather, fog left **24%** of the plate's own detail and **41%** of its
-chroma, blizzard 40%/22%, the tornado 57%/**14%**, across the whole frame.
-
-The fix is not a weaker effect, it is a **placed** one:
-
-- **Fog rolls along the ground.** `band` gates its haze *and* its diffusion
-  to a bank in the lower half, whose top edge undulates and rolls. Denser
-  than it was where it actually sits, and the sky above it is untouched.
-- **Blizzard settles.** The whiteout is banded the same way, and `accum`
-  lays a drift along the bottom eighth with an undulating surface. The
-  driven snow is the event; the drift is the evidence it has been going a
-  while, which is what separates a blizzard from heavy snow at a glance.
-- **The flood is placed by definition.** It is the clearest case of the
-  same idea: the water occupies the bottom 40% and the plate above the
-  waterline is untouched. It also *refracts and mirrors* the plate rather
-  than hazing it, so it moves the background's contrast around instead of
-  removing it — 58% of the plate's detail kept at noon against fog's 43%,
-  despite changing far more of the frame, and its chroma comes out *above*
-  100% because the water adds its own colour.
-- **The tornado stopped darkening the sky to be seen.** It used to crush
-  the whole plate so a pale funnel would read against it. Now the funnel
-  carries itself — an opaque column with a **lit rim** on its upper-left
-  flank — so it separates by local contrast on a bright plate and a dark
-  one alike, and the supercell grade can stay light. The debris it throws
-  across the plate adds high-frequency detail rather than removing it,
-  which is why the tornado now scores *better* than the states that only
-  haze.
-
-| | detail kept | chroma kept | | detail | chroma |
-|---|---|---|---|---|---|
-| fog | 24% | 41% | → | **45%** | **63%** |
-| blizzard | 40% | 22% | → | **66%** | **43%** |
-| tornado | 57% | 14% | → | **82%** | **35%** |
-
-`verify_sky.py` holds a `PLATE_DETAIL_FLOOR` per state and fails if one
-drifts past its own. It is checked at **`day` and `night`**, because every
-hazing state gets steadily worse as the sky darkens — lerping an
-already-dark plate toward a bright haze crushes its relative contrast far
-harder than doing the same to a bright one. Measured across all eight
-phases the fall is monotonic (fog 43%→23%, blizzard 50%→31%, tornado
-68%→48%), so night is the binding case.
 
 **Fog is nearly free and always was**: the mask means the plate can be
 hazed while the character is not, which is literal atmospheric
@@ -375,17 +321,17 @@ Three things hold regardless of format:
   and changes without notice; this table is a starting point, not a
   guarantee.
 
-## Locale is a property of the token
+## Locale was a property of the token, and is not one any more
 
-The holder's location is **not knowable** from a render request — it arrives
-from a marketplace's servers, not from the holder. So locale is claimed:
-holder signs in, picks a city, and it **resets on transfer** so the next
-owner claims it themselves. Unclaimed tokens should derive a stable
-pseudo-locale from the token id rather than defaulting to one place, so the
-collection always has tokens in every sky.
+The old design needed a locale per token and could not get one honestly —
+a render request arrives from a marketplace's servers, not from a holder —
+so it was going to be *claimed*, reset on transfer, and rate-limited so
+rare skies could not be farmed.
 
-If locale is freely settable, rare skies can be farmed. Lock it at first
-claim until transfer, or one change per 30 days.
+None of that survives. The weather is drawn at mint, by the allocator, at
+exact counts nobody can influence. **Rare skies cannot be farmed because
+there is nothing to farm**: a tornado is 14 of 4,444 and it was decided
+before anyone owned anything.
 
 ## Usage
 
@@ -393,8 +339,6 @@ claim until transfer, or one change per 30 days.
 pip install pillow numpy scipy
 
 python3 dynamic/solar.py                          # one instant, six cities
-python3 dynamic/weather.py                        # the WMO table + gates
-python3 dynamic/weather.py --lat 51.51 --lon -0.13 # one live locale
 python3 dynamic/render.py --tokens 3 --sheet      # mint samples + sheets
 python3 dynamic/render.py --variety 6             # one token per plate
 python3 dynamic/animate.py                        # weather loops (mp4/webp)
@@ -402,9 +346,24 @@ python3 dynamic/verify_sky.py                     # THE GATE
 
 python3 asset_assessment/make_weather_contact.py  # the approval sheet
 python3 asset_assessment/verify_media.py          # will the loops PLAY
+
+# the mint, in two passes
 python3 asset_assessment/build_mint.py --render --masks \
         --animation '{id}.mp4' --symbol SWEET --royalty-bps 500
+python3 asset_assessment/bake_weather.py          # the 444 stills + loops
 ```
+
+**Two passes on purpose.** `build_mint.py` composes and renders all 4,444
+plus their protect masks; `bake_weather.py` then rewrites the still and
+writes the loop for the 444 that drew a state. Separating them keeps the
+expensive pass restartable — an interrupted bake costs one token, not the
+whole mint — and keeps the weather render off the critical path of a mint
+that has nothing to do with it.
+
+`bake_weather.py` never reads its own output: the clear render is moved to
+`images_clear/` on first bake and every later run starts from there, so
+re-running cannot put a second flood on top of the first. Same discipline
+as `shade_skin_balls.py`, for the same reason.
 
 `--animation` is what closes the gap between a correct render and a holder
 seeing it move. Without it the mint emits `name`, `description`, `image`
@@ -437,28 +396,40 @@ measure 36KB mean, ~156MB across 4,444.
 `dynamic/proof/sheet_*.png` are committed as the design record; the
 `token_*` / `var_*` inputs are regenerated artifacts and are git-ignored.
 
-## Open decisions
+## What the pivot settled, and what is still open
 
-1. **Solana has no `baseURI`.** Each NFT carries its own `uri` string in its
-   Metaplex Token Metadata account, so this must be decided **before mint**
-   or retrofitted with one update transaction per token (4,444 of them).
-   Keep `isMutable: true` either way — it is the escape hatch.
-2. **Canonical or alternate view?** Recommended: `image` stays the static
-   minted render (marketplaces cache it happily, rarity tools keep working)
-   and the live view is additional. `animation_url` is the standard slot for
-   it, but wallet/marketplace support for HTML there varies and needs
-   testing on Phantom, Magic Eden and Tensor before it is relied on.
-3. **Dynamic state in `attributes`?** A value that changes hourly will be
-   indexed by rarity tools as though it were permanent. Safest is to leave
-   the seven canonical traits untouched and expose sky/weather elsewhere.
-4. Whether the night grade's brightness gap is a bug or the look — see
+Three of the four things this file used to list as undecided were
+consequences of the weather being live. They are not questions any more:
+
+- **Canonical or alternate view?** Settled. `image` is the *weathered*
+  still at the full 1393 canvas and `animation_url` is the loop. The still
+  had to carry the weather: a token whose trait says Tornado and whose
+  thumbnail is a clear sky has its rarest attribute invisible in every
+  grid, search result and notification.
+- **Weather in `attributes`?** Settled, and reversed. The old answer was
+  no — "a value that changes hourly will be indexed by rarity tools as
+  though it were permanent". It *is* permanent now, so it belongs in
+  `attributes` and in the rarity table, next to the arms.
+- **How the severe states are sourced.** Gone. They are allocated at exact
+  counts, not derived from a feed, so `tornado` is not US-skewed by which
+  countries publish an alerts API — it is 14 tokens because
+  `WEATHER_COUNTS` says 14.
+
+Still open:
+
+1. **One phase for all 444, or a second random axis?** Everything bakes at
+   `blue_dusk` — the phase every proof sheet and contact sheet was judged
+   at. Rolling the phase per token would multiply the variety and add a
+   second rarity dimension, at the cost of doubling how many distinct
+   looks a buyer has to learn and making the weather itself harder to read
+   at a glance. `bake_weather.py --phase` changes it globally; making it
+   per-token is a small change and a real design decision.
+2. **`isMutable`.** Solana has no `baseURI` — each NFT carries its own
+   `uri`, so the metadata must be right **before** mint or retrofitted one
+   transaction per token. Nothing about a baked token changes after mint,
+   which is an argument for locking it; keeping it mutable is still the
+   only escape hatch if a URI ever has to move.
+3. Whether the night grade's brightness gap is a bug or the look — see
    `sheet_variety_night.png`. Across the plate family it reads as a
-   deliberate spotlight; on busy mid-key plates it reads flatter.
-5. **How the two severe states are sourced in production.** `blizzard`
-   falls out of Open-Meteo for free. `tornado` does not: it needs an
-   alerts feed, and the free ones are national — `api.weather.gov` covers
-   the US and much of the world publishes nothing comparable. So either
-   the state is US-skewed by accident of data coverage, or it becomes an
-   owner-triggered collection-wide event, or a token can hold it as a
-   claimed one-off. `stable_state()`'s mix currently gives it ~1% for
-   unclaimed tokens, which is a placeholder, not a decision.
+   deliberate spotlight; on busy mid-key plates it reads flatter. Only
+   matters if the phase is ever rolled per token.

@@ -55,12 +55,12 @@ state, for every sample token it finds:
      ways: a state with no floor fails, and a floor for a state that no
      longer exists fails too, so a retired state cannot leave a rule
      behind that looks like it is still being enforced.
-  9. Every state weather.py can PRODUCE is a state sky.py can grade. The
-     two tables are written independently -- one from the WMO code list,
-     one from the art direction -- and a mapping to a state that does not
-     exist raises a KeyError at render time, on somebody's token, rather
-     than here. This is the same class of check verify_trait_names.py
-     runs over the trait tables, for the same reason.
+
+The weather is no longer LIVE, so there is no WMO table left to
+cross-check against. build_mint.py allocates the states at exact counts
+and validates its own table against sky.WEATHER_STATES at import; that is
+where the "can everything asked for actually be rendered" check now lives,
+next to the table it guards.
 
 Exits non-zero on any failure.
 
@@ -78,7 +78,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from PIL import ImageFilter
 
 from dynamic import sky as skymod
-from dynamic import weather as wxmod
 
 PROOF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "proof")
 OPAQUE = 255
@@ -355,25 +354,6 @@ def main():
               f"{worst_leg[2]} on token {worst_leg[3]} — "
               f"{worst_leg[4] * 100:.0f}% kept "
               f"(floor {worst_leg[5] * 100:.0f}%)")
-
-    # 9. weather.py can only ask for states sky.py actually has
-    producible = {p for p in (set(wxmod.WMO_STATES.values())
-                              | set(wxmod.DEFAULT_MIX)
-                              | {wxmod.FALLBACK, "blizzard", "tornado"})
-                  if p is not None}
-    unknown = sorted(producible - set(skymod.WEATHER_STATES))
-    if unknown:
-        failures.append(f"weather.py can produce {unknown}, which sky.py "
-                        f"cannot grade")
-    else:
-        print(f"  all {len(producible)} states weather.py can produce are "
-              f"gradeable")
-    # and classify() must never invent the one state it cannot know about
-    tornadoes = [c for c in wxmod.WMO_STATES
-                 if wxmod.classify(c, 200.0) == "tornado"]
-    if tornadoes:
-        failures.append(f"classify() returned 'tornado' for WMO {tornadoes}; "
-                        f"there is no WMO code for a tornado")
 
     print(f"\n{checked} renders checked "
           f"({len(skymod.SKY_STATES)} phases x "
