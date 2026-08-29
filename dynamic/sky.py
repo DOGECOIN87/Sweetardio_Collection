@@ -603,9 +603,14 @@ def _funnel(size, density, seed, t=0.0):
         layer = Image.new("L", (w, h), 0)
         draw = ImageDraw.Draw(layer)
         th0 = rng.random(count) * 2.0 * np.pi
-        v0 = rng.random(count) ** 0.55            # biased toward the ground
+        v0 = rng.random(count) ** 0.75            # biased toward the ground
         k = 1.05 + 0.75 * rng.random(count)
-        rad = rng.integers(3, 9, count)
+        # Sized as a FRACTION OF THE CANVAS, like the funnel it orbits, not
+        # in absolute pixels. The loops export at 512 while the mint is
+        # 1393, so an absolute radius comes out 2.7x oversized in exactly
+        # the render anyone actually watches -- the debris stops reading as
+        # grit around a funnel and starts reading as boulders.
+        rad = w * (0.0022 + 0.0043 * rng.random(count))
         vv = (v0 - t) % 1.0                       # rises; one tile per loop
         th = th0 + 2.0 * np.pi * _TORNADO_TURNS * t
         ss = np.clip(vv / float(tip), 0.0, 1.0)
@@ -623,8 +628,9 @@ def _funnel(size, density, seed, t=0.0):
             ex, ey = rd * nr * 1.9, rd * nr * 0.8
             draw.ellipse([x - ex, y - ey, x + ex, y + ey],
                          fill=int(255 * nr))
-        deb = np.asarray(layer.filter(ImageFilter.GaussianBlur(1.1)),
-                         dtype=_F) / _F(255.0) * _F(_TORNADO_DEBRIS)
+        deb = np.asarray(
+            layer.filter(ImageFilter.GaussianBlur(max(0.6, w / 995.0))),
+            dtype=_F) / _F(255.0) * _F(_TORNADO_DEBRIS)
 
     return np.clip(out, 0.0, 1.0, out=out), deb
 

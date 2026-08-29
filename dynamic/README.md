@@ -25,8 +25,9 @@ function of the plate region of a *finished* token:
 `create_image(..., mask_path=...)` writes the `protect` mask at mint-build
 time — the union of every layer except `layers[0]`. It is written there
 because that is the only place the silhouette is known for free; recovering
-it from the finished PNG would mean segmenting the art. **The masks are
-28–60KB each**, so all 4,444 add ~150MB.
+it from the finished PNG would mean segmenting the art. **The masks measure
+36KB mean**, so all 4,444 add ~156MB. `build_mint.py --render --masks` is
+what actually writes them; without that flag the pass has no input.
 
 Two consequences:
 
@@ -73,16 +74,67 @@ the saving — a *scalar* exposure applied as a luma ratio is just a scalar
 multiply, and saturation-about-luma is luma-preserving, so the split-tone
 reuses that luma instead of recomputing it.
 
-## Six weather states, not a hundred
+## Six ordinary states, then two that are an event
 
 Open-Meteo (free, no key, takes lat/lon directly) returns ~100 WMO codes.
-Six is the ceiling at which they still read as distinct traits rather than
-noise. Call once per *distinct locale* bucketed to ~25km and cache 30 min —
-4,444 tokens is a few hundred real cities.
+`weather.py` collapses them: **six** is the ceiling for the ordinary sky,
+past which they stop reading as distinct traits and start reading as noise
+— drizzle and light rain are the same trait however different the code is.
+Call once per *distinct locale* bucketed to ~25km and cache 30 min — 4,444
+tokens is a few hundred real cities.
+
+**`blizzard` and `tornado` sit outside that ceiling on purpose**, because
+they are not more of the same. A holder sees `overcast` most weeks of the
+year and a blizzard a handful of times, so a state that reads as an EVENT
+does not add to the noise the ceiling exists to stop. What they must not do
+is arrive by accident, and each is gated on more than a code — in opposite
+directions:
+
+- **`blizzard` is not a WMO code.** It is snow *and* wind, which Open-Meteo
+  returns as separate fields, so it is derived: heavy snow at 35km/h, any
+  snow at the NWS's own 56km/h. The NWS definition proper (56km/h sustained
+  plus visibility under 400m for three hours) is a handful of tokens a year
+  worldwide — rare enough that nobody would ever see the state.
+- **`tornado` is not derivable from Open-Meteo at all.** There is no WMO
+  code for one and no field that implies one; 99 is a thunderstorm with
+  heavy hail, which is the closest the table gets and is still not a
+  tornado. `classify()` never returns it — it comes from a severe-weather
+  **alert feed** through `from_alert()`, or it is set by hand for a
+  collection-wide event. Reading hail as a tornado would put the rarest
+  state in the set on several thousand hailstorms a year.
+
+`fetch()` never raises. A render request is on the critical path of someone
+looking at their token, so a slow or broken weather service must cost them
+the dynamic layer and not the image. `stable_state(token_id)` gives an
+unclaimed token a deterministic sky from its id — off a fixed hash, not
+python's `hash()`, which is salted per process and would hand the same
+token a different sky on every restart.
 
 **Fog is the strongest of the six and nearly free**: the mask means the
 plate can be hazed while the character is not, which is literal atmospheric
 perspective. The character pops forward without a pixel of it changing.
+`blizzard` is the same trick at the other end of the scale — the plate goes
+most of the way to white while the character does not move a pixel.
+
+**The tornado is the one state that is a shape rather than a field.** Every
+other weather changes the whole plate uniformly; a funnel is an object
+standing in it, which is why it reads as the rarest thing in the set. Three
+things follow, and none of them are optional:
+
+- It is **placed off the face column**. The character composites at a fixed
+  canvas position around x=690 of 1393 and the mask puts the whole effect
+  behind it, so a centred funnel is a tornado you cannot see. It is seeded
+  to the left or right edge, and `verify_sky.py` measures what fraction
+  actually survives the mask rather than trusting the arithmetic (worst 81%
+  over 3 tokens × 12 seeds, floor 60%).
+- It needs **two tints, not one**. The column is condensation and is *paler*
+  than the supercell grade behind it, which is what keeps it visible from
+  high noon to night — a dark funnel vanishes into a dark sky the moment the
+  sun goes down. Its debris is dirt and is darker than everything. Share one
+  tint and the debris turns into pale bubbles floating beside the trunk.
+- Its debris is sized as a **fraction of the canvas**, like the funnel it
+  orbits. Absolute pixel sizes come out 2.7× oversized in the 512px loops
+  everyone actually watches, and the grit starts reading as boulders.
 
 Particles are stylised, not photoreal — the cast is flat cartoon over lit
 spheres, and photoreal rain in front of a Twinkie reads as a compositing
@@ -115,6 +167,8 @@ filmstrip; only a numeric check catches it.
 | `rain` | two depth bands falling down-and-right, near band 2x faster |
 | `snow` | slow fall with a sideways sway, one cycle per loop |
 | `storm` | heavy rain, plus a lightning strike and its echo |
+| `blizzard` | driven snow, three tiles across for every one down, under a gusting whiteout |
+| `tornado` | the funnel snakes once, its banding climbs three times, the debris orbits twice |
 
 **A motionless state is never exported as an animation.** Encoding N
 identical frames of a still spends a downscale and a lossy round-trip to
@@ -135,11 +189,14 @@ shadow tint — and nothing to do with the weather trait. `SKY_STATES` is
 where to dial it if it goes too far.
 
 The loops are built on a torus: particles travel a **whole number of tiles**
-per loop, sway uses an integer number of cycles, and the fog field is rolled
-by exactly its own width. The rain lean is *derived* from that tile geometry
+per loop, sway uses an integer number of cycles, the fog field is rolled by
+exactly its own width, and the funnel's sway, banding, orbit and rise are
+all integer cycles. The streak lean is *derived* from that tile geometry
 rather than set by hand, so streaks always point along the direction they
-actually travel — on the square canvas that lands at 1/3, down and to the
-right, matching the cast-shadow convention.
+actually travel — rain's `(1, 3)` lands at 1/3, steeply down and to the
+right, and the blizzard's `(3, 1)` at 3, a shallow drive the same way. Both
+match the cast-shadow convention rather than fighting it; wind blowing the
+other way would fight the key light.
 
 ## Will the loops play on marketplaces and wallets?
 
@@ -149,7 +206,7 @@ in `properties.files[]`.
 
 | format | verdict |
 |---|---|
-| **MP4 (H.264, yuv420p)** | the safest bet, and also the smallest here — 80–261KB against WebP's 300–726KB |
+| **MP4 (H.264, yuv420p)** | the safest bet, and also the smallest here — 80–377KB against WebP's 296–900KB |
 | animated WebP | plays in every browser, but marketplace *image pipelines* commonly re-encode and flatten it to frame 1 |
 | GIF | universally supported and the worst-looking: 256 colours band these graded plates, and it came out at ~6MB a loop |
 | HTML | richest, least supported — wallets sandbox or refuse it |
@@ -190,11 +247,32 @@ claim until transfer, or one change per 30 days.
 pip install pillow numpy scipy
 
 python3 dynamic/solar.py                          # one instant, six cities
+python3 dynamic/weather.py                        # the WMO table + gates
+python3 dynamic/weather.py --lat 51.51 --lon -0.13 # one live locale
 python3 dynamic/render.py --tokens 3 --sheet      # mint samples + sheets
 python3 dynamic/render.py --variety 6             # one token per plate
-python3 dynamic/animate.py                        # weather loops (webp)
+python3 dynamic/animate.py                        # weather loops (mp4/webp)
 python3 dynamic/verify_sky.py                     # THE GATE
+
+python3 asset_assessment/make_weather_contact.py  # the approval sheet
+python3 asset_assessment/build_mint.py --render --masks   # mint + masks
 ```
+
+`make_weather_contact.py` is what decides whether a *new* state ships.
+`render.py --sheet` grades one token, which cannot answer either question
+that matters: does the state hold across the plate **family**, and is it a
+new trait or a second copy of one the set already has. So it renders every
+state down a column of different plates and measures mean plate dE between
+every pair, and exits non-zero if a state is not distinct from the one it
+is most likely to be confused with. Current numbers, at dusk over 6 plates:
+`blizzard`/`snow` **44.8**, `tornado`/`storm` **19.3**, against a bar of
+6.0 — which sits deliberately above the closest already-approved pair
+(`clear`/`overcast`, 2.7 at dusk, because the dusk grade dominates both).
+
+**`build_mint.py --masks` is not optional if this ships.** `create_image()`
+has taken `mask_path=` since the prototype landed and the mint did not pass
+it, which left the pass with no input at collection scale. The masks
+measure 36KB mean, ~156MB across 4,444.
 
 `dynamic/proof/sheet_*.png` are committed as the design record; the
 `token_*` / `var_*` inputs are regenerated artifacts and are git-ignored.
@@ -216,3 +294,11 @@ python3 dynamic/verify_sky.py                     # THE GATE
 4. Whether the night grade's brightness gap is a bug or the look — see
    `sheet_variety_night.png`. Across the plate family it reads as a
    deliberate spotlight; on busy mid-key plates it reads flatter.
+5. **How the two severe states are sourced in production.** `blizzard`
+   falls out of Open-Meteo for free. `tornado` does not: it needs an
+   alerts feed, and the free ones are national — `api.weather.gov` covers
+   the US and much of the world publishes nothing comparable. So either
+   the state is US-skewed by accident of data coverage, or it becomes an
+   owner-triggered collection-wide event, or a token can hold it as a
+   claimed one-off. `stable_state()`'s mix currently gives it ~1% for
+   unclaimed tokens, which is a placeholder, not a decision.

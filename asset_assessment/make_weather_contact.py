@@ -175,7 +175,12 @@ def build_sheet(grid, states, labels, cell, phase, path):
                   f"{state}   ·   " + "   ".join(l[:22] for l in labels),
                   font=_font(16), fill=(176, 182, 198))
         y += cell + cap + pad
-    sheet.save(path)
+    # This sheet is a committed design record, and at eight rows of graded
+    # photographic plates it is the largest file in dynamic/proof (~6MB at
+    # the default cell). optimize=True buys only about 2% of that -- the
+    # size is the plate content, not the encoder -- so drop --cell if it
+    # needs to be smaller, rather than expecting compression to do it.
+    sheet.save(path, optimize=True)
     return path
 
 
