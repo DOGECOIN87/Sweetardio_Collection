@@ -94,9 +94,19 @@ def run_alloc(n, seed):
 
 def realised(tokens, key):
     """Share of COMPOSITED tokens carrying each asset, in percent. Tokens
-    with no traits at all (the retired secret-rare tier was the only source of
+    with no traits at all (the 1/1 secret-rare tier is the only source of
     those) are excluded from the denominator, so targets stay comparable
-    whether or not such a tier exists."""
+    whether or not such a tier exists.
+
+    A secret rare is skipped EXPLICITLY rather than by "has no value for this
+    key", because build_mint.py stores the artwork's own filename in the
+    token's `bg` slot. Falsiness alone therefore dropped them from every
+    category except backgroundz, which counted them and reported a 4444
+    denominator against eyez's 4442. Harmless in magnitude -- 2 tokens in
+    4444 understates a 1.13 % plate by 0.0005 points, far below the +/-0.6
+    this can resolve -- but it also let the two artwork filenames into the
+    background counter as if they were plates."""
+    tokens = [t for t in tokens if not t.get("secret_rare")]
     vals = [t.get(key) for t in tokens if t.get(key)]
     total = len(vals)
     c = collections.Counter(vals)

@@ -220,7 +220,7 @@ _secret_rare_keys_cache = None
 
 def _secret_rare_keys():
     """Sorted secret-rare filenames, from the trait folder. Empty when the
-    tier is retired (the folder is absent), which is the normal case."""
+    folder is absent, which is how the tier is retired wholesale."""
     global _secret_rare_keys_cache
     if _secret_rare_keys_cache is None:
         d = os.path.join(TRAITS_DIR, SECRET_RAREZ)
@@ -248,6 +248,45 @@ def secret_rare_token_name(filename):
     """Drop-ready token name, e.g. 'Secret Rarez #1 — Milk Dunk'."""
     return (f"Secret Rarez #{secret_rare_number(filename)} — "
             f"{trait_name(SECRET_RAREZ, os.path.basename(filename))}")
+
+
+# Who actually drew a secret rare, for the pieces made by a GUEST artist, and
+# where to find them. The piece's TITLE is its display name; the artist is a
+# different string for one of the two and would otherwise appear nowhere a
+# collector can see.
+#
+# It matters unevenly. "Radbro Webring" is both the piece and the artist, so
+# that one carries the name by accident. Emily Cartoons appears in no metadata
+# at all — her signature is painted into the Duhnut Candy Man art and vanishes
+# at thumbnail size.
+#
+# This lives here rather than in build_mint.py because the credit is a property
+# of the ARTWORK, not of one mint run: every path that builds a secret rare's
+# metadata goes through extract_metadata() and so cannot drop it.
+#
+# An ABSENT entry is legitimate and must never be fatal — the 23 pieces parked
+# in traits/secret_rarez_retired are in-house art with no guest to credit. Only
+# a guest artist's piece belongs here.
+#
+# Minted with the permission of both artists (confirmed by the owner, 2026-08).
+# The same two links are the collection site's own attribution, in the games
+# repo at src/content/artistRares.ts.
+SECRET_RARE_ARTISTS = {
+    "Secret_Radbro_Webring.png":   ("Radbro Webring", "https://radbro.xyz"),
+    "Secret_Duhnut_Candy_Man.png": ("Emily Cartoons", "https://emilycartoons.com"),
+}
+
+
+def secret_rare_artist(filename):
+    """(artist, url) for a guest-artist secret rare, or None for in-house art."""
+    return SECRET_RARE_ARTISTS.get(os.path.basename(filename))
+
+
+def secret_rare_artist_url(filename):
+    """The artist's own site, for the token's external_url. None when the piece
+    has no guest artist."""
+    credit = secret_rare_artist(filename)
+    return credit[1] if credit else None
 
 # ---- Human-readable display names for every trait asset ----
 # Keys for CHARACTERZ: the internal char_name (prefix-stripped, no .png).
@@ -433,11 +472,17 @@ TRAIT_NAMES = {
         "Sweetardio_200 (30).png":          "Cookboy",
     },
     # 1/1 secret rares (standalone full-canvas artworks, never composited).
-    # SECRET_RAREZ has no names block: the tier is retired and its art lives
-    # in traits/secret_rarez_retired. secret_rare_number() reads the folder
-    # rather than this table, so restoring the folder restores the tier's
-    # numbering on its own; display names fall back from the filenames, which
-    # for "Secret_Milk_Dunk.png" gives "Secret Milk Dunk".
+    # SECRET_RAREZ has no names block ON PURPOSE, and the live tier depends on
+    # it: secret_rare_number() reads the folder rather than this table, and
+    # display names fall back from the filenames, where _fallback_display_name
+    # strips the Secret_ tier marker. "Secret_Duhnut_Candy_Man.png" therefore
+    # gives "Duhnut Candy Man" with nothing to keep in sync here.
+    #
+    # That fallback is now load-bearing rather than a retired-tier leftover:
+    # the two guest-artist 1/1s in traits/secret_rarez are named through it.
+    # Adding a block here would take the strip path out of service again,
+    # which is exactly how it stayed broken until 33dbdff -- every secret rare
+    # had an explicit name until there were none at all.
 }
 
 
@@ -487,8 +532,15 @@ def extract_metadata(layers, char_name):
         sr = next(layer for layer in layers if is_secret_rare(layer["path"]))
         fn = os.path.basename(sr["path"])
         name = trait_name(SECRET_RAREZ, fn)
-        return [{"trait_type": "Secret Rarez",
-                 "value": f"#{secret_rare_number(fn)} {name}"}]
+        attrs = [{"trait_type": "Secret Rarez",
+                  "value": f"#{secret_rare_number(fn)} {name}"}]
+        # Guest artists are credited on the piece itself. Only the guest-drawn
+        # 1/1s carry this, which makes Artist a rarity signal as well as a
+        # credit: a marketplace shows it as a trait held by 2 of 4444.
+        credit = secret_rare_artist(fn)
+        if credit:
+            attrs.append({"trait_type": "Artist", "value": credit[0]})
+        return attrs
 
     overlay_filenames = set(BG_OVERLAY_PAIRS.values())
 

@@ -342,11 +342,15 @@ def main():
         sys.exit(f"{len(legs)} legendaries x {args.leg_each} = {leg_total} "
                  f"exceeds n={args.n}")
 
-    # 1/1 secret rares: one standalone token each, never composited
-    # Secret rares are RETIRED: traits/secret_rarez is gone, its 23 assets
-    # moved to traits/secret_rarez_retired. Restoring the folder restores the
-    # tier -- nothing else here is conditional on them. A missing directory is
-    # the normal case now, not an error.
+    # 1/1 secret rares: one standalone token each, never composited.
+    # The tier holds the two guest-artist pieces -- Radbro Webring and Duhnut
+    # Candy Man -- at one token apiece: 1 of 4444 = 0.0225 %, ten times rarer
+    # than the Starfield. The 23 assets of the original tier stay retired in
+    # traits/secret_rarez_retired; dropping one back in would renumber the
+    # set, because secret_rare_number() indexes sorted filenames.
+    #
+    # Nothing else here is conditional on the tier, and a missing directory is
+    # still valid -- it simply empties it.
     sr_dir = os.path.join(g.TRAITS_DIR, g.SECRET_RAREZ)
     secrets = sorted(f for f in os.listdir(sr_dir)
                      if f.endswith(".png") and g.is_secret_rare(f)) \
@@ -583,8 +587,14 @@ def main():
     os.makedirs("output/mint/metadata", exist_ok=True)
     for tid, t in manifest.items():
         name = None
+        # external_url points at the GUEST ARTIST's own site, and only on the
+        # 2 tokens that have one. It is the one standard metadata field for a
+        # link, and no other Sweetardio token uses it, so it credits the artist
+        # everywhere the token travels without competing with anything.
+        ext = None
         if t.get("secret_rare"):
             name = g.secret_rare_token_name(t["secret_rare"])
+            ext = g.secret_rare_artist_url(t["secret_rare"])
         # An animation_url ONLY where there is an animation. A static
         # token that claims one shows a broken player on every surface
         # that believes it. TWO tiers animate: a weather state, and the
@@ -595,7 +605,7 @@ def main():
                 else None)
         token = g.token_metadata(
             t["attributes"], token_id=tid, image=f"{tid}.png", name=name,
-            animation_url=anim, symbol=args.symbol,
+            animation_url=anim, symbol=args.symbol, external_url=ext,
             seller_fee_basis_points=args.royalty_bps)
         with open(f"output/mint/metadata/{tid}.json", "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)

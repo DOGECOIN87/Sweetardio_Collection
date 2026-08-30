@@ -461,9 +461,10 @@ if the value ever moves.
 
 ## The starfield is the ultra-rare tier, and the one ANIMATED plate
 
-`Starfield.png` is **10 of 4444 — 0.225 %, 1 in 444 — the rarest trait in the
-collection**. Next rarest is Tornado at 14 (0.32 %); a legendary plate is 50
-(1.13 %).
+`Starfield.png` is **10 of 4444 — 0.225 %, 1 in 444 — the rarest COMPOSITED
+trait in the collection**. Next rarest is Tornado at 14 (0.32 %); a legendary
+plate is 50 (1.13 %). Only the 1/1 secret rares beat it, at 1 of 4444 each,
+and those are not composited traits at all — they are whole tokens.
 
 The cap only holds because the plate is kept out of the weighted draw
 entirely. `is_allocator_only_bg()` in `generator.py` covers the `Legendary_*`
@@ -545,6 +546,110 @@ before the plate existed. Same band, tighter spread. Re-solving to chase that
 would be fitting noise on one seed, which `calibrate_rarity.py`'s docstring
 warns against explicitly, so **the gains were left alone**. Backgrounds stayed
 within ±0.42.
+
+## The 1/1 secret rares are the rarest tier, and composite with NOTHING
+
+`traits/secret_rarez/` holds finished full-canvas artworks that mint as a whole
+token with no character, plate, skin, eyes or mouth over them. Each is **1 of
+4444 — 0.0225 %, ten times rarer than the Starfield** and fifty times rarer
+than a legendary plate.
+
+The tier holds two guest-artist pieces: **Duhnut Candy Man** (#1, by Emily
+Cartoons) and **Radbro Webring** (#2, by Radbro Webring). The 23 in-house
+pieces of the original tier stay retired in `traits/secret_rarez_retired/`.
+
+**The mechanism already existed — do not build a new one.** `build_mint.py`
+step 0 gives each a fixed slot and excludes it from every other pool;
+`generator.secret_rare_combination()` makes the art the sole layer.
+Restoring the tier is *only* dropping files into the folder:
+
+- **The `Secret_` prefix is required** — `is_secret_rare()` matches on it.
+- **Numbering is `secret_rare_number()`, which indexes SORTED FILENAMES.**
+  D sorts before R, hence #1 Duhnut and #2 Radbro. Adding or renaming a piece
+  renumbers the set, which is why restoring a retired piece would not give it
+  back its old number.
+- **There is deliberately no `TRAIT_NAMES[SECRET_RAREZ]` block.** Names fall
+  back from the filenames, and `_fallback_display_name()` strips the `Secret_`
+  tier marker. Adding a block would take that strip path out of service — it
+  is exactly how the tier shipped "Secret Rarez #1 — Secret Milk Dunk" until
+  `33dbdff`, because every secret rare had an explicit name until there were
+  none at all.
+
+### Use the UNGRADED art, and store it at 1393
+
+The pieces existed on an unmerged branch in **two** versions, and the graded
+one is the wrong one. `background_pop_studies/grade.py` normalises a plate
+cool / desaturated / mid-key so a *character* reads in front of it; nothing
+stands in front of a 1/1, so that grade only mutes an artist's own colour.
+Measured on the Radbro piece, grading lifted the blacks (mean RGB 44 → 77) and
+cut the saturation (std 68.4 → 56.4).
+
+The art is 1200×1200 and the canvas is 1393. Stored at 1393 it is
+**bit-identical** to what `_render_layer()`'s silent resize would produce, so
+it changes no output — it just stops `audit_art_quality.py` flagging a SIZE
+deviation, and stops the origin quietly moving if the art is ever re-authored.
+
+**The top-left lighting convention does not apply to this tier.** Every other
+asset is lit to sit with the cast; a 1/1 composites with nothing, so it keeps
+the artist's own light. `audit_art_quality.py` reads UL/LR as `nan` on both
+(they are fully opaque) and flags neither.
+
+### The guest artists are credited on-chain
+
+`SECRET_RARE_ARTISTS` in `generator.py` maps a piece to `(artist, url)`, and
+`extract_metadata()` adds an `Artist` attribute; `build_mint.py` puts the URL
+in the token's `external_url`. Only 2 of 4444 carry either, so Artist is a
+rarity signal as well as a credit.
+
+It lives in `generator.py`, not `build_mint.py`, because the credit is a
+property of the ARTWORK — every path that builds a secret rare's metadata goes
+through `extract_metadata()` and so cannot drop it. **A missing entry is
+legitimate and must never be fatal**: the 23 retired pieces are in-house art
+with no guest to credit.
+
+It matters unevenly. "Radbro Webring" is both the piece and the artist, so
+that one carried the name by accident; Emily Cartoons appeared in no metadata
+at all — her signature is painted into the art and vanishes at thumbnail size.
+The same two links are the site's own attribution, in the `Sweetarded-Games`
+repo at `src/content/artistRares.ts`. Minted with both artists' permission
+(confirmed by the owner, 2026-08).
+
+### DO NOT resurrect the old Artist Series
+
+The unmerged branch `claude/rarity-collection-generation-3j2o6v` made these
+**plates at 10 each** with curated character pairings, `is_artist_bg()`,
+`is_quota_bg()` and an `ARTIST_BARE` rule. That is the opposite of standalone
+1/1s. Take only the ART from that branch — its `is_quota_bg` idea already
+exists on main, in better form, as `generator.is_allocator_only_bg()`.
+
+### It did not move the rarity gains either
+
+Same finding as the starfield, and for the same reason. Adding the two drops
+the composited pool 4444 → 4442 and re-randomises every downstream draw.
+Measured before and after on **three** seeds (4444 / 909090 / 7), the eyes'
+mean absolute deviation went 0.45 → 0.55 points and the **worst single reading
+improved**, 1.44 (Cerise at seed 7) → 1.12. Side Eye — the eye this file
+already flags as the sensitive one — read 1.12 / 0.87 / 0.71 before and
+0.70 / 1.12 / 0.72 after: the same band, and it moves in *both* directions
+across seeds, which is what noise looks like rather than a systematic shift.
+All of it sits inside the ±0.6 the calibration can resolve (1σ for a 16 %
+trait at this supply is 0.55 points), so **the gains were left alone.**
+Re-solving to chase it would be fitting noise on one seed, which
+`calibrate_rarity.py`'s docstring warns against explicitly.
+
+Skins are **not** calibrated at all — they draw on raw weights (7 / 37 / 56 in
+`skin_weights.json`), so their shares move more freely: Alien read 7.47 %
+before and 6.62 % after, both within ~1.2σ of target. That is not a regression
+and there is no knob for it.
+
+**Two denominators had been sized against 4444 and are now honest.**
+`calibrate_rarity.realised()` excluded secret rares by falsiness, which worked
+for every category except backgroundz — `build_mint.py` stores the artwork's
+own filename in the token's `bg` slot, so that one category counted them and
+reported 4444 against eyez's 4442 (and let two artwork filenames into the
+background counter as if they were plates). It now skips them explicitly.
+`build_rarity_table.py` hard-coded "**4444 tokens, all composited**" in its
+header; that line is now written from the metadata.
 
 ## Backgrounds are a two-stage problem
 

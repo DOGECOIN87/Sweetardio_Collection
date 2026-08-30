@@ -38,7 +38,40 @@ METADATA_DIR = "output/mint/metadata"
 OUT = "catalog/RARITY.md"
 # canonical metadata order; presence-optional traits last
 ALWAYS = ["Character", "Background", "Skin", "Eyes", "Mouth"]
-OPTIONAL = ["Footwear", "Arms", "Sticker", "Weather"]
+OPTIONAL = ["Footwear", "Arms", "Sticker", "Weather", "Artist"]
+
+
+def _pct(count, n, dp=1):
+    """A share at `dp` decimals, widened only if that would round it away to
+    zero. The tiers span four orders of magnitude -- a 55 % skin down to a
+    1-of-4444 secret rare -- and at the presence line's 1 decimal the rarest
+    tier in the collection printed as "0.0%", which reads as none of them.
+
+    Widening only the figures that need it is the point: a blanket reformat
+    took Tornado from 0.32 % to 0.3 % and White skin from 55.47 % to 55.5 %,
+    losing real precision everywhere to fix two lines."""
+    p = 100.0 * count / n
+    while dp < 4 and count and round(p, dp) == 0:
+        dp += 1
+    return f"{p:.{dp}f}%"
+
+
+def _supply_note(n, toks):
+    """One line on how the supply splits between composited characters and the
+    standalone 1/1 secret rares. Written from the metadata rather than hard-
+    coded, because it was hard-coded as "all composited" and went stale the
+    moment the tier came back."""
+    sr = sum(1 for t in toks if "Secret Rarez" in t)
+    if not sr:
+        return (f"**{n} tokens, all composited.** The 1/1 secret-rare tier is "
+                "retired to `traits/secret_rarez_retired`, so every token is "
+                "a character.\n")
+    return (f"**{n} tokens: {n - sr} composited characters and {sr} "
+            f"standalone 1/1 secret rares.** A secret rare is a finished "
+            f"artwork minted as the whole token \u2014 no character, no plate, "
+            f"no traits composited over it \u2014 so it carries a Secret "
+            f"Rarez attribute instead of the usual breakdown, and every other "
+            f"tier draws from the remaining {n - sr}.\n")
 
 
 def load_tokens(d):
@@ -79,8 +112,7 @@ def main():
         f"{args.seed} is the seed the draw gains in "
         f"`traits/rarity_weights.json` are calibrated against. Regenerate "
         f"whenever the calibration is re-run or a trait is renamed.\n",
-        f"**{n} tokens, all composited.** The 1/1 secret-rare tier is retired "
-        "to `traits/secret_rarez_retired`, so every token is a character.\n",
+        _supply_note(n, toks),
         "Always-present traits (character, background, skin, eyes, mouth) are "
         "drawn by calibrated weight and land within ~0.2 points of target "
         "\u2014 roughly the sampling floor at this supply. Optional traits "
@@ -110,10 +142,10 @@ def main():
             add(note + "\n")
         if key in OPTIONAL:
             add(f"{present} of {n} carry this trait "
-                f"({100 * present / n:.1f}%); {n - present} do not.\n")
+                f"({_pct(present, n)}); {n - present} do not.\n")
         add("| trait | count | share |", "|---|---:|---:|")
         for k, v in sorted(c.items(), key=lambda kv: kv[1]):
-            add(f"| {k} | {v} | {100 * v / n:.2f}% |")
+            add(f"| {k} | {v} | {_pct(v, n, dp=2)} |")
 
     table("Backgrounds", "Background",
           "The four `Legendary` plates are slot-allocated at exactly 50 each "
@@ -133,6 +165,23 @@ def main():
           "legendary plates \u2014 the point of a 1-of-50 background is that "
           "you can see it, and every weather state sits in front of it. So "
           "no token is both Legendary and animated.")
+
+    table("Secret Rarez", "Secret Rarez",
+          "**The 1/1 tier, and the rarest thing in the collection.** Each is a "
+          "complete guest-artist artwork minted as the entire token, with "
+          "nothing composited over it \u2014 so it has no character, plate, "
+          "skin, eyes or mouth. One of each exists: **1 of "
+          f"{n} = {100.0 / n:.4f}%**, ten times rarer than the Starfield "
+          "plate (10 of " f"{n}" ") and fifty times rarer than a legendary "
+          "background (50 of " f"{n}" ").")
+    table("Artist", "Artist",
+          "Guest artists, credited on the 1/1s they drew. The display name of "
+          "the PIECE is its title; this is the person who made it, which for "
+          "Duhnut Candy Man is a different string and appears nowhere else a "
+          "collector can see \u2014 Emily Cartoons' signature is painted into "
+          "the art and vanishes at thumbnail size. These tokens also carry the "
+          "artist's own site in `external_url`. Minted with both artists' "
+          "permission.")
 
     stk = sum(1 for t in toks if "Sticker" in t)
     distinct = len({t["Sticker"] for t in toks if "Sticker" in t})

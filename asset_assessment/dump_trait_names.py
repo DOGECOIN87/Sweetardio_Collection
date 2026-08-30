@@ -114,20 +114,60 @@ def build():
                              for f in g.get_files(g.STICKERZ)),
           cat=g.STICKERZ)
 
+    live = g._secret_rare_keys()
+    if live:
+        w(f"## Secret Rarez — live ({len(live)})\n")
+        w("The 1/1 tier. Each of these is a finished full-canvas artwork that "
+          "mints")
+        w("as an entire token with nothing composited over it, exactly once — "
+          "**1 of")
+        w("4444 = 0.0225 %**, the rarest thing in the collection. Both are by "
+          "guest")
+        w("artists, credited in the token metadata by an `Artist` attribute "
+          "and a")
+        w("link in `external_url`.\n")
+        w("Names fall back from the filenames rather than a `TRAIT_NAMES` "
+          "block —")
+        w("`_fallback_display_name()` strips the `Secret_` tier marker — so "
+          "there is")
+        w("nothing here to keep in sync. The **#** is `secret_rare_number()`, "
+          "which")
+        w("indexes SORTED FILENAMES, so adding or renaming a piece renumbers "
+          "the")
+        w("set.\n")
+        w("| # | Name | File | Artist |")
+        w("|--:|------|------|--------|")
+        for i, f in enumerate(live, 1):
+            credit = g.secret_rare_artist(f)
+            who = f"{credit[0]} — <{credit[1]}>" if credit else "—"
+            w(f"| {i} | {g._fallback_display_name(f)} | `{f}` | {who} |")
+        w("")
+
     retired_path = os.path.join(g.TRAITS_DIR, RETIRED_DIR)
     retired = sorted(f for f in os.listdir(retired_path)
                      if f.endswith(".png")) if os.path.isdir(retired_path) else []
     w(f"## Secret Rarez — retired ({len(retired)})\n")
-    w("The 1/1 tier is **retired**: `traits/secret_rarez` is empty, so nothing "
-      "here")
-    w("mints. The art is kept in `traits/secret_rarez_retired`, and")
-    w("`secret_rare_number()` reads that folder rather than a names table, so "
-      "moving")
-    w("it back restores the tier with its original numbering. Names fall back "
-      "from")
-    w("the filenames. `catalog/traitsheet_secret_rarez.png` is the record of "
-      "the")
-    w("tier as it stood.\n")
+    if live:
+        w("The original 1/1 tier, kept in `traits/secret_rarez_retired`. None "
+          "of it")
+        w("mints. The numbers below are what the set held when it was the "
+          "whole")
+        w("tier — they are **no longer the numbers it would come back with**, "
+          "since")
+        w(f"`secret_rare_number()` indexes sorted filenames and the "
+          f"{len(live)} live")
+        w("pieces above already hold places in that ordering.\n")
+    else:
+        w("The 1/1 tier is **retired**: `traits/secret_rarez` is empty, so "
+          "nothing here")
+        w("mints. The art is kept in `traits/secret_rarez_retired`, and")
+        w("`secret_rare_number()` reads that folder rather than a names table, "
+          "so moving")
+        w("it back restores the tier with its original numbering. Names fall "
+          "back from")
+        w("the filenames.\n")
+    w("`catalog/traitsheet_secret_rarez.png` is the record of the tier as it "
+      "stood.\n")
     w("| # | Name | File |")
     w("|--:|------|------|")
     for i, f in enumerate(retired, 1):

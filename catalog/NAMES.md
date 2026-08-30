@@ -40,7 +40,7 @@ A **†** marks a name that deliberately does not describe its art; see
 | Waffle | `after_skinz_waffle.png` |
 | Zebra Cake | `before_skinz_zebra_cake.png` |
 
-## Backgrounds — standard (59)
+## Backgrounds — standard (60)
 
 | Name | File |
 |------|------|
@@ -81,6 +81,7 @@ A **†** marks a name that deliberately does not describe its art; see
 | Snack Pack | `Snack_Pack.png` |
 | Soft Serve | `soft_serve.png` |
 | Starburst | `Starburst.png` |
+| Starfield | `Starfield.png` |
 | Store | `Store.png` |
 | Straight of America | `Straight_of_America (1).png` |
 | Sugar | `Sugar.png` |
@@ -222,40 +223,60 @@ holds 11 PNGs for 5 names.
 | The Meme is the Tech | `20_The_meme_is_the_tech.png` |
 | Zombieland Twinkie | `25_Zombieland_Twinkie.png` |
 
+## Secret Rarez — live (2)
+
+The 1/1 tier. Each of these is a finished full-canvas artwork that mints
+as an entire token with nothing composited over it, exactly once — **1 of
+4444 = 0.0225 %**, the rarest thing in the collection. Both are by guest
+artists, credited in the token metadata by an `Artist` attribute and a
+link in `external_url`.
+
+Names fall back from the filenames rather than a `TRAIT_NAMES` block —
+`_fallback_display_name()` strips the `Secret_` tier marker — so there is
+nothing here to keep in sync. The **#** is `secret_rare_number()`, which
+indexes SORTED FILENAMES, so adding or renaming a piece renumbers the
+set.
+
+| # | Name | File | Artist |
+|--:|------|------|--------|
+| 1 | Duhnut Candy Man | `Secret_Duhnut_Candy_Man.png` | Emily Cartoons — <https://emilycartoons.com> |
+| 2 | Radbro Webring | `Secret_Radbro_Webring.png` | Radbro Webring — <https://radbro.xyz> |
+
 ## Secret Rarez — retired (23)
 
-The 1/1 tier is **retired**: `traits/secret_rarez` is empty, so nothing here
-mints. The art is kept in `traits/secret_rarez_retired`, and
-`secret_rare_number()` reads that folder rather than a names table, so moving
-it back restores the tier with its original numbering. Names fall back from
-the filenames. `catalog/traitsheet_secret_rarez.png` is the record of the
-tier as it stood.
+The original 1/1 tier, kept in `traits/secret_rarez_retired`. None of it
+mints. The numbers below are what the set held when it was the whole
+tier — they are **no longer the numbers it would come back with**, since
+`secret_rare_number()` indexes sorted filenames and the 2 live
+pieces above already hold places in that ordering.
+
+`catalog/traitsheet_secret_rarez.png` is the record of the tier as it stood.
 
 | # | Name | File |
 |--:|------|------|
-| 1 | Secret Bubble Gum Rules | `Secret_Bubble_Gum_Rules.png` |
-| 2 | Secret Cabaret Cone | `Secret_Cabaret_Cone.png` |
-| 3 | Secret Checkered Oreo | `Secret_Checkered_Oreo.png` |
-| 4 | Secret Churro Cantina | `Secret_Churro_Cantina.png` |
-| 5 | Secret Cold Served | `Secret_Cold_Served.png` |
-| 6 | Secret Cookie Bro | `Secret_Cookie_Bro.png` |
-| 7 | Secret Cosmic Melt | `Secret_Cosmic_Melt.png` |
-| 8 | Secret Frosted Crate | `Secret_Frosted_Crate.png` |
-| 9 | Secret Golden Waffle | `Secret_Golden_Waffle.png` |
-| 10 | Secret Graveyard Scoop | `Secret_Graveyard_Scoop.png` |
-| 11 | Secret Grinning Oreo | `Secret_Grinning_Oreo.png` |
-| 12 | Secret High Voltage | `Secret_High_Voltage.png` |
-| 13 | Secret Jackpot Waffle | `Secret_Jackpot_Waffle.png` |
-| 14 | Secret Liberty Churro | `Secret_Liberty_Churro.png` |
-| 15 | Secret Marshmallow Blaze | `Secret_Marshmallow_Blaze.png` |
-| 16 | Secret Milk Dunk | `Secret_Milk_Dunk.png` |
-| 17 | Secret Off The Line | `Secret_Off_The_Line.png` |
-| 18 | Secret Smokey Marshmallow | `Secret_Smokey_Marshmallow.png` |
-| 19 | Secret Stadium Marshmallow | `Secret_Stadium_Marshmallow.png` |
-| 20 | Secret Twinkie Cash | `Secret_Twinkie_Cash.png` |
-| 21 | Secret Unicorn Twinkie | `Secret_Unicorn_Twinkie.png` |
-| 22 | Secret Waffle Loops | `Secret_Waffle_Loops.png` |
-| 23 | Secret Waffle Nothing | `Secret_Waffle_Nothing.png` |
+| 1 | Bubble Gum Rules | `Secret_Bubble_Gum_Rules.png` |
+| 2 | Cabaret Cone | `Secret_Cabaret_Cone.png` |
+| 3 | Checkered Oreo | `Secret_Checkered_Oreo.png` |
+| 4 | Churro Cantina | `Secret_Churro_Cantina.png` |
+| 5 | Cold Served | `Secret_Cold_Served.png` |
+| 6 | Cookie Bro | `Secret_Cookie_Bro.png` |
+| 7 | Cosmic Melt | `Secret_Cosmic_Melt.png` |
+| 8 | Frosted Crate | `Secret_Frosted_Crate.png` |
+| 9 | Golden Waffle | `Secret_Golden_Waffle.png` |
+| 10 | Graveyard Scoop | `Secret_Graveyard_Scoop.png` |
+| 11 | Grinning Oreo | `Secret_Grinning_Oreo.png` |
+| 12 | High Voltage | `Secret_High_Voltage.png` |
+| 13 | Jackpot Waffle | `Secret_Jackpot_Waffle.png` |
+| 14 | Liberty Churro | `Secret_Liberty_Churro.png` |
+| 15 | Marshmallow Blaze | `Secret_Marshmallow_Blaze.png` |
+| 16 | Milk Dunk | `Secret_Milk_Dunk.png` |
+| 17 | Off The Line | `Secret_Off_The_Line.png` |
+| 18 | Smokey Marshmallow | `Secret_Smokey_Marshmallow.png` |
+| 19 | Stadium Marshmallow | `Secret_Stadium_Marshmallow.png` |
+| 20 | Twinkie Cash | `Secret_Twinkie_Cash.png` |
+| 21 | Unicorn Twinkie | `Secret_Unicorn_Twinkie.png` |
+| 22 | Waffle Loops | `Secret_Waffle_Loops.png` |
+| 23 | Waffle Nothing | `Secret_Waffle_Nothing.png` |
 
 ## Deliberate names
 
