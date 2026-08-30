@@ -315,6 +315,60 @@ Two things worth knowing:
   visible — the body covers them — so it is a no-op today and correct
   structurally.
 
+## Footwear geometry is measured on the SOLID art, and two assets needed it
+
+Every slipper is composited at `offset=False, dy=0` — its authored position —
+and the character is moved to meet it. Two per-footwear tables in
+`generator.py` handle the assets that do not fit that on their own, and both
+were solved from measurement:
+
+**`WAT_CHAR_LIFT` — raise the CHARACTER (never the footwear).** A slipper's
+*silhouette* decides how buried the body looks, not its height. Per-column
+tops: the bunny/pepe/shiba/monster taper — only ears, eyes and ankle stubs
+reach the asset top, and 90 % of their width starts at y 972–1006. The
+gorbhouse is a flat-topped cylinder, 90th-percentile column top y 895. So at
+one shared body line the cans cover **37.2 %** of their own mass against
+28–30 % for every other slipper, and the body sits **63px below** the point
+where the can's bulk begins where every other slipper puts it 17–49px
+*above*. Rendered as a ladder (0 / −40 / −70 / −95 / −120), **−70** is where
+the black ankle stubs authored into the can art read as short legs and the
+body still rests on the lids; −95 and beyond floats it. This is a property of
+the SLIPPER, so all six wearers take it identically — it needs no
+per-character tuning.
+
+**It does not stack with `ARMED_LIFT`.** Both say "this figure must ride N px
+higher for clearance", so the figure takes the larger N, not the sum. Summed,
+an armed gorbhouse went up 140px and floated clear of the cans on two long
+black ankles.
+
+**`WAT_SCALE` / `WAT_SCALE_PIVOT` — resize a footwear asset.** Measured on the
+**solid** art (alpha > 200; four of the five carry a baked soft drop shadow,
+and any lower threshold reads that as extra sole):
+
+| slipper | one foot w | sole | height |
+|---|---|---|---|
+| Cookie Monster | 327 | 1168 | 345 |
+| Pepe | 287 | 1147 | 329 |
+| Shiba | 286 | 1142 | 309 |
+| Gorbhouse | 282 | 1144 | 323 |
+| Bunny | 256 | 1147 | 321 |
+
+The Cookie Monster was ~14 % wider than the cast mean and its sole sat 23px
+below a 1142–1147 line the other four agree on — so its wearers stood on a
+lower floor than everyone else, contact shadow and all. **0.88** puts one
+foot at 287: *exactly* Pepe's, the largest of the other four rather than
+smaller than them.
+
+**Solve the pivot against the real render path, not by algebra on the bbox.**
+`scale_about` resamples, so the threshold that defines "sole" moves under it:
+the pivot the algebra gives (y 728) measured back as sole 1114–1129, 30px
+high. y 985 is the value that measures back as 1145. Re-solve it if the scale
+ever changes.
+
+Every file of a pair — base and overlay(s) — must take the same scale and
+pivot, or the front piece slides off the back one. `_wat_layer()` is the one
+place that builds a footwear layer, for that reason.
+
 ## An armed figure rides 70px higher, as one piece
 
 `ARMED_LIFT` in `generator.py` raises the WHOLE figure — body, skin ball, eyes,

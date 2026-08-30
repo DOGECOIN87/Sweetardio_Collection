@@ -109,13 +109,20 @@ def placement_cases(name):
         cases.append(("no-offset", base))
     else:
         if wat_ok:
-            # One case covers every slipper, the gorbhouse trash-cans
-            # included: they are all footwear bases now, so they all suppress
-            # the footwear-less drop and place the body at CHAR_Y_ADJUST. The
-            # gorbhouse used to have a case of its own here (VERTICAL_OFFSET +
-            # base + footwearless_dy) because it was drawn as a character-
-            # anchored layer, which sank the body 156px past the can rims.
+            # Every slipper suppresses the footwear-less drop and places the
+            # body at CHAR_Y_ADJUST. (The gorbhouse used to have a case of its
+            # own here — VERTICAL_OFFSET + base + footwearless_dy — because it
+            # was drawn as a CHARACTER-anchored layer, which sank the body
+            # 156px past the can rims. It is an ordinary footwear base now.)
             cases.append(("footwear", base))
+            # …except that a footwear with a WAT_CHAR_LIFT raises the figure
+            # off its own bulk, so its wearers form a group of their own at a
+            # different line. Today that is the gorbhouse and only the
+            # gorbhouse: a flat-topped can buries a body that a tapering
+            # slipper would not. See WAT_CHAR_LIFT in generator.py.
+            for wat, px in g.WAT_CHAR_LIFT.items():
+                if wat != g.GORBHOUSE_BASE or g.gets_gorbhouse_overlay(name):
+                    cases.append((f"footwear:{wat}", base - px))
         if centered:
             cases.append(("centered-bare", g.centered_footwearless_dy(name)))
         else:
@@ -132,6 +139,8 @@ def group_of(name, case):
         return "cone tips (no-offset)" if cone else "no-offset bodies"
     if case == "footwear":
         return "standing on footwear"
+    if case.startswith("footwear:"):
+        return f"standing on {case.split(':', 1)[1]}"
     if case == "centered-bare":
         return "centred, bare"
     return "standing, bare"

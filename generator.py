@@ -1044,6 +1044,82 @@ def gets_gorbhouse_overlay(char_name):
 # matching the filename exactly.
 GORBHOUSE_BASE = "Gorbhouse"
 
+# ---- per-footwear geometry ----
+#
+# WAT_CHAR_LIFT: px to raise the CHARACTER (body, face, arms — never the
+# footwear) when it wears this base. Default 0, and four of the five need it.
+#
+# It exists because a slipper's SILHOUETTE decides how buried the body looks,
+# not its height. Measured per-column tops: the bunny/pepe/shiba/monster
+# taper — only ears, eyes and ankle stubs reach the asset's top, and 90 % of
+# their width starts at y 972–1006. The gorbhouse is a flat-topped cylinder:
+# its 90th percentile column top is y 895. So at one shared body line the
+# cans cover 37.2 % of their own mass against 28–30 % for every other
+# slipper, and the body sits 63px BELOW the point where the can's bulk
+# begins where every other slipper puts it 17–49px ABOVE. Rendered as a
+# ladder (0 / -40 / -70 / -95 / -120), -70 is where the black ankle stubs
+# authored into the can art read as short legs and the body still rests on
+# the lids; -95 and beyond floats it.
+#
+# NOT a per-character value: it is a property of the SLIPPER, so it applies
+# to all six gorbhouse wearers identically and needs no per-character tuning.
+WAT_CHAR_LIFT = {
+    "Gorbhouse": 70,
+}
+
+def wat_char_lift(wat_base):
+    return WAT_CHAR_LIFT.get(wat_base, 0) if wat_base else 0
+
+# WAT_SCALE / WAT_SCALE_PIVOT: intrinsic scale for a footwear asset, about a
+# pivot in the art's own space. Same mechanism as the arms' ARM_SCALE.
+#
+# The Cookie Monster was authored oversized against the rest of the set.
+# Measured on the SOLID art (alpha > 200 — the soft drop shadow baked into
+# four of the five assets makes any lower threshold read as extra sole):
+#
+#     slipper          one foot w   sole      height
+#     Cookie Monster          327   1168         345
+#     Pepe                    287   1147         329
+#     Shiba                   286   1142         309
+#     Gorbhouse               282   1144         323
+#     Bunny                   256   1147         321
+#
+# So it is ~14 % wider than the cast mean and its sole sits 23px below a
+# 1142-1147 band the other four agree on — meaning a character wearing it
+# stood on a lower floor than everyone else, contact shadow and all.
+#
+# 0.88 puts one foot at 287 wide: EXACTLY Pepe's, the largest of the other
+# four, rather than smaller than them — which is what "slightly oversized"
+# asks for. The pivot is solved against the real render path, not by algebra
+# on the bbox: scale_about resamples, so the threshold that defines "sole"
+# moves under it. y 985 is the value that measures back as sole 1145, dead
+# centre of the band; x 716 is the pair's own centre, so it does not drift.
+# Re-solve both if the scale changes.
+WAT_SCALE = {
+    "Cookie_Monster_Slippers": 0.88,
+}
+WAT_SCALE_PIVOT = {
+    "Cookie_Monster_Slippers": (716, 985),
+}
+
+def wat_scale(wat_base):
+    """(scale, pivot) for a footwear base; (1.0, None) when it is native."""
+    if not wat_base:
+        return 1.0, None
+    return WAT_SCALE.get(wat_base, 1.0), WAT_SCALE_PIVOT.get(wat_base)
+
+def _wat_layer(path, wscale, wpivot):
+    """One footwear layer. offset=False ALWAYS: a slipper is composited at the
+    position it was authored at, and the character is moved to meet it (that
+    is what CHAR_Y_ADJUST and WAT_CHAR_LIFT are for). Every file of a pair —
+    base and overlay(s) — must take the same scale and pivot, or the front
+    piece slides off the back one."""
+    layer = {"path": path, "offset": False}
+    if wpivot is not None and abs(wscale - 1.0) > 0.001:
+        layer["fscale"] = wscale
+        layer["fcenter"] = wpivot
+    return layer
+
 # How often an eligible character actually wears the gorbhouse (rolled per
 # generation) WHEN its footwear slot is active. < 1.0 so eligible characters
 # still get regular slippers (and, via the tiers below, footwear-less runs).
@@ -1629,10 +1705,13 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 2. What Are Thosez BASE (placed before characterz)
     if chosen_wat:
         wat_files = get_files(WHAT_ARE_THOSEZ)
+        wscale, wpivot = wat_scale(chosen_wat)
         for f in wat_files:
             base = wat_base_name(f)
             if base and base.lower() == chosen_wat.lower():
-                layers.append({"path": os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f), "offset": False})
+                layers.append(_wat_layer(
+                    os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, f),
+                    wscale, wpivot))
                 break
     
     # Determine if we should apply offset
@@ -1686,13 +1765,21 @@ def generate_random_combination(force_bg=None, force_arm="auto",
         raise ValueError(f"No art in traits/{CHARACTERZ} for character "
                          f"{char_name!r}")
 
-    # Raise the whole figure when it holds a weapon (see ARMED_LIFT). Applied
-    # to y_adjust BEFORE any layer is built, so the body, skin ball, eyes,
-    # mouth, footwear and the arm all take it together and nothing inside the
-    # figure shifts relative to anything else. The grounding shadow is derived
-    # from those layers, so it rises with them.
-    if arm:
-        y_adjust -= armed_lift(body_files[0], arm, cscale)
+    # Raise the whole figure when it holds a weapon (ARMED_LIFT) or when its
+    # footwear needs the body above its own bulk (WAT_CHAR_LIFT). Applied to
+    # y_adjust BEFORE any layer is built, so the body, skin ball, eyes, mouth
+    # and the arm all take it together and nothing inside the figure shifts
+    # relative to anything else. The grounding shadow is derived from those
+    # layers plus the footwear, so it stays on the sole.
+    #
+    # The two are ALTERNATIVES, never cumulative. Both say "this figure must
+    # ride N px higher for clearance", so the figure takes the larger N.
+    # Summed, an armed gorbhouse went up 140px and floated clear of the cans
+    # on two long black ankles — rendered, and plainly wrong.
+    lift = max(armed_lift(body_files[0], arm, cscale) if arm else 0,
+               wat_char_lift(chosen_wat))
+    if lift:
+        y_adjust -= lift
     for f in body_files:
         layer = {"path": os.path.join(TRAITS_DIR, CHARACTERZ, f), "offset": apply_offset, "dy": y_adjust + bg_extra_y, "cscale": cscale, "ccenter": CHAR_SCALE_PIVOT}
         if body_after_skin(char_name, f):
@@ -1757,8 +1844,9 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     # 8. What Are Thosez OVERLAY (footwear front piece) — placed BEFORE arms
     # so a held weapon (katana/knives) reads on top of the slippers instead
     # of being hidden behind them.
+    wscale, wpivot = wat_scale(chosen_wat)
     for overlay_path in wat_overlays:
-        layers.append({"path": overlay_path, "offset": False})
+        layers.append(_wat_layer(overlay_path, wscale, wpivot))
 
     # (The gorbhouse used to be appended here, as a ninth step of its own,
     # anchored to the CHARACTER -- offset=apply_offset, dy=y_adjust. It is
