@@ -24,7 +24,7 @@ what the weather costs, not what the hour of day costs. The per-state floors liv
 
 | new state | vs | dE | vs whole table (min) | verdict |
 |---|---|---|---|---|
-| `blizzard` | `snow` | 20.7 | 9.9 (`fog`) | distinct |
+| `blizzard` | `snow` | 20.8 | 9.8 (`fog`) | distinct |
 | `tornado` | `storm` | 15.9 | 7.1 (`rain`) | distinct |
 | `flooded` | `rain` | 10.3 | 8.6 (`snow`) | distinct |
 
@@ -32,10 +32,10 @@ Full matrix (dE):
 
 | | fog | rain | snow | storm | blizzard | tornado | flooded |
 |---|---|---|---|---|---|---|---|
-| **fog** | — | 21.0 | 12.4 | 33.9 | 9.9 | 22.5 | 14.9 |
-| **rain** | 21.0 | — | 9.8 | 13.5 | 30.1 | 7.1 | 10.3 |
-| **snow** | 12.4 | 9.8 | — | 22.9 | 20.7 | 12.3 | 8.6 |
-| **storm** | 33.9 | 13.5 | 22.9 | — | 42.8 | 15.9 | 20.9 |
-| **blizzard** | 9.9 | 30.1 | 20.7 | 42.8 | — | 30.3 | 24.0 |
-| **tornado** | 22.5 | 7.1 | 12.3 | 15.9 | 30.3 | — | 13.1 |
-| **flooded** | 14.9 | 10.3 | 8.6 | 20.9 | 24.0 | 13.1 | — |
+| **fog** | — | 21.1 | 12.5 | 34.1 | 9.8 | 22.6 | 15.1 |
+| **rain** | 21.1 | — | 9.8 | 13.5 | 30.2 | 7.1 | 10.3 |
+| **snow** | 12.5 | 9.8 | — | 22.9 | 20.8 | 12.3 | 8.6 |
+| **storm** | 34.1 | 13.5 | 22.9 | — | 42.9 | 15.9 | 20.9 |
+| **blizzard** | 9.8 | 30.2 | 20.8 | 42.9 | — | 30.4 | 24.2 |
+| **tornado** | 22.6 | 7.1 | 12.3 | 15.9 | 30.4 | — | 13.1 |
+| **flooded** | 15.1 | 10.3 | 8.6 | 20.9 | 24.2 | 13.1 | — |
