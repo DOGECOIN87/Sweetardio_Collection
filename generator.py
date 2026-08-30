@@ -144,6 +144,52 @@ LEGENDARY_BG_PREFIX = "Legendary_"
 
 def is_legendary_bg(filename):
     return os.path.basename(filename).startswith(LEGENDARY_BG_PREFIX)
+
+# The ANIMATED plate. Its PNG in traits/backgroundz is frame 0 of a 12-frame
+# loop that dynamic/starfield.py rebuilds from Nyan_Blank.gif; the loop is
+# what animation_url points at, and asset_assessment/bake_starfield.py writes
+# it for the tokens that drew the plate.
+STARFIELD_BG = "Starfield.png"
+
+# Plates the ALLOCATOR places and the weighted draw never touches, so their
+# hard caps stay exact. Legendary plates have always worked this way; the
+# starfield joins them because an ultra-rare cap cannot survive a plate also
+# being drawable at weight 1.0 alongside ~70 others -- that alone would mint
+# it onto roughly 1 token in 70 rather than 10 in 4444.
+ALLOCATOR_ONLY_BGS = {STARFIELD_BG}
+
+def is_allocator_only_bg(filename):
+    """True for a plate that may appear ONLY via force_bg from build_mint."""
+    f = os.path.basename(filename)
+    return is_legendary_bg(f) or f in ALLOCATOR_ONLY_BGS
+
+# Characters the starfield may pair with. The plate is FLAT, so the usual
+# camouflage test (build_char_compat.py, which scores a body against a
+# plate's LOCAL colour) degenerates -- there is one colour to clash with, and
+# what decides legibility is contrast against it.
+#
+# Measured as mean CIE76 dE between the composited character's pixels and the
+# field (#002147), over all 27: the cast runs 38.1 (chocolate sandwich
+# cookie) to 103.9 (Twinkie), and the natural break is at ~75 -- below it sit
+# the dark chocolate bodies (mean L* 22-40), which read as silhouettes rather
+# than as characters against deep space. The 14 above it are listed here.
+#
+# Nothing is illegible at any point on that range (0 % of any body's pixels
+# fall within dE 25 of the field, bar 1.5 % of the gummy bear), so this is an
+# APPEARANCE cut, not a legibility one -- re-render the cast sheet and move
+# the line if the owner's eye disagrees with the number.
+STARFIELD_CHARS = [
+    "Twinkie", "gold_waffle", "og_poptart", "glazed_doughnut", "smores",
+    "sugar_doughnut", "churro", "rice_crispy_treat", "waffle", "marshmallow",
+    "cyan_sherbert_ice_cream", "vanilla_ice_cream", "zebra_cake",
+    "pink_sherbert_ice_cream",
+]
+
+def starfield_allowed(char_name):
+    """EXACT match, not substring: 'waffle' and 'gold_waffle' are both on the
+    list and a substring test cannot tell one from the other -- the repo's
+    recurring failure class (see char_base_name)."""
+    return char_name in STARFIELD_CHARS
 SKINZ = "skinz"
 CHARACTERZ = "characterz"
 EYEZ = "eyez"
@@ -268,6 +314,10 @@ TRAIT_NAMES = {
         "RIP_Gorbagana.png":                "RIP Gorbagana",
         "Smuckers_Blue.png":                "Smuckers Blue",
         "Snack_Pack.png":                   "Snack Pack",
+        # GENERATED, not photographed: dynamic/starfield.py rebuilds it from
+        # Nyan_Blank.gif. It is the one ANIMATED plate -- this PNG is frame 0
+        # of a 12-frame loop, and the loop is what animation_url points at.
+        "Starfield.png":                    "Starfield",
         "Straight_of_America (1).png":      "Straight of America",
         "Sugar.png":                        "Sugar",
         "Sweet_Castle_2.png":               "Sweet Castle",
@@ -1557,10 +1607,10 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             bg_files = get_files(bg_dir)
         # overlays pair with their parent plate; they are never a background
         bg_files = [f for f in bg_files if f not in BG_OVERLAY_PAIRS.values()]
-        # Legendary_* plates are 1/1-style rares: they appear ONLY via the
-        # mint allocator's fixed per-plate quota (force_bg), never in the
-        # normal weighted random pick, so their hard caps stay exact.
-        bg_files = [f for f in bg_files if not is_legendary_bg(f)]
+        # Legendary_* plates and the starfield are capped rares: they appear
+        # ONLY via the mint allocator's fixed per-plate quota (force_bg),
+        # never in the normal weighted random pick, so their caps stay exact.
+        bg_files = [f for f in bg_files if not is_allocator_only_bg(f)]
         if not bg_files:
             raise ValueError("No background assets found")
         # character <-> background pairing. Hard rule: drop plates this

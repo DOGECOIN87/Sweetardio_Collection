@@ -459,6 +459,93 @@ The blade runs OFF the frame at both values — it touches the left and right
 edges before and after — so no floating blade stub is introduced. Check that
 if the value ever moves.
 
+## The starfield is the ultra-rare tier, and the one ANIMATED plate
+
+`Starfield.png` is **10 of 4444 — 0.225 %, 1 in 444 — the rarest trait in the
+collection**. Next rarest is Tornado at 14 (0.32 %); a legendary plate is 50
+(1.13 %).
+
+The cap only holds because the plate is kept out of the weighted draw
+entirely. `is_allocator_only_bg()` in `generator.py` covers the `Legendary_*`
+plates and this one, and `generate_random_combination` filters on it before
+weighting — a plate sitting in the pool at weight 1.0 alongside ~70 others
+would mint on roughly 1 token in 70, not 10 in 4444. `STARFIELD_COUNT` in
+`build_mint.py` is then the only way one exists.
+
+It is **generated, not photographed**: `dynamic/starfield.py` rebuilds it from
+`Nyan_Blank.gif`, so its source of truth is reproducible rather than merely
+restorable. That is why it is NOT in `traits/backgroundz_originals` — and
+because `grade.py` grades everything in that folder with no skip list, it also
+carries an explicit `GENERATED` skip there. Running the family grader over a
+flat authored field would put a vignette, a bloom and a depth blur on a colour
+that is meant to be exactly one value.
+
+The field is **Oxford Blue `#002147`**, not the GIF's own `#00008B`. The plate
+family is graded cool, desaturated and mid-key; `#00008B` is the one saturated
+primary in the set (L\* 21.6, chroma 79) and reads as a swatch beside them,
+where Oxford Blue (L\* 15.5, chroma 32) reads as deep space. Because the field
+went DOWN in luma, the sparkles gain contrast rather than lose it.
+`from_gif()` **cleans then recolours**, in that order — cleaning leaves exactly
+two colours so the swap is a substitution, and recolouring first would strand
+the Nyan-removal residue as visible specks.
+
+### What it composes with
+
+- **Characters: `STARFIELD_CHARS`, 14 of 27, matched EXACTLY** (`waffle` and
+  `gold_waffle` are both on it and a substring test cannot tell them apart).
+  The plate is flat, so `build_char_compat.py`'s camouflage test degenerates —
+  there is one colour to clash with. The list is cut on measured mean CIE76 dE
+  between the composited body and the field: the cast runs 38.1 (chocolate
+  sandwich cookie) to 103.9 (Twinkie), and the natural break is ~75, below
+  which sit the dark chocolate bodies (mean L\* 22–40) that read as
+  silhouettes. Nothing is *illegible* anywhere on that range, so this is an
+  appearance cut, not a legibility one.
+- **Weather: mutually exclusive.** Not squeamishness about rain in space —
+  both tiers own `animation_url`, and a token carrying each would have two
+  loops and one field to put them in.
+- **Legendary plates: mutually exclusive**, one rare plate per token.
+- **Stickers: allowed, deliberately.** They allocate from every composable
+  slot, legendary included. All 10 drew one.
+
+### The loop is written at MINT time, not in a bake pass
+
+`bake_weather.py` can work from a finished PNG plus its protect mask because a
+weather state is a grade laid *over* the token. The starfield's **plate
+moves**, and the grounding shadow and the subject-separation pocket are
+painted onto the plate *before* the character goes down — so a frame built by
+swapping the plate under a finished PNG loses both and the character floats.
+(`starfield.behind()` does exactly that and is labelled a proof path.)
+
+So `build_mint.py --render --animation` calls `starfield.loop_layers()`, which
+re-composites the whole stack once per plate frame. 10 tokens x 12 frames is
+120 composites at ~1s each; the 444 weather tokens would have been 16,000,
+which is why the weather bake had to be a grade and this one does not.
+
+### On the flat field, the halo is the SHADOW
+
+Measured on a Twinkie over the plate, as % of plate pixels deviating from the
+flat field: both stages on 4.1 %, shadow only 4.0 %, separation only 0.6 %,
+neither 0.6 %. `SUBJECT_SEPARATION` contributes essentially nothing, exactly
+as its own rule predicts — its strength is measured from a band-pass, and a
+flat field has no business to detect. The visible pool under a floating
+character is `GROUND_SHADOW`, and **the owner chose to keep it.**
+
+### It did not move the rarity gains
+
+Adding it changed `char_compat.json`'s weights (all 27 entries — the grader
+measures against every plate in the folder, capped ones included, which is how
+the `Legendary_*` plates are already treated) but changed **nothing** in
+`eyez_compat.json` beyond adding the plate's own entry: no existing plate's
+blocklist or weight moved. The eyez entry blocks Blue and Cyan on it, which
+costs those eyes nothing at all, because the plate is not in the weighted pool.
+
+Side Eye — the eye this file already flags as the sensitive one — reads
+**+1.12 / +0.87** at seeds 4444 / 909090 against the **+0.31 / +1.70** recorded
+before the plate existed. Same band, tighter spread. Re-solving to chase that
+would be fitting noise on one seed, which `calibrate_rarity.py`'s docstring
+warns against explicitly, so **the gains were left alone**. Backgrounds stayed
+within ±0.42.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`

@@ -53,6 +53,11 @@
    "Blue.png",
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
   ],
+  "Starfield.png": [
+   "Blue.png",
+   "layer-Eyes_Cyan (1).png",
+   "layer-file_000000001e1c71fd9d410745ea63114e (1).png"
+  ],
   "Store.png": [
    "Blue.png"
   ],
@@ -321,6 +326,9 @@
    "Cerise.png": 0.656,
    "layer-Eyes_Cyan (1).png": 0.908,
    "layer-file_000000001e1c71fd9d410745ea63114e (1).png": 0.898
+  },
+  "Starfield.png": {
+   "Cerise.png": 0.742
   },
   "Store.png": {
    "Cerise.png": 0.667,

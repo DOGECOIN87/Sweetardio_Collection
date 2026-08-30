@@ -323,6 +323,22 @@ LOG_COLS = ("plate, L, Lstd, S, temp, edge, op%, p_midkey, c_scurve, f_sat, "
             "overlay, L_out, S_out, temp_out").split(", ")
 
 
+# Plates that are GENERATED rather than photographed, and must never be
+# graded. This grader normalises a photographic plate toward the family key;
+# run on a flat authored field it would put a vignette, a bloom and a depth
+# blur on a colour that is meant to be exactly one value.
+#
+# It is a skip rather than an absence because grade.py grades EVERYTHING in
+# the source folder with no other filter, so the only safe place for a
+# generated plate's source is nowhere near it -- and this list is what says
+# so out loud if someone ever copies backgroundz/ back over originals/.
+#
+# Starfield.png is rebuilt by dynamic/starfield.py from Nyan_Blank.gif, which
+# is a stronger guarantee than a preserved PNG: it is reproducible, not just
+# restorable.
+GENERATED = {"Starfield.png"}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default=SRC_DEFAULT)
@@ -334,6 +350,7 @@ def main():
 
     files = sorted(f for f in os.listdir(args.src)
                    if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")))
+    files = [f for f in files if f not in GENERATED]
     if args.only:
         files = [f for f in files if any(s in f for s in args.only)]
     if not files:

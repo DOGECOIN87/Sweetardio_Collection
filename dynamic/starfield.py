@@ -24,8 +24,15 @@ prototype the motion, to render a field at any canvas size without a
 source, and as the fallback if the art is ever regenerated.
 """
 
+import os
+
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+
+# The owner's source art, at the repo root.
+GIF_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "Nyan_Blank.gif")
 
 # The SOURCE field, sampled off the owner's GIF: a single flat colour, no
 # gradient. #00008B is X11 "dark blue" rather than navy -- worth naming,
@@ -143,6 +150,43 @@ def from_gif(path, size=(1393, 1393), clean=True, field=None):
         a[~star] = dst
         frames.append(Image.fromarray(a.astype(np.uint8), "RGB")
                       .resize(size, Image.Resampling.NEAREST))
+    return frames
+
+
+def loop_layers(layers, out_dir, tid, gen, gif=GIF_PATH, size=None):
+    """Render a token's seamless starfield loop by RE-COMPOSITING it once per
+    plate frame, and return the frames.
+
+    This is the one place the shipping path differs from the weather bake,
+    and the reason is structural. A weather loop is a GRADE over a finished
+    token, so bake_weather.py can work from the PNG plus its protect mask and
+    never needs the layer stack. Here the plate itself moves, and the
+    grounding shadow and the subject-separation pocket are painted ONTO the
+    plate before the character goes down -- so a frame built by swapping the
+    plate under a finished PNG loses both, and the character floats (see
+    behind() below, which does exactly that and is a proof path only).
+
+    Re-compositing is affordable precisely because this tier is ultra-rare:
+    10 tokens x 12 frames is 120 composites, where the 444 weather tokens
+    would have been 16,000.
+    """
+    import copy
+    frames = []
+    plates = from_gif(gif, size=(gen.CANVAS_SIZE, gen.CANVAS_SIZE))
+    os.makedirs(out_dir, exist_ok=True)
+    for i, plate in enumerate(plates):
+        pp = os.path.join(out_dir, f"_plate_{tid}_{i:02d}.png")
+        plate.save(pp)
+        ls = [dict(l) for l in layers]
+        ls[0] = {"path": pp, "offset": False}
+        tmp = os.path.join(out_dir, f"_f_{tid}_{i:02d}.png")
+        gen.create_image(ls, tmp)
+        im = Image.open(tmp).convert("RGB")
+        if size and im.size != (size, size):
+            im = im.resize((size, size), Image.Resampling.LANCZOS)
+        frames.append(im.copy())
+        os.remove(pp)
+        os.remove(tmp)
     return frames
 
 

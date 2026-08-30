@@ -54,6 +54,8 @@ import generator as g
 from verify_separation import at_risk, plate_stats   # noqa: E402
 from build_char_compat import char_table              # noqa: E402
 from dynamic import sky as skymod                     # noqa: E402
+from dynamic import starfield as sfmod                # noqa: E402
+from dynamic.animate import write_mp4                 # noqa: E402
 
 TRAIT_KEYS = ("character", "bg", "skin", "eye", "mouth", "arm", "wat", "sticker")
 
@@ -189,6 +191,29 @@ if _unknown:
 # that you can see it, and every weather state is in front of the plate.
 # A tornado over a 1-of-50 background hides the thing that made it rare.
 
+# ---- the starfield: the collection's ULTRA-RARE tier ----
+#
+# 10 of 4444 -- 0.225 %, or 1 in 444, which is the rarest thing in the set:
+# the next rarest trait is Tornado at 14 (0.32 %), and a legendary plate is
+# 50 (1.13 %). It is not a hard cap by luck: generator.is_allocator_only_bg
+# keeps the plate out of the weighted draw entirely, exactly as the
+# Legendary_* plates are kept out, so the only way to mint one is here.
+STARFIELD_COUNT = 10
+
+# It is kept off LEGENDARY slots (one rare plate per token -- a starfield
+# would simply replace the legendary plate it was supposed to coexist with)
+# and off WEATHER slots. The weather exclusion is not squeamishness about
+# rain in space: both traits own animation_url, so a token carrying each
+# would have two loops and one slot to put them in.
+#
+# Stickers are deliberately NOT excluded. They allocate from every
+# composable slot, legendary included, and the owner asked for them here
+# too, so a starfield token can carry one like any other.
+if STARFIELD_COUNT and g.STARFIELD_BG not in g.get_files(g.BACKGROUNDZ):
+    sys.exit(f"STARFIELD_COUNT is {STARFIELD_COUNT} but "
+             f"traits/{g.BACKGROUNDZ}/{g.STARFIELD_BG} is missing — "
+             f"rebuild it with dynamic/starfield.py")
+
 
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
@@ -252,6 +277,10 @@ def main():
                          "ONLY to the tokens that drew a weather state; the "
                          "other 4,000 are stills and must not claim an "
                          "animation they do not have")
+    ap.add_argument("--anim-size", type=int, default=640,
+                    help="starfield loop resolution (the STILL is full canvas)")
+    ap.add_argument("--anim-ms", type=int, default=70,
+                    help="starfield frame duration; 70 is the source GIF's own")
     ap.add_argument("--no-weather", action="store_true",
                     help="mint without the animated weather tier at all")
     ap.add_argument("--symbol", default=None)
@@ -283,11 +312,27 @@ def main():
         sys.exit("--masks needs --render: the mask is a by-product of the "
                  "composite, so there is nothing to write without it")
 
-    def render(layers, tid):
+    anim_dir = os.path.join("output", "mint", "anim")
+
+    def render(layers, tid, starfield=False):
         g.create_image(
             layers, os.path.join(img_dir, f"{tid}.png"),
             mask_path=(os.path.join(mask_dir, f"{tid}.png")
                        if args.masks else None))
+        # The starfield loop is written HERE, not in a later bake pass, and
+        # the reason is that it is the only animated tier whose PLATE moves.
+        # bake_weather.py can work from a finished PNG plus its protect mask
+        # because a weather state is a grade laid over the token; a moving
+        # plate has to go UNDER the grounding shadow and the separation
+        # pocket, which exist only while the layer stack does. 10 tokens x 12
+        # frames is 120 composites, which is why this is affordable here and
+        # would not have been for the 444 weather tokens.
+        if starfield and args.animation:
+            frames = sfmod.loop_layers(layers, anim_dir, tid, g,
+                                       size=args.anim_size)
+            if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
+                         1000.0 / args.anim_ms) is None:
+                sys.exit("no ffmpeg — pip install imageio-ffmpeg")
 
     bg_dir = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ)
     legs = sorted(f for f in os.listdir(bg_dir)
@@ -343,10 +388,23 @@ def main():
         forced_bg[s] = leg
     is_leg = set(leg_slots)
 
+    # 1a) the starfield -> NON-legendary slots, on an eligible character.
+    #     Allocated before everything else that competes for a slot so the
+    #     ultra-rare tier is never the thing that gets squeezed out.
+    star_free = [s for s in avail if s not in is_leg]
+    random.shuffle(star_free)
+    if STARFIELD_COUNT > len(star_free):
+        sys.exit(f"STARFIELD_COUNT {STARFIELD_COUNT} exceeds the "
+                 f"{len(star_free)} non-legendary slots available")
+    star_slots = star_free[:STARFIELD_COUNT]
+    for s in star_slots:
+        forced_bg[s] = g.STARFIELD_BG
+    is_star = set(star_slots)
+
     # 1b) rare characters -> exact counts on NON-legendary slots. Legendary
     #     slots re-roll the character when it camouflages against the plate,
     #     which a forced character could never satisfy, so they are excluded.
-    char_free = [s for s in avail if s not in is_leg]
+    char_free = [s for s in avail if s not in is_leg and s not in is_star]
     random.shuffle(char_free)
     char_total = sum(CHARACTER_COUNTS.values())
     if char_total > len(char_free):
@@ -425,7 +483,7 @@ def main():
     #     standalone art with no plate to weather and no protect mask to
     #     hold the effect off them, so they are out too.
     if not args.no_weather:
-        wx_free = [s for s in avail if s not in is_leg]
+        wx_free = [s for s in avail if s not in is_leg and s not in is_star]
         if WEATHER_TOTAL > len(wx_free):
             sys.exit(f"WEATHER_COUNTS total {WEATHER_TOTAL} exceeds the "
                      f"{len(wx_free)} non-legendary slots available")
@@ -464,7 +522,11 @@ def main():
             continue
 
         leg = forced_bg[i]
-        fb  = (g.BACKGROUNDZ, leg) if leg is not None else None
+        star = leg == g.STARFIELD_BG
+        if star:
+            leg = None                 # a capped plate, but not a legendary
+        fb  = (g.BACKGROUNDZ, g.STARFIELD_BG) if star else (
+            (g.BACKGROUNDZ, leg) if leg is not None else None)
         farm = forced_arm[i] if forced_arm[i] is not None else None
         fwat = forced_wat[i] if forced_wat[i] is not None else None
         fstk = forced_stk[i] if forced_stk[i] is not None else None
@@ -483,6 +545,8 @@ def main():
             )
             if leg is not None and camo(char, leg):
                 continue                           # re-roll camouflaging char
+            if star and not g.starfield_allowed(char):
+                continue          # re-roll onto a character the plate suits
 
             meta = g.extract_metadata(layers, char)
             md = {a["trait_type"]: a["value"] for a in meta}
@@ -497,6 +561,7 @@ def main():
                 continue
             seen.add(sig(t))
             t["legendary"] = leg is not None
+            t["starfield"] = star
             if forced_wx[i] is not None:
                 # Appended rather than built by extract_metadata(), because
                 # weather is not a LAYER -- it is a grade applied to the
@@ -508,7 +573,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                render(layers, i + 1)
+                render(layers, i + 1, starfield=star)
             break
         else:
             sys.exit(f"token {i+1}: no unique combo for arm={farm} wat={fwat} "
@@ -522,9 +587,12 @@ def main():
             name = g.secret_rare_token_name(t["secret_rare"])
         # An animation_url ONLY where there is an animation. A static
         # token that claims one shows a broken player on every surface
-        # that believes it.
+        # that believes it. TWO tiers animate: a weather state, and the
+        # starfield plate. They are allocated mutually exclusive, so a token
+        # never has two loops competing for the one field.
         anim = (args.animation.replace("{id}", str(tid))
-                if args.animation and t.get("weather") else None)
+                if args.animation and (t.get("weather") or t.get("starfield"))
+                else None)
         token = g.token_metadata(
             t["attributes"], token_id=tid, image=f"{tid}.png", name=name,
             animation_url=anim, symbol=args.symbol,
@@ -537,6 +605,8 @@ def main():
         row = {k: t[k] for k in TRAIT_KEYS + ("legendary",)}
         if t.get("weather"):
             row["weather"] = t["weather"]
+        if t.get("starfield"):
+            row["starfield"] = True
         if t.get("secret_rare"):
             row["secret_rare"] = t["secret_rare"]
         slim[tid] = row
