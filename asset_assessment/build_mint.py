@@ -304,10 +304,14 @@ def main():
     # It is opt-in because it is not free: the masks run 28-60KB each, so a
     # 4,444 mint adds ~150MB beside the images.
     mask_dir = "output/mint/masks"
+    # The float mask (the corner sticker alone) rides with the protect mask:
+    # bake_weather.py needs both to float a sticker on a flood.
+    float_dir = "output/mint/float_masks"
     if args.render:
         os.makedirs(img_dir, exist_ok=True)
         if args.masks:
             os.makedirs(mask_dir, exist_ok=True)
+            os.makedirs(float_dir, exist_ok=True)
     elif args.masks:
         sys.exit("--masks needs --render: the mask is a by-product of the "
                  "composite, so there is nothing to write without it")
@@ -318,7 +322,9 @@ def main():
         g.create_image(
             layers, os.path.join(img_dir, f"{tid}.png"),
             mask_path=(os.path.join(mask_dir, f"{tid}.png")
-                       if args.masks else None))
+                       if args.masks else None),
+            float_mask_path=(os.path.join(float_dir, f"{tid}.png")
+                             if args.masks else None))
         # The starfield loop is written HERE, not in a later bake pass, and
         # the reason is that it is the only animated tier whose PLATE moves.
         # bake_weather.py can work from a finished PNG plus its protect mask

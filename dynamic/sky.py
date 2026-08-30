@@ -250,7 +250,22 @@ WEATHER_STATES = {
             foam=0.60,            # the bright line where air meets water
             foam_width=0.005,
             caustic=0.13,
-            caustic_cycles=1),
+            caustic_cycles=1,
+            # --- what the water does around a FLOATING piece (the corner
+            # sticker). See _submerge's `afloat` branch. Without these the
+            # piece is just un-submerged, which reads as a decal pasted over
+            # the flood rather than an object resting on it.
+            float_shadow=0.34,        # how far it darkens the water it sits on
+            float_shadow_r=15.0,      # softness of that contact shadow, px
+            float_rim=0.50,           # meniscus: water climbing its edge
+            float_rim_r=2.5,
+            # Reflection settings picked off a rendered ladder (fade/strength
+            # /blur at 0.026/0.34/5, 0.014/0.30/7, 0.009/0.26/9, 0.006/0.22
+            # /11). Anything longer than ~13px of fade stays legible upside
+            # down and reads as a second sticker lying under the water.
+            float_reflect=0.26,       # its own reflection under it
+            float_reflect_fade=0.009, # ~13px; a smear, not a mirror
+            float_reflect_blur=9.0),  # the surface breaking that reflection
         particles="rain", density=0.7),
 }
 
@@ -495,6 +510,17 @@ def _band_field(h, w, cfg, seed, t):
 
 
 _NOISE_CACHE = {}
+
+
+def _soft(a, r):
+    """Gaussian-blur a 0..1 float field, via PIL so it costs one pass rather
+    than an ndarray convolution. Used for the floating piece's contact
+    shadow and meniscus, which are both "the mask, spread"."""
+    if r <= 0.0:
+        return a
+    im = Image.fromarray((np.clip(a, 0.0, 1.0) * 255.0 + 0.5).astype(np.uint8),
+                         "L").filter(ImageFilter.GaussianBlur(float(r)))
+    return np.asarray(im, dtype=_F) / _F(255.0)
 
 
 def _noise_field(h, w, seed, blur):
@@ -836,8 +862,25 @@ def _wet(weather):
 #
 # Everything that varies with t is an integer number of cycles per loop,
 # like every other motion here.
-def _submerge(rgb, cfg, seed, t=0.0):
-    """Put everything below the waterline under water. rgb is (h, w, 3)."""
+def _submerge(rgb, cfg, seed, t=0.0, afloat=None):
+    """Put everything below the waterline under water. rgb is (h, w, 3).
+
+    `afloat` is an optional 0..1 field marking pixels that FLOAT ON the water
+    instead of being under it -- today the corner sticker. Every sticker in
+    the collection is authored at y 1114..1338 and the waterline sits at
+    y 836, so without this every one of them is fully submerged: the flood
+    tints and darkens the piece toward the deep colour and its own palette
+    disappears. Measured on the Golden Ticket, the gold (198, 172, 96) came
+    out (95, 120, 116) -- a murky teal, and unreadable as gold.
+
+    Simply exempting it is not enough. A piece that the water neither wets
+    nor touches reads as a decal pasted over the flood, so the water is made
+    to acknowledge it in three ways, all painted INTO the water before the
+    piece goes back on top: a contact shadow under it, a meniscus climbing
+    its edge, and its own reflection below it. That the piece sits low in
+    frame is not a contradiction -- the surface recedes from the viewer, so
+    something floating near the bottom edge is simply close to the camera,
+    which is where flood debris actually sits in a photograph."""
     h, w = rgb.shape[:2]
     t = float(t) % 1.0
     v, xs = _grid(h, w)
@@ -890,8 +933,62 @@ def _submerge(rgb, cfg, seed, t=0.0):
         band = np.exp(-(depth / _F(cfg["foam_width"])) ** 2)
         water = water + (_F(1.0) - water) * (band * _F(cfg["foam"]))[..., None]
 
+    # 5. the floating piece: what the water does AROUND it. Painted into the
+    #    water while it is still water, so all three cues are themselves
+    #    refracted, tinted and darkened by the depth ramp above rather than
+    #    sitting on top of it looking like decals of their own.
+    if afloat is not None and float(afloat.max()) > 1e-4:
+        solid = afloat > 0.5
+        live = solid.any(axis=0)
+        if live.any():
+            # Its reflection, mirrored PER COLUMN about that column's own
+            # lowest lit pixel -- not about one global bottom row. A sticker
+            # is authored tilted, so a single mirror line detaches the
+            # reflection from the high side of the piece and drops a second,
+            # readable copy of it into the water. Per column the reflection
+            # touches the whole lower edge and inherits the tilt.
+            bot = np.where(live, (h - 1) - np.argmax(solid[::-1, :], axis=0),
+                           0)[None, :]
+            yy = np.arange(h, dtype=np.intp)[:, None]
+            sy = np.clip(2 * bot - yy, 0, h - 1).astype(np.intp)
+            # sampled THROUGH the refraction, so the reflection wobbles with
+            # the same surface that displaces everything else under water --
+            # which is also what stops it reading as legible upside-down art.
+            dist = np.maximum(yy - bot, 0).astype(_F)
+            fade = np.exp(-dist / _F(cfg.get("float_reflect_fade", 0.04) * h))
+            wgt = (afloat[sy, xi] * fade * (yy > bot) * live[None, :]
+                   * _F(cfg.get("float_reflect", 0.38)))
+            refl = rgb[sy, xi]
+            # Blur the reflected CONTENT, not just its weight. Softening the
+            # weight alone feathers the edges of a still-crisp mirror image,
+            # which stays legible upside-down and reads as a second sticker
+            # lying under the water rather than as a reflection on it.
+            rb = cfg.get("float_reflect_blur", 5.0)
+            if rb > 0.0:
+                refl = np.dstack([_soft(refl[..., c], rb) for c in range(3)])
+            water = water + (refl - water) * wgt[..., None]
+
+        # the contact shadow it casts into the water it displaces
+        sh = np.clip(_soft(afloat, cfg.get("float_shadow_r", 15.0)) - afloat,
+                     0.0, 1.0)
+        water = water * (_F(1.0)
+                         - _F(cfg.get("float_shadow", 0.34)) * sh)[..., None]
+
+        # the meniscus -- water climbing the edge, the brightest line on any
+        # floating object, and the same idea as `foam` at the waterline
+        rim = np.clip(_soft(afloat, cfg.get("float_rim_r", 2.5)) - afloat,
+                      0.0, 1.0)
+        water = water + (_F(1.0) - water) * (
+            rim * _F(cfg.get("float_rim", 0.50)))[..., None]
+
     np.clip(water, 0.0, 1.0, out=water)
-    return rgb * (1.0 - under[..., None]) + water * under[..., None]
+    out = rgb * (1.0 - under[..., None]) + water * under[..., None]
+
+    # the piece itself never gets wet -- it is ON the water, so it keeps the
+    # colour it was minted with, at full strength, over everything above.
+    if afloat is not None:
+        out = out * (1.0 - afloat[..., None]) + rgb * afloat[..., None]
+    return out
 
 
 def _combine(sky, wet):
@@ -1063,8 +1160,12 @@ def grade_static(base, phase="day", weather=None):
             "p": p, "wet": wet}
 
 
-def frame(static, protect, t=0.0, seed=0, strength=1.0):
-    """One frame of a loop, from a cached grade_static() result."""
+def frame(static, protect, t=0.0, seed=0, strength=1.0, afloat=None):
+    """One frame of a loop, from a cached grade_static() result.
+
+    afloat: optional L image (or 0..1 array) marking the pixels that float on
+    a flood rather than sinking under it -- see _submerge. Ignored by every
+    state that does not submerge, so it is always safe to pass."""
     # t WRAPS HERE, once, for everything downstream. The tile and roll
     # motions were already exact at t=1 because they go through a modulo,
     # but anything built from sin(2*pi*(k*x + c*t)) is not: adding a whole
@@ -1161,7 +1262,13 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
     # mint. Alpha is untouched: see below, it never enters this path.
     sub_cfg = wet.get("submerge")
     if sub_cfg is not None and strength > 1e-4:
-        flooded = _submerge(np.clip(out, 0.0, 1.0), sub_cfg, seed, t)
+        af = afloat
+        if af is not None and not isinstance(af, np.ndarray):
+            if af.size != (w, h):
+                af = af.resize((w, h), Image.Resampling.LANCZOS)
+            af = np.asarray(af.convert("L"), dtype=_F) / _F(255.0)
+        flooded = _submerge(np.clip(out, 0.0, 1.0), sub_cfg, seed, t,
+                            afloat=af)
         out = out + (flooded - out) * _F(strength)
 
     return Image.fromarray(
@@ -1170,7 +1277,7 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
 
 
 def apply_sky(base, protect, phase="day", weather=None,
-              seed=0, strength=1.0, t=0.0):
+              seed=0, strength=1.0, t=0.0, afloat=None):
     """Grade the background of a finished token render (a single still).
 
     base     : RGBA PIL image -- the minted token, unmodified.
@@ -1181,6 +1288,11 @@ def apply_sky(base, protect, phase="day", weather=None,
     seed     : token id; makes the particle field stable per token.
     strength : 0..1 global dial on the whole effect, for previewing.
     t        : 0..1 position in the weather loop.
+    afloat   : L PIL image -- the FLOAT MASK create_image(float_mask_path=...)
+               wrote, marking the corner sticker. On a flood the sticker rides
+               ON the water instead of under it; every other state ignores it,
+               so passing it is always safe and omitting it only costs the
+               flood its floating sticker.
 
     Returns a new RGBA image the same size. The character is untouched.
     """
@@ -1201,7 +1313,7 @@ def apply_sky(base, protect, phase="day", weather=None,
         return base.copy()
 
     return frame(grade_static(base, phase, weather), protect,
-                 t=t, seed=seed, strength=strength)
+                 t=t, seed=seed, strength=strength, afloat=afloat)
 
 
 def describe(phase, weather):

@@ -64,8 +64,10 @@ def mint_samples(n, seed):
         layers, char = gen.generate_random_combination()
         base = os.path.join(PROOF_DIR, f"token_{i}.png")
         mask = os.path.join(PROOF_DIR, f"token_{i}_mask.png")
+        flt = os.path.join(PROOF_DIR, f"token_{i}_float.png")
         t0 = time.time()
-        gen.create_image(layers, base, mask_path=mask)
+        gen.create_image(layers, base, mask_path=mask,
+                         float_mask_path=flt)
         print(f"  token {i}: {char} ({time.time() - t0:.2f}s composite)")
         made.append((i, char, base, mask))
     return made
@@ -93,7 +95,8 @@ def variety_sheet(n, phases, cell_px, seed, strength):
             force_bg=(gen.BACKGROUNDZ, plate))
         b = os.path.join(PROOF_DIR, f"var_{i}.png")
         m = os.path.join(PROOF_DIR, f"var_{i}_mask.png")
-        gen.create_image(layers, b, mask_path=m)
+        fl = os.path.join(PROOF_DIR, f"var_{i}_float.png")
+        gen.create_image(layers, b, mask_path=m, float_mask_path=fl)
         made.append((os.path.splitext(plate)[0], char,
                      Image.open(b).convert("RGBA"), Image.open(m).convert("L")))
         print(f"  {i}. {char} on {plate}")
@@ -116,9 +119,12 @@ def variety_sheet(n, phases, cell_px, seed, strength):
 def _load(idx):
     base = os.path.join(PROOF_DIR, f"token_{idx}.png")
     mask = os.path.join(PROOF_DIR, f"token_{idx}_mask.png")
+    flt = os.path.join(PROOF_DIR, f"token_{idx}_float.png")
     if not (os.path.exists(base) and os.path.exists(mask)):
         return None
-    return Image.open(base).convert("RGBA"), Image.open(mask).convert("L")
+    return (Image.open(base).convert("RGBA"),
+            Image.open(mask).convert("L"),
+            Image.open(flt).convert("L") if os.path.exists(flt) else None)
 
 
 def contact_sheet(cells, cols, cell_px, title, out_path):
@@ -183,7 +189,7 @@ def main():
     tok = _load(args.token)
     if tok is None:
         sys.exit("no sample tokens; run with --tokens 3 first")
-    base, mask = tok
+    base, mask, afloat = tok
     tid = args.token
     suffix = "" if tid == 1 else f"_t{tid}"
 
@@ -191,7 +197,7 @@ def main():
     cells, t0 = [], time.time()
     for wx in WEATHER_ORDER:
         img = skymod.apply_sky(base, mask, "day", wx, seed=tid,
-                               strength=args.strength)
+                               strength=args.strength, afloat=afloat)
         cells.append((wx or "no weather — the mint, unchanged", img))
     per = (time.time() - t0) / len(WEATHER_ORDER)
     p2 = contact_sheet(cells, 4, args.cell,

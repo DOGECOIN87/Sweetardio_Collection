@@ -130,16 +130,19 @@ def _font(size):
         return ImageFont.load_default()
 
 
-def loop_frames(base, protect, phase, weather, n, seed, size):
+def loop_frames(base, protect, phase, weather, n, seed, size, afloat=None):
     """n seamless frames. grade_static runs ONCE; only frame() repeats."""
     if base.size != (size, size):
         base = base.resize((size, size), Image.Resampling.LANCZOS)
         protect = protect.resize((size, size), Image.Resampling.LANCZOS)
+        if afloat is not None:
+            afloat = afloat.resize((size, size), Image.Resampling.LANCZOS)
     t0 = time.time()
     static = skymod.grade_static(base, phase, weather)
     t_grade = time.time() - t0
     t0 = time.time()
-    frames = [skymod.frame(static, protect, t=i / n, seed=seed)
+    frames = [skymod.frame(static, protect, t=i / n, seed=seed,
+                           afloat=afloat)
               for i in range(n)]
     return frames, t_grade, (time.time() - t0) / n
 
@@ -187,6 +190,8 @@ def main():
         sys.exit("no sample token; run: python3 dynamic/render.py --tokens 3")
     base = Image.open(b).convert("RGBA")
     protect = Image.open(m).convert("L")
+    f = os.path.join(PROOF, f"token_{args.token}_float.png")
+    afloat = Image.open(f).convert("L") if os.path.exists(f) else None
     os.makedirs(ANIM, exist_ok=True)
 
     states = args.only or list(skymod.WEATHER_STATES)
@@ -202,7 +207,7 @@ def main():
         # fails if one does.
         if not skymod.has_motion(wx):
             still = skymod.apply_sky(base, protect, args.phase, wx,
-                                     seed=args.token)
+                                     seed=args.token, afloat=afloat)
             out = os.path.join(ANIM, f"weather_{wx}.png")
             still.save(out, optimize=True)
             same = skymod.is_identity(args.phase, wx)
@@ -213,7 +218,8 @@ def main():
             continue
 
         frames, t_grade, t_frame = loop_frames(
-            base, protect, args.phase, wx, args.frames, args.token, args.size)
+            base, protect, args.phase, wx, args.frames, args.token,
+            args.size, afloat=afloat)
         fps = 1000.0 / args.ms
         wrote = []
         if "webp" in args.formats:

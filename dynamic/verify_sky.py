@@ -151,8 +151,9 @@ def tokens():
     for i in range(1, 100):
         b = os.path.join(PROOF_DIR, f"token_{i}.png")
         m = os.path.join(PROOF_DIR, f"token_{i}_mask.png")
+        f = os.path.join(PROOF_DIR, f"token_{i}_float.png")
         if os.path.exists(b) and os.path.exists(m):
-            out.append((i, b, m))
+            out.append((i, b, m, f if os.path.exists(f) else None))
     return out
 
 
@@ -164,9 +165,12 @@ def main():
 
     failures = []
     checked = 0
-    for idx, bpath, mpath in toks:
+    for idx, bpath, mpath, fpath in toks:
         base = Image.open(bpath).convert("RGBA")
         mask = Image.open(mpath).convert("L")
+        # the gate runs the SHIPPING path: bake_weather passes the float mask,
+        # so a check that omitted it would be testing a render nobody gets
+        afloat = Image.open(fpath).convert("L") if fpath else None
         b = np.asarray(base)
         m = np.asarray(mask)
         protected = m >= OPAQUE
@@ -181,7 +185,8 @@ def main():
         for phase in skymod.SKY_STATES:
             for weather in [None] + list(skymod.WEATHER_STATES):
                 out = np.asarray(
-                    skymod.apply_sky(base, mask, phase, weather, seed=idx))
+                    skymod.apply_sky(base, mask, phase, weather, seed=idx,
+                                     afloat=afloat))
                 checked += 1
                 tag = f"token {idx} {phase}+{weather}"
 
@@ -231,7 +236,7 @@ def main():
             failures.append(f"{weather}: waterline {top:.3f}..{bottom:.3f} "
                             f"is not inside the canvas")
         wet_px = 0
-        for idx, bpath, mpath in toks:
+        for idx, bpath, mpath, fpath in toks:
             m = np.asarray(Image.open(mpath).convert("L"))
             rows = np.arange(m.shape[0])[:, None]
             wet_px += int(((m >= OPAQUE)
@@ -274,7 +279,7 @@ def main():
 
     # 7. the funnel is not hidden behind the character
     worst = None
-    for idx, bpath, mpath in toks:
+    for idx, bpath, mpath, fpath in toks:
         pr = (np.asarray(Image.open(mpath).convert("L"), dtype=np.float32)
               / 255.0)
         h, w = pr.shape
@@ -318,7 +323,7 @@ def main():
                   if w in skymod.WEATHER_STATES]
 
     worst_leg = None
-    for idx, bpath, mpath in toks:
+    for idx, bpath, mpath, fpath in toks:
         base_i = Image.open(bpath).convert("RGBA")
         mask_i = Image.open(mpath).convert("L")
         plate_i = np.asarray(mask_i) == 0

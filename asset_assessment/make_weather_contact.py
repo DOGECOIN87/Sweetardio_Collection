@@ -175,11 +175,13 @@ def samples(n, seed):
             force_bg=(gen.BACKGROUNDZ, plate))
         b = os.path.join(PROOF, f"wx_{i}.png")
         m = os.path.join(PROOF, f"wx_{i}_mask.png")
-        gen.create_image(layers, b, mask_path=m)
+        fl = os.path.join(PROOF, f"wx_{i}_float.png")
+        gen.create_image(layers, b, mask_path=m, float_mask_path=fl)
         name = os.path.splitext(plate)[0]
         print(f"  {i}. {char} on {name}", flush=True)
         out.append((name, Image.open(b).convert("RGBA"),
-                    Image.open(m).convert("L"), i))
+                    Image.open(m).convert("L"), i,
+                    Image.open(fl).convert("L")))
     return out
 
 
@@ -268,9 +270,10 @@ def main():
           f"{args.phase}")
     grid = {}
     for state in [None] + states:
-        for c, (_, base, mask, tid) in enumerate(toks):
+        for c, (_, base, mask, tid, afl) in enumerate(toks):
             grid[(state, c)] = skymod.apply_sky(base, mask, args.phase,
-                                                state, seed=tid, t=0.25)
+                                                state, seed=tid, t=0.25,
+                                                afloat=afl)
         print(f"  {state or 'no weather (the mint)'}", flush=True)
 
     # Legibility, measured against THE SAME PHASE WITH NO WEATHER, not

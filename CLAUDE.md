@@ -651,6 +651,87 @@ background counter as if they were plates). It now skips them explicitly.
 `build_rarity_table.py` hard-coded "**4444 tokens, all composited**" in its
 header; that line is now written from the metadata.
 
+## The flood is the one state that reaches the character, and the sticker floats on it
+
+`flooded` is the only weather state that touches protected pixels — everything
+else grades the plate behind the character and gives every masked pixel back
+bit-identical. Below the waterline the flood refracts, mirrors, tints and
+darkens the composited frame, character and all.
+
+**Every sticker in the collection is authored at y 1114..1338, and the
+waterline sits at y 836.** So all 23 are fully under water, and until this was
+fixed the flood repainted them: measured on the Golden Ticket, the gold
+(187, 176, 141) came back (74, 98, 99) — a murky teal, unreadable as gold, and
+individual sticker pixels moved by up to **223 of 255**. At thumbnail size the
+piece was a smudge.
+
+The fix is a **second mask**. `create_image(float_mask_path=...)` writes the
+corner sticker ALONE, and `sky.apply_sky(..., afloat=...)` rests it on the
+water instead of sinking it. The sticker core now comes back **bit-identical
+to the mint** (max delta 0).
+
+Four things worth knowing:
+
+- **It is a separate file, not a second channel of the protect mask.** Every
+  existing consumer opens that one with `.convert("L")`, which on a
+  multi-channel image returns a luma MIX and would silently corrupt the
+  protect mask itself.
+- **The float mask is the sticker only, not `_is_top()`'s union.** A paired
+  background overlay is part of the plate's own scene and must keep drowning
+  with it.
+- **Exempting the sticker is not enough on its own** — a piece the water
+  neither wets nor acknowledges reads as a decal pasted over the flood. Three
+  cues are painted INTO the water first, so they are themselves refracted and
+  tinted by the depth ramp: a contact shadow, a meniscus climbing the edge,
+  and the piece's own reflection.
+- **The reflection mirrors PER COLUMN about each column's lowest lit pixel**,
+  not about one global bottom row. Stickers are authored tilted, and a single
+  mirror line detaches the reflection from the high side and drops a second,
+  readable copy of the art into the water. It is also sampled *through* the
+  existing refraction and blurred in CONTENT, not just in weight — softening
+  the weight alone feathers the edges of a still-legible upside-down mirror.
+  Settings came off a rendered ladder (fade/strength/blur 0.026/0.34/5,
+  0.014/0.30/7, **0.009/0.26/9**, 0.006/0.22/11); past ~13px of fade it stays
+  legible upside down.
+
+That the sticker sits low in frame is not a contradiction. The surface recedes
+from the viewer, so something floating near the bottom edge is simply close to
+the camera — which is where flood debris sits in a photograph.
+
+Empty float mask is a no-op, and every non-submerging state ignores it
+entirely (verified identical across all six). `verify_sky.py` passes it, so
+the gate tests the shipping path rather than a render nobody gets.
+
+## The blizzard plate-detail floor is measured as a RATIO, and that is wrong
+
+**Not yet fixed — it changes the owner's quality bar and needs their call.**
+
+`verify_sky.py` scores a state as `detail_with_weather / detail_without`, and
+floors that ratio. Fitted to the blizzard on ten proof tokens, what it
+actually does is:
+
+    detail_after = 0.0173 + 0.271 x detail_before
+
+Blizzard keeps 27 % of the plate's own detail and **adds** a fixed ~0.017 of
+its own — the snow is itself high-frequency texture the band-pass counts. So
+the ratio is `0.0173/base + 0.271`: a function of the PLATE, not of the
+weather. Same blizzard, same physics, scored across plates: 96 % at base
+0.025, 62 % at 0.05, 44 % at 0.10, **37 %** at 0.18.
+
+It fails plates that are doing well and passes plates that are gone:
+
+- Token 10 fails at 36 % kept while retaining **0.0635** absolute detail —
+  nearly 3x more than token 5, which passes at 91 % with 0.0222.
+- Across ten tokens, plate business correlates **−0.87** with the gate's score
+  and **+0.99** with the detail that actually survives. It ranks backwards.
+- A plate flattened to a single colour — nothing to preserve, so everything
+  measured is snow — scores **376 % "kept"** against a 41 % floor.
+
+The fix is to floor on absolute retained detail. **Stickers cannot help
+here**: the sticker is inside the protect mask and `plate_detail` measures
+only `mask < 128`, so sticker pixels are excluded by construction, and the
+float-mask work above left token 10's blizzard reading unchanged at 36 %.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`

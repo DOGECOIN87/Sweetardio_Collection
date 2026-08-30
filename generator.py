@@ -2239,14 +2239,19 @@ def _subject_separation(bg_img, sil_alpha, cfg):
     return out
 
 
-def create_image(layers, output_name=None, metadata=None, mask_path=None):
+def create_image(layers, output_name=None, metadata=None, mask_path=None,
+                 float_mask_path=None):
     """Composite all layers and write the PNG.
     If metadata is provided (a list of {"trait_type", "value"} dicts as
     returned by extract_metadata()), a matching .json sidecar is saved
     next to the PNG with OpenSea-compatible attributes.
 
     mask_path, if given, additionally writes the PROTECT MASK for the
-    dynamic sky pass (dynamic/sky.py) -- see the note where it is saved."""
+    dynamic sky pass (dynamic/sky.py) -- see the note where it is saved.
+
+    float_mask_path, if given, writes the FLOAT MASK: the corner sticker
+    alone, for the flood to rest on its surface rather than drown -- see the
+    note where that is saved."""
     if output_name is None:
         import time
         if not os.path.exists("output"):
@@ -2273,6 +2278,15 @@ def create_image(layers, output_name=None, metadata=None, mask_path=None):
     def _is_arm(layer_info):
         return os.path.normpath(layer_info["path"]).startswith(
             armz_prefix + os.sep)
+
+    def _is_sticker(layer_info):
+        return os.path.normpath(layer_info["path"]).startswith(
+            sticker_prefix + os.sep)
+
+    # The float mask is the sticker ALONE, not the union _is_top() composites:
+    # a paired background overlay is part of the plate's own scene and must
+    # keep drowning with it, so the two cannot share a mask.
+    float_mask = Image.new("L", canvas, 0)
 
     bg_layer = layers[0] if layers else None
     char_layers = [li for li in layers[1:] if not _is_top(li)]
@@ -2358,7 +2372,10 @@ def create_image(layers, output_name=None, metadata=None, mask_path=None):
         img = _render_layer(layer_info)
         if img is not None:
             base_img.alpha_composite(img)
-            fg_mask = ImageChops.lighter(fg_mask, img.getchannel("A"))
+            a = img.getchannel("A")
+            fg_mask = ImageChops.lighter(fg_mask, a)
+            if _is_sticker(layer_info):
+                float_mask = ImageChops.lighter(float_mask, a)
 
     base_img.save(output_name)
 
@@ -2381,6 +2398,22 @@ def create_image(layers, output_name=None, metadata=None, mask_path=None):
     # blend feathers across the silhouette instead of stair-stepping it.
     if mask_path is not None:
         fg_mask.save(mask_path)
+
+    # Float mask: the corner sticker on its own. `flooded` is the one state
+    # that reaches past the protect mask, and every sticker in the collection
+    # is authored at y 1114..1338 against a waterline at y 836 -- so all 23
+    # are fully under water, and the flood tints the piece toward its deep
+    # colour until the art is unreadable. With this the sticker rides ON the
+    # surface instead, and the water gets a contact shadow, a meniscus and a
+    # reflection around it so it reads as floating rather than pasted on.
+    #
+    # A SECOND FILE rather than a second channel of the protect mask: every
+    # existing consumer opens that one with .convert("L"), which on a
+    # multi-channel image returns a luma MIX of the channels and would
+    # silently corrupt the protect mask itself. Optional everywhere, and a
+    # token with no sticker simply writes an empty one.
+    if float_mask_path is not None:
+        float_mask.save(float_mask_path)
 
     if metadata is not None:
         json_path = os.path.splitext(output_name)[0] + ".json"

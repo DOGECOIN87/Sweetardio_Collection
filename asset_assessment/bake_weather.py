@@ -59,6 +59,9 @@ MANIFEST = os.path.join(ROOT, "output", "mint_manifest.json")
 IMAGES = os.path.join(MINT, "images")
 CLEAR = os.path.join(MINT, "images_clear")
 MASKS = os.path.join(MINT, "masks")
+# The sticker-only mask, written beside the protect mask by build_mint.py
+# --masks. Optional: a run whose mint predates it simply floats nothing.
+FLOATS = os.path.join(MINT, "float_masks")
 ANIM = os.path.join(MINT, "anim")
 
 # `day` is the identity grade: the exact light the other 4,000 tokens are
@@ -138,19 +141,28 @@ def main():
 
         base = Image.open(src).convert("RGBA")
         mask = Image.open(mask_path).convert("L")
+        float_path = os.path.join(FLOATS, f"{tid}.png")
+        afloat = (Image.open(float_path).convert("L")
+                  if os.path.exists(float_path) else None)
 
         # The still: full mint canvas, frame 0 of the loop, so the image a
         # marketplace caches is literally where the animation starts.
         still = skymod.apply_sky(base, mask, args.phase, state,
-                                 seed=tid, t=0.0)
+                                 seed=tid, t=0.0, afloat=afloat)
         still.save(os.path.join(IMAGES, f"{tid}.png"), optimize=True)
 
         # The loop: one graded plate, N cheap frames -- the whole reason
         # this is affordable at 444 tokens.
         sm = base.resize((args.size, args.size), Image.Resampling.LANCZOS)
         mk = mask.resize((args.size, args.size), Image.Resampling.LANCZOS)
+        # Resized HERE rather than inside frame(): the loop calls frame()
+        # once per frame, and re-resampling the float mask 24 times a token
+        # over 444 tokens is 10k LANCZOS passes for one unchanging image.
+        fk = (afloat.resize((args.size, args.size), Image.Resampling.LANCZOS)
+              if afloat is not None else None)
         static = skymod.grade_static(sm, args.phase, state)
-        frames = [skymod.frame(static, mk, t=i / args.frames, seed=tid)
+        frames = [skymod.frame(static, mk, t=i / args.frames, seed=tid,
+                               afloat=fk)
                   for i in range(args.frames)]
         if write_mp4(frames, out_mp4, fps) is None:
             sys.exit("no ffmpeg — pip install imageio-ffmpeg")
