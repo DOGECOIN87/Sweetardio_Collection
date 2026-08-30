@@ -443,12 +443,21 @@ TRAIT_NAMES = {
 
 def _fallback_display_name(filename):
     """Derive a readable display name from a raw filename when no explicit
-    mapping exists: strip layer- prefixes, extension, numeric index suffixes,
-    and convert underscores to spaces."""
+    mapping exists: strip the structural prefixes, extension, numeric index
+    suffixes, and convert underscores to spaces.
+
+    `Secret_` is stripped for the same reason `layer-` is: it is a TIER
+    MARKER that is_secret_rare() matches on, not part of the artwork's name.
+    Leaving it in produced "Secret Rarez #1 - Secret Milk Dunk" against the
+    "Secret Rarez #1 - Milk Dunk" that secret_rare_token_name's own docstring
+    specifies. It only became reachable when the tier was retired and
+    TRAIT_NAMES[SECRET_RAREZ] went with it, which is why nothing caught it:
+    every secret rare had an explicit name until there were none at all."""
     import re as _re
     name = os.path.basename(filename)
     name = _re.sub(r'\.png$', '', name, flags=_re.IGNORECASE)
     name = _re.sub(r'^(layer-)+', '', name)
+    name = _re.sub(r'^' + _re.escape(SECRET_RARE_PREFIX), '', name)
     name = _re.sub(r'\s*\(\d+\)\s*', ' ', name).strip()
     name = name.replace('_', ' ').strip()
     return name
