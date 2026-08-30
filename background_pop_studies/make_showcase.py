@@ -143,7 +143,13 @@ def main():
         layers.append({"path": arms, "offset": offset})
         for ex in extras:
             if "Gorbhouse" in ex:
-                layers.append({"path": ex, "offset": offset})
+                # offset=False, like every other footwear layer. The gorbhouse
+                # is a what_are_thosez BASE in the generator now, so the right
+                # way to add it here is really the `foot` slot above; this
+                # branch stays only so an extras-style entry cannot silently
+                # re-anchor the trash-cans to the character and sink it into
+                # them (see the note at step 8 in generator.py).
+                layers.append({"path": ex, "offset": False})
         if sticker:
             layers.append({"path": f"{ST}/{sticker}", "offset": False})
         for ex in extras:  # paired background overlays go absolutely last

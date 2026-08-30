@@ -272,6 +272,49 @@ keeps `audit_face_holes.py` and `verify_face_coverage.py` out of it.
 occludes it, so the face reads as set *into* the recess. It lands exactly on
 that rim, so fix the matte line first or the shadow deepens it.
 
+## The gorbhouse is footwear, and must be drawn like footwear
+
+The trash-cans are a `what_are_thosez` base like the bunny/pepe/shiba/monster
+slippers, and the art says so: `Gorbhouse_base.png` occupies **y 820..1146**,
+the same authored band as Bunny (825..1148) and Cookie Monster (821..1276).
+Every footwear layer is therefore composited at `offset=False, dy=0` — its
+authored position — and the character standing in it is placed by
+`CHAR_Y_ADJUST` alone.
+
+The gorbhouse used to break both halves of that. It had a draw of its own
+(`gets_gorbhouse`) *and* a layer of its own, appended anchored to the
+CHARACTER (`offset=apply_offset, dy=y_adjust`); and because it never set
+`chosen_wat`, `apply_offset = not chosen_wat and …` stayed **True**, so a
+character wearing footwear collected the **footwear-LESS** trims —
+`VERTICAL_OFFSET` (+150), `FOOTWEARLESS_DY` and `BG_CHAR_EXTRA_Y`. Cans and
+body went down 130–190px together, which is why it looked internally coherent
+and still wrong: the body bottom landed at **1105–1109**, i.e. **156px BELOW
+the can rims**, against 137–139px *above* their floor for every other slipper.
+The character sat in the cans up to its middle.
+
+The fix is one line of intent: the gorbhouse roll sets
+`chosen_wat = GORBHOUSE_BASE`, and everything else — the base layer, the
+overlay layer, `apply_offset`, `extract_metadata`'s Footwear attribute — falls
+out of the path that already existed. **Do not give it a layer of its own
+again.** If a future asset needs the same treatment, give it a `_base` file
+and let `wat_base_name()` find it.
+
+Measured after: all 15 footwear-capable characters bottom out at **943–965**
+(22px spread), sinking 123–144px into their slipper, the six gorbhouse
+wearers included. Before, those six sat 150px outside that band.
+
+Two things worth knowing:
+
+- **`gold_waffle` is gorbhouse-eligible only by SUBSTRING**, via `"waffle"` in
+  `GORBHOUSE_CHARS` — it has no entry of its own. That is the repo's
+  recurring failure class (see `char_base_name`), so it is deliberate or it is
+  a bug; it renders correctly either way, so it was left alone. Decide it
+  before adding another `*_waffle`.
+- Drawing the base as well as the overlay adds 6,047 px the overlay lacks, at
+  (539,829)–(874,907). Measured across all six wearers, **0** of them are
+  visible — the body covers them — so it is a no-op today and correct
+  structurally.
+
 ## An armed figure rides 70px higher, as one piece
 
 `ARMED_LIFT` in `generator.py` raises the WHOLE figure — body, skin ball, eyes,

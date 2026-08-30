@@ -206,8 +206,8 @@ def secret_rare_token_name(filename):
 # ---- Human-readable display names for every trait asset ----
 # Keys for CHARACTERZ: the internal char_name (prefix-stripped, no .png).
 # Keys for WHAT_ARE_THOSEZ: the base-name returned by wat_base_name()
-#   (e.g. "layer-Bunny_Slippers"), or the string "Gorbhouse" for the
-#   gorbhouse trash-can slippers.
+#   (e.g. "layer-Bunny_Slippers"). The gorbhouse trash-cans are an ordinary
+#   footwear base, so they key off "Gorbhouse" like any other.
 # Keys for all other categories: the bare filename (with .png).
 TRAIT_NAMES = {
     CHARACTERZ: {
@@ -345,7 +345,7 @@ TRAIT_NAMES = {
         "layer-layer-layer-layer-Military_Brat.png":    "Military Brat",
         "layer-layer-layer-layer-Nerf_Blaster.png":     "Nerf Blaster",
     },
-    # Keyed by wat_base_name() result, plus "Gorbhouse" for trash-can slippers.
+    # Keyed by wat_base_name() result -- the trash-cans included.
     WHAT_ARE_THOSEZ: {
         # Every one of these is a novelty SLIPPER, the gorbhouse included (it
         # is a pair of trash-can slippers), so every value says so. "Monster"
@@ -487,10 +487,13 @@ def extract_metadata(layers, char_name):
         elif p.startswith(sticker_prefix + os.sep):
             attrs.setdefault("Sticker", trait_name(STICKERZ, fname))
 
-        # Footwear (WAT base or gorbhouse overlay)
+        # Footwear. The gorbhouse ships a base like every other slipper, so
+        # the regex below names it too; the overlay branch is the fallback for
+        # a stack that somehow carries only the front piece.
         elif p.startswith(wat_prefix + os.sep):
             if "gorbhouse" in fname.lower() and "overlay" in fname.lower():
-                attrs.setdefault("Footwear", trait_name(WHAT_ARE_THOSEZ, "Gorbhouse"))
+                attrs.setdefault("Footwear",
+                                 trait_name(WHAT_ARE_THOSEZ, GORBHOUSE_BASE))
             else:
                 m = _re.match(r"(.+?)_base(?:\s*\(\d+\))?\.png$", fname, _re.IGNORECASE)
                 if m:
@@ -1034,6 +1037,13 @@ def gets_gorbhouse_overlay(char_name):
     return (any(gc.lower() in char_name.lower() for gc in GORBHOUSE_CHARS)
             and not is_wat_excluded(char_name))
 
+# The gorbhouse's footwear BASE NAME, i.e. what wat_base_name() returns for
+# Gorbhouse_base.png. It is the key that carries the trash-cans through the
+# ordinary footwear path -- the base/overlay layer pair, extract_metadata's
+# Footwear attribute and trait_name() all key off it -- so it must keep
+# matching the filename exactly.
+GORBHOUSE_BASE = "Gorbhouse"
+
 # How often an eligible character actually wears the gorbhouse (rolled per
 # generation) WHEN its footwear slot is active. < 1.0 so eligible characters
 # still get regular slippers (and, via the tiers below, footwear-less runs).
@@ -1545,9 +1555,15 @@ def generate_random_combination(force_bg=None, force_arm="auto",
 
     # --- footwear slot: gorbhouse trash-cans (eligible chars) or regular WAT,
     # the latter biased by the measured footwear<->background compat table ---
+    #
+    # The gorbhouse has its own DRAW (eligibility + GORBHOUSE_CHANCE, not the
+    # bg-weighted pick), but from here on it is an ordinary footwear base:
+    # chosen_wat carries it, so it lands on exactly the same code path as the
+    # bunny/pepe/shiba/monster slippers. It used to be a separate flag with a
+    # layer of its own, and that is what sank the character into the cans --
+    # see the note at the placement branch below.
     chosen_wat = None
     wat_overlays = []
-    gets_gorbhouse = False
     if "footwear" in active:
         if force_wat not in ("auto", None):
             # explicit footwear from the allocator, but honor character
@@ -1555,11 +1571,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
             # the allocator re-rolls onto an eligible character.
             if str(force_wat).lower() == "gorbhouse":
                 if gets_gorbhouse_overlay(char_name):
-                    gets_gorbhouse = True
+                    chosen_wat = GORBHOUSE_BASE
             elif footwear_available:
                 chosen_wat = force_wat
         elif gets_gorbhouse_overlay(char_name) and random.random() < GORBHOUSE_CHANCE:
-            gets_gorbhouse = True
+            chosen_wat = GORBHOUSE_BASE
         elif wat_bases:
             wat_blocked = load_wat_blocklist().get(bg, [])
             allowed_wat = [b for b in wat_bases
@@ -1627,9 +1643,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     y_adjust = char_y_adjust(char_name)
     cscale = char_scale(char_name)
     # Baseless/round characters sit centred ONLY when they have nothing under
-    # them to stand on: no footwear (apply_offset) and no gorbhouse. With a
-    # shoe or trash-can they keep their normal grounded placement.
-    if is_centered(char_name) and apply_offset and not gets_gorbhouse:
+    # them to stand on -- i.e. no footwear at all, which apply_offset already
+    # says (the gorbhouse is footwear, so it clears apply_offset like any
+    # other base). With a shoe or a trash-can they keep their normal grounded
+    # placement.
+    if is_centered(char_name) and apply_offset:
         # natural centre (suppress the standing CHAR_Y_ADJUST), plus an optional
         # small per-character centre trim so a round body isn't left too high
         apply_offset = False
@@ -1742,17 +1760,19 @@ def generate_random_combination(force_bg=None, force_arm="auto",
     for overlay_path in wat_overlays:
         layers.append({"path": overlay_path, "offset": False})
 
-    # 9. Gorbhouse special overlay (a footwear-type trait) — placed BEFORE
-    # arms, like the WAT overlay, so a held weapon reads on top of it.
-    if gets_gorbhouse:
-        gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_overlay.png")
-        if not os.path.exists(gorbhouse_path):
-            gorbhouse_path = os.path.join(TRAITS_DIR, WHAT_ARE_THOSEZ, "Gorbhouse_Overlay.png")
-        if os.path.exists(gorbhouse_path):
-            layers.append({"path": gorbhouse_path, "offset": apply_offset, "dy": y_adjust + bg_extra_y})
+    # (The gorbhouse used to be appended here, as a ninth step of its own,
+    # anchored to the CHARACTER -- offset=apply_offset, dy=y_adjust. It is
+    # drawn by the WAT base/overlay pair above now, at offset=False like every
+    # other slipper, because the art says so: Gorbhouse_base.png occupies
+    # y 820..1146, the same authored band as Bunny (825..1148) and Cookie
+    # Monster (821..1276). Riding the character meant riding the +150
+    # footwear-LESS drop -- on a character that is, by definition, wearing
+    # footwear -- so cans and body went down 130-190px together and the body
+    # bottom landed 156px BELOW the can rims instead of 138px above their
+    # floor. The character sat in the cans up to its middle.)
 
-    # 10. Armz (after ALL footwear overlays — WAT and gorbhouse — so a held
-    # katana/knife reads on top of the footwear; tracks the character's scale)
+    # 9. Armz (after the footwear overlay, so a held katana/knife reads on
+    # top of the footwear; tracks the character's scale)
     if arm:
         # Arms deliberately do NOT take cscale. A weapon is a rarity trait, and
         # a Blue Saber should read as the same object whoever holds it — when
@@ -1767,11 +1787,11 @@ def generate_random_combination(force_bg=None, force_arm="auto",
                               + arm_char_dy(char_name, arm)),
                        "ascale": arm_scale(arm), "acenter": ARM_SCALE_PIVOT})
 
-    # 11. Sticker
+    # 10. Sticker
     if sticker:
         layers.append({"path": os.path.join(TRAITS_DIR, STICKERZ, sticker), "offset": False})
 
-    # 12. Paired background overlay - always placed LAST, on top of everything
+    # 11. Paired background overlay - always placed LAST, on top of everything
     if bg in BG_OVERLAY_PAIRS:
         ov_path = os.path.join(TRAITS_DIR, bg_dir, BG_OVERLAY_PAIRS[bg])
         if os.path.exists(ov_path):

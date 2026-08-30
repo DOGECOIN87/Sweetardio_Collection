@@ -109,12 +109,15 @@ def placement_cases(name):
         cases.append(("no-offset", base))
     else:
         if wat_ok:
+            # One case covers every slipper, the gorbhouse trash-cans
+            # included: they are all footwear bases now, so they all suppress
+            # the footwear-less drop and place the body at CHAR_Y_ADJUST. The
+            # gorbhouse used to have a case of its own here (VERTICAL_OFFSET +
+            # base + footwearless_dy) because it was drawn as a character-
+            # anchored layer, which sank the body 156px past the can rims.
             cases.append(("footwear", base))
         if centered:
             cases.append(("centered-bare", g.centered_footwearless_dy(name)))
-            # a gorbhouse re-enables the drop for centred characters
-            cases.append(("centered+gorbhouse",
-                          g.VERTICAL_OFFSET + base + g.footwearless_dy(name)))
         else:
             cases.append(("standing-bare",
                           g.VERTICAL_OFFSET + base + g.footwearless_dy(name)))
@@ -131,8 +134,6 @@ def group_of(name, case):
         return "standing on footwear"
     if case == "centered-bare":
         return "centred, bare"
-    if case == "centered+gorbhouse":
-        return "centred, on gorbhouse"
     return "standing, bare"
 
 
