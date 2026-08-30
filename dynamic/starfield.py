@@ -27,10 +27,22 @@ source, and as the fallback if the art is ever regenerated.
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-# Sampled off the reference: a single flat field, no gradient. #00008B is
-# X11 "dark blue" rather than navy -- worth naming, because navy (#000080)
-# is a different colour and the two get used interchangeably.
-FIELD = (0, 0, 139)
+# The SOURCE field, sampled off the owner's GIF: a single flat colour, no
+# gradient. #00008B is X11 "dark blue" rather than navy -- worth naming,
+# because navy (#000080) is a different colour and the two get used
+# interchangeably. 159,616 of the frame's 160,000 pixels are exactly this.
+SOURCE_FIELD = (0, 0, 139)
+
+# The SHIPPING field. Oxford Blue is darker and desaturated against
+# #00008B (L* 21.6 vs 15.5, chroma 32 vs 79), which is what the plate
+# family is graded for -- cool, desaturated, out of the characters' hue
+# bands (see background_pop_studies/grade.py). #00008B is the one saturated
+# primary in the set and reads as a flat swatch beside the graded plates;
+# Oxford Blue reads as deep space, and the white sparkles gain contrast
+# rather than lose it because the field went DOWN in luma, not up.
+OXFORD_BLUE = (0, 33, 71)
+
+FIELD = OXFORD_BLUE
 STAR = (255, 255, 255)
 
 # (count, arm length, thickness, brightness, blur, tiles per loop)
@@ -57,7 +69,7 @@ def _plus(draw, x, y, arm, thick, value):
     draw.rectangle([x - h, y - arm, x + h, y + arm], fill=value)
 
 
-def render(size, t=0.0, seed=0):
+def render(size, t=0.0, seed=0, field=None):
     """The plate at loop position t, as an RGB uint8 array (h, w, 3)."""
     w, h = size
     t = float(t) % 1.0
@@ -67,7 +79,7 @@ def render(size, t=0.0, seed=0):
     rng = np.random.default_rng(seed ^ 0x57A25)
 
     out = np.zeros((h, w, 3), dtype=np.float32)
-    out[...] = np.asarray(FIELD, dtype=np.float32) / 255.0
+    out[...] = np.asarray(field or FIELD, dtype=np.float32) / 255.0
 
     for count, arm, thick, bright, blur, tiles in BANDS:
         layer = Image.new("L", (w, h), 0)
@@ -102,21 +114,33 @@ def render(size, t=0.0, seed=0):
 #   removal left 760 pixels across the loop that are neither the field nor
 #   a star: a green-teal speck, 507px of a second blue (#003366), and
 #   traces of the rainbow's yellow. They are snapped back to the field.
+#
+#   RECOLOUR the field. Cleaning leaves exactly two colours -- SOURCE_FIELD
+#   and the sparkles -- so the swap to Oxford Blue is a substitution, not a
+#   hue rotation, and the sparkles are untouched by construction. Do the
+#   clean FIRST: the residue is nearer the source field than the target is,
+#   so recolouring first would strand it as visible specks.
 FIELD_SNAP = 0        # sum-of-channels distance; 0 = anything not exactly
-                      # the field colour and not a star gets snapped
+                      # the source field colour and not a star gets snapped
 
 
-def from_gif(path, size=(1393, 1393), clean=True):
-    """Load an animated GIF as a list of plate frames at the mint canvas."""
+def from_gif(path, size=(1393, 1393), clean=True, field=None):
+    """Load an animated GIF as a list of plate frames at the mint canvas.
+
+    `field` recolours the flat backdrop (default: the shipping FIELD).
+    Pass SOURCE_FIELD to keep the GIF's own #00008B.
+    """
     from PIL import ImageSequence
-    field = np.asarray(FIELD, dtype=np.int16)
+    src = np.asarray(SOURCE_FIELD, dtype=np.int16)
+    dst = np.asarray(field if field is not None else FIELD, dtype=np.int16)
     frames = []
     for f in ImageSequence.Iterator(Image.open(path)):
         a = np.asarray(f.convert("RGB")).astype(np.int16)
+        star = a.min(-1) >= 200
         if clean:
-            d = np.abs(a - field).sum(-1)
-            star = a.min(-1) >= 200
-            a[(d > FIELD_SNAP) & (~star)] = field
+            d = np.abs(a - src).sum(-1)
+            a[(d > FIELD_SNAP) & (~star)] = src
+        a[~star] = dst
         frames.append(Image.fromarray(a.astype(np.uint8), "RGB")
                       .resize(size, Image.Resampling.NEAREST))
     return frames
