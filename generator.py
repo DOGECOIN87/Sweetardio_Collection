@@ -1004,9 +1004,43 @@ ARM_CHAR_DY = {
 #   Cash is the opposite: the fists hold the notes fanned UPWARD at chest
 #     height, so it was never sitting low, and -40 put the notes across the
 #     eyes (0 px of overlap at 0, 489 px at -40). It opts out at 0.
+#
+# THE GUMMY BEAR AND THE THREE SABERS take +100, the only positive entry: it
+# pushes an arm DOWN rather than lifting it.
+#
+# The bear is the one character whose body art carries its own arms -- two
+# ~6,700px lobes at x 396..451 and x 922..977, y 751..911, tips at (429,839)
+# and (944,839). Every armz asset lays gloved hands over that, and the
+# pairing reads right only when the added glove lands ON the bear's own arm.
+# Measured, right glove vs that right-arm tip:
+#
+#     Knives          dx  +3  dy  -18     its hand
+#     Military Brat   dx  -1  dy  -55     its hand
+#     Cash            dx +57  dy  +16     its hand
+#     Dual Uzis       dx +128 dy  -86     in front of the torso
+#     AK15            dx +244 dy  +22     in front of the torso
+#     the 3 sabers    dx -59  dy +263     a hand floating above an orphaned arm
+#
+# The saber is the only asymmetric pose in the set -- it holds its hands
+# 187px apart vertically where every other two-handed arm keeps them within
+# 0-93px -- so its LEFT glove lands on the bear's left arm (dx +5, dy +75)
+# and reads fine while the right rides up by the head, stranding the right
+# arm below it.
+#
+# +100 is as far down as the pose can go and stay in frame: the blade spans
+# y 84..1263 at rest and 184..1363 at +100, against a 1393 canvas. It takes
+# the glove's coverage of the bear's own arms from 32 % to 64 %, which
+# closes most of the gap but NOT all of it -- the arm tip still shows past
+# the hilt. Chosen off a rendered ladder (0/+40/+70/+100/+130/+160); +130
+# and beyond clip the blade. Removing the artefact outright needs a bear
+# body authored without its own arms for the armed case, which is art that
+# does not exist yet.
 ARM_CHAR_ARM_DY = {
     ("ding_dong", "Sweetardio_115 (11).png"): -55,   # Dual Uzis
     ("ding_dong", "Arms_Cash.png"): 0,
+    ("og_gummy_bear", "Sweetardio_114 (4).png"): 100,   # Blue Saber
+    ("og_gummy_bear", "Sweetardio_114 (5).png"): 100,   # Pink Saber
+    ("og_gummy_bear", "Sweetardio_114 (6).png"): 100,   # Cyan Saber
 }
 
 

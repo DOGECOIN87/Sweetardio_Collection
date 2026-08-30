@@ -415,6 +415,50 @@ That split is the point: one number per character cannot fit arms that differ
 in pose, so any new entry needs the whole 11-arm strip rendered and looked at.
 With these values 0 of 11 weapons touch `ding_dong`'s eyes.
 
+### The gummy bear has arms of its own, and only the sabers argue with them
+
+`og_gummy_bear` is the one character whose BODY ART carries arms — two
+~6,700px lobes at x 396..451 and x 922..977, y 751..911, tips at (429, 839)
+and (944, 839). Every armz asset lays gloved hands over that, and the pairing
+reads right only when the added glove lands **on** the bear's own arm.
+Measured, right glove vs that right-arm tip:
+
+| arm | offset | reads as |
+|---|---|---|
+| Knives | dx +3, dy −18 | its hand |
+| Military Brat | dx −1, dy −55 | its hand |
+| Cash | dx +57, dy +16 | its hand |
+| Dual Uzis | dx +128, dy −86 | in front of the torso |
+| AK15 | dx +244, dy +22 | in front of the torso |
+| **the 3 sabers** | **dx −59, dy +263** | a hand floating above an orphaned arm |
+
+The saber is the only **asymmetric** pose in the set: it holds its hands
+187px apart vertically where every other two-handed arm keeps them within
+0–93px. So its LEFT glove lands on the bear's left arm (dx +5, dy +75) and
+reads fine, while the right rides up by the head and strands the right arm
+below it. That is the artefact, and it is visible at thumbnail size.
+
+`ARM_CHAR_ARM_DY` takes **+100** for the three sabers on the bear — the only
+positive entry in the table, because it pushes an arm DOWN rather than
+lifting it. That is as far as the pose can go and stay in frame: the blade
+spans y 84..1263 at rest and 184..1363 at +100 (>128 alpha), against a 1393
+canvas, and at +130 it clips. Coverage of the bear's own arms goes 32 % →
+64 %.
+
+**It does not remove the artefact, it reduces it** — the arm tip still shows
+past the hilt, and the owner chose this over the alternatives knowing that.
+Two things were rejected: blocking the pairing (costs 3 of 297
+character × arm combinations and, because a changed draw re-randomises
+everything downstream, a rarity re-solve), and a bear body authored without
+its own arms for the armed case (the real fix, and the art does not exist —
+a naive alpha cut of the arm lobes leaves an edge with no rim light and the
+arm's interior gloss sliced through, which is fine at token size and
+obviously wrong at 3×).
+
+The blade runs OFF the frame at both values — it touches the left and right
+edges before and after — so no floating blade stub is introduced. Check that
+if the value ever moves.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
