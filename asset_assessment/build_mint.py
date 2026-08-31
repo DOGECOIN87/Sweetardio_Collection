@@ -6,7 +6,7 @@ Rarity model (all counts are EXACT, hit by pre-allocating token slots):
 
   Backgrounds
     * Legendary_* plates (in traits/backgroundz) are 1/1-style rares: each one
-      appears EXACTLY --leg-each times (default 15). 4 x 15 = 60.
+      appears EXACTLY --leg-each times (default 30). 4 x 30 = 120.
     * every other token gets a normal weighted/compat plate; Legendary plates
       never appear via the random pick (generator excludes the prefix).
 
@@ -38,7 +38,7 @@ Outputs:
 Reproducible by --seed.
 
 Usage (from repo root):
-  python3 asset_assessment/build_mint.py [--n 4444] [--leg-each 15] [--seed 4444]
+  python3 asset_assessment/build_mint.py [--n 4444] [--leg-each 30] [--seed 4444]
   python3 asset_assessment/build_mint.py --render --masks
 """
 
@@ -199,7 +199,7 @@ if _unknown:
 # 50 (1.13 %). It is not a hard cap by luck: generator.is_allocator_only_bg
 # keeps the plate out of the weighted draw entirely, exactly as the
 # Legendary_* plates are kept out, so the only way to mint one is here.
-STARFIELD_COUNT = 10
+STARFIELD_COUNT = 22
 
 # It is kept off LEGENDARY slots (one rare plate per token -- a starfield
 # would simply replace the legendary plate it was supposed to coexist with)
@@ -285,7 +285,7 @@ def main():
     import random
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=4444)
-    ap.add_argument("--leg-each", type=int, default=15)
+    ap.add_argument("--leg-each", type=int, default=30)
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
@@ -438,20 +438,50 @@ def main():
         forced_bg[s] = g.STARFIELD_BG
     is_star = set(star_slots)
 
-    # 1b) rare characters -> exact counts on NON-legendary slots. Legendary
-    #     slots re-roll the character when it camouflages against the plate,
-    #     which a forced character could never satisfy, so they are excluded.
-    char_free = [s for s in avail if s not in is_leg and s not in is_star]
+    # 1b) rare characters -> exact counts, and they MAY land on a legendary or
+    #     starfield slot. They used to be barred from both, which was a
+    #     workaround rather than a decision: those slots re-roll the character
+    #     when it camouflages against the plate (or is off STARFIELD_CHARS),
+    #     and a re-roll cannot change a FORCED character, so the loop below
+    #     would spin out its 4000 attempts and die.
+    #
+    #     The cost of that workaround was invisible and large: 14 of the 27
+    #     characters -- every pinned one, including all four chase bodies --
+    #     could NEVER appear on the best backgrounds in the collection. A
+    #     Gold Waffle on Legendary Simplex was not rare, it was impossible.
+    #
+    #     The fix is to check the pairing HERE, where the character is being
+    #     placed, instead of leaving it to a re-roll that cannot act. A pinned
+    #     character takes a rare-plate slot only when that exact pairing is
+    #     already legal, so the main loop never has to re-roll it.
+    def char_fits_slot(cname, slot):
+        leg = forced_bg[slot]
+        if slot in is_leg and camo(cname, leg):
+            return False
+        if slot in is_star and not g.starfield_allowed(cname):
+            return False
+        return True
+
+    char_free = list(avail)
     random.shuffle(char_free)
     char_total = sum(CHARACTER_COUNTS.values())
     if char_total > len(char_free):
         sys.exit(f"CHARACTER_COUNTS total {char_total} exceeds the "
-                 f"{len(char_free)} non-legendary slots available")
-    cur = 0
+                 f"{len(char_free)} slots available")
+    taken = set()
     for cname, cnt in CHARACTER_COUNTS.items():
-        for s in char_free[cur:cur + cnt]:
+        placed = 0
+        for s in char_free:
+            if placed == cnt:
+                break
+            if s in taken or not char_fits_slot(cname, s):
+                continue
             forced_char[s] = cname
-        cur += cnt
+            taken.add(s)
+            placed += 1
+        if placed != cnt:
+            sys.exit(f"{cname}: placed {placed} of {cnt} -- not enough slots "
+                     f"whose plate it may legally pair with")
     # A pinned character cannot also carry a character-locked signature arm.
     is_rarechar = {s for s in range(N) if forced_char[s] is not None}
     # Footwear is a separate question, and the blanket rule that used to live

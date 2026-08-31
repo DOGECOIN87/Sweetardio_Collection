@@ -214,13 +214,16 @@ def plate_tier(filename):
     tgt = _plate_targets().get(f)
     if tgt is None:
         return "Standard"
-    # Two pinned tiers are in use (a low and a high target). Split on the
-    # midpoint rather than on either literal, so retuning a target moves the
-    # plate's band with it instead of silently reclassifying every plate.
-    lows = sorted({v for v in _plate_targets().values()})
-    if len(lows) < 2:
-        return "Scarce"
-    return "Scarce" if tgt <= (lows[0] + lows[-1]) / 2.0 else "Uncommon"
+    # The band is the plate's RANK among the distinct targets in use, rarest
+    # first -- not a comparison against any literal value. An earlier version
+    # split on the midpoint of the target range, which silently collapsed
+    # three pinned tiers into two the moment a third target was introduced:
+    # every Scarce and Uncommon plate came back "Scarce" together.
+    bands = sorted({v for v in _plate_targets().values()})
+    names = ["Scarce", "Uncommon", "Standard"]
+    i = bands.index(tgt)
+    # More pinned tiers than names: the extra ones are all the common end.
+    return names[i] if i < len(names) else names[-1]
 
 # Characters the starfield may pair with. The plate is FLAT, so the usual
 # camouflage test (build_char_compat.py, which scores a body against a

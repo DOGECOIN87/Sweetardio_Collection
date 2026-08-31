@@ -734,37 +734,47 @@ float-mask work above left token 10's blizzard reading unchanged at 36 %.
 
 ## The rarity ladder must be MONOTONE, and the label must be true
 
-Two collector-facing defects were found by counting the mint rather than
-reading the config, and both are fixed.
+Three collector-facing defects were found by counting the mint rather than
+reading the config. All are fixed, and the ladder below is the shipping one.
 
 **`Legendary` was not legendary.** At `--leg-each 50` each legendary plate was
-50 of 4444 (1.13 %) while **17 ordinary plates were rarer** — Sweet Castle 19,
-Abduction 21, Goo Lagoon 26, In Cook We Trust 26, Cabaret Alley 27. Holding
-the rarest background in the collection looked exactly like holding the 40th
-rarest, and the one label a collector could see said the opposite.
+50 of 4444 while **17 ordinary plates were rarer** — Sweet Castle 19,
+Abduction 21, Goo Lagoon 26. Holding the rarest background in the collection
+looked exactly like holding the 40th rarest, and the one label a collector
+could see said the opposite.
 
-`--leg-each` is now **15** (4 x 15 = 60, 1.35 % of supply). The ladder is
-monotone by construction and checked by counting:
+**The plate budget is zero-sum, and it caps the spread.** 64 plates share 4442
+composited tokens — an average of **69.4 per plate (1.56 %)**. Every plate
+pushed below average is paid for by plates above it, so the FLOOR you set on
+the rarest plate fixes how much ladder there is to have. Measured: a 0.23 %
+floor allows a 9.7x spread, a 0.5 % floor 3.8x, a **1 % floor only 1.7x** —
+at which point every plate sits between 0.99 % and 1.69 % and the tier names
+stop meaning anything. The owner chose the 0.5 % floor for that reason.
 
-| tier | plates | tokens each |
-|---|---:|---|
-| Ultra (Starfield) | 1 | 10 (0.23 %) |
-| Legendary | 4 | 15 (0.34 %) |
-| Scarce | 8 | 23–27 |
-| Uncommon | 17 | 47–55 |
-| Standard | 34 | 59–136 |
+| tier | plates | tokens each | share |
+|---|---:|---|---|
+| Ultra (Starfield) | 1 | 22 | 0.50 % |
+| Legendary | 4 | 30 | 0.68 % |
+| Scarce | 8 | 41–48 | 0.92–1.08 % |
+| Uncommon | 17 | 55–67 | 1.24–1.51 % |
+| Standard | 34 | 77–91 | 1.73–2.05 % |
 
-**`Plate Tier` states that band on the token.** It is derived in
-`generator.plate_tier()` from the DESIGNED target in `rarity_weights.json`,
-never from a realised count, so it is a property of the collection and not of
-whichever seed was minted. An unpinned plate reads Standard, which is the
-honest answer for it — 34 of 64 plates have no target and share the remainder.
+No tier overlaps the next. **That required pinning EVERY weighted plate.** The
+34 Standard plates were unpinned and shared the remainder, which let them
+free-float 62–116 and overlap Uncommon from below — the same credibility bug
+as the legendary one, a tier lower. Pinned at 1.910 % they land 77–91.
 
-**`Trait Count` exposes scarcity that existed but was invisible.** 141 tokens
-(3.17 %) carry no arm, no footwear and no sticker, and 5 tokens (0.11 %) carry
-the most — **both tails rarer than a Legendary plate**, and neither was
-discoverable, because an ABSENCE is not an attribute and no marketplace or
-rarity tool can filter on one.
+**`plate_tier()` ranks, it does not threshold.** The band is a plate's
+position among the DISTINCT targets in use, rarest first. An earlier version
+split on the midpoint of the target range and silently collapsed three tiers
+into two the moment a third target existed — every Scarce and Uncommon plate
+came back "Scarce" together. It reads the designed target, never a realised
+count, so the band is a property of the collection and not of the seed.
+
+**`Trait Count` exposes scarcity that existed but was invisible.** 136 tokens
+(3.06 %) carry no arm, no footwear and no sticker, and 7 (0.16 %) carry the
+most — **both tails rarer than a Legendary plate**, and neither discoverable,
+because an ABSENCE is not an attribute and no marketplace can filter on one.
 
 It is a NUMBER, not a named band ("Bare", "Full Kit"), because the number is
 already the convention collectors rank on. Five is the floor — character,
@@ -773,21 +783,45 @@ Weather (a real trait) and **not** `Plate Tier`, which only restates the
 Background and would otherwise add a free +1 to every token and move the floor
 off 5. The two 1/1s carry neither attribute: they have no traits to count.
 
-### Cutting the legendary count DID invalidate the gains
+### The chase characters were barred from the best plates, by accident
 
-Unlike adding the two secret rares (2 tokens, left alone), this moved 140
-tokens back into the weighted plate pool and the fit visibly broke: **Beady
-went to −1.78**, three times the ±0.6 the calibration can resolve. Re-solved at
-seed 4444, and the result is tighter than the state that shipped before any of
-this: eyes within **±0.09**, mouths ±0.10, plates ±0.11, against a previous
-Beady −0.93 and Side Eye +1.12.
+0 of 60 legendary and 0 of 10 starfield tokens carried a pinned character —
+all 14 of them, the four chase bodies included. A Gold Waffle on Legendary
+Simplex was not rare, it was **impossible**, and legendary plates drew from
+only 13 of 27 characters.
+
+That was a workaround, not a decision. Those slots re-roll the character when
+it camouflages against the plate, and a re-roll cannot change a FORCED
+character, so the allocator spun out its attempt budget and died. The fix is
+to test the pairing WHERE THE CHARACTER IS PLACED (`char_fits_slot`) instead
+of leaving it to a re-roll that cannot act: a pinned character takes a
+rare-plate slot only when that exact pairing is already legal. Legendary
+plates now draw from **26 of 27** characters, with 7 chase tokens on legendary
+and 2 on the starfield.
+
+### Do not put weather on a legendary plate without measuring first
+
+The rule "weather hides the plate" is written as though it were true of every
+state, and it is not. Absolute plate detail retained, averaged over the four
+legendary plates: **storm 100 %**, rain 81 %, snow 75 %, tornado 57 %, flooded
+45 %, blizzard 37 %, fog 31 %. Storm costs a legendary plate nothing. The
+exclusion is still in force — the owner has not taken it — but if it is ever
+revisited, storm is the state that survives the measurement.
+
+### Re-solving is REQUIRED whenever the allocation moves
+
+Unlike adding the two secret rares (2 tokens, deliberately left alone), each
+of these moved hundreds of tokens and the fit visibly broke — cutting the
+legendary count alone put Beady at **−1.78**, three times the ±0.6 the
+calibration can resolve. After re-solving, eyes land within ±0.16 and mouths
+±0.14.
 
 Fitting to seed 4444 alone is correct HERE, whatever the docstring's general
 warning: 4444 is the seed the collection actually mints at, so a single-seed
 fit makes the shipped distribution match target. Cross-seed spread is a
 robustness property, not a property of the drop.
 
-**None of this is possible after launch.** Changing `--leg-each` changes the
+**None of this is possible after launch.** Changing the counts changes the
 allocation, so every token's traits move and all 4444 images must be
 re-rendered. Only the metadata-only half (`Plate Tier`, `Trait Count`) could
 be applied to an already-minted collection.
