@@ -147,8 +147,15 @@ def is_legendary_bg(filename):
 
 # The ANIMATED plate. Its PNG in traits/backgroundz is frame 0 of a 12-frame
 # loop that dynamic/starfield.py rebuilds from Nyan_Blank.gif; the loop is
-# what animation_url points at, and asset_assessment/bake_starfield.py writes
-# it for the tokens that drew the plate.
+# what animation_url points at, and build_mint.py --render --animation writes
+# it for the tokens that drew the plate (there is no separate bake pass: this
+# is the one animated tier whose PLATE moves, so its frames have to be
+# re-composited rather than graded over a finished still).
+#
+# The PNG here is the dy=0 REFERENCE plate -- what the trait sheet and any
+# ad-hoc render show, and what build_mint checks for before it will mint the
+# tier. The minted tokens each get their own copy of it, because the rainbow
+# trail is centred on the character it leaves (starfield.centre_layers).
 STARFIELD_BG = "Starfield.png"
 
 # Plates the ALLOCATOR places and the weighted draw never touches, so their
@@ -240,6 +247,14 @@ def plate_tier(filename):
 # fall within dE 25 of the field, bar 1.5 % of the gummy bear), so this is an
 # APPEARANCE cut, not a legibility one -- re-render the cast sheet and move
 # the line if the owner's eye disagrees with the number.
+#
+# THAT MEASUREMENT IS AGAINST THE FIELD ALONE, and the plate is no longer
+# only field: the rainbow trail runs behind the left ~57 % of a body's width
+# (the cut sits at canvas x 721, bodies span 458..922). It is a partial
+# reading rather than a wrong one -- the excluded bodies are dark, and dark
+# against a saturated trail is the pairing this cut was never scored on. Do
+# not "fix" the list on that alone: changing it moves the allocation and
+# costs a rarity re-solve, so re-measure against the composited plate first.
 STARFIELD_CHARS = [
     "Twinkie", "gold_waffle", "og_poptart", "glazed_doughnut", "smores",
     "sugar_doughnut", "churro", "rice_crispy_treat", "waffle", "marshmallow",

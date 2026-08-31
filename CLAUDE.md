@@ -560,6 +560,113 @@ as its own rule predicts — its strength is measured from a band-pass, and a
 flat field has no business to detect. The visible pool under a floating
 character is `GROUND_SHADOW`, and **the owner chose to keep it.**
 
+**The rainbow did not change that**, which is worth knowing because it looks
+like it should. The trail is hard-edged pixel art, so it does give the
+band-pass something to read — measured over six characters, the annulus
+reading goes **1.25–1.90 → 2.93–3.48**. But `busy0` is 2.5 and `busy1` is
+14.0, so that lands at `amount` **0.004–0.021**: the pass is still off, to
+three decimal places. A flat colour and six flat stripes are the same kind of
+nothing to a band-pass; what would trip it is texture, not saturation.
+
+### The 8-bit rainbow: what the "Blank" in Nyan_Blank.gif was blanking
+
+The source GIF is the Nyan Cat field with the cat **and its trail** erased.
+`dynamic/starfield.py` puts the trail back, and every decision about it is
+downstream of two facts.
+
+**It is drawn on the SOURCE GRID, at 400×400, and rides the same
+nearest-neighbour upscale as the sparkles.** That is the whole reason it
+reads as 8-bit: one rainbow pixel is one star pixel, 3.4825 canvas px on a
+side, and both staircase with the same tooth. Drawn at 1393 with hard edges
+it would be a second, finer pixel grid on the one plate — the same mistake as
+resampling the sparkles smooth. It is painted **after** the clean and the
+recolour and **before** the resize, and the order is load-bearing in both
+directions: the clean snaps anything that is neither field nor star back to
+the field, so a trail laid down first is erased; the recolour rewrites every
+non-star pixel, so a trail laid down between them comes back Oxford Blue.
+
+**The palette is the canonical Nyan one, ungraded.** `grade.py` normalises a
+plate cool / desaturated / mid-key so a *character* reads in front of it, and
+the field is Oxford Blue for exactly that reason — but the field is the
+backdrop and the trail is the subject. Six primaries muted into the plate
+family's band are not a quieter rainbow, they are not a rainbow.
+
+Three things it would have been easy to get wrong, and all three are now
+gated by `python3 dynamic/starfield.py --verify`:
+
+- **The wave travels RIGHT TO LEFT, with the stars.** The trail is laid down
+  behind a character flying left to right, so its material is stationary in
+  the world and streams off toward the left edge on screen. Run it the other
+  way and the trail feeds *into* the character's back. This shipped backwards
+  once: the sign of the phase and the direction the block index counts in
+  cancel out, so the code ran right-to-left while its own comment said
+  left-to-right, and **it read correct to both of us until the owner watched
+  it move.** `verify_direction()` cross-correlates two consecutive phases and
+  reports the px/frame, which is not a thing a comment can be wrong about.
+- **The loop closes.** The wave advances `BLOCKS_PER_LOOP` blocks over the
+  12 frames and that must be a whole number of `WAVE` cycles — the same torus
+  rule the stars follow, and a step at the wrap is invisible in a filmstrip.
+  12 blocks, a 4-block wave.
+- **The flat cut is hidden.** The trail has to stop somewhere and it stops on
+  a straight vertical line, at canvas x 721. If the figure does not cover
+  that line over the band's full swept height the token shows a rainbow
+  rectangle ending in mid-air. Measured over 196 renders (14 characters × 14
+  rolls), worst margin 139px.
+
+#### The band is centred per TOKEN, so the plate is per token
+
+**One height for the whole cast does not work.** The face composites at a
+fixed canvas position for everybody, but the body does not: over 14
+characters × 6 rolls the body's own vertical centre runs **501–752, a 251px
+spread**. At a fixed height the trail leaves the marshmallow near its
+shoulders and the waffle near its knees.
+
+It is not a per-character table either, because the same character sits at
+different heights depending on what it rolled — footwear, `VERTICAL_OFFSET`
+and `FOOTWEARLESS_DY` move `gold_waffle` by 220px between two of its own
+rolls. So `centre_dy()` measures the placed art, per token.
+
+**Anchor on the body, clamp on everything.** The trail should leave the
+middle of the *character*, so the anchor is the characterz layer's own bbox —
+not the footwear, which drags it to the shoe line, and not the arms, which
+swing a saber 1200px up the frame. But what has to *hide* the cut is whatever
+is actually in front of it, so the clamp uses the full silhouette. Note the
+body alone cannot serve as the clamp: **the cut at x 721 runs straight
+through the face hole**, so the body layer's cover there is split in two and
+it is the skin ball that fills the gap. Measured after: the band centre lands
+within **2px** of the body's on the worst of 42 renders and 0px on average,
+i.e. the clamp essentially never bites.
+
+The offset is a **whole number of source pixels**. A fractional one resamples
+the trail off the source grid and costs it the hard edge that is the whole
+point; 3.4825 canvas px of resolution is far finer than the 251px spread it
+is correcting.
+
+The cost is that `traits/backgroundz/Starfield.png` is now the **dy=0
+reference plate** rather than the thing that mints. It is what the trait
+sheet, the catalog and any ad-hoc render show, and what `build_mint.py`
+checks for before it will mint the tier at all; the 22 minted tokens each get
+their own copy, written by `starfield.centre_layers()` and deleted after.
+That helper must run **after** `extract_metadata()`, because the Background
+attribute is read off `layers[0]`'s filename and the swapped stack carries a
+temp name.
+
+#### Rebuilding the compat maps moved nothing
+
+Repainting the plate changes what `build_char_compat.py` and
+`build_eyez_compat.py` measure, so both were rebuilt. **No blocklist moved in
+either.** What moved: all 27 `char_compat` pairing weights on `Starfield.png`
+(−0.09 to −0.11 each) and one `eyez_compat` weight (Starfield × Cerise,
+−0.007).
+
+Run through `calibrate_rarity.py --check` on seeds 4444 / 909090 / 7,
+**0 of 78 readings moved on any seed** — not "within noise", identical. The
+char weights are dead entries by construction, because `is_allocator_only_bg`
+filters the plate out of the weighted pool before the weights are consulted;
+the one live weight is too small to flip a draw. So the gains stand, and this
+one did not need the judgement call the secret rares and the plate itself
+did.
+
 ### It did not move the rarity gains
 
 Adding it changed `char_compat.json`'s weights (all 27 entries — the grader
@@ -1070,6 +1177,8 @@ python3 asset_assessment/register_eyes.py --report        # eye size + baseline
 python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
 python3 asset_assessment/verify_trait_names.py    # do the names still resolve
 python3 asset_assessment/clean_trait_art.py --report   # cut-out residue on trait art
+python3 dynamic/starfield.py --verify             # the rainbow: seam, direction, cut
+python3 dynamic/starfield.py --write              # rebuild the reference plate
 ```
 
 `verify_trait_names.py` is the gate on the *names*: it fails on a `TRAIT_NAMES`
@@ -1094,6 +1203,13 @@ off `FACE_HOLE_WIDTH`. Run both — they catch opposite failures.
 `verify_generator_rules.py` covers the footwear exclusions and the
 character-locked arms. Its lock audit includes a **synthetic** lock, so it
 still tests the rule while `ARMZ_CHAR_LOCK` is empty.
+
+`dynamic/starfield.py --verify` is the gate on the animated plate, and it
+checks the three things about the rainbow trail that no still can show: the
+loop closes at the wrap, the wave travels **left** (it shipped backwards
+once — see the rainbow section), and the trail's flat cut stays hidden behind
+every character at the per-token height `centre_dy()` puts it. `--rolls N`
+widens the sample; 14 is 196 renders and a few minutes.
 
 The environment needs `pillow`, `numpy` and `scipy` (`pip install pillow numpy
 scipy`); a bare container has none of them.

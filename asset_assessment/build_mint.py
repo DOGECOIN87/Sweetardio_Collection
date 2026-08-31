@@ -346,6 +346,17 @@ def main():
     anim_dir = os.path.join("output", "mint", "anim")
 
     def render(layers, tid, starfield=False):
+        # The starfield's rainbow trail leaves the character's own middle, and
+        # bodies sit 251px apart vertically across the tier, so its plate is
+        # built PER TOKEN rather than read from traits/. Both the still and
+        # the loop take the same offset, or the thumbnail and the animation
+        # would disagree about where the trail is. This must happen after
+        # extract_metadata(): the Background attribute is read off layers[0]'s
+        # filename, and the swapped stack carries a temp name.
+        plate = None
+        dy = 0
+        if starfield:
+            layers, dy, plate = sfmod.centre_layers(layers, anim_dir, tid, g)
         g.create_image(
             layers, os.path.join(img_dir, f"{tid}.png"),
             mask_path=(os.path.join(mask_dir, f"{tid}.png")
@@ -362,10 +373,12 @@ def main():
         # would not have been for the 444 weather tokens.
         if starfield and args.animation:
             frames = sfmod.loop_layers(layers, anim_dir, tid, g,
-                                       size=args.anim_size)
+                                       size=args.anim_size, dy=dy)
             if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
                          1000.0 / args.anim_ms) is None:
                 sys.exit("no ffmpeg — pip install imageio-ffmpeg")
+        if plate is not None:
+            os.remove(plate)
 
     bg_dir = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ)
     legs = sorted(f for f in os.listdir(bg_dir)
