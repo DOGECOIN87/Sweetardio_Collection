@@ -315,6 +315,35 @@ Two things worth knowing:
   visible — the body covers them — so it is a no-op today and correct
   structurally.
 
+## The zebra cake wears no footwear
+
+`EXCLUDE_WAT_CHARS` now holds `zebra_cake`, alongside the churro, twinkie,
+poptarts, ice creams, nutty bar and gummy bear. It is a flat hexagonal wafer
+whose bottom edge is a straight horizontal line, with no legs and nothing to
+put a shoe on: rendered against all four options the slippers simply park
+under it with a gap while the body hovers above them, reading as shoes left
+beside a floating biscuit rather than worn. **The gorbhouse is no better** — a
+can under a flat hexagon has the same problem — which is why this is a
+whole-footwear exclusion and not a slippers-only one.
+
+It stays listed in `GORBHOUSE_CHARS` even though `EXCLUDE_WAT_CHARS` wins,
+which is the convention twinkie and the poptarts already follow: membership
+there records eligibility, and the exclusion list is what decides.
+
+**Excluding a character changes `footwear_availability`, and that is measured,
+not derived.** The cast went from 15 wearers to 14, so the ad-hoc roll — which
+is only offered to eligible characters — started undershooting the mint:
+`verify_generator_rules.py` read the ad-hoc footwear share at 11.13 % against
+the mint's 11.99 %, a −1.03 drift where the tolerance is 1.2. Re-measured over
+8 seeds x 3000 tokens, **0.528** lands it at 12.05 % (+0.05, seed stdev 0.36).
+The narrow count (14/27 = 0.519) is not the answer on its own, because the
+gorbhouse reaches some excluded characters.
+
+The zebra cake's `CHAR_Y_ADJUST -20` is now unreachable — only the bare path
+runs — but it is kept as a pair with `FOOTWEARLESS_DY -2` because the two sum
+to the −22 the bare case has always used, and the shod value stays correct if
+it ever wears footwear again.
+
 ## Footwear geometry is measured on the SOLID art, and two assets needed it
 
 Every slipper is composited at `offset=False, dy=0` — its authored position —

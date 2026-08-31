@@ -791,7 +791,19 @@ GORBHOUSE_CHARS = [
 ]
 
 # Characters that should NOT get what_are_thosez (footwear):
-# churro, twinkie, poptarts and all ice creams
+# churro, twinkie, poptarts, all ice creams, and the zebra cake.
+#
+# The zebra cake is a flat hexagonal wafer whose bottom edge is a straight
+# horizontal line, with no legs and nothing to put a shoe on. Rendered against
+# all four footwear options the slippers simply park under it with a gap and
+# the body hovers above them -- it reads as shoes left beside a floating
+# biscuit rather than worn. The gorbhouse is no better: a can under a flat
+# hexagon has the same problem, which is why this is a WHOLE-footwear
+# exclusion and not a slippers-only one.
+#
+# It stays listed in GORBHOUSE_CHARS above even though this list wins, which
+# is the convention twinkie and the poptarts already follow -- membership
+# there records eligibility, and this list is what actually decides.
 EXCLUDE_WAT_CHARS = [
     "cyan_sherbert_ice_cream",
     "neopolitan_ice_cream",
@@ -803,6 +815,7 @@ EXCLUDE_WAT_CHARS = [
     "nutty_bar",
     "churro",
     "poptart",
+    "zebra_cake",
 ]
 
 # Character-specific armz: each file here may ONLY appear on characters
@@ -919,7 +932,12 @@ CHAR_Y_ADJUST = {
     "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
     "brownie_bite": 22,
-    "zebra_cake": -20,         # with-footwear case raised; the (perfect) bare
+    "zebra_cake": -20,         # footwear-excluded now, so only the BARE path
+                               # runs: -20 here plus FOOTWEARLESS_DY -2 gives
+                               # the same -22 the bare case always had. Kept as
+                               # a pair rather than collapsed to -22, so the
+                               # shod value is still correct if it ever wears
+                               # footwear again. Originally: the bare
                                # stance is held put by FOOTWEARLESS_DY
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
