@@ -943,6 +943,56 @@ than every other wearer and read as too tall. **-20 measures back at 957**,
 and `FOOTWEARLESS_DY -2` holds the bare bottom at 1105 exactly where it was.
 Change one, check the other — `verify_placement` passes either way.
 
+## Cut-out residue: stray pixels OUTSIDE an asset's outline
+
+Stickers, arms and footwear shipped with the ghost of a lasso path left behind
+when the piece was cut from its background — **979 disconnected components,
+3,183 px, across 28 of 45 assets**. On the Pepe and Shiba slipper bases it is
+literally a dotted arc tracing the right slipper; on the bunny overlay it is a
+detached smear of the baked drop shadow floating between the two slippers; on
+the stickers it is 1–77 px specks hugging the die-cut border, plus hair wisps
+that escaped it. Invisible on a dark plate, obvious on a light one.
+
+`asset_assessment/despeckle_traits.py` removes them. Cleaned: 0 px remain, and
+every KEPT pixel is bit-identical to the original.
+
+**The threshold is safe because of the gap, not the number.** A component goes
+only if it is under 2 % of the asset's largest AND under 500 px. The largest
+speck in the collection is 340 px; the smallest legitimate part — the Military
+Brat's second glove — is 16,208 px. Nothing lives in that 48× gap, so no
+threshold inside it can be wrong. A pair of slippers is two components and an
+arm is two gloves; those are parts, and they sit far above the line.
+
+**The EDGE is deliberately untouched.** `audit_art_quality.py` flags the three
+sabers at fringe 88 against a cast median near 2, and the Cookie Monster
+slippers at 21–23. That is a wide band of semi-transparent pixels — a glow on
+a lightsaber, fur on a puppet. It is the art working. This tool only ever
+removes pixels DISCONNECTED from the piece.
+
+**Removing residue can move the SOLID bbox, and for footwear that matters.**
+Some specks are fully opaque and sit at the art's extremity, so clearing them
+pulls the alpha > 200 box in by a pixel or two. `WAT_SCALE_PIVOT` was solved
+against the sole line measured at that threshold, so the tool REFUSES to touch
+a footwear asset whose solid bbox would move (measured: none do). Four
+stickers shift 1–4 px, and nothing reads a sticker's bbox.
+
+### `<class>_originals` is NOT a free naming convention
+
+The backups go to `traits/<class>_prespeckle/`, and the name matters. The
+obvious `<class>_originals` is **already taken, with three different
+meanings**:
+
+- `skinz_originals` / `eyez_originals` — a genuine pre-pass backup.
+- `armz_originals` — **RETIRED ART**: the seven per-character katanas and
+  knives replaced by one generic file each. It also contains three filenames
+  that are live assets (`Sweetardio_114 (4)/(5)/(6).png`) with **different
+  pixels**. A tool that assumed it was its own backup read the retired art as
+  the "original", and would have written a cleaned version of the WRONG art
+  over the live saber. It did not only because those three carry no specks.
+- `backgroundz_originals` — read at MINT time by `BACKGROUNDZ_FALLBACK`.
+
+Check what a folder already means before writing into it.
+
 ## Verification tools
 
 ```bash
@@ -955,6 +1005,7 @@ python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeli
 python3 asset_assessment/register_eyes.py --report        # eye size + baseline
 python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
 python3 asset_assessment/verify_trait_names.py    # do the names still resolve
+python3 asset_assessment/despeckle_traits.py --report  # stray pixels off the art
 ```
 
 `verify_trait_names.py` is the gate on the *names*: it fails on a `TRAIT_NAMES`
