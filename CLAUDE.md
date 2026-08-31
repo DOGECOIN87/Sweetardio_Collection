@@ -953,7 +953,7 @@ detached smear of the baked drop shadow floating between the two slippers; on
 the stickers it is 1–77 px specks hugging the die-cut border, plus hair wisps
 that escaped it. Invisible on a dark plate, obvious on a light one.
 
-`asset_assessment/despeckle_traits.py` removes them. Cleaned: 0 px remain, and
+`asset_assessment/clean_trait_art.py` removes them (stage 1). Cleaned: 0 px remain, and
 every KEPT pixel is bit-identical to the original.
 
 **The threshold is safe because of the gap, not the number.** A component goes
@@ -975,6 +975,41 @@ pulls the alpha > 200 box in by a pixel or two. `WAT_SCALE_PIVOT` was solved
 against the sole line measured at that threshold, so the tool REFUSES to touch
 a footwear asset whose solid bbox would move (measured: none do). Four
 stickers shift 1–4 px, and nothing reads a sticker's bbox.
+
+### The die-cut edge carries a matte line too, and it is a SECOND defect
+
+The connected-component pass cannot see this one: it is a dark rim ATTACHED to
+the art, and much of it is opaque. Measured inward from the visible edge, an
+affected sticker reads luma **35 / 125 / 212** at bands −1 / −2 / −3 against a
+white die-cut border of ~250 at −4..−6 — a thin ragged line following the cut
+rather than the art. **19 of the 23 stickers carry it**, with near-identical
+numbers (dip 193–241), so it is a property of how the set was cut and not a
+few bad assets.
+
+Stage 2 of `clean_trait_art.py` fixes it the way `fix_hole_matte_line.py`
+fixes face-hole rims: replace the rim's RGB with the nearest healthy pixel's,
+extending the border's own colour to the edge. **Alpha is never touched** —
+a sticker's alpha is what `create_image()` writes the FLOAT MASK from, and the
+flood rests the sticker on the water using it. After: dip ≤ 15.
+
+**The line is removed, not replaced with a keyline.** Both were rendered; an
+even 2px keyline reads as a deliberate die-cut and holds the edge against a
+light plate, where removal lets the white border soften into it. The owner
+looked at both and chose removal (2026-08).
+
+**FOUR STICKERS ARE EXCLUDED, by measurement rather than a name list.** The
+Meme is the Tech and Straight Outta Gulag are posters with a BLACK border by
+design; Caroline Ellison is a photo in a white polaroid frame and Opengotchi
+already has a clean edge. Rendered with the fix applied, all four are visibly
+damaged — the black borders erode to white, the polaroid edge goes ragged.
+What separates them from the 19 is not "dark at the rim", since the posters
+are dark at the rim too, but whether the darkness RECOVERS: an affected
+sticker is back to a bright border by band −3 (148–214), the posters are still
+at 11–32. The gate is `dip > 60 AND band −3 > 100`.
+
+**Both stages live in ONE tool on purpose.** Split in two, the second would
+clean the first's output, and re-running the first would silently restore the
+residue the second had removed.
 
 ### `<class>_originals` is NOT a free naming convention
 
@@ -1005,7 +1040,7 @@ python3 asset_assessment/render_sample_sheet.py   # N random tokens, full pipeli
 python3 asset_assessment/register_eyes.py --report        # eye size + baseline
 python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
 python3 asset_assessment/verify_trait_names.py    # do the names still resolve
-python3 asset_assessment/despeckle_traits.py --report  # stray pixels off the art
+python3 asset_assessment/clean_trait_art.py --report   # cut-out residue on trait art
 ```
 
 `verify_trait_names.py` is the gate on the *names*: it fails on a `TRAIT_NAMES`

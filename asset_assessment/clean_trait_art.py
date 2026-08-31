@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Remove cut-out residue -- stray pixels OUTSIDE an asset's own outline.
+"""Clean the cut-out residue left on sticker, arm and footwear art.
+
+Two defects, both from the same cause -- the piece was cut from a background
+and the cut left traces -- and both handled here so one --apply from one backup
+gives the finished art. Splitting them into two tools was the obvious shape and
+the wrong one: the second would clean the first's output, and re-running the
+first would silently restore the residue the second had removed.
+
+STAGE 1 -- stray pixels OUTSIDE the outline.
 
 Several stickers, arms and footwear assets ship with small disconnected blobs
 sitting off the art: the ghost of a lasso path left behind when the piece was
@@ -52,10 +60,42 @@ a backup kept there would mint as a trait. And never "<class>_originals",
 which is already taken and means something different -- see backup_dir(). The tool always cleans FROM the
 backup, so re-running it is idempotent rather than compounding.
 
+STAGE 2 -- the matte line baked onto the die-cut edge (STICKERS only).
+
+The connected-component pass above cannot see this one: it is a dark rim
+ATTACHED to the art, not detached from it, and much of it is opaque. Measured
+inward from the visible edge, an affected sticker reads luma 35 / 125 / 212 at
+bands -1 / -2 / -3 against a white die-cut border of ~250 at -4..-6 -- a thin
+ragged line that follows the cut rather than the art. 19 of the 23 stickers
+carry it.
+
+The fix is the one fix_hole_matte_line.py already uses on face-hole rims:
+replace the rim's RGB with the colour of the nearest healthy pixel, so the
+border's own colour is extended out to the edge. ALPHA IS NEVER TOUCHED, which
+is what keeps it safe -- a sticker's alpha is what create_image() writes the
+FLOAT MASK from, and the flood rests the sticker on the water using it.
+
+The line is REMOVED rather than replaced with a clean keyline. Both were
+rendered: an even 2px keyline reads as a deliberate die-cut and holds the
+sticker's edge against a light plate, where the removed version's white border
+softens into it. The owner looked at both and chose removal (2026-08), so the
+sticker's own white border is the whole edge. If that is ever revisited, the
+keyline is a few lines here -- paint the outer 2px of the SOLID contour, so the
+existing antialiasing softens it; at 1px it comes out broken.
+
+FOUR STICKERS ARE EXCLUDED, and the gate is measured rather than a name list.
+The Meme is the Tech and Straight Outta Gulag are posters with a BLACK border
+by design; Caroline Ellison is a photo in a white polaroid frame and Opengotchi
+has a clean white edge already. Rendered with the fix applied, all four are
+visibly damaged -- the black borders erode to white and the polaroid edge goes
+ragged. What separates them from the 19 is not "dark at the rim" (the two
+posters are dark at the rim too) but whether the darkness RECOVERS: an affected
+sticker is back to a bright border by band -3, the posters are still at 11-32.
+
 Usage:
-  python3 asset_assessment/despeckle_traits.py --report   # measure only
-  python3 asset_assessment/despeckle_traits.py --apply
-  python3 asset_assessment/despeckle_traits.py --restore
+  python3 asset_assessment/clean_trait_art.py --report   # measure only
+  python3 asset_assessment/clean_trait_art.py --apply
+  python3 asset_assessment/clean_trait_art.py --restore
 """
 
 import argparse
@@ -118,6 +158,59 @@ def solid_bbox(alpha):
     return int(ys.min()), int(ys.max()), int(xs.min()), int(xs.max())
 
 
+# ---- stage 2: the die-cut edge (stickers) ----
+#
+# RIM is the band whose colour is replaced; HEALTHY is the first band trusted
+# to hold the border's real colour. Measured across the affected stickers, the
+# line occupies bands -1 and -2 and the border is clean by -4, so RIM 3 covers
+# the line with a pixel of margin without reaching the border itself.
+RIM, HEALTHY = 3, 4
+# Gate thresholds. DIP is how far the rim falls below the healthy border, and
+# RECOVER is the band -3 luma that separates "a thin line on a bright border"
+# from "the border is genuinely dark". The affected stickers read dip 193-241
+# and recover 148-214; the four excluded read recover 11-32 or no dip at all.
+MIN_DIP, MIN_RECOVER = 60, 100
+
+
+def _bands(a):
+    """(luma per band 1..6 inward from the visible edge, distance transform)."""
+    al = a[..., 3].astype(float)
+    lum = (0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2])
+    din = ndimage.distance_transform_edt(al > VISIBLE)
+    out = []
+    for k in range(1, 7):
+        m = (din >= k) & (din < k + 1)
+        out.append(lum[m].mean() if m.sum() else np.nan)
+    return out, din
+
+
+def edge_verdict(a):
+    """(affected?, dip, recover) for one sticker."""
+    v, _ = _bands(a.astype(float))
+    healthy = np.nanmean(v[3:6])
+    dip = healthy - min(v[0], v[1])
+    recover = v[2]
+    return (dip > MIN_DIP and recover > MIN_RECOVER), dip, recover
+
+
+def fix_edge(a):
+    """Replace the ragged matte line with the border's own colour, then paint
+    an even keyline. Alpha is untouched -- see the module docstring."""
+    a = a.copy()
+    _, din = _bands(a.astype(float))
+    vis = a[..., 3] > VISIBLE
+    rim = (din >= 1) & (din < RIM + 1) & vis
+    good = din >= HEALTHY
+    if not good.any():
+        return a, 0
+    idx = ndimage.distance_transform_edt(~good, return_distances=False,
+                                         return_indices=True)
+    for c in range(3):
+        ch = a[..., c]
+        ch[rim] = ch[idx[0], idx[1]][rim]
+    return a, int(rim.sum())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
@@ -160,9 +253,18 @@ def main():
             im = Image.open(src).convert("RGBA")
             arr = np.array(im)
             sp, n = specks(arr[..., 3])
-            if n == 0:
-                continue
             px = int(sp.sum())
+
+            # Stage 2 has to run even on a sticker with no specks -- the two
+            # defects are independent, and 4 of the 19 edge-affected stickers
+            # carry very few of them.
+            edge_px = 0
+            if cls == g.STICKERZ:
+                affected, dip, recover = edge_verdict(arr)
+            else:
+                affected = False
+            if n == 0 and not affected:
+                continue
             total_files += 1
             total_comps += n
             total_px += px
@@ -185,8 +287,17 @@ def main():
                          f"{before} -> {after}. Footwear geometry is measured "
                          f"at alpha>{SOLID} and would shift with it -- refusing "
                          f"to touch this asset.")
+            if affected:
+                alpha_in = out[..., 3].copy()
+                out, edge_px = fix_edge(out)
+                # Only the EDGE step is alpha-preserving; stage 1 above clears
+                # alpha where a speck was, so the baseline is post-stage-1.
+                assert np.array_equal(out[..., 3], alpha_in), \
+                    f"{f}: the edge fix changed alpha; the float mask reads it"
+
             note = "" if before == after else f"  bbox {delta}"
-            print(f"  {f[:46]:46} {n:4} specks  {px:6} px{note}")
+            edge = f"  edge {edge_px:5} px" if edge_px else ""
+            print(f"  {f[:46]:46} {n:4} specks  {px:6} px{edge}{note}")
             if args.apply:
                 Image.fromarray(out, "RGBA").save(os.path.join(live, f))
 
