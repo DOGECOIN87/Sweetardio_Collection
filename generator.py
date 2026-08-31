@@ -959,21 +959,41 @@ def char_y_adjust(char_name):
 # A shared bottom makes every bare character in the collection sit in one
 # 1084-1109 band and gives them all the same contact shadow. The tops now
 # vary by body height instead, which is what resting on a floor looks like.
+# Each value is the character's own CHAR_Y_ADJUST plus a SHARED DROP, so the
+# group keeps one tight bare-bottom band and the drop is a single number to
+# tune. The drop is 70.
+#
+# It was 139, which grounded these bodies onto the same 1084-1109 band the
+# STANDING characters use -- and that is what made them read as sitting too
+# low. The drop carries the face with it, so at 139 a bare chocolate chip
+# cookie put its eyes at y 735 against y 598 for the same cookie in slippers,
+# and the shorter the body the worse it got: ding dong +139 onto the shortest
+# body in the cast (635px) left it pinned to the floor with a third of the
+# frame empty above its head.
+#
+# Grounding them also contradicted the reason CENTERED_CHARS exists, which is
+# that "a round shape lowered to the floor looks like it is resting awkwardly,
+# not standing". A round body has no feet to put on a floor; 70 lets it sit
+# centred, which is the whole point of the list.
+#
+# THE GROUP IS DELIBERATELY HIGHER THAN THE STANDING CAST after this: bare
+# bottoms land 1023-1027 against 1082-1110 for the standing characters. That
+# is the feature working, not a regression -- these bodies float, the standing
+# ones stand. Chosen off a rendered ladder at 139 / 100 / 70 / 40; past ~40
+# they start to read as floating rather than centred.
+_CENTERED_DROP = 70
 CENTERED_FOOTWEARLESS_DY = {
-    "glazed_doughnut": 121,           # was 99, bare bottom 1074
-    "chocolate_doughnut": 121,        # was 93, bare bottom 1068
-    "sugar_doughnut": 113,            # was 93, bare bottom 1076
-    "chocolate_sandwich_cookie": 133, # was 90, bare bottom 1053. Two-part
-                                      # asset: the bbox bottom is the BACK
-                                      # wafer, which is the lowest thing it
-                                      # rests on, so grounding by bbox is
-                                      # right here even though the front disc
-                                      # then sits higher than its peers'.
-    "chocolate_chip_cookie": 137,     # was 72, bare bottom 1031 (65px high)
-    "oatmeal_cream_pie": 153,         # was 80, bare bottom 1023 (73px high)
-    "ding_dong": 173,                 # was 94, bare bottom 1017 — the worst
-                                      # of the group at 79px high, because it
-                                      # is the shortest body in it
+    "glazed_doughnut": -18 + _CENTERED_DROP,
+    "chocolate_doughnut": -18 + _CENTERED_DROP,
+    "sugar_doughnut": -26 + _CENTERED_DROP,
+    "chocolate_sandwich_cookie": -6 + _CENTERED_DROP,  # two-part asset: the
+                                      # bbox bottom is the BACK wafer, which
+                                      # is the lowest thing it rests on, so
+                                      # measuring by bbox is right here even
+                                      # though the front disc sits higher.
+    "chocolate_chip_cookie": -2 + _CENTERED_DROP,
+    "oatmeal_cream_pie": 14 + _CENTERED_DROP,
+    "ding_dong": 34 + _CENTERED_DROP,
 }
 
 def centered_footwearless_dy(char_name):

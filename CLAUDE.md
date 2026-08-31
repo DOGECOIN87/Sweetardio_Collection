@@ -899,6 +899,50 @@ gate: `catalog/character_showcase/pairings.json` pins one plate per character,
 and `background_pop_studies/make_proofs.py` names plates in its proof list.
 Seven retirements broke four showcase pairings and one proof.
 
+## Bare placement: the round characters are CENTRED, the rest STAND
+
+Two tables decide where a character sits when it has no footwear, and they
+pull in opposite directions on purpose.
+
+`VERTICAL_OFFSET` (+150) drops an offset-eligible character so it stands on
+the ground rather than floating. `CENTERED_FOOTWEARLESS_DY` handles the seven
+round bodies — the cookies, the three doughnuts and the ding dong — which
+`CENTERED_CHARS` exempts from that drop because *"a round shape lowered to the
+floor looks like it is resting awkwardly, not standing"*. A round body has no
+feet to put on a floor.
+
+**Each centred value is that character's own `CHAR_Y_ADJUST` plus one shared
+drop**, so the group keeps a single tight bare-bottom band and the drop is one
+number to tune. It is **70**, and bare bottoms land 1023–1027.
+
+It was 139, which grounded them onto the same 1084–1109 band the STANDING
+characters use — and that is what made them read as sitting too low. **The dy
+carries the FACE with it**: at 139 a bare chocolate chip cookie put its eyes at
+y 735 against y 598 for the same cookie in slippers, a +139 gap. The shorter
+the body the worse it got, because a short body grounded from a fixed face has
+further to travel — ding dong, the shortest in the cast at 635px, took +173.
+At 70 the gap is a uniform +70.
+
+**The group is deliberately higher than the standing cast**: 1023–1027 against
+1082–1110. That is the feature working, not a regression — these bodies float,
+the standing ones stand. Chosen off a rendered ladder at 139 / 100 / 70 / 40;
+past ~40 they read as floating rather than centred.
+
+Worth knowing before touching either table: **the whole bare cast has a wide
+face spread** (577–771) because bottoms are aligned and bodies differ in
+height, where the shod cast sits at 560–640. Aligning bare faces instead would
+spread the bottoms by 304px. Neither is free; the collection aligns bottoms.
+
+### A footwear trim moves only the shod case
+
+`CHAR_Y_ADJUST` applies to both cases, so raising a character for its slipper
+also raises it bare. `FOOTWEARLESS_DY` exists to cancel that. The zebra cake
+is the worked example: `CHAR_Y_ADJUST -37` put its shod bottom at **940**
+against a cast band of 953–961, so it rode ~16px further out of the slipper
+than every other wearer and read as too tall. **-20 measures back at 957**,
+and `FOOTWEARLESS_DY -2` holds the bare bottom at 1105 exactly where it was.
+Change one, check the other — `verify_placement` passes either way.
+
 ## Verification tools
 
 ```bash
