@@ -8,7 +8,7 @@ produces the same 4,444 tokens, so the collection can be regenerated from a
 clean checkout and come out the same.
 
 > **Run this on your own machine, not in a container session.** The full
-> render is ~3 hours and ~13 GB (see [§7](#7-what-it-costs)); `output/` is
+> build is ~4 hours and ~12 GB (see [§7](#7-what-it-costs)); `output/` is
 > git-ignored, so anything produced in an ephemeral session is lost with it.
 
 ---
@@ -53,7 +53,7 @@ python3 asset_assessment/build_mint.py --fresh ...
 
 `--fresh` deletes `images/`, `metadata/`, `masks/`, `float_masks/`, `anim/`,
 `images_clear/`, the manifest and the rarity report. It is never the default:
-deleting a finished 13 GB render on a typo is not a recoverable mistake.
+deleting a finished 12 GB render on a typo is not a recoverable mistake.
 
 **Nothing outside `output/` is a build artifact.** In particular do **not**
 clear these — every one of them is an input or a record something still
@@ -290,18 +290,29 @@ rarity gains must be re-solved with `calibrate_rarity.py`. See CLAUDE.md,
 
 ## 7. What it costs
 
-Measured on this repo, single-threaded:
+Measured on this repo, single-threaded, by rendering a real 166-token slice
+and baking all seven weather states from it — not estimated.
 
 | | |
 |---|---|
-| Metadata only (no `--render`) | ~30 s |
-| Full render, 4,444 tokens | **~3 h** at ~2.5 s per composite |
+| Metadata only (no `--render`) | **~30 s** |
+| Pass 1, 4,444 tokens | **~3 h** at ~2.5 s per composite |
 | Starfield loops (22 × 12 frames) | ~11 min, inside pass 1 |
-| Weather bake (444 stills + loops) | pass 2, on top |
-| `output/mint/images/` | **~12 GB** (~2.8 MB per PNG; a flat plate compresses far smaller than a graded one) |
-| `output/mint/masks/` + `float_masks/` | ~115 MB |
-| `output/mint/images_clear/` | ~1.2 GB (the 444 pre-weather stills) |
-| **Total** | **~13 GB** |
+| Pass 2, weather bake (444 tokens) | **~64 min** at 8.7 s per token |
+| **Total wall time** | **~4 h** |
+
+| Folder | Per file | Total |
+|---|---|---|
+| `output/mint/images/` | 2.44 MB | **10.8 GB** |
+| `output/mint/images_clear/` | 2.46 MB | 1.1 GB (the 444 pre-weather stills) |
+| `output/mint/masks/` + `float_masks/` | 31 KB | 136 MB |
+| `output/mint/anim/` | 237 KB | 110 MB (466 loops) |
+| `output/mint/metadata/` | ~1 KB | 5 MB |
+| **Total** | | **~12.2 GB** |
+
+A PNG's size tracks how busy its plate is — a flat starfield compresses to
+~0.8 MB against ~2.9 MB for a heavily graded plate, so the mean moves if the
+plate mix ever changes.
 
 Render the metadata first, read `rarity_report.txt`, and only then commit to
 the render.
