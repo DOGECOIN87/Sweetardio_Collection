@@ -37,7 +37,8 @@ import build_mint as bm          # noqa: E402
 METADATA_DIR = "output/mint/metadata"
 OUT = "catalog/RARITY.md"
 # canonical metadata order; presence-optional traits last
-ALWAYS = ["Character", "Background", "Skin", "Eyes", "Mouth"]
+ALWAYS = ["Character", "Background", "Plate Tier", "Skin", "Eyes",
+          "Mouth", "Trait Count"]
 OPTIONAL = ["Footwear", "Arms", "Sticker", "Weather", "Artist"]
 
 
@@ -147,6 +148,20 @@ def main():
         for k, v in sorted(c.items(), key=lambda kv: kv[1]):
             add(f"| {k} | {v} | {_pct(v, n, dp=2)} |")
 
+    table("Plate Tier", "Plate Tier",
+          "**What a background is worth, stated on the token.** Plate rarity "
+          "used to be legible only by counting the mint, and the count "
+          "contradicted the label: at 50 each, every `Legendary` plate was "
+          "more COMMON than 17 ordinary ones. Legendary is now 15 each, and "
+          "the ladder is monotone \u2014 every Legendary is rarer than every "
+          "ordinary plate. Derived from the designed target, so it is a "
+          "property of the collection rather than of the seed that was minted.")
+    table("Trait Count", "Trait Count",
+          "**The axis collectors actually rank on**, and both tails are rarer "
+          "than a Legendary plate. Five is the floor \u2014 character, "
+          "background, skin, eyes and mouth are on every token \u2014 so a "
+          "5 carries no arm, no footwear and no sticker. Counts Weather; does "
+          "not count Plate Tier, which only restates the Background.")
     table("Backgrounds", "Background",
           "The four `Legendary` plates are slot-allocated at exactly 50 each "
           "and never appear in the weighted pick.")

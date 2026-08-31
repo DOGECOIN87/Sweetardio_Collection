@@ -6,7 +6,7 @@ Rarity model (all counts are EXACT, hit by pre-allocating token slots):
 
   Backgrounds
     * Legendary_* plates (in traits/backgroundz) are 1/1-style rares: each one
-      appears EXACTLY --leg-each times (default 50). 4 x 50 = 200.
+      appears EXACTLY --leg-each times (default 15). 4 x 15 = 60.
     * every other token gets a normal weighted/compat plate; Legendary plates
       never appear via the random pick (generator excludes the prefix).
 
@@ -38,7 +38,7 @@ Outputs:
 Reproducible by --seed.
 
 Usage (from repo root):
-  python3 asset_assessment/build_mint.py [--n 4444] [--leg-each 50] [--seed 4444]
+  python3 asset_assessment/build_mint.py [--n 4444] [--leg-each 15] [--seed 4444]
   python3 asset_assessment/build_mint.py --render --masks
 """
 
@@ -111,7 +111,8 @@ SIGNATURE_ARMS = {}
 # one plate with one face (not from the filenames). The COMMON tier is
 # deliberately left unpinned: legendary-background slots re-roll the character
 # when it camouflages against the plate, which a forced character can never
-# satisfy, so the 200 legendary slots have to draw from somewhere.
+# satisfy, so the legendary slots (4 x --leg-each) have to draw from
+# somewhere.
 #
 #   chase     4 x 60  = 240   the four that look like nothing else in the set
 #   uncommon 10 x 130 = 1300  strong, individual silhouettes
@@ -215,6 +216,32 @@ if STARFIELD_COUNT and g.STARFIELD_BG not in g.get_files(g.BACKGROUNDZ):
              f"rebuild it with dynamic/starfield.py")
 
 
+# Trait Count is the axis collectors already rank on, and both of its tails
+# here are rarer than a Legendary plate: 5 traits is 139 tokens (3.13 %) and
+# 9 traits is 10 (0.23 %), the same order as the Starfield. Neither was
+# discoverable, because "carries no arm, no footwear and no sticker" is an
+# ABSENCE -- there is no attribute for it, so no marketplace can filter or
+# sort on it and no rarity tool can score it.
+#
+# Emitted as a NUMBER rather than a named band ("Bare", "Full Kit") because
+# the number IS the convention: marketplaces sort it natively and rarity tools
+# already compute it, so a name would only be a second vocabulary for
+# something collectors read at a glance.
+#
+# Counted AFTER Weather is appended, so an animated token scores the trait it
+# actually carries, and placed last because it describes the list.
+# Plate Tier is DERIVED -- it restates the Background's scarcity band rather
+# than being a trait a token independently carries -- so counting it would add
+# a free +1 to every token and move the floor off the five traits every
+# composited token actually has (character, background, skin, eyes, mouth).
+_NOT_A_TRAIT = {"Trait Count", "Plate Tier"}
+
+
+def _with_trait_count(meta):
+    n = sum(1 for a in meta if a["trait_type"] not in _NOT_A_TRAIT)
+    return list(meta) + [{"trait_type": "Trait Count", "value": n}]
+
+
 def traits_of(layers, char):
     t = {k: None for k in TRAIT_KEYS}
     t["character"] = char
@@ -258,7 +285,7 @@ def main():
     import random
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=4444)
-    ap.add_argument("--leg-each", type=int, default=50)
+    ap.add_argument("--leg-each", type=int, default=15)
     ap.add_argument("--seed", type=int, default=4444)
     ap.add_argument("--render", action="store_true",
                     help="also render every token PNG to output/mint/images/")
@@ -580,6 +607,7 @@ def main():
                 t["weather"] = forced_wx[i]
                 meta = list(meta) + [{"trait_type": "Weather",
                                       "value": forced_wx[i].title()}]
+            meta = _with_trait_count(meta)
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:

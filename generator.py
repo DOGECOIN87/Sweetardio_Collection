@@ -163,6 +163,65 @@ def is_allocator_only_bg(filename):
     f = os.path.basename(filename)
     return is_legendary_bg(f) or f in ALLOCATOR_ONLY_BGS
 
+
+# ---- Plate Tier: the plate's scarcity band, as a metadata attribute ----
+#
+# A plate's rarity was legible only by counting the mint, and the counts
+# contradicted the one label a collector could see: at 50 each, every
+# "Legendary" plate was MORE common than 17 ordinary ones -- Sweet Castle
+# realised 19, Abduction 21, Goo Lagoon 26. Holding the rarest background in
+# the collection looked exactly like holding the 40th rarest.
+#
+# The band is derived from the DESIGNED target in traits/rarity_weights.json
+# rather than from a realised count, so it is a property of the collection and
+# not of whichever seed was minted. The ladder is monotone by construction:
+#
+#   Ultra      Starfield, 10                    (allocator-only)
+#   Legendary  4 plates x LEG_EACH              (allocator-only)
+#   Scarce     pinned at the low target
+#   Uncommon   pinned at the high target
+#   Standard   unpinned -- shares whatever is left, so the most common
+#
+# Unpinned is Standard and NOT an error: 41 of 66 plates have no target and
+# draw at gain 1.0 together. A plate added without a target lands here, which
+# is the honest answer for it.
+_PLATE_TIER_CACHE = None
+
+
+def _plate_targets():
+    """{plate filename -> designed share} from traits/rarity_weights.json.
+    Missing file or key is not fatal -- every plate then reads Standard,
+    which is what an uncalibrated collection actually is."""
+    global _PLATE_TIER_CACHE
+    if _PLATE_TIER_CACHE is None:
+        try:
+            import json as _json
+            with open(os.path.join(TRAITS_DIR, "rarity_weights.json")) as fh:
+                _PLATE_TIER_CACHE = (_json.load(fh)
+                                     .get(BACKGROUNDZ, {}).get("target", {}))
+        except Exception:
+            _PLATE_TIER_CACHE = {}
+    return _PLATE_TIER_CACHE
+
+
+def plate_tier(filename):
+    """The scarcity band of a background, for the Plate Tier attribute."""
+    f = os.path.basename(filename)
+    if f == STARFIELD_BG:
+        return "Ultra"
+    if is_legendary_bg(f):
+        return "Legendary"
+    tgt = _plate_targets().get(f)
+    if tgt is None:
+        return "Standard"
+    # Two pinned tiers are in use (a low and a high target). Split on the
+    # midpoint rather than on either literal, so retuning a target moves the
+    # plate's band with it instead of silently reclassifying every plate.
+    lows = sorted({v for v in _plate_targets().values()})
+    if len(lows) < 2:
+        return "Scarce"
+    return "Scarce" if tgt <= (lows[0] + lows[-1]) / 2.0 else "Uncommon"
+
 # Characters the starfield may pair with. The plate is FLAT, so the usual
 # camouflage test (build_char_compat.py, which scores a body against a
 # plate's LOCAL colour) degenerates -- there is one colour to clash with, and
@@ -545,6 +604,7 @@ def extract_metadata(layers, char_name):
     overlay_filenames = set(BG_OVERLAY_PAIRS.values())
 
     attrs = {}  # trait_type -> value, filled in order below
+    bg_file = None  # the plate's filename, for its Plate Tier band
 
     # Character (always present)
     attrs["Character"] = trait_name(CHARACTERZ, char_name)
@@ -576,7 +636,9 @@ def extract_metadata(layers, char_name):
                      if p.startswith(bp + os.sep)),
                     BACKGROUNDZ,
                 )
-                attrs.setdefault("Background", trait_name(bg_cat, fname))
+                if "Background" not in attrs:
+                    attrs["Background"] = trait_name(bg_cat, fname)
+                    bg_file = fname
 
         # Skin ball
         elif p.startswith(skinz_prefix + os.sep):
@@ -611,8 +673,13 @@ def extract_metadata(layers, char_name):
                     base = m.group(1)
                     attrs.setdefault("Footwear", trait_name(WHAT_ARE_THOSEZ, base))
 
+    # Plate Tier rides directly after Background, so the band reads next to
+    # the plate it describes rather than at the end of the attribute list.
+    if "Background" in attrs and bg_file:
+        attrs["Plate Tier"] = plate_tier(bg_file)
+
     # Return in canonical order; omit absent optional traits
-    order = ["Character", "Background", "Skin", "Eyes", "Mouth",
+    order = ["Character", "Background", "Plate Tier", "Skin", "Eyes", "Mouth",
              "Footwear", "Arms", "Sticker"]
     return [{"trait_type": k, "value": attrs[k]}
             for k in order if k in attrs]

@@ -732,6 +732,66 @@ here**: the sticker is inside the protect mask and `plate_detail` measures
 only `mask < 128`, so sticker pixels are excluded by construction, and the
 float-mask work above left token 10's blizzard reading unchanged at 36 %.
 
+## The rarity ladder must be MONOTONE, and the label must be true
+
+Two collector-facing defects were found by counting the mint rather than
+reading the config, and both are fixed.
+
+**`Legendary` was not legendary.** At `--leg-each 50` each legendary plate was
+50 of 4444 (1.13 %) while **17 ordinary plates were rarer** — Sweet Castle 19,
+Abduction 21, Goo Lagoon 26, In Cook We Trust 26, Cabaret Alley 27. Holding
+the rarest background in the collection looked exactly like holding the 40th
+rarest, and the one label a collector could see said the opposite.
+
+`--leg-each` is now **15** (4 x 15 = 60, 1.35 % of supply). The ladder is
+monotone by construction and checked by counting:
+
+| tier | plates | tokens each |
+|---|---:|---|
+| Ultra (Starfield) | 1 | 10 (0.23 %) |
+| Legendary | 4 | 15 (0.34 %) |
+| Scarce | 8 | 23–27 |
+| Uncommon | 17 | 47–55 |
+| Standard | 34 | 59–136 |
+
+**`Plate Tier` states that band on the token.** It is derived in
+`generator.plate_tier()` from the DESIGNED target in `rarity_weights.json`,
+never from a realised count, so it is a property of the collection and not of
+whichever seed was minted. An unpinned plate reads Standard, which is the
+honest answer for it — 34 of 64 plates have no target and share the remainder.
+
+**`Trait Count` exposes scarcity that existed but was invisible.** 141 tokens
+(3.17 %) carry no arm, no footwear and no sticker, and 5 tokens (0.11 %) carry
+the most — **both tails rarer than a Legendary plate**, and neither was
+discoverable, because an ABSENCE is not an attribute and no marketplace or
+rarity tool can filter on one.
+
+It is a NUMBER, not a named band ("Bare", "Full Kit"), because the number is
+already the convention collectors rank on. Five is the floor — character,
+background, skin, eyes and mouth are on every composited token. It counts
+Weather (a real trait) and **not** `Plate Tier`, which only restates the
+Background and would otherwise add a free +1 to every token and move the floor
+off 5. The two 1/1s carry neither attribute: they have no traits to count.
+
+### Cutting the legendary count DID invalidate the gains
+
+Unlike adding the two secret rares (2 tokens, left alone), this moved 140
+tokens back into the weighted plate pool and the fit visibly broke: **Beady
+went to −1.78**, three times the ±0.6 the calibration can resolve. Re-solved at
+seed 4444, and the result is tighter than the state that shipped before any of
+this: eyes within **±0.09**, mouths ±0.10, plates ±0.11, against a previous
+Beady −0.93 and Side Eye +1.12.
+
+Fitting to seed 4444 alone is correct HERE, whatever the docstring's general
+warning: 4444 is the seed the collection actually mints at, so a single-seed
+fit makes the shipped distribution match target. Cross-seed spread is a
+robustness property, not a property of the drop.
+
+**None of this is possible after launch.** Changing `--leg-each` changes the
+allocation, so every token's traits move and all 4444 images must be
+re-rendered. Only the metadata-only half (`Plate Tier`, `Trait Count`) could
+be applied to an already-minted collection.
+
 ## Backgrounds are a two-stage problem
 
 The plates are graded as a family by `background_pop_studies/grade.py`
