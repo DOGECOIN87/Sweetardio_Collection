@@ -919,7 +919,7 @@ CHAR_Y_ADJUST = {
     "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
     "brownie_bite": 22,
-    "zebra_cake": -37,         # with-footwear case raised; the (perfect) bare
+    "zebra_cake": -20,         # with-footwear case raised; the (perfect) bare
                                # stance is held put by FOOTWEARLESS_DY
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
@@ -994,8 +994,14 @@ def centered_footwearless_dy(char_name):
 FOOTWEARLESS_DY = {
     "sugar_cube": -23,   # bare bottom -> 1084 (was -45, floating at 1062)
     "smores": -29,       # bare bottom -> 1084 (was -75, floating at 1038)
-    "zebra_cake": 15,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
-                         # raises only the with-footwear case
+    "zebra_cake": -2,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
+                         # raises only the with-footwear case.
+                         # CHAR_Y_ADJUST -37 overshot: it put the shod bottom
+                         # at 940 against a cast band of 953-961, so the body
+                         # rode ~16px further out of the slipper than every
+                         # other wearer and read as too tall. -20 measures
+                         # back at 957, mid-band; this -2 holds the bare
+                         # bottom at 1105, exactly where it was.
     "brownie_bite": -23, # bare bottom -> 1084 (was -65, floating at 1042)
 }
 
