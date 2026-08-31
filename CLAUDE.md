@@ -907,8 +907,8 @@ into two the moment a third target existed — every Scarce and Uncommon plate
 came back "Scarce" together. It reads the designed target, never a realised
 count, so the band is a property of the collection and not of the seed.
 
-**`Trait Count` exposes scarcity that existed but was invisible.** 136 tokens
-(3.06 %) carry no arm, no footwear and no sticker, and 7 (0.16 %) carry the
+**`Trait Count` exposes scarcity that existed but was invisible.** 135 tokens
+(3.04 %) carry no arm, no footwear and no sticker, and 7 (0.16 %) carry the
 most — **both tails rarer than a Legendary plate**, and neither discoverable,
 because an ABSENCE is not an attribute and no marketplace can filter on one.
 
@@ -1179,6 +1179,7 @@ python3 asset_assessment/verify_trait_names.py    # do the names still resolve
 python3 asset_assessment/clean_trait_art.py --report   # cut-out residue on trait art
 python3 dynamic/starfield.py --verify             # the rainbow: seam, direction, cut
 python3 dynamic/starfield.py --write              # rebuild the reference plate
+python3 asset_assessment/verify_mint.py           # does the OUTPUT pair up
 ```
 
 `verify_trait_names.py` is the gate on the *names*: it fails on a `TRAIT_NAMES`
@@ -1203,6 +1204,20 @@ off `FACE_HOLE_WIDTH`. Run both — they catch opposite failures.
 `verify_generator_rules.py` covers the footwear exclusions and the
 character-locked arms. Its lock audit includes a **synthetic** lock, so it
 still tests the rule while `ARMZ_CHAR_LOCK` is empty.
+
+`verify_mint.py` is the only gate that looks at the **output** rather than
+the art, and it exists for one failure the others cannot see: a MISPAIRED
+collection. `build_mint.py` keys every path by token id, so a re-run
+overwrites what it produces and leaves everything else — a smaller `--n`
+strands the tail of the last mint, and a changed allocation leaves the
+previous run's animations pointing at stills replaced underneath them. Every
+file still validates; the folder holds two collections. `--fresh` is the fix
+(the mint now refuses to start against a dirty `output/`) and this is the
+proof it worked: ids 1..N with no orphan either way, every `image` naming the
+file that is there, `animation_url` on exactly the animated tiers with its
+Metaplex `properties`, attributes agreeing with the manifest, and every
+designed count minted exactly. It does **not** check that a token's picture
+shows the traits it claims — that needs a re-render. See `MINT_PROCESS.md`.
 
 `dynamic/starfield.py --verify` is the gate on the animated plate, and it
 checks the three things about the rainbow trail that no still can show: the

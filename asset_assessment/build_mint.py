@@ -45,6 +45,7 @@ Usage (from repo root):
 import argparse
 import json
 import os
+import shutil
 import sys
 from collections import Counter
 
@@ -56,6 +57,24 @@ from build_char_compat import char_table              # noqa: E402
 from dynamic import sky as skymod                     # noqa: E402
 from dynamic import starfield as sfmod                # noqa: E402
 from dynamic.animate import write_mp4                 # noqa: E402
+
+# ---- every path the mint writes, named once ----
+# The preflight below deletes exactly these, and the writers at the bottom
+# fill exactly these. Spelled twice they drift, and a --fresh that misses a
+# folder is worse than no --fresh at all: it leaves the one stale directory
+# nobody thought to look in.
+OUT_DIR = "output"
+MINT_DIR = os.path.join(OUT_DIR, "mint")
+IMG_DIR = os.path.join(MINT_DIR, "images")
+META_DIR = os.path.join(MINT_DIR, "metadata")
+MASK_DIR = os.path.join(MINT_DIR, "masks")
+FLOAT_DIR = os.path.join(MINT_DIR, "float_masks")
+ANIM_DIR = os.path.join(MINT_DIR, "anim")
+# bake_weather.py moves the clear render here on first bake and reads it back
+# on every later one, so a stale copy silently re-bakes yesterday's art.
+CLEAR_DIR = os.path.join(MINT_DIR, "images_clear")
+MANIFEST_PATH = os.path.join(OUT_DIR, "mint_manifest.json")
+REPORT_PATH = os.path.join(MINT_DIR, "rarity_report.txt")
 
 TRAIT_KEYS = ("character", "bg", "skin", "eye", "mouth", "arm", "wat", "sticker")
 
@@ -194,9 +213,10 @@ if _unknown:
 
 # ---- the starfield: the collection's ULTRA-RARE tier ----
 #
-# 10 of 4444 -- 0.225 %, or 1 in 444, which is the rarest thing in the set:
-# the next rarest trait is Tornado at 14 (0.32 %), and a legendary plate is
-# 50 (1.13 %). It is not a hard cap by luck: generator.is_allocator_only_bg
+# 22 of 4444 -- 0.50 %, the rarest COMPOSITED trait in the set: the next
+# rarest is Tornado at 14 (0.32 %) but that is a weather state rather than a
+# plate, and a legendary plate is 30 (0.68 %). Only the two 1/1 secret rares
+# beat it. It is not a hard cap by luck: generator.is_allocator_only_bg
 # keeps the plate out of the weighted draw entirely, exactly as the
 # Legendary_* plates are kept out, so the only way to mint one is here.
 STARFIELD_COUNT = 22
@@ -217,8 +237,8 @@ if STARFIELD_COUNT and g.STARFIELD_BG not in g.get_files(g.BACKGROUNDZ):
 
 
 # Trait Count is the axis collectors already rank on, and both of its tails
-# here are rarer than a Legendary plate: 5 traits is 139 tokens (3.13 %) and
-# 9 traits is 10 (0.23 %), the same order as the Starfield. Neither was
+# here are rarer than a Legendary plate: at seed 4444, 5 traits is 135 tokens
+# (3.04 %) and 9 traits is 7 (0.16 %), rarer than the Starfield's 22. Neither was
 # discoverable, because "carries no arm, no footwear and no sticker" is an
 # ABSENCE -- there is no attribute for it, so no marketplace can filter or
 # sort on it and no rarity tool can score it.
@@ -308,6 +328,11 @@ def main():
                     help="starfield loop resolution (the STILL is full canvas)")
     ap.add_argument("--anim-ms", type=int, default=70,
                     help="starfield frame duration; 70 is the source GIF's own")
+    ap.add_argument("--fresh", action="store_true",
+                    help="DELETE any previous mint in output/ first. Required "
+                         "to re-mint: a run overwrites only what it produces, "
+                         "so without this the folders end up holding two "
+                         "different collections mixed together")
     ap.add_argument("--no-weather", action="store_true",
                     help="mint without the animated weather tier at all")
     ap.add_argument("--symbol", default=None)
@@ -316,7 +341,7 @@ def main():
     args = ap.parse_args()
     random.seed(args.seed)
 
-    img_dir = "output/mint/images"
+    img_dir = IMG_DIR
     # The protect mask for the dynamic sky pass (dynamic/sky.py): the union
     # of every layer except the background plate, i.e. exactly the pixels a
     # time-of-day or weather grade must never touch.
@@ -330,10 +355,51 @@ def main():
     #
     # It is opt-in because it is not free: the masks run 28-60KB each, so a
     # 4,444 mint adds ~150MB beside the images.
-    mask_dir = "output/mint/masks"
+    mask_dir = MASK_DIR
     # The float mask (the corner sticker alone) rides with the protect mask:
     # bake_weather.py needs both to float a sticker on a flood.
-    float_dir = "output/mint/float_masks"
+    float_dir = FLOAT_DIR
+    anim_dir = ANIM_DIR
+    clear_dir = CLEAR_DIR
+
+    # ---- a mint NEVER writes into somebody else's output ----
+    #
+    # Every path here is keyed by token id, so a re-run OVERWRITES what it
+    # produces and leaves everything it does not. That is silent and it is
+    # wrong in both directions: a smaller --n leaves tokens 3001..4444 from
+    # the last run sitting beside the new ones, and any change to the tier
+    # allocation (a retired plate, a moved count, this collection's rainbow)
+    # leaves the previous run's ANIMATIONS pointing at stills that have been
+    # replaced underneath them. The result validates fine file-by-file and
+    # is a different collection in every folder.
+    #
+    # So a dirty tree is fatal unless --fresh says to clear it. It is not
+    # the default because deleting a finished 4,444-token render on a typo
+    # costs hours, and the whole tree is ~6GB.
+    dirty = {d: len(os.listdir(d))
+             for d in (img_dir, META_DIR, mask_dir, float_dir,
+                       anim_dir, clear_dir)
+             if os.path.isdir(d) and os.listdir(d)}
+    strays = [p for p in (MANIFEST_PATH, REPORT_PATH) if os.path.exists(p)]
+    if dirty or strays:
+        if not args.fresh:
+            listing = "\n".join(f"    {d}  {n} files"
+                                for d, n in sorted(dirty.items()))
+            listing += "".join(f"\n    {p}" for p in strays)
+            sys.exit(
+                f"output/ already holds a previous mint:\n{listing}\n"
+                f"  A re-run overwrites what it produces and leaves the rest, "
+                f"so the folders would end up holding two different mints.\n"
+                f"  Pass --fresh to clear them first, or move output/ aside.")
+        for d in dirty:
+            shutil.rmtree(d)
+        for p in strays:
+            os.remove(p)
+        print(f"--fresh: cleared {sum(dirty.values())} files from "
+              f"{len(dirty)} folders" + (f" and {len(strays)} report files"
+                                         if strays else ""))
+
+    os.makedirs(META_DIR, exist_ok=True)
     if args.render:
         os.makedirs(img_dir, exist_ok=True)
         if args.masks:
@@ -342,8 +408,6 @@ def main():
     elif args.masks:
         sys.exit("--masks needs --render: the mask is a by-product of the "
                  "composite, so there is nothing to write without it")
-
-    anim_dir = os.path.join("output", "mint", "anim")
 
     def render(layers, tid, starfield=False):
         # The starfield's rainbow trail leaves the character's own middle, and
@@ -661,7 +725,7 @@ def main():
                      f"stk={fstk} leg={leg}")
 
     # ---- write OpenSea token metadata + manifest ----
-    os.makedirs("output/mint/metadata", exist_ok=True)
+    os.makedirs(META_DIR, exist_ok=True)
     for tid, t in manifest.items():
         name = None
         # external_url points at the GUEST ARTIST's own site, and only on the
@@ -684,7 +748,7 @@ def main():
             t["attributes"], token_id=tid, image=f"{tid}.png", name=name,
             animation_url=anim, symbol=args.symbol, external_url=ext,
             seller_fee_basis_points=args.royalty_bps)
-        with open(f"output/mint/metadata/{tid}.json", "w") as f:
+        with open(os.path.join(META_DIR, f"{tid}.json"), "w") as f:
             json.dump(token, f, indent=2, ensure_ascii=False)
     # compact manifest (drop the embedded attributes to keep it small)
     slim = {}
@@ -697,7 +761,7 @@ def main():
         if t.get("secret_rare"):
             row["secret_rare"] = t["secret_rare"]
         slim[tid] = row
-    with open("output/mint_manifest.json", "w") as f:
+    with open(MANIFEST_PATH, "w") as f:
         json.dump(slim, f)
 
     # ---- report ----
@@ -815,7 +879,7 @@ def main():
     p(f"\nquality: camouflage={camo_v}  eye-clash={eye_v}  "
       f"unique={len(seen)}/{N}  distinct_chars={len(dist('character'))}")
 
-    with open("output/mint/rarity_report.txt", "w") as f:
+    with open(REPORT_PATH, "w") as f:
         f.write("\n".join(out) + "\n")
     p("\nwrote output/mint_manifest.json")
     p("wrote output/mint/metadata/<id>.json  (OpenSea token metadata)")
