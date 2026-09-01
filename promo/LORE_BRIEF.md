@@ -47,7 +47,8 @@ Recorded as given. Everything not listed here is still open.
 | **E7b / E9** | **Do not name them.** The public can work it out. Leave the mismatched names as they are |
 | **E8** | Starfield is a **Nyan Cat homage** — confirmed |
 | **Arms** | Military Brat holds nothing because the figure is **pretending**; the creator was a military brat himself. The empty gloves are the joke |
-| **F** | Sweet Tooth = **Twisted Metal** |
+| **F** | Sweet Tooth = **Twisted Metal** · Benson = **Regular Show** (confirmed) · The Bunny = **an old VeggieTales episode** |
+| **E3** | Opengotchi is **an open-source project the creator likes** |
 
 ### Still open
 
@@ -55,6 +56,7 @@ Recorded as given. Everything not listed here is still open.
 - **C1** — do the five tier names work
 - **E1–E6** — the background clusters, and **E3** especially: which of Cookboy / Swolex / Emblem / The Board / In Cook We Trust / RIP Gorbagana are also tributes
 - **F1–F3** — what a sticker *is* in the fiction; the shared names; the set-completion angle
+- **Pwease Lollipop** — the last sticker nobody has placed
 - **G1–G3** — the two guest artists
 - **H1–H3** — brands and real people. **Still blocking the hero shot**: the single 1-of-4,444 grail (#1331) has *Ayatollah* as its background
 
@@ -360,16 +362,16 @@ collection. Correct the middle column.
 | Candy Land | The board game | |
 | Dude Sweet | Dude, Where's My Car? | |
 | American Pie | The film | |
-| Sweet Tooth | Twisted Metal? Or the Netflix show? | |
+| Sweet Tooth | **Twisted Metal** | ✓ owner |
 | Robot Chicken Gummy Bear | The Robot Chicken sketch | |
 | Candy Shop | 50 Cent | |
 | Caroline Ellison | FTX / Alameda — see section H | |
 | The Meme is the Tech | The crypto phrase | |
 | Straight Outta Gulag | Straight Outta Compton + the gulag meme | |
-| Opengotchi | Tamagotchi — and the legendary background shares the name | |
+| Opengotchi | **An open-source project the creator likes** — shares its name with the legendary plate | ✓ owner |
 | Cookboy | Shares a name with two backgrounds — who is Cookboy? | |
-| Benson | Regular Show? | |
-| The Bunny | **No idea** | |
+| Benson | **Regular Show** | ✓ owner |
+| The Bunny | **An old VeggieTales episode** | ✓ owner |
 | Pwease Lollipop | **No idea** | |
 
 ### F1. What *is* a sticker, in the fiction? Something the character collected, earned, stuck on themselves?
