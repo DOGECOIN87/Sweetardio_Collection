@@ -291,4 +291,4 @@ after flavours they were not and did need correcting (see `CLAUDE.md`).
 | Coder Chick | `backgroundz` | Pastel unicorn wallpaper. Kept on the owner's call. |
 | Druski | `backgroundz` | A blonde woman with a flag and confetti; the comedian himself is not in frame. Kept — the still comes from his content. |
 | Legendary Tenders | `backgroundz` | The word NOTHING repeated over a star field. Kept on the owner's call; the Legendary_ prefix is load-bearing either way. |
-| Military Brat | `armz` | Two cartoon gloves, one pointing, one open — no weapon. It is the de-facto unarmed arm (lifts 3 of 27 figures against the AK15's 18). Kept on the owner's call. |
+| Military Brat | `armz` | Two cartoon gloves, one pointing, one open — no weapon, because the figure is PRETENDING to hold one. The owner was a military brat himself, which is the joke; it is not a missing weapon and must not be 'fixed' by adding one. Also the de-facto unarmed arm (lifts 3 of 27 figures against the AK15's 18). |

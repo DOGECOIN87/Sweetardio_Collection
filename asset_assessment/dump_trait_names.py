@@ -35,9 +35,11 @@ INTENTIONAL = {
         "The word NOTHING repeated over a star field. Kept on the owner's "
         "call; the Legendary_ prefix is load-bearing either way.",
     ("armz", "layer-layer-layer-layer-Military_Brat.png"):
-        "Two cartoon gloves, one pointing, one open — no weapon. It is the "
-        "de-facto unarmed arm (lifts 3 of 27 figures against the AK15's 18). "
-        "Kept on the owner's call.",
+        "Two cartoon gloves, one pointing, one open — no weapon, because the "
+        "figure is PRETENDING to hold one. The owner was a military brat "
+        "himself, which is the joke; it is not a missing weapon and must not "
+        "be 'fixed' by adding one. Also the de-facto unarmed arm (lifts 3 of "
+        "27 figures against the AK15's 18).",
 }
 
 

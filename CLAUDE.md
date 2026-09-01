@@ -152,10 +152,24 @@ that he is not in), `Legendary Tenders` (the word NOTHING over a star field)
 and the `Military Brat` arm (two cartoon gloves, no weapon — it is the de-facto
 unarmed arm, lifting 3 of 27 figures against the AK15's 18).
 
+**The Military Brat is not an unfinished asset.** The figure is *pretending*
+to hold a weapon, and the owner was a military brat himself — the empty
+gloves are the joke, and adding a weapon would delete it (owner, 2026-09).
+It also means an `Arms` trait does not imply a weapon: 707 tokens carry one
+and **85 of those (12 %) hold nothing at all**, so "armed" as a collector
+filter over-counts by that much.
+
 They live in `INTENTIONAL` in `asset_assessment/dump_trait_names.py` and are
 marked **†** in `catalog/NAMES.md`. **Read that list before "fixing" a name.**
 The ice creams needed correcting because the art contradicted the flavour;
 these are the owner's naming, which is a different thing.
+
+**The four legendary plates are tributes**, to people the owner met in the
+Gorbagana period. They are deliberately NOT credited on-chain or on screen —
+asked directly, the owner's call was to leave them for the public to work out
+(2026-09). So the absence of a name is the design, not a gap to fill: do not
+add an `Artist`-style attribute or a caption for them the way the two secret
+rares carry one.
 
 ## Character art is resolved by exact base name
 
