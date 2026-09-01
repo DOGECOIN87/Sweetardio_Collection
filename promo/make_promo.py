@@ -392,13 +392,24 @@ def blend(a, b, k):
 
 
 def timeline_frames(segs, xf=0.34):
+    """Frames for the whole timeline.
+
+    Cut points come from each segment's absolute start time, rounded once --
+    never from accumulating a rounded per-segment length. On a musical grid
+    the per-segment duration is rarely a whole number of frames (140 BPM is
+    12.857 frames a beat), and accumulating that error walks the edit off the
+    beat by half a second over a couple of minutes.
+    """
     """Every segment dissolves into the next. A cut would be fine between two
     cards and wrong around the tagline words, which have to fade in and out
     of the images they sit between -- one transition rule is simpler than
     two and reads better than either alone."""
     nxf = int(xf * FPS)
+    t0 = 0.0
     for i, seg in enumerate(segs):
-        n = max(1, int(seg.dur * FPS))
+        start = round(t0 * FPS)
+        t0 += seg.dur
+        n = max(1, round(t0 * FPS) - start)
         for k in range(n):
             t = k / FPS
             cur = seg.at(t)

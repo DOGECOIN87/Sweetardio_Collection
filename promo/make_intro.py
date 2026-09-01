@@ -281,7 +281,7 @@ def build(args):
                   for f in frames[:args.max_frames]]
         seg.append(Seg(plates, args.hold, loop_fps=args.gif_fps))
 
-    seg.append(Seg(closer_plate(ground, thumbs), 3.4))
+    seg.append(Seg(closer_plate(ground, thumbs), args.hold))
 
     # the payoff: the logo's own dolly zoom, letterboxed onto the black ground
     logo = os.path.join(ART, "6_sweetardio.mp4")
@@ -309,8 +309,13 @@ def build(args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default="promo/sweetardio_intro.mp4")
-    ap.add_argument("--hold", type=float, default=4.0,
-                    help="seconds per ancestor")
+    ap.add_argument("--bpm", type=float, default=140.0,
+                    help="cut on this beat grid, so the edit locks to the "
+                         "track laid over it")
+    ap.add_argument("--beats", type=float, default=8,
+                    help="beats each ancestor holds for (8 = two bars)")
+    ap.add_argument("--hold", type=float, default=None,
+                    help="seconds per ancestor; overrides --bpm/--beats")
     ap.add_argument("--box", type=int, default=560,
                     help="artwork size on the card")
     ap.add_argument("--gif-fps", type=float, default=12,
@@ -318,6 +323,17 @@ def main():
     ap.add_argument("--max-frames", type=int, default=60)
     ap.add_argument("--logo-frames", type=int, default=200)
     args = ap.parse_args()
+
+    # THE EDIT IS CUT TO THE MUSIC, not to round seconds. At 140 BPM a beat is
+    # 0.4286s, which is not a whole number of frames -- so each cut is placed
+    # from its ABSOLUTE time on the grid and rounded once, rather than by
+    # accumulating a per-segment duration. Accumulating drifts: 30 cuts at a
+    # rounded 12.857 frames would land nearly half a second off the beat by
+    # the end, which is exactly where a viewer hears it.
+    if args.hold is None:
+        args.hold = args.beats * 60.0 / args.bpm
+        print(f"{args.bpm:g} BPM: beat {60.0/args.bpm:.4f}s, "
+              f"{args.beats:g} beats per card = {args.hold:.4f}s")
 
     segs = build(args)
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
