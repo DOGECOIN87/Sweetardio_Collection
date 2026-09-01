@@ -91,7 +91,11 @@ def stat_plate(ground, big, kicker=None, sub=None, colour=None):
     """One number, alone. Minimal text means the number IS the sentence."""
     im = ground.copy()
     d = ImageDraw.Draw(im)
-    y = 380
+    # Optically centred, not top-aligned: the block is kicker + number + sub,
+    # so the number sits below the frame's middle and the whole group reads
+    # centred. Set flush at the old 380 it left a third of the frame empty
+    # underneath, which on a phone reads as a mistake.
+    y = 452
     if kicker:
         f = font(26)
         w = tracked_width(d, kicker, f, 5.5)
@@ -130,7 +134,7 @@ def roster_plate(ground, rows, foot, upto=None):
     tracked(d, ((W - w) / 2, 132), "WHAT IS IN ONE", fk, PINK_HI, track=5.5)
 
     x0, x1 = 620, 1300
-    y = 222
+    y = 246
     shown = len(rows) if upto is None else upto
     for i, (label, count) in enumerate(rows):
         if i >= shown:
@@ -145,6 +149,55 @@ def roster_plate(ground, rows, foot, upto=None):
         d.text(((W - d.textlength(foot, font=ff)) / 2, y + 26), foot,
                font=ff, fill=DIM)
     return im
+
+
+def sticker_plate(ground, arts, upto=None, headline=None):
+    """The 23 stickers as a set.
+
+    They are the flattest trait in the collection -- 184 of each, 4.14 % --
+    so rarity is the wrong story for them. Completion is the right one, and
+    a grid filling in one sticker at a time says that without a sentence.
+    """
+    im = ground.copy()
+    d = ImageDraw.Draw(im)
+    fk = font(26)
+    w = tracked_width(d, "STICKERS", fk, 5.5)
+    tracked(d, ((W - w) / 2, 152), "STICKERS", fk, PINK_HI, track=5.5)
+    cols, cell, gap = 8, 150, 26
+    rows = (len(arts) + cols - 1) // cols
+    x0 = (W - (cols * cell + (cols - 1) * gap)) // 2
+    y0 = 244
+    shown = len(arts) if upto is None else upto
+    for i, a in enumerate(arts):
+        x = x0 + (i % cols) * (cell + gap)
+        y = y0 + (i // cols) * (cell + gap)
+        if i < shown:
+            im.paste(a.resize((cell, cell), Image.Resampling.LANCZOS), (x, y))
+        else:
+            d.rounded_rectangle([x, y, x + cell, y + cell], radius=12,
+                                outline=(38, 40, 48), width=2)
+    if headline:
+        f = font(34)
+        d.text(((W - d.textlength(headline, font=f)) / 2,
+                y0 + rows * (cell + gap) + 26), headline, font=f, fill=DIM)
+    return im
+
+
+def sticker_arts(limit=23):
+    """The sticker art itself, cropped to its own ink and set on black."""
+    out = []
+    for f in sorted(g.get_files(g.STICKERZ))[:limit]:
+        p = os.path.join(g.TRAITS_DIR, g.STICKERZ, f)
+        im = Image.open(p).convert("RGBA")
+        bb = im.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+        if bb:
+            im = im.crop(bb)
+        side = max(im.size)
+        c = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+        c.paste(im, ((side - im.width) // 2, (side - im.height) // 2))
+        out.append(Image.alpha_composite(
+            Image.new("RGBA", c.size, (10, 8, 14, 255)), c).convert("RGB"))
+    return out
 
 
 def launch_plate(ground):
@@ -172,6 +225,23 @@ def launch_plate(ground):
 # Missing or partial is fine -- any group not named falls back to the
 # automatic pick, so a half-filled file still builds.
 HEROES_PATH = os.path.join(ROOT, "promo", "heroes.json")
+READS_PATH = os.path.join(ROOT, "promo", "read_scores.json")
+
+
+def read_scores():
+    """How well each token READS, measured — see tools/score_reads.py.
+
+    Ranking by manifest order put cluttered tokens on screen: a saber, a pair
+    of slippers and a busy plate all competing, which is what the owner
+    rejected. The score is the opposite property -- silhouette contrast
+    against the plate ring, a quiet background, and a sensible fill -- so
+    sorting by it picks the bold, legible ones the reference cut showed.
+    """
+    try:
+        with open(READS_PATH) as f:
+            return {int(k): v["read"] for k, v in json.load(f).items()}
+    except Exception:
+        return {}
 
 
 def heroes():
@@ -234,16 +304,26 @@ def build(args):
 
     picks = heroes()
 
+    reads = read_scores()
+
     def pick(group, auto, want):
-        """The owner's list for a group, else the automatic one. Only ids that
-        were actually rendered survive -- a pick the mint has not drawn yet
-        would otherwise crash the build at encode time."""
+        """The owner's list for a group, else the best-READING ones.
+
+        Only ids that were actually rendered survive -- a pick the mint has
+        not drawn yet would otherwise crash the build at encode time.
+        """
         ids = [int(t) for t in picks.get(group, []) if int(t) in have]
         missing = [t for t in picks.get(group, []) if int(t) not in have]
         if missing:
             print(f"  {group}: not rendered, skipped — "
                   + ", ".join(f"#{t}" for t in missing))
-        return (ids or auto)[:want]
+        if ids:
+            return ids[:want]
+        auto = sorted(auto, key=lambda t: -reads.get(t, 0))
+        if reads:
+            print(f"  {group}: best-reading — "
+                  + ", ".join(f"#{t} {reads.get(t, 0):.2f}" for t in auto[:want]))
+        return auto[:want]
 
     seg = []
     def S(plates, beats, loop_fps=13):
@@ -284,6 +364,14 @@ def build(args):
     S(stat_plate(ground, f"{n_arm}", kicker="ARMED",
                  sub=f"of {n:,}  ·  1 in {round(n / n_arm)}"), 5)
 
+    # ---- 4b. the stickers, which are a SET rather than a rarity ----
+    arts = sticker_arts()
+    S(sticker_plate(ground, arts, upto=0), 2)
+    for i in range(4, len(arts) + 1, 4):
+        S(sticker_plate(ground, arts, upto=i), 1)
+    S(sticker_plate(ground, arts,
+                    headline="184 of each. A set inside the set."), 8)
+
     # ---- 5. the grails (B6) ----
     S(line_plate(ground, "Both?", size=92), 5)
     for t in pick("both",
@@ -320,12 +408,20 @@ def build(args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default="promo/sweetardio_film.mp4")
-    ap.add_argument("--bpm", type=float, default=140.0)
+    ap.add_argument("--bpm", type=float, default=132.0,
+                    help="MEASURED off the supplied track, not assumed. "
+                         "UK_Drill_Pascal_Bounce is 132.00 exactly — comb "
+                         "energy 1.61 there against 0.13 at 140")
+    ap.add_argument("--audio", default=None, help="track to mux in")
+    ap.add_argument("--audio-start", type=float, default=0.3300,
+                    help="the track's first beat; the cut starts there so "
+                         "frame 0 is a downbeat")
     ap.add_argument("--box", type=int, default=760, help="token art size")
     args = ap.parse_args()
     segs = build(args)
     print("encoding...")
-    n = encode(timeline_frames(segs, xf=0.24), args.out)
+    n = encode(timeline_frames(segs, xf=0.24), args.out,
+               audio=args.audio, audio_offset=args.audio_start)
     print(f"wrote {args.out}  {n} frames, {n / FPS:.1f}s, "
           f"{os.path.getsize(args.out) / 1e6:.1f} MB")
 

@@ -421,7 +421,7 @@ def timeline_frames(segs, xf=0.34):
                 yield cur
 
 
-def encode(frames, path, fps=FPS):
+def encode(frames, path, fps=FPS, audio=None, audio_offset=0.0):
     """Same ffmpeg contract as dynamic/animate.write_mp4 -- Main profile,
     yuv420p, faststart -- so asset_assessment/verify_media.py passes this
     file too. Streamed rather than collected: 1080p x ~4,000 frames is 25 GB
@@ -430,10 +430,19 @@ def encode(frames, path, fps=FPS):
     exe = imageio_ffmpeg.get_ffmpeg_exe()
     cmd = [exe, "-y", "-loglevel", "error",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-           "-r", f"{fps:.4f}", "-i", "-", "-an",
-           "-c:v", "libx264", "-preset", "medium", "-crf", "19",
-           "-profile:v", "main", "-pix_fmt", "yuv420p",
-           "-movflags", "+faststart", path]
+           "-r", f"{fps:.4f}", "-i", "-"]
+    if audio:
+        # -ss BEFORE -i seeks the source, so the track can be started at its
+        # own first beat rather than at file zero. -shortest ends the mux at
+        # the video, since the track is longer than the cut.
+        if audio_offset:
+            cmd += ["-ss", f"{audio_offset:.4f}"]
+        cmd += ["-i", audio, "-c:a", "aac", "-b:a", "192k", "-shortest"]
+    else:
+        cmd += ["-an"]
+    cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "19",
+            "-profile:v", "main", "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart", path]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     n = 0
     for f in frames:
