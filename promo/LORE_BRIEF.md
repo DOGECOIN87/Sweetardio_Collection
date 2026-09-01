@@ -17,6 +17,49 @@ repo. Say "yes" or correct it.
 
 ---
 
+## ANSWERED SO FAR  (owner, 2026-09)
+
+Recorded as given. Everything not listed here is still open.
+
+| ID | Answer |
+|---|---|
+| **A1** | Brand new to Sweetardio, but already knows NFTs generally |
+| **A2** | X.com, and the website hero section |
+| **A3** | The lineage narrative playing out — the plan is to be the top NFT project on Solana |
+| **A4** | Owner supplies music, typically **140 BPM**. Text still allowed but **must be minimal** |
+| **A5** | Intro already made — use it at the beginning |
+| **B1** | Check **animated** first, then whether the character is **armed**. Animated weather is also rare |
+| **B2** | Rank is **misleading** — relative info only, and minimal |
+| **B3** | No fixed chase list; show the best-looking ones |
+| **B4** | *(owner asked for help — proposed: combinations are undervalued, since no rarity tool scores them)* |
+| **B5** | Background matters most to him, but really it's the **character + background combination** |
+| **B6** | Yes — curate the best grail examples |
+| **B7** | **No prices.** Not yet minted. **Launching 14 Sept 2026 on launchmynft.io** |
+| **C2** | "Swee-tardio" = a play on **Retardio** + **sweets** |
+| **C3** | Naming is fine — do not change the metadata |
+| **D1** | Chibi-like children of people wearing costumes — *but not worded that way*. Owner asked for help |
+| **D2** | The collection is very much **a reflection of the creator**. Drained The Swamp is Trump-era politics |
+| **D3** | **No origin story needed** |
+| **D4** | Confirmed — the Alien face means something |
+| **D5** | They're armed because **the creator is from the United States** |
+| **D6** | Keep it themed |
+| **E7** | The four legendary plates honour **OGs the creator met in the Gorbagana period** |
+| **E7b / E9** | **Do not name them.** The public can work it out. Leave the mismatched names as they are |
+| **E8** | Starfield is a **Nyan Cat homage** — confirmed |
+| **Arms** | Military Brat holds nothing because the figure is **pretending**; the creator was a military brat himself. The empty gloves are the joke |
+| **F** | Sweet Tooth = **Twisted Metal** |
+
+### Still open
+
+- **D1** — pick a wording (three drafts offered)
+- **C1** — do the five tier names work
+- **E1–E6** — the background clusters, and **E3** especially: which of Cookboy / Swolex / Emblem / The Board / In Cook We Trust / RIP Gorbagana are also tributes
+- **F1–F3** — what a sticker *is* in the fiction; the shared names; the set-completion angle
+- **G1–G3** — the two guest artists
+- **H1–H3** — brands and real people. **Still blocking the hero shot**: the single 1-of-4,444 grail (#1331) has *Ayatollah* as its background
+
+---
+
 ## A — The film itself
 
 ### A1. Who is watching — someone who has never heard of Sweetardio, or someone already holding one and deciding whether to buy more?
