@@ -1,0 +1,496 @@
+<title>Sweetardio Lore Brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  :root{
+    --paper:#F4F6F8; --card:#FFFFFF; --ink:#0C1524; --ink-2:#33445C;
+    --ink-3:#65758C; --rule:#DCE2EA; --rule-2:#EDF1F5;
+    --field:#002147; --cyan:#0B6E85; --gold:#8A6206; --hot:#A81B54;
+    --ask-bg:#FFFFFF; --ask-edge:#A81B54; --mine-bg:#EDF1F5;
+    --shadow:0 1px 2px rgba(12,21,36,.06),0 8px 24px rgba(12,21,36,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#080E18; --card:#0F1826; --ink:#E8EDF4; --ink-2:#A9B7CA;
+      --ink-3:#71829A; --rule:#22304400; --rule:#223044; --rule-2:#18222F;
+      --field:#7FB0E0; --cyan:#4FD0E4; --gold:#F0B72B; --hot:#F27BAA;
+      --ask-bg:#131E2E; --ask-edge:#F27BAA; --mine-bg:#131C28;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#080E18; --card:#0F1826; --ink:#E8EDF4; --ink-2:#A9B7CA;
+    --ink-3:#71829A; --rule:#223044; --rule-2:#18222F;
+    --field:#7FB0E0; --cyan:#4FD0E4; --gold:#F0B72B; --hot:#F27BAA;
+    --ask-bg:#131E2E; --ask-edge:#F27BAA; --mine-bg:#131C28;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font:400 16.5px/1.62 "IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px;margin:0 auto;padding:56px 28px 120px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace}
+
+  /* masthead */
+  .mast{border-top:5px solid var(--ink);padding-top:20px;margin-bottom:44px}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--hot)}
+  h1{font-family:Archivo,system-ui,sans-serif;font-weight:800;
+    font-size:clamp(34px,5.4vw,52px);line-height:1.04;letter-spacing:-.022em;
+    margin:12px 0 0;text-wrap:balance}
+  .dek{font-size:18px;color:var(--ink-2);max-width:62ch;margin:16px 0 0}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:22px;
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-3)}
+  .meta b{color:var(--ink-2);font-weight:500}
+
+  .note{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--cyan);
+    border-radius:3px;padding:16px 20px;margin:30px 0;box-shadow:var(--shadow);
+    font-size:15.5px;color:var(--ink-2)}
+  .note b{color:var(--ink)}
+
+  /* sections */
+  section{margin-top:56px;scroll-margin-top:20px}
+  .shead{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);
+    padding-bottom:10px;margin-bottom:8px}
+  .sid{font-family:Archivo,sans-serif;font-weight:800;font-size:26px;color:var(--hot);
+    line-height:1}
+  h2{font-family:Archivo,sans-serif;font-weight:700;font-size:25px;letter-spacing:-.012em;
+    margin:0;line-height:1.12}
+  .sdek{color:var(--ink-3);font-size:14.5px;margin:10px 0 24px;max-width:66ch}
+
+  /* question block */
+  .q{background:var(--card);border:1px solid var(--rule);border-radius:4px;
+    padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .qid{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--hot);letter-spacing:.06em}
+  .qt{font-weight:600;font-size:16.5px;margin:5px 0 0;color:var(--ink)}
+  .mine{background:var(--mine-bg);border-radius:3px;padding:11px 14px;margin-top:12px;
+    font-size:14.5px;color:var(--ink-2)}
+  .mine .lab{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--cyan);display:block;
+    margin-bottom:5px}
+  .why{font-size:14px;color:var(--ink-3);margin-top:10px;font-style:italic}
+
+  /* tables */
+  .scroll{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);border-radius:4px;
+    background:var(--card);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+  th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+    letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+    padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--rule-2)}
+  td{padding:10px 14px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.n{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+    color:var(--ink-2);white-space:nowrap}
+  td.name{font-weight:600;white-space:nowrap}
+  .fill{color:var(--ink-3);font-style:italic}
+
+  /* cluster list */
+  .cl{display:grid;gap:12px;margin:18px 0}
+  .cluster{background:var(--card);border:1px solid var(--rule);border-radius:4px;
+    padding:15px 18px;box-shadow:var(--shadow)}
+  .cluster h4{margin:0 0 4px;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;
+    letter-spacing:.01em}
+  .cluster .names{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-3);
+    line-height:1.75}
+  .cluster .ask{font-size:14px;color:var(--ink-2);margin-top:9px}
+  .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+    font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;
+    border-radius:2px;border:1px solid var(--rule);color:var(--ink-3);margin-left:8px;
+    vertical-align:2px}
+
+  .flag{border-left:3px solid var(--gold)}
+  ul{padding-left:20px;margin:10px 0} li{margin:5px 0;color:var(--ink-2);font-size:15px}
+  a{color:var(--cyan)}
+  .end{margin-top:64px;padding-top:20px;border-top:2px solid var(--ink);
+    font-size:14.5px;color:var(--ink-3)}
+</style>
+
+<div class="wrap">
+
+<div class="mast">
+  <div class="kicker">Working brief · answer inline or in chat</div>
+  <h1>What a Sweetardio Actually Is</h1>
+  <p class="dek">Everything I need from you to build the collector-facing explainer — the film that
+  says what the collection is, what to look for when trading, and what the backgrounds and
+  stickers actually mean.</p>
+  <div class="meta">
+    <span><b>47</b> questions</span>
+    <span><b>66</b> backgrounds</span>
+    <span><b>23</b> stickers</span>
+    <span>Answer by ID — <b>B3</b>, <b>E2</b>, etc.</span>
+  </div>
+</div>
+
+<div class="note">
+  <b>Most questions come with my read already filled in.</b> Where you see
+  <span class="mono" style="color:var(--cyan)">MY READ</span>, I've guessed from the art and
+  the repo — just say “yes”, or correct me. The ones with no read are the ones only you can
+  answer. If you only have time for one section, make it <b>B</b> — that's the “what to look
+  for when trading” material, and it's the part I can't infer at all.
+</div>
+
+<section>
+  <div class="shead"><span class="sid">A</span><h2>The film itself</h2></div>
+  <p class="sdek">Five quick ones that set the shape before I write a word of it.</p>
+
+  <div class="q"><span class="qid">A1</span>
+    <p class="qt">Who is watching — someone who has never heard of Sweetardio, or someone already
+    holding one and deciding whether to buy more?</p>
+    <p class="why">This changes everything. A cold-open explainer and a trader's guide are
+    different films; trying to be both makes a worse version of each.</p>
+  </div>
+
+  <div class="q"><span class="qid">A2</span>
+    <p class="qt">Where does it get posted, and how long should it run?</p>
+    <div class="mine"><span class="lab">My read</span>The rarity video runs 3:23, which is long
+    for X and about right for a pinned post or the site. If this is for X, I'd aim 60–90 seconds
+    and cut a longer version for the site.</div>
+  </div>
+
+  <div class="q"><span class="qid">A3</span>
+    <p class="qt">What is the one sentence you want someone repeating after they watch it?</p>
+    <p class="why">Not the tagline — the thing they'd say to a friend. Everything in the film
+    should be pushing toward that one line.</p>
+  </div>
+
+  <div class="q"><span class="qid">A4</span>
+    <p class="qt">Voiceover, music, or silent-with-text like the rarity video?</p>
+    <p class="why">If there's a voice, the writing changes completely — spoken sentences are
+    shorter and the visuals stop carrying the explanation. I can't record audio, but I can build
+    to a script you narrate, or leave clean gaps for it.</p>
+  </div>
+
+  <div class="q"><span class="qid">A5</span>
+    <p class="qt">Does this replace the rarity video, or sit next to it as part one?</p>
+    <div class="mine"><span class="lab">My read</span>Part one. “What is this” then “here's how
+    rarity works” is the right order, and it would let me cut the rarity video's explainer cards
+    down since this film already did that job.</div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">B</span><h2>What to look for when trading</h2></div>
+  <p class="sdek">The core of what you asked for, and the part I genuinely cannot guess. I know
+  what's <em>rare</em> — I counted it. I don't know what's <em>desirable</em>, and those are not
+  the same thing.</p>
+
+  <div class="q"><span class="qid">B1</span>
+    <p class="qt">If a buyer could check only one thing before bidding, what should it be?</p>
+    <div class="mine"><span class="lab">My read</span>The background, because it's the biggest
+    thing on screen and it's where the scarcity ladder actually lives. But you may think it's the
+    character, or the weapon.</div>
+  </div>
+
+  <div class="q"><span class="qid">B2</span>
+    <p class="qt">Is “rarity rank #13 / 4,444” a number you want shown, or does it mislead?</p>
+    <div class="mine"><span class="lab">My read</span>It's a computed score (sum of 1/frequency),
+    which is the market convention — but it rewards owning many slightly-uncommon traits over one
+    genuinely rare one. A token can rank top-20 without carrying anything a collector wants.</div>
+    <p class="why">If you'd rather I lead with “this token has a Starfield” than with a rank
+    number, say so and I'll drop ranks from the film entirely.</p>
+  </div>
+
+  <div class="q"><span class="qid">B3</span>
+    <p class="qt">In your own words: what are the chase items? What would you personally pay up
+    for?</p>
+    <div class="mine"><span class="lab">My read</span>My guess at the pecking order: the two 1/1s,
+    then Starfield, then the four legendary backgrounds, then the golden AK15, then a chase
+    character (Gold Waffle, Gummy Bear, Churro, Zebra Cake). Rank these yourself — I'm inferring
+    from counts, and counts aren't taste.</div>
+  </div>
+
+  <div class="q"><span class="qid">B4</span>
+    <p class="qt">Which trait do you think collectors will <em>undervalue</em>?</p>
+    <p class="why">This is the most useful thing an explainer can do — tell people what's cheap
+    now and shouldn't be. It also gives the film a reason to exist beyond marketing.</p>
+  </div>
+
+  <div class="q"><span class="qid">B5</span>
+    <p class="qt">Character or background — which drives value more?</p>
+  </div>
+
+  <div class="q"><span class="qid">B6</span>
+    <p class="qt">Are there specific <em>combinations</em> that are grails? Pairings worth more
+    than the sum of their traits?</p>
+    <div class="mine"><span class="lab">My read</span>Some pairings look deliberate — an Alien
+    skin on the Abduction or UAP Taskforce background; a Gold Waffle on a legendary. If any
+    combination is a genuine grail, I'll build a whole section around it, because “here is the
+    one to hunt” is the most watchable thing a trading video can show.</div>
+  </div>
+
+  <div class="q"><span class="qid">B7</span>
+    <p class="qt">Should the film imply value at all — floors, “this one sold for”, comparisons?</p>
+    <p class="why">Worth deciding deliberately. Price talk ages fast and reads as promotion; a
+    pure “here's what's scarce and why” ages well. I'd default to no prices unless you say
+    otherwise.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">C</span><h2>The vocabulary problem</h2></div>
+  <p class="sdek">You're right that nobody knows what a “plate” is — that's internal shorthand
+  that leaked into the metadata. Here's every term the collection currently uses in public, with
+  what I'd say instead. Correct anything that's wrong; the right column is what goes on screen.</p>
+
+  <div class="scroll"><table>
+    <thead><tr><th>Shown today</th><th>What it actually means</th><th>Proposed wording</th></tr></thead>
+    <tbody>
+      <tr><td class="name mono">Plate Tier</td><td>How scarce the background is, on a 5-step ladder</td><td class="name">Background Rarity</td></tr>
+      <tr><td class="name mono">Background</td><td>The scene behind the character</td><td class="name">Scene <span class="tag">or keep?</span></td></tr>
+      <tr><td class="name mono">Footwear</td><td>The slippers / trash cans it stands in</td><td class="name">Kicks</td></tr>
+      <tr><td class="name mono">Arms</td><td>What it's holding</td><td class="name">Loadout</td></tr>
+      <tr><td class="name mono">Skin</td><td>Face colour — White, Black, Alien</td><td class="name">Face</td></tr>
+      <tr><td class="name mono">Sticker</td><td>The die-cut badge in the corner</td><td class="name">Sticker <span class="tag">fine as-is</span></td></tr>
+      <tr><td class="name mono">Trait Count</td><td>How many traits it carries, 5 to 9</td><td class="name">Trait Count <span class="tag">fine as-is</span></td></tr>
+      <tr><td class="name mono">Ultra / Legendary / Scarce / Uncommon / Standard</td><td>The five background bands</td><td class="fill">C1 — do these five names work, or do you want your own?</td></tr>
+      <tr><td class="name mono">Secret Rarez</td><td>The two 1/1 artworks</td><td class="name">1 of 1</td></tr>
+      <tr><td class="name mono">Weather</td><td>Rain, snow, fog, storm, blizzard, flood, tornado</td><td class="name">Weather <span class="tag">fine as-is</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="q"><span class="qid">C2</span>
+    <p class="qt">“Sweetardio” — where does the name come from, and how is it pronounced?</p>
+    <p class="why">If there's a voiceover this matters immediately. It also probably belongs in the
+    first ten seconds either way.</p>
+  </div>
+
+  <div class="q"><span class="qid">C3</span>
+    <p class="qt">Renaming traits changes the minted metadata. Do you want the film to use new
+    wording the tokens don't carry, or should I change <span class="mono">TRAIT_NAMES</span> too?</p>
+    <p class="why">Flagging rather than deciding: if the metadata says “Plate Tier” and the film
+    says “Background Rarity”, that's a mismatch a collector will notice. Changing it before mint
+    is free; after mint it's one transaction per token.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">D</span><h2>The premise</h2></div>
+  <p class="sdek">The spine of the lore. Right now I know what the art <em>is</em> but not what it
+  <em>means</em>, and no amount of reading the repo will tell me.</p>
+
+  <div class="q"><span class="qid">D1</span>
+    <p class="qt">What is a Sweetardio, in a paragraph you'd be happy seeing on screen?</p>
+    <p class="why">Snacks with faces is the what. I need the why — where they came from, what
+    happened to them, why they're like this.</p>
+  </div>
+
+  <div class="q"><span class="qid">D2</span>
+    <p class="qt">“4444 sugar addicted conspiracy theorists armed to the teeth who refuse to take
+    their meds” — is that the actual lore, or a joke line?</p>
+    <div class="mine"><span class="lab">My read</span>It reads as the actual lore, and the
+    backgrounds back it up: aliens, UAP task forces, drained swamps, empty fridges at 3am, and a
+    lot of guns. If that's the premise, the film almost writes itself — but you removed the line
+    from the last video, so I want to know whether you're moving away from it.</div>
+  </div>
+
+  <div class="q"><span class="qid">D3</span>
+    <p class="qt">Do the 27 characters share an origin, or is each just a snack?</p>
+  </div>
+
+  <div class="q"><span class="qid">D4</span>
+    <p class="qt">Does the <em>Alien</em> face mean something in the fiction, or is it a colourway?</p>
+    <div class="mine"><span class="lab">My read</span>It means something. It's the rarest face at
+    6.7 %, and it lands on abduction and UAP backgrounds often enough to look intentional. If
+    aliens are the reason these things are conscious, that's the best thirty seconds in the film.</div>
+  </div>
+
+  <div class="q"><span class="qid">D5</span>
+    <p class="qt">Why are they armed?</p>
+  </div>
+
+  <div class="q"><span class="qid">D6</span>
+    <p class="qt">Is the tone pure comedy, or is there a sincere thread under it?</p>
+    <p class="why">Decides whether the film can have a serious beat or should stay funny
+    throughout. Both work; mixing them badly doesn't.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">E</span><h2>The backgrounds</h2></div>
+  <p class="sdek">All 66, sorted into the themes I can see. Confirm the grouping, then give me a
+  line on the clusters that carry real meaning — I don't need all 66, I need the ones with a story.</p>
+
+  <div class="cl">
+    <div class="cluster">
+      <h4>Conspiracy &amp; the sky <span class="tag">7</span></h4>
+      <p class="names">UAP Taskforce · Abduction · Legendary Just Aliens · Mars · Clouds ·
+      Starfield · Psychedelics</p>
+      <p class="ask"><b>E1 —</b> Is this the spine of the lore, or set dressing?</p>
+    </div>
+    <div class="cluster">
+      <h4>Politics &amp; news <span class="tag">9</span></h4>
+      <p class="names">Ayatollah · Drained The Swamp · Whitehouse Lawn · Straight of America ·
+      Tampa Bay Pete · The 2023 Las Vegas Incident · The Miami Mall Incident · Winning ·
+      I'm Not Sorry</p>
+      <p class="ask"><b>E2 —</b> Several of these reference specific real events. Which ones do you
+      want <em>named</em> on screen, and which should stay a wink for people who get it?</p>
+    </div>
+    <div class="cluster">
+      <h4>Crypto &amp; the space <span class="tag">11</span></h4>
+      <p class="names">Bored Apes · RIP Gorbagana · Legendary Opengotchi · Emblem · Swolex ·
+      The Board · In Cook We Trust · Cookboy · Cookboy Chocolate · Where's My $ B1tch ·
+      Legendary Simplex</p>
+      <p class="ask"><b>E3 —</b> Which of these are nods to friends, partners or communities? Those
+      are worth calling out by name — it's the kind of detail that makes holders feel seen.</p>
+    </div>
+    <div class="cluster">
+      <h4>Candy brands <span class="tag">8</span></h4>
+      <p class="names">Hurshey · Nabisco · Smuckers Blue · Tootsie Blue · Tootsie Cerise ·
+      Starburst · Graham · Sugar</p>
+      <p class="ask"><b>E4 —</b> See section <b>H</b> — I want to check with you before naming any
+      of these on screen.</p>
+    </div>
+    <div class="cluster">
+      <h4>Munchies &amp; aftermath <span class="tag">9</span></h4>
+      <p class="names">Empty Fridge · Midnight Snack · Baked · Toasted · Tooth Decay · Snack Pack ·
+      Why So Cereal · Cereal Killer · He Needs Some Milk</p>
+      <p class="ask"><b>E5 —</b> This cluster is the funniest and the most on-theme. Any of these a
+      specific story rather than a general gag?</p>
+    </div>
+    <div class="cluster">
+      <h4>Candy world &amp; scenes <span class="tag">20</span></h4>
+      <p class="names">Sweet Shop · Sweet Castle · Cookie Dough · Choco Falls · Candy Tundra ·
+      Goo Lagoon · Bubble Trouble · Pink Abyss · Crumble Trail · Flavor Explosion · Soft Serve ·
+      Store · Vanilla Lane · Cabaret Alley · Room · The Set · Sweetardio · Coder Chick · Druski ·
+      Legendary Tenders</p>
+      <p class="ask"><b>E6 —</b> Is there a <em>place</em> here — a home world the collection lives
+      in — or are these just varied scenes?</p>
+    </div>
+  </div>
+
+  <div class="q"><span class="qid">E7</span>
+    <p class="qt">The four legendary backgrounds — 30 tokens each. What are they, and why these
+    four?</p>
+    <div class="mine"><span class="lab">My read</span><b>Just Aliens</b> and <b>Opengotchi</b> read
+    as references I half-recognise; <b>Simplex</b> I don't know at all; <b>Tenders</b> is the word
+    NOTHING over a star field, which your own notes say is deliberate. Being the top tier, each of
+    these deserves its own beat in the film — but I can't write them from the pixels.</div>
+  </div>
+
+  <div class="q"><span class="qid">E8</span>
+    <p class="qt">The Starfield — is it Nyan Cat homage, a wink at where the collection lives, or
+    something else?</p>
+    <div class="mine"><span class="lab">My read</span>The source art is the Nyan Cat field with the
+    cat erased, and I put the 8-bit rainbow back. So it's an homage — but there may be a reason
+    it's the <em>rarest</em> background specifically, and that reason is worth saying out loud.</div>
+  </div>
+
+  <div class="q"><span class="qid">E9</span>
+    <p class="qt">Four names deliberately don't match their art — Coder Chick, Druski, Legendary
+    Tenders, and the Military Brat arm. What's the joke?</p>
+    <p class="why">Your notes mark all four as intentional keepers. If each is an in-joke, that's a
+    great “for the people paying attention” segment. If they're just leftovers, I'll leave them
+    alone.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">F</span><h2>The stickers</h2></div>
+  <p class="sdek">All 23, at roughly 184 tokens each — the most evenly distributed trait in the
+  collection. Here's my read on every one; correct the wrong column and I'll build the segment
+  from it.</p>
+
+  <div class="scroll"><table>
+    <thead><tr><th>Sticker</th><th>What I think it references</th><th>Right?</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Golden Ticket</td><td>Willy Wonka</td><td class="fill">—</td></tr>
+      <tr><td class="name">Marshmallow Man</td><td>Stay Puft, Ghostbusters</td><td class="fill">—</td></tr>
+      <tr><td class="name">Box of Chocolates</td><td>Forrest Gump</td><td class="fill">—</td></tr>
+      <tr><td class="name">Calvin Candie</td><td>Django Unchained</td><td class="fill">—</td></tr>
+      <tr><td class="name">Zombieland Twinkie</td><td>Zombieland</td><td class="fill">—</td></tr>
+      <tr><td class="name">Mr Owl</td><td>The Tootsie Pop “how many licks” ad</td><td class="fill">—</td></tr>
+      <tr><td class="name">Hunny Pot</td><td>Winnie the Pooh</td><td class="fill">—</td></tr>
+      <tr><td class="name">Peppermint Butler</td><td>Adventure Time</td><td class="fill">—</td></tr>
+      <tr><td class="name">Rare Candy</td><td>Pokémon</td><td class="fill">—</td></tr>
+      <tr><td class="name">Candy Land</td><td>The board game</td><td class="fill">—</td></tr>
+      <tr><td class="name">Dude Sweet</td><td>Dude, Where's My Car?</td><td class="fill">—</td></tr>
+      <tr><td class="name">American Pie</td><td>The film</td><td class="fill">—</td></tr>
+      <tr><td class="name">Sweet Tooth</td><td>Twisted Metal? Or the Netflix show?</td><td class="fill">—</td></tr>
+      <tr><td class="name">Robot Chicken Gummy Bear</td><td>The Robot Chicken sketch</td><td class="fill">—</td></tr>
+      <tr><td class="name">Candy Shop</td><td>50 Cent</td><td class="fill">—</td></tr>
+      <tr><td class="name">Caroline Ellison</td><td>FTX / Alameda — see section H</td><td class="fill">—</td></tr>
+      <tr><td class="name">The Meme is the Tech</td><td>The crypto phrase</td><td class="fill">—</td></tr>
+      <tr><td class="name">Straight Outta Gulag</td><td>Straight Outta Compton + the gulag meme</td><td class="fill">—</td></tr>
+      <tr><td class="name">Opengotchi</td><td>Tamagotchi — and the legendary background shares the name</td><td class="fill">—</td></tr>
+      <tr><td class="name">Cookboy</td><td>Shares a name with two backgrounds — who is Cookboy?</td><td class="fill">—</td></tr>
+      <tr><td class="name">Benson</td><td>Regular Show?</td><td class="fill">—</td></tr>
+      <tr><td class="name">The Bunny</td><td>No idea</td><td class="fill">—</td></tr>
+      <tr><td class="name">Pwease Lollipop</td><td>No idea</td><td class="fill">—</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="q"><span class="qid">F1</span>
+    <p class="qt">What <em>is</em> a sticker, in the fiction? Something the character collected,
+    earned, stuck on themselves?</p>
+    <p class="why">This is the question that turns the sticker segment from a list of references
+    into a story. They sit in the corner of the frame like something applied to the token itself,
+    which is a nice idea if it's deliberate.</p>
+  </div>
+
+  <div class="q"><span class="qid">F2</span>
+    <p class="qt">Three stickers share names with backgrounds — Cookboy, Opengotchi, Candy Land.
+    Connected, or coincidence?</p>
+  </div>
+
+  <div class="q"><span class="qid">F3</span>
+    <p class="qt">Every sticker is ~184 tokens — deliberately flat. Do you want them read as a
+    <em>set</em> to complete, rather than as rarity?</p>
+    <div class="mine"><span class="lab">My read</span>Yes, and I'd make that a segment: 23 stickers
+    at 4.1 % each is a collection inside the collection. “Own all 23” is a much better hook than
+    any single sticker's rarity.</div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">G</span><h2>The two 1 of 1s</h2></div>
+  <p class="sdek">Duhnut Candy Man by Emily Cartoons, and Radbro Webring by Radbro Webring. 1 of
+  4,444 each — the rarest things you have, and the only tokens carrying an artist credit.</p>
+
+  <div class="q"><span class="qid">G1</span>
+    <p class="qt">How did each collaboration come about, and what should I say about each artist?</p>
+  </div>
+  <div class="q"><span class="qid">G2</span>
+    <p class="qt">Do they have any meaning in the lore, or are they standalone art?</p>
+  </div>
+  <div class="q"><span class="qid">G3</span>
+    <p class="qt">Will there be more guest 1/1s later?</p>
+    <p class="why">If yes, the film should frame the tier as open rather than closed — that's a
+    different sentence.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="sid">H</span><h2>What I shouldn't say out loud</h2></div>
+  <p class="sdek">Raising this once so you can decide, not to talk you out of anything. The art is
+  already made and that's your call — but a narrated explainer <em>naming</em> these is a louder,
+  more public act than a background having a name in a metadata field.</p>
+
+  <div class="q flag"><span class="qid">H1</span>
+    <p class="qt">Real brands: Hurshey, Nabisco, Smuckers, Tootsie, Starburst, Graham.</p>
+    <p class="why">“Hurshey” is a deliberate misspelling, which suggests you've already thought
+    about this. Do you want the film to name them, show them without naming, or skip those
+    backgrounds entirely in this video?</p>
+  </div>
+
+  <div class="q flag"><span class="qid">H2</span>
+    <p class="qt">Real, living people: Caroline Ellison, Druski, Tampa Bay Pete.</p>
+    <p class="why">Same question. Druski your notes say comes from his own content. Caroline
+    Ellison is a named private individual with a criminal conviction — a sticker is one thing, a
+    voiceover explaining the reference is another. Tell me which way you want it and I'll follow.</p>
+  </div>
+
+  <div class="q flag"><span class="qid">H3</span>
+    <p class="qt">Anything else off-limits — words, references, claims about the project?</p>
+  </div>
+</section>
+
+<div class="end">
+  <p><b>How to answer:</b> reply by ID in chat (“B3: the AK15 is the real chase, then…”) — you
+  don't need to fill in every one. <b>A1–A5</b> and <b>B1–B7</b> unblock me on their own; the lore
+  sections I can start drafting from partial answers and show you a cut to react to.</p>
+</div>
+
+</div>
