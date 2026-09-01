@@ -16,3 +16,7 @@ dynamic/proof/anim/*.gif
 # The promo render is a regenerated artifact of a mint, like output/ — the
 # GENERATOR is the record. promo/make_promo.py rebuilds it from output/.
 promo/*.mp4
+# Lineage artwork is other projects' work, supplied for the intro — not ours
+# to redistribute in this repo. make_intro.py renders a labelled placeholder
+# for any slot that is empty, so the video builds without them.
+promo/lineage/

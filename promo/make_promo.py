@@ -436,7 +436,7 @@ def encode(frames, path, fps=FPS):
     return n
 
 
-def read_loop(path, size, limit=24):
+def read_loop(path, size, limit=24, native=False):
     """Decode a token's own mp4 so an animated tier actually MOVES here.
     Falls back to nothing; the caller then uses the still."""
     import imageio_ffmpeg
@@ -451,7 +451,7 @@ def read_loop(path, size, limit=24):
         out = []
         for raw in rd:
             im = Image.frombytes("RGB", (w, h), bytes(raw))
-            if (w, h) != (size, size):
+            if not native and (w, h) != (size, size):
                 im = im.resize((size, size), Image.Resampling.LANCZOS)
             out.append(im)
             if len(out) >= limit:
