@@ -47,7 +47,7 @@ Recorded as given. Everything not listed here is still open.
 | **E7b / E9** | **Do not name them.** The public can work it out. Leave the mismatched names as they are |
 | **E8** | Starfield is a **Nyan Cat homage** — confirmed |
 | **Arms** | Military Brat holds nothing because the figure is **pretending**; the creator was a military brat himself. The empty gloves are the joke |
-| **F** | Sweet Tooth = **Twisted Metal** · Benson = **Regular Show** (confirmed) · The Bunny = **an old VeggieTales episode** |
+| **F** | Sweet Tooth = **Twisted Metal** · Benson = **Regular Show** (confirmed) · The Bunny = **an old VeggieTales episode** · Pwease Lollipop = **a JD Vance political meme** |
 | **E3** | Opengotchi is **an open-source project the creator likes** |
 
 ### Still open
@@ -56,9 +56,11 @@ Recorded as given. Everything not listed here is still open.
 - **C1** — do the five tier names work
 - **E1–E6** — the background clusters, and **E3** especially: which of Cookboy / Swolex / Emblem / The Board / In Cook We Trust / RIP Gorbagana are also tributes
 - **F1–F3** — what a sticker *is* in the fiction; the shared names; the set-completion angle
-- **Pwease Lollipop** — the last sticker nobody has placed
 - **G1–G3** — the two guest artists
-- **H1–H3** — brands and real people. **Still blocking the hero shot**: the single 1-of-4,444 grail (#1331) has *Ayatollah* as its background
+- **H1–H3** — brands and real people. The list has grown: Caroline Ellison, Druski,
+  Tampa Bay Pete, the Ayatollah plate, and now Pwease Lollipop (JD Vance).
+  All 23 stickers are identified, so this is the last open question with teeth.
+  **Still blocking the hero shot**: the single 1-of-4,444 grail (#1331) has *Ayatollah* as its background
 
 ---
 
@@ -372,7 +374,7 @@ collection. Correct the middle column.
 | Cookboy | Shares a name with two backgrounds — who is Cookboy? | |
 | Benson | **Regular Show** | ✓ owner |
 | The Bunny | **An old VeggieTales episode** | ✓ owner |
-| Pwease Lollipop | **No idea** | |
+| Pwease Lollipop | **A JD Vance political meme** | ✓ owner |
 
 ### F1. What *is* a sticker, in the fiction? Something the character collected, earned, stuck on themselves?
 
