@@ -60,17 +60,17 @@ INK = (232, 234, 240)
 # lines below are written from general knowledge, not from anything in this
 # repo -- every one of them should be read by someone who was there.
 LINEAGE = [
-    ("Milady Maker", "1_milady.gif", "IT ALL BEGAN WITH",
+    ("Milady Maker", "1_milady", "IT ALL BEGAN WITH",
      "10,000 neochibi PFPs that looked like nothing else on Ethereum,"
      " and changed what a PFP was allowed to be."),
-    ("Remilia Corporation", "2_remilia.png", "THEN CAME",
+    ("Remilia Corporation", "2_remilia", "THEN CAME",
      "The collective behind Milady. Not a drop — a whole aesthetic,"
      " and a network of everything that came after it."),
-    ("Radbro", "3_radbro.gif", "THE WEBRING SPREAD",
+    ("Radbro", "3_radbro", "THE WEBRING SPREAD",
      "Same lineage, harder edge. Consume. Obey. Conform."),
-    ("Retardio", "4_retardio.png", "IT CROSSED CHAINS",
+    ("Retardio", "4_retardio", "IT CROSSED CHAINS",
      "The joke went to Solana and went further than anyone expected."),
-    ("Gorbagio", "5_gorbagio.png", "AND WENT DIVING",
+    ("Gorbagio", "5_gorbagio", "AND WENT DIVING",
      "Dumpster Divers. A trash can, a rifle, and a chain of its own."),
 ]
 
@@ -100,12 +100,29 @@ def make_ground(seed=11):
     return Image.blend(im, Image.blend(im, glow, 0.9), 0.8)
 
 
-def load_art(fname, box):
-    """An ancestor's artwork, letterboxed into `box` on its own. Returns a
-    list of frames (one for a still, many for a GIF), or None if absent."""
-    path = os.path.join(ART, fname)
-    if not os.path.exists(path):
+def find_art(stem):
+    """The file for a slot, whatever extension it arrived as.
+
+    Matching on the numbered prefix rather than a fixed filename: the same
+    artwork turns up as .gif, .png, .webp or .jpg depending on how it was
+    sent, and an intro that silently shows a placeholder because the owner
+    saved a .png where the code wanted a .gif is a bad failure mode.
+    """
+    if not os.path.isdir(ART):
         return None
+    for f in sorted(os.listdir(ART)):
+        if f.startswith(stem) and not f.lower().endswith(".mp4"):
+            return os.path.join(ART, f)
+    return None
+
+
+def load_art(stem, box):
+    """An ancestor's artwork, letterboxed into `box` on its own. Returns a
+    list of frames (one for a still, many for an animation), or None."""
+    path = find_art(stem)
+    if path is None:
+        return None
+    fname = os.path.basename(path)
     if fname.lower().endswith(".mp4"):
         return read_loop(path, box, limit=200)
     im = Image.open(path)
@@ -253,10 +270,12 @@ def build(args):
     for name, fname, kicker, line in LINEAGE:
         frames = load_art(fname, box)
         if frames is None:
-            print(f"  MISSING promo/lineage/{fname} — placeholder for {name}")
+            print(f"  MISSING promo/lineage/{fname}.* — placeholder for {name}")
             frames = [placeholder(name, box)]
         else:
-            print(f"  {name:22s} {fname}  {len(frames)} frame(s)")
+            got = os.path.basename(find_art(fname))
+            print(f"  {name:22s} {got:22s} {len(frames)} frame(s)"
+                  + ("" if len(frames) > 1 else "   [still]"))
         thumbs.append((name.split()[0], frames[0]))
         plates = [card(ground, f, name, kicker, line, thumbs, len(thumbs) - 1)
                   for f in frames[:args.max_frames]]
