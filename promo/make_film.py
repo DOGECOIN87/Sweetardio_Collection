@@ -277,6 +277,24 @@ def token_frames(ground, tid, box, animate=True, caption=None, badge=None):
             for a in art]
 
 
+CLIPS = os.path.join(ROOT, "promo", "clips")
+
+
+def clip_frames(ground, name, box, caption=None, limit=30):
+    """A loop the owner supplied directly, e.g. his own flooded Twinkie.
+
+    Preferred over anything picked here when it exists: he cut it, and it is
+    the reference he gave for what the art should look like on screen.
+    """
+    p = os.path.join(CLIPS, name)
+    if not os.path.exists(p):
+        return None
+    fr = read_loop(p, box, limit=limit)
+    if not fr:
+        return None
+    return [art_plate(ground, a, box, caption=caption) for a in fr]
+
+
 def build(args):
     beat = 60.0 / args.bpm
     with open(MANIFEST) as f:
@@ -335,68 +353,76 @@ def build(args):
 
     # ---- 2. what it is: the roster (D1) ----
     S(stat_plate(ground, "4,444", kicker="SWEETARDIO COLLECTION"), 5)
-    for i in range(1, len(ROSTER) + 1):        # one row per beat, assembling
+    for i in range(1, len(ROSTER) + 1):
         S(roster_plate(ground, ROSTER, ROSTER_FOOT, upto=i), 1)
-    S(roster_plate(ground, ROSTER, ROSTER_FOOT), 7)
-    faces = pick("collection",
-                 [t for t in have if not animated(t)
-                  and not man[t].get("secret_rare")], 8)
-    for t in faces:
-        S(token_frames(ground, t, args.box, animate=False), 2)
+    S(roster_plate(ground, ROSTER, ROSTER_FOOT), 6)
 
-    # ---- 3. the thesis (B4) ----
-    S(line_plate(ground, "Rarity tools rank traits.", size=68, colour=DIM), 6)
-    S(line_plate(ground, "This one rewards combinations.", size=68), 8)
+    # ---- 3. THE ART. Held long, and given most of the running time.
+    #
+    # The first cut was a rarity deck with pictures between the numbers. The
+    # owner's note was the reverse -- more artwork, less rarity -- so the
+    # stat cards are down from eight to three and every token now holds for
+    # four beats instead of two. The numbers that survive are the ones a
+    # buyer cannot get from looking.
+    for t in pick("collection",
+                  [t for t in have if not animated(t)
+                   and not man[t].get("secret_rare")], 12):
+        S(token_frames(ground, t, args.box, animate=False), 4)
 
-    # ---- 4. what to look for (B1) ----
-    S(stat_plate(ground, "1", kicker="WHAT TO LOOK FOR",
-                 sub="Is it animated?"), 6)
-    for t in pick("animated", [t for t in have if animated(t)], 6):
-        S(token_frames(ground, t, args.box), 2)
+    # ---- 4. weather: ALL SEVEN, each with its own loop ----
+    wx_counts = {}
+    for t in man:
+        if man[t].get("weather"):
+            wx_counts[man[t]["weather"]] = wx_counts.get(man[t]["weather"], 0) + 1
+    S(line_plate(ground, "Seven of them carry weather.", size=62), 6)
+    for state in ("rain", "snow", "fog", "storm", "blizzard", "flooded",
+                  "tornado"):
+        cap = f"{state.title()}  ·  {wx_counts.get(state, 0)} of 4,444"
+        plates = None
+        if state == "flooded":                 # the owner's own cut
+            plates = clip_frames(ground, "flooded_twinkie.mp4", args.box, cap)
+        if plates is None:
+            cands = [t for t in have if man[t].get("weather") == state
+                     and os.path.exists(os.path.join(ANIM, f"{t}.mp4"))]
+            cands.sort(key=lambda t: -reads.get(t, 0))
+            if not cands:
+                print(f"  weather {state}: NO LOOP RENDERED — skipped")
+                continue
+            plates = token_frames(ground, cands[0], args.box, caption=cap)
+        S(plates, 6)
+
+    # ---- 5. the animated plate ----
+    S(line_plate(ground, "One of them moves.", size=66), 5)
+    for t in pick("animated",
+                  [t for t in have if man[t].get("starfield")], 5):
+        S(token_frames(ground, t, args.box), 4)
     S(stat_plate(ground, f"{n_anim}", kicker="ANIMATED",
                  sub=f"of {n:,}  ·  1 in {round(n / n_anim)}"), 5)
 
-    S(stat_plate(ground, "2", kicker="WHAT TO LOOK FOR",
-                 sub="Is it armed?"), 6)
-    for t in pick("armed",
-                  [t for t in have if armed(t) and not animated(t)], 6):
-        S(token_frames(ground, t, args.box, animate=False), 2)
-    S(stat_plate(ground, f"{n_arm}", kicker="ARMED",
-                 sub=f"of {n:,}  ·  1 in {round(n / n_arm)}"), 5)
-
-    # ---- 4b. the stickers, which are a SET rather than a rarity ----
+    # ---- 6. the stickers, a SET rather than a rarity ----
     arts = sticker_arts()
     S(sticker_plate(ground, arts, upto=0), 2)
     for i in range(4, len(arts) + 1, 4):
         S(sticker_plate(ground, arts, upto=i), 1)
     S(sticker_plate(ground, arts,
-                    headline="184 of each. A set inside the set."), 8)
+                    headline="184 of each. A set inside the set."), 7)
 
-    # ---- 5. the grails (B6) ----
-    S(line_plate(ground, "Both?", size=92), 5)
+    # ---- 7. armed, and the one ----
+    S(line_plate(ground, "Most of them are armed.", size=62), 5)
+    for t in pick("armed",
+                  [t for t in have if armed(t) and not animated(t)], 6):
+        S(token_frames(ground, t, args.box, animate=False), 4)
     for t in pick("both",
-                  [t for t in have if animated(t) and armed(t)], 4):
-        S(token_frames(ground, t, args.box), 3)
-    S(stat_plate(ground, f"{n_both}", kicker="ANIMATED AND ARMED",
-                 sub=f"of {n:,}  ·  1 in {round(n / n_both)}",
-                 colour=PINK_HI), 6)
+                  [t for t in have if animated(t) and armed(t)], 3):
+        S(token_frames(ground, t, args.box), 4)
 
-    S(line_plate(ground, "On the rarest plate in the collection.", size=54,
-                 colour=DIM), 5)
-    for t in [t for t in star_arm if t in have]:
-        S(token_frames(ground, t, args.box, animate=True), 3)
-    S(stat_plate(ground, f"{len(star_arm)}", kicker="STARFIELD AND ARMED",
-                 sub=f"of {n:,}  ·  1 in {round(n / len(star_arm)):,}",
-                 colour=PINK_HI), 6)
-
-    # ---- 6. the one ----
-    S(line_plate(ground, "And one of them holds a weapon in a tornado.",
-                 size=52, colour=DIM), 6)
+    S(line_plate(ground, "One is armed, animated, and in a tornado.",
+                 size=52, colour=DIM), 5)
     S(token_frames(ground, the_one, args.box + 60), 10)
     S(stat_plate(ground, "1", kicker="OF 4,444", sub="There is only one.",
-                 colour=PINK_HI), 8)
+                 colour=PINK_HI), 7)
 
-    # ---- 7. the close ----
+    # ---- 8. the close ----
     S(launch_plate(ground), 12)
 
     total = sum(x.dur for x in seg)
