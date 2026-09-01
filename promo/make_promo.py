@@ -204,8 +204,14 @@ ROW_ORDER = ["Character", "Background", "Plate Tier", "Skin", "Eyes",
              "Mouth", "Footwear", "Arms", "Sticker", "Weather"]
 
 
-def draw_panel(im, tid, vals, freq, rank, n, tier):
-    """The right-hand metadata panel."""
+def draw_panel(im, tid, vals, freq, rank, n, tier, section=None):
+    """The right-hand metadata panel.
+
+    `section` is the run this token belongs to -- the same words the
+    explainer card that just played used. It rides at the top right, on the
+    brand eyebrow's own line, so the tier being explained and the tokens
+    that carry it are never more than a glance apart.
+    """
     d = ImageDraw.Draw(im)
     x0, x1 = 1030, 1868
     f_eyebrow, f_num = font(25), font(80)
@@ -214,6 +220,13 @@ def draw_panel(im, tid, vals, freq, rank, n, tier):
 
     y = 62
     tracked(d, (x0, y), "SWEETARDIO COLLECTION", f_eyebrow, CYAN, track=2.2)
+    if section:
+        text, col = section
+        fs = font(21)
+        w = tracked_width(d, text, fs, 2.0)
+        d.rounded_rectangle([x1 - w - 40, y - 8, x1, y + 34],
+                            radius=21, fill=(15, 7, 22), outline=col, width=2)
+        tracked(d, (x1 - w - 20, y + 1), text, fs, col, track=2.0)
     y += 40
     d.text((x0, y), f"#{tid}", font=f_num, fill=WHITE)
     y += 96
@@ -272,7 +285,8 @@ def draw_panel(im, tid, vals, freq, rank, n, tier):
     d.text((x1 - tw, 1002), f"TOKEN #{tid}", font=f_foot, fill=MUTED)
 
 
-def card_plate(ground, art, tid, vals, freq, rank, n, tier):
+def card_plate(ground, art, tid, vals, freq, rank, n, tier,
+               section=None):
     """One token: art in a rounded card on the left, panel on the right."""
     im = ground.copy()
     d = ImageDraw.Draw(im)
@@ -298,38 +312,7 @@ def card_plate(ground, art, tid, vals, freq, rank, n, tier):
                         radius=23, outline=fill, width=2)
     d.text((cx0 + 44, cy0 + 33), s, font=f, fill=(238, 234, 244))
 
-    draw_panel(im, tid, vals, freq, rank, n, tier)
-    return im
-
-
-def word_plate(ground, word, said, total):
-    """One word of the tagline, plus the words already spent as a dim trail."""
-    im = ground.copy()
-    d = ImageDraw.Draw(im)
-    f = font(150)
-    tw = d.textlength(word, font=f)
-    while tw > W - 260:
-        f = font(int(f.size * 0.9))
-        tw = d.textlength(word, font=f)
-    d.text(((W - tw) / 2, H / 2 - f.size * 0.72), word, font=f, fill=WHITE)
-
-    # The words already spent, so the sentence assembles as the video runs
-    # instead of asking the viewer to hold fifteen cards in their head.
-    fs = font(34)
-    trail = " ".join(said[:-1])
-    tail = (" " if trail else "") + said[-1]
-    while d.textlength(trail + tail, font=fs) > W - 220 and fs.size > 16:
-        fs = font(int(fs.size * 0.92))
-    tw = d.textlength(trail + tail, font=fs)
-    x = (W - tw) / 2
-    d.text((x, H / 2 + 132), trail, font=fs, fill=(126, 110, 152))
-    d.text((x + d.textlength(trail, font=fs), H / 2 + 132), tail,
-           font=fs, fill=CYAN)
-
-    bar_w = int((W - 500) * (len(said) / total))
-    d.line([250, H - 96, W - 250, H - 96], fill=BAR_TRACK, width=4)
-    if bar_w:
-        d.line([250, H - 96, 250 + bar_w, H - 96], fill=CYAN, width=4)
+    draw_panel(im, tid, vals, freq, rank, n, tier, section)
     return im
 
 
@@ -478,10 +461,10 @@ def read_loop(path, size, limit=24):
         return None
 
 
-# The tagline, one word per interstitial. Fifteen words, so the body of the
-# video is fifteen beats and every beat gets its own pair of tokens.
-TAGLINE = ("4444 Sugar Addicted Conspiracy Theorists Armed To The Teeth "
-           "Who Refuse To Take Their Meds").split()
+# There is no tagline overlay. The video is a rarity breakdown, and the
+# sections below are what paces it -- an explainer, then the tokens that
+# explainer is about, so the number on screen and the art on screen are
+# always the same thing.
 
 
 def build(args):
@@ -499,48 +482,6 @@ def build(args):
             return "Ultra"
         return g.plate_tier(row["bg"]) if row.get("bg") else "Standard"
 
-    # ---- the cast: rare tiers first, then whatever else was rendered ----
-    star = [t for t in sorted(have) if man[t].get("starfield")]
-    sec = [t for t in sorted(have) if man[t].get("secret_rare")]
-    leg = sorted((t for t in have if man[t].get("legendary")),
-                 key=lambda t: rank[t])
-    wx = sorted((t for t in have if man[t].get("weather")
-                 and not man[t].get("legendary")), key=lambda t: rank[t])
-    rest = sorted((t for t in have if t not in set(star + sec + leg + wx)),
-                  key=lambda t: rank[t])
-
-    # Interleave so the rare tiers are spread through the run rather than
-    # front-loaded -- a viewer who leaves at 40 % should still have seen a
-    # Starfield, a Legendary and a 1/1.
-    order, pools = [], [list(star), list(leg), list(wx), list(rest), list(sec)]
-    while any(pools):
-        for p in pools:
-            if p:
-                order.append(p.pop(0))
-    # Every card lives inside a beat. Anything past the last beat used to be
-    # appended in one 40-card run AFTER the tagline finished, which is not a
-    # section anyone designed -- it is the leftovers.
-    cap = args.per_beat * len(TAGLINE)
-    if len(order) > cap:
-        keep, nstar = [], 0
-        for t in order:                       # 1/1s are never dropped: 2 exist
-            if man[t].get("secret_rare"):
-                keep.append(t)
-        for t in order:
-            if len(keep) >= cap or t in keep:
-                continue
-            if man[t].get("starfield"):
-                if nstar >= args.max_star:
-                    continue
-                nstar += 1
-            keep.append(t)
-        order = [t for t in order if t in set(keep)]
-    print(f"cast: {len(order)} of {len(have)} rendered "
-          f"({len([t for t in order if man[t].get('starfield')])} starfield, "
-          f"{len([t for t in order if man[t].get('secret_rare')])} 1/1, "
-          f"{len([t for t in order if man[t].get('legendary')])} legendary, "
-          f"{len([t for t in order if man[t].get('weather')])} weather)")
-
     # ---- rarity facts, all counted rather than declared ----
     # The ladder ranks BACKGROUNDS, so the two 1/1s are not on it: they
     # composite with nothing and have no plate to band. Folding them into
@@ -557,71 +498,126 @@ def build(args):
     n_star = sum(1 for t in man if man[t].get("starfield"))
     n_sec = sum(1 for t in man if man[t].get("secret_rare"))
     n_wx = sum(1 for t in man if man[t].get("weather"))
+    n_leg = sum(1 for t in man if man[t].get("legendary"))
     wx_counts = Counter(man[t]["weather"] for t in man if man[t].get("weather"))
     rarest_wx, rarest_wx_n = min(wx_counts.items(), key=lambda kv: kv[1])
     tc = Counter(len([k for k, v in vals[t].items() if v != "None"])
                  for t in man)
     n_armed = sum(1 for t in man if man[t].get("arm"))
+    n_ak = sum(1 for t in man if man[t].get("arm")
+               and "AK15" in str(man[t]["arm"]))
 
     def one_in(k):
         return f"1 in {round(n / k):,}"
+
+    # ---- SECTIONS: each explainer is followed by the tokens it describes ----
+    #
+    # The explainers used to fall every few beats regardless of what was on
+    # screen, so the Starfield card could play over a Standard token and the
+    # 1/1 card over a doughnut. Grouping the cast by tier and putting each
+    # tier's own tokens straight after its explainer is the whole fix: the
+    # section chip on every panel then repeats the claim the card just made.
+    def is_rare_arm(t):
+        a = str(man[t].get("arm") or "")
+        return "AK15" in a or "Sweetardio_114" in a
+
+    used = set()
+
+    def claim(pred, limit=None):
+        out = []
+        for t in sorted(have, key=lambda x: rank[x]):
+            if t in used or not pred(t):
+                continue
+            out.append(t)
+            used.add(t)
+            if limit and len(out) >= limit:
+                break
+        return out
+
+    sections = [
+        (("ULTRA · STARFIELD", TIER_COLOR["Ultra"][0]),
+         title_plate(ground, f"{n_star} of 4,444",
+                     ["The Starfield is the ultra tier — " + one_in(n_star) + ".",
+                      "It is the only plate in the collection that MOVES.",
+                      "Its 8-bit rainbow is centred on each character."],
+                     eyebrow="ULTRA · STARFIELD", foot="0.50 %"),
+         claim(lambda t: man[t].get("starfield"), args.max_star)),
+
+        (("1/1 SECRET RARE", HOT),
+         title_plate(ground, f"{n_sec} of 4,444",
+                     ["Two 1/1 artworks, by guest artists.",
+                      "They composite with nothing — no plate, no face, no traits.",
+                      f"{one_in(n_sec)}, ten times rarer than the Starfield."],
+                     eyebrow="THE 1/1 SECRET RARES", foot="0.02 %"),
+         claim(lambda t: man[t].get("secret_rare"))),
+
+        (("LEGENDARY PLATE", TIER_COLOR["Legendary"][0]),
+         title_plate(ground, f"{n_leg} of 4,444",
+                     ["Four legendary plates, 30 tokens each.",
+                      f"{one_in(n_leg // 4)} for any one of them.",
+                      "They never appear through the ordinary background draw."],
+                     eyebrow="LEGENDARY", foot="2.70 %"),
+         claim(lambda t: man[t].get("legendary"), 11)),
+
+        (("WEATHER · ANIMATED", (140, 220, 170)),
+         title_plate(ground, f"{n_wx} of 4,444",
+                     ["Seven weather states, permanently baked in.",
+                      f"The rarest is {rarest_wx.title()} at {rarest_wx_n} tokens "
+                      f"— {one_in(rarest_wx_n)}.",
+                      "Each one carries its own animated loop."],
+                     eyebrow="WEATHER · ANIMATED", foot="10 %"),
+         claim(lambda t: man[t].get("weather"), 11)),
+
+        (("RARE ARMS", GOLD),
+         title_plate(ground, f"{n_armed:,} armed",
+                     [f"{100.0 * n_armed / n:.1f} % of the collection holds a weapon.",
+                      f"The golden AK15 is {n_ak} tokens — {one_in(n_ak)}.",
+                      "The three sabers are 25 each."],
+                     eyebrow="ARMS", foot="15.9 %"),
+         claim(is_rare_arm, 6)),
+
+        (("THE FIELD", TIER_COLOR["Standard"][0]),
+         title_plate(ground, f"{tc[min(tc)]} of 4,444",
+                     ["Trait Count is the scarcity nobody could see.",
+                      f"{tc[min(tc)]} tokens carry the fewest traits ({min(tc)}); "
+                      f"{tc[max(tc)]} carry the most ({max(tc)}).",
+                      "Both tails are rarer than a Legendary plate."],
+                     eyebrow="TRAIT COUNT", foot="THE INVISIBLE TIER"),
+         # EXPLICITLY the ordinary tokens. `used` alone is not enough: the
+         # Starfield section is capped, so the tokens it did not use would
+         # fall through to here and put an "Ultra TIER" pill under a chip
+         # that says THE FIELD -- the exact contradiction these sections
+         # exist to remove.
+         claim(lambda t: not (man[t].get("starfield")
+                              or man[t].get("secret_rare")
+                              or man[t].get("legendary")
+                              or man[t].get("weather")
+                              or is_rare_arm(t)), 8)),
+    ]
 
     seg = []
     S = seg.append
 
     S(Seg(title_plate(ground, "4,444",
-                      ["Sugar-addicted conspiracy theorists.",
-                       "Every trait composited, graded and counted."],
+                      ["Every trait composited, graded and counted.",
+                       "Every percentage below is measured, not estimated."],
                       eyebrow="SWEETARDIO COLLECTION",
-                      foot="A RARITY BREAKDOWN"), 4.2))
-
+                      foot="A RARITY BREAKDOWN"), 4.4))
     S(Seg(ladder_plate(ground, tier_rows, "THE RARITY LADDER",
                        "Every background is pinned to an exact count. "
                        "No tier overlaps the next."), 6.6))
-
     S(Seg(title_plate(ground, "How to read it",
-                      ["Every percentage below is counted across all 4,444 tokens.",
+                      ["Every percentage is counted across all 4,444 tokens.",
                        f"A trait at 1.35 % is on {round(n * 0.0135)} of them.",
                        "The bar is square-root scaled, so the rare end stays visible."],
-                      eyebrow="THE NUMBERS ARE REAL"), 6.0))
+                      eyebrow="THE NUMBERS ARE REAL"), 6.2))
 
-    explainers = [
-        (title_plate(ground, f"{n_star} of 4,444",
-                     ["The Starfield is the ultra tier — " + one_in(n_star) + ".",
-                      "It is the only plate in the collection that MOVES.",
-                      "Its 8-bit rainbow is centred on each character."],
-                     eyebrow="ULTRA · STARFIELD", foot="0.50 %"), 6.0),
-        (title_plate(ground, f"{n_sec} of 4,444",
-                     ["Two 1/1 artworks, by guest artists.",
-                      "They composite with nothing — no plate, no face, no traits.",
-                      f"{one_in(n_sec)}, ten times rarer than the Starfield."],
-                     eyebrow="THE 1/1 SECRET RARES", foot="0.02 %"), 6.0),
-        (title_plate(ground, f"{n_wx} of 4,444",
-                     ["Seven weather states, permanently baked in.",
-                      f"The rarest is {rarest_wx.title()} at {rarest_wx_n} tokens.",
-                      "Each one carries its own animated loop."],
-                     eyebrow="WEATHER · ANIMATED", foot="10 %"), 6.0),
-        (title_plate(ground, f"{tc[min(tc)]} of 4,444",
-                     ["Trait Count is the scarcity nobody could see.",
-                      f"{tc[min(tc)]} tokens carry the fewest traits ({min(tc)}); "
-                      f"{tc[max(tc)]} carry the most ({max(tc)}).",
-                      "Both tails are rarer than a Legendary plate."],
-                     eyebrow="TRAIT COUNT", foot="THE INVISIBLE TIER"), 6.0),
-        (title_plate(ground, f"{n_armed:,} armed",
-                     [f"{100.0 * n_armed / n:.1f} % of the collection holds a weapon.",
-                      "The golden AK15 is 20 tokens — " + one_in(20) + ".",
-                      "The other 84 % refuse to take their meds unarmed."],
-                     eyebrow="ARMS", foot="15.9 %"), 6.0),
-    ]
-
-    # ---- the body: two tokens, then a word ----
-    said, ei, oi = [], 0, 0
-    for wi, word in enumerate(TAGLINE):
-        for _ in range(args.per_beat):
-            if oi >= len(order):
-                break
-            tid = order[oi]
-            oi += 1
+    shown = 0
+    for chip, plate, ids in sections:
+        if not ids:
+            continue
+        S(Seg(plate, 5.8))
+        for tid in ids:
             art = Image.open(os.path.join(IMAGES, f"{tid}.png")).convert("RGB")
             tier = tier_of(tid)
             loop = None
@@ -629,26 +625,24 @@ def build(args):
                                  or man[tid].get("weather")):
                 loop = read_loop(os.path.join(ANIM, f"{tid}.mp4"), 880)
             if loop:
-                plates = [card_plate(ground, fr, tid, vals, freq, rank, n, tier)
-                          for fr in loop]
-                S(Seg(plates, args.card, loop_fps=14))
+                S(Seg([card_plate(ground, fr, tid, vals, freq, rank, n, tier,
+                                  chip) for fr in loop],
+                      args.card, loop_fps=14))
             else:
-                S(Seg(card_plate(ground, art, tid, vals, freq, rank, n, tier),
-                      args.card))
-        said.append(word)
-        S(Seg(word_plate(ground, word, said, len(TAGLINE)), args.word))
-        if wi in (2, 5, 8, 11, 13) and ei < len(explainers):
-            plate, dur = explainers[ei]
-            ei += 1
-            S(Seg(plate, dur))
+                S(Seg(card_plate(ground, art, tid, vals, freq, rank, n, tier,
+                                 chip), args.card))
+            shown += 1
+        print(f"  {chip[0]:22s} {len(ids)} tokens")
 
-    S(Seg(title_plate(ground, "Refuse to take their meds",
-                      [" ".join(TAGLINE[:5]), " ".join(TAGLINE[5:])],
-                      eyebrow="4,444 SUGAR ADDICTED CONSPIRACY THEORISTS",
-                      foot="SWEETARDIO COLLECTION"), 6.5))
+    S(Seg(title_plate(ground, "4,444",
+                      ["Five background tiers. Two 1/1s. Seven weather states.",
+                       "Every count designed, allocated and verified."],
+                      eyebrow="SWEETARDIO COLLECTION",
+                      foot="SWEETARDIO COLLECTION"), 6.4))
 
-    total = sum(s.dur for s in seg)
-    print(f"{len(seg)} segments, {total:.0f}s ({total/60:.1f} min)")
+    total = sum(x.dur for x in seg)
+    print(f"{len(seg)} segments, {shown} token cards, "
+          f"{total:.0f}s ({total/60:.1f} min)")
     return seg
 
 
@@ -658,12 +652,8 @@ def main():
     ap.add_argument("--max-star", type=int, default=13,
                     help="cap on Starfield cards, so the ultra tier does not "
                          "crowd out the legendary plates")
-    ap.add_argument("--per-beat", type=int, default=3,
-                    help="token cards between one tagline word and the next")
     ap.add_argument("--card", type=float, default=2.9,
                     help="seconds per token card")
-    ap.add_argument("--word", type=float, default=1.5,
-                    help="seconds per tagline word")
     ap.add_argument("--animate", action="store_true", default=True,
                     help="play an animated tier's own loop in the card")
     ap.add_argument("--no-animate", dest="animate", action="store_false")
