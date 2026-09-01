@@ -328,6 +328,13 @@ def main():
                     help="starfield loop resolution (the STILL is full canvas)")
     ap.add_argument("--anim-ms", type=int, default=70,
                     help="starfield frame duration; 70 is the source GIF's own")
+    ap.add_argument("--render-only", default=None, metavar="IDS",
+                    help="with --render, composite ONLY these token ids "
+                         "(comma-separated). The allocation still runs in "
+                         "full, so every token gets its metadata and the ids "
+                         "mean the same thing they would in a full mint — "
+                         "this only skips the ~2.5s composite for the rest. "
+                         "For proof sheets and promos, not for a real mint")
     ap.add_argument("--fresh", action="store_true",
                     help="DELETE any previous mint in output/ first. Required "
                          "to re-mint: a run overwrites only what it produces, "
@@ -409,7 +416,15 @@ def main():
         sys.exit("--masks needs --render: the mask is a by-product of the "
                  "composite, so there is nothing to write without it")
 
+    render_only = (None if not args.render_only else
+                   {int(x) for x in args.render_only.replace(",", " ").split()})
+
     def render(layers, tid, starfield=False):
+        # A subset render for a proof or a promo. Gated HERE rather than at the
+        # call sites so it cannot miss one -- the secret rares are rendered
+        # from a different branch than the composited tokens.
+        if render_only is not None and tid not in render_only:
+            return
         # The starfield's rainbow trail leaves the character's own middle, and
         # bodies sit 251px apart vertically across the tier, so its plate is
         # built PER TOKEN rather than read from traits/. Both the still and

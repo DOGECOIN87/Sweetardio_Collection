@@ -12,3 +12,7 @@ dynamic/proof/var_*.png
 dynamic/proof/wx_*.png
 dynamic/proof/anim/weather_*_strip.png
 dynamic/proof/anim/*.gif
+
+# The promo render is a regenerated artifact of a mint, like output/ — the
+# GENERATOR is the record. promo/make_promo.py rebuilds it from output/.
+promo/*.mp4
