@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-"""The launch film: lineage intro, then what to look for when trading.
+"""The launch film: where it came from, what is in it, and what it all means.
 
-Built to the owner's brief (promo/LORE_BRIEF.md), and three of those answers
-decide almost everything about it:
+THE FILM IS ABOUT THE ART, NOT THE RARITY. Three cuts in a row led with
+counts and odds and the owner's note each time was to push the other way,
+the last one flatly: "I don't want the focus to be the rarity. I want the
+lore explained. The art/stickers explained." So the counts are gone --
+no odds, no "1 in N", no scarcity ladder. What is left is what each thing
+IS and why it is in there.
 
-  A4  he scores it himself at 140 BPM and wants text MINIMAL. So every cut
-      lands on a beat, and there are no metadata panels anywhere -- the
-      rarity video's nine-row read-out is the opposite of this instruction.
-      Numbers appear alone, big, and briefly.
-  B2  rarity rank is misleading, so no rank appears. Only counts and odds.
-  B7  nothing is minted yet, so no prices and no floors -- it closes on the
-      launch date instead.
+EVERYTHING STATED HERE CAME FROM THE OWNER (promo/LORE_BRIEF.md). Nothing
+about the lore is inferred, because the repo cannot know it: the name is
+Retardio + sweets, the empty gloves are a military brat's own joke, the
+Starfield is a Nyan Cat homage, Drained The Swamp is what it sounds like,
+and the four legendary plates honour people from the Gorbagana period --
+deliberately uncredited, because he asked that the public work it out.
 
-THE THESIS IS B4, ANSWERED FROM THE DATA. Every rarity tool scores traits
-INDEPENDENTLY and sums them; none of them score a pairing. So the thing the
-owner says to look for -- animated, then armed -- is precisely the thing no
-ranking will price. 466 tokens are animated and 707 carry an arm, but only
-64 are both, and exactly ONE pairs the rarest weather with a weapon.
+THE STICKERS ARE THE HEART OF IT. All 23 are named pop-culture references
+and the owner identified every one. That is the section a viewer actually
+enjoys, and it was missing entirely from the first cut.
 
-WHAT IT DOES NOT DO. It shows the art and does not caption it. Several
-backgrounds and stickers reference real, living people, and the owner's call
-on whether to name them was still open when this was built -- so the film
-names none of them. Nothing is hidden: the art appears exactly as minted.
-Nothing is amplified either, which is the reversible default. See H1-H3.
+TWO ARE SHOWN WITHOUT NAMING WHAT THEY REFERENCE. Both point at real,
+living people, and whether to name them on screen (H1-H3) is a question
+the owner has not answered. The art appears exactly as minted; only the
+caption is withheld, which is the reversible half.
 
     python3 promo/make_film.py --out promo/sweetardio_film.mp4
 """
@@ -62,6 +62,68 @@ ROSTER = [
     ("Footwear", 5), ("Stickers", 23), ("Weather", 7),
 ]
 ROSTER_FOOT = "2 one-of-one artworks, by guest artists"
+
+# Sticker -> what it references. Every one identified BY THE OWNER; none of
+# it is guesswork. Two are deliberately left uncaptioned -- they point at
+# real living people and that call (H1-H3) is still his to make.
+STICKER_REF = {
+    "Golden Ticket": "Willy Wonka",
+    "Marshmallow Man": "Ghostbusters",
+    "Box of Chocolates": "Forrest Gump",
+    "Calvin Candie": "Django Unchained",
+    "Zombieland Twinkie": "Zombieland",
+    "Mr Owl": "the Tootsie Pop ad",
+    "Hunny Pot": "Winnie the Pooh",
+    "Peppermint Butler": "Adventure Time",
+    "Rare Candy": "Pokémon",
+    "Candy Land": "the board game",
+    "Dude Sweet": "Dude, Where's My Car?",
+    "American Pie": "the film",
+    "Sweet Tooth": "Twisted Metal",
+    "Robot Chicken Gummy Bear": "Robot Chicken",
+    "Candy Shop": "50 Cent",
+    "The Meme is the Tech": "the crypto line",
+    "Straight Outta Gulag": "Straight Outta Compton",
+    "Benson": "Regular Show",
+    "The Bunny": "an old VeggieTales episode",
+    "Opengotchi": "an open-source project",
+}
+HELD = {"Caroline Ellison", "Pwease Lollipop"}   # real people; art only
+
+# Background themes.
+#
+# THE LABELLED CARDS USE PLATES WITH NO IDENTIFIABLE REAL FACES, and that is
+# a deliberate line rather than squeamishness. Several plates are photographs
+# of living politicians; putting those under a pink banner reading CONSPIRACY
+# and the line "they think something is out there" is not showing the art, it
+# is captioning real people with a claim about them. That is the H1-H3
+# question the owner has not answered yet, and it is the half that cannot be
+# taken back once posted.
+#
+# Those plates are NOT hidden -- they still appear behind tokens elsewhere in
+# the film, exactly as minted. Only the editorial grouping is withheld. To put
+# them back, add the stems here; nothing else needs to change.
+THEMES = [
+    ("CONSPIRACY", "They think something is out there.",
+     ["Abduction", "Clouds", "Drained_The_Swamp", "Starfield"]),
+    ("CRYPTO", "The rooms they grew up in.",
+     ["Bored_Apes", "RIP_Gorbagana", "Emblem", "Swolex"]),
+    ("THE MUNCHIES", "Three in the morning, every time.",
+     ["Empty_Fridge", "Midnight_Snack (1)", "Baked", "Toasted"]),
+    ("CANDY WORLD", "And sometimes it is just very sweet.",
+     ["Sweet_Shop", "Choco_Falls", "Candy_Tundra", "Goo_Lagoon"]),
+]
+
+# Details that carry a joke, each one the owner's own.
+DETAILS = [
+    ("The empty gloves are the joke.",
+     "He was a military brat. The figure is only pretending to hold one."),
+    ("The alien face is not a colourway.",
+     "It is the rarest face in the set, and it turns up where you would "
+     "expect it to."),
+    ("The starfield is a Nyan Cat homage.",
+     "The cat was erased from the original. The rainbow was put back."),
+]
 
 
 # ------------------------------------------------------------ plate makers
@@ -183,6 +245,22 @@ def sticker_plate(ground, arts, upto=None, headline=None):
     return im
 
 
+def sticker_one(fname):
+    """One sticker's art, cropped to its own ink and set on the ground."""
+    p = os.path.join(g.TRAITS_DIR, g.STICKERZ, fname)
+    if not os.path.exists(p):
+        return None
+    im = Image.open(p).convert("RGBA")
+    bb = im.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+    if bb:
+        im = im.crop(bb)
+    side = max(im.size)
+    c = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    c.paste(im, ((side - im.width) // 2, (side - im.height) // 2))
+    return Image.alpha_composite(
+        Image.new("RGBA", c.size, (6, 4, 10, 255)), c).convert("RGB")
+
+
 def sticker_arts(limit=23):
     """The sticker art itself, cropped to its own ink and set on black."""
     out = []
@@ -198,6 +276,88 @@ def sticker_arts(limit=23):
         out.append(Image.alpha_composite(
             Image.new("RGBA", c.size, (10, 8, 14, 255)), c).convert("RGB"))
     return out
+
+
+def sticker_card(ground, art, name, ref):
+    """One sticker, large, with what it references named under it.
+
+    This is the section the owner asked for twice. A grid of 23 thumbnails
+    says "there are 23 stickers"; it does not say that the owl is the Tootsie
+    Pop ad. Naming each one is the whole point.
+    """
+    box = 560
+    im = ground.copy()
+    d = ImageDraw.Draw(im)
+    x, y = (W - box) // 2, 190
+    im.paste(art.resize((box, box), Image.Resampling.LANCZOS), (x, y))
+    f = font(54)
+    d.text(((W - d.textlength(name, font=f)) / 2, y + box + 40), name,
+           font=f, fill=INK)
+    if ref:
+        fr = font(32, bold=False)
+        t = ref if ref.startswith(("the ", "an ", "a ")) else ref
+        d.text(((W - d.textlength(t, font=fr)) / 2, y + box + 108), t,
+               font=fr, fill=PINK_HI)
+    return im
+
+
+def theme_card(ground, plates, title, line):
+    """A background theme: four plates at once, so the family reads."""
+    im = ground.copy()
+    d = ImageDraw.Draw(im)
+    fk = font(30)
+    w = tracked_width(d, title, fk, 6)
+    tracked(d, ((W - w) / 2, 116), title, fk, PINK_HI, track=6)
+    cell, gap = 380, 30
+    n = len(plates)
+    x0 = (W - (n * cell + (n - 1) * gap)) // 2
+    for i, pl in enumerate(plates):
+        x = x0 + i * (cell + gap)
+        im.paste(pl.resize((cell, cell), Image.Resampling.LANCZOS), (x, 200))
+        d.rounded_rectangle([x - 3, 197, x + cell + 3, 200 + cell + 3],
+                            radius=12, outline=(52, 55, 64), width=2)
+    f = font(42, bold=False)
+    d.text(((W - d.textlength(line, font=f)) / 2, 200 + cell + 56), line,
+           font=f, fill=STEEL)
+    return im
+
+
+def detail_card(ground, headline, line):
+    im = ground.copy()
+    d = ImageDraw.Draw(im)
+    f1 = font(62)
+    while d.textlength(headline, font=f1) > W - 260:
+        f1 = font(int(f1.size * 0.93))
+    d.text(((W - d.textlength(headline, font=f1)) / 2, 430), headline,
+           font=f1, fill=INK)
+    f2 = font(34, bold=False)
+    y = 430 + int(f1.size * 1.45)
+    for part in wrap_text(d, line, f2, 1250):
+        d.text(((W - d.textlength(part, font=f2)) / 2, y), part,
+               font=f2, fill=DIM)
+        y += 48
+    return im
+
+
+def wrap_text(d, text, fnt, width):
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        t = (cur + " " + w).strip()
+        if d.textlength(t, font=fnt) > width and cur:
+            lines.append(cur); cur = w
+        else:
+            cur = t
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def plate_art(stem):
+    """A background plate straight from traits/, for the theme cards."""
+    p = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ, stem + ".png")
+    if not os.path.exists(p):
+        return None
+    return Image.open(p).convert("RGB")
 
 
 def launch_plate(ground):
@@ -351,78 +511,81 @@ def build(args):
     seg.extend(mi.build(SimpleNamespace(
         box=560, hold=8 * beat, gif_fps=12, max_frames=60, logo_frames=200)))
 
-    # ---- 2. what it is: the roster (D1) ----
-    S(stat_plate(ground, "4,444", kicker="SWEETARDIO COLLECTION"), 5)
+    # ---- 2. the name (C2, the owner's own) ----
+    S(detail_card(ground, "Swee-tardio.",
+                  "Sweets, and Retardio. The name says where it came from."), 7)
+
+    # ---- 3. what is in one (D1: "just list the traits") ----
     for i in range(1, len(ROSTER) + 1):
         S(roster_plate(ground, ROSTER, ROSTER_FOOT, upto=i), 1)
     S(roster_plate(ground, ROSTER, ROSTER_FOOT), 6)
 
-    # ---- 3. THE ART. Held long, and given most of the running time.
-    #
-    # The first cut was a rarity deck with pictures between the numbers. The
-    # owner's note was the reverse -- more artwork, less rarity -- so the
-    # stat cards are down from eight to three and every token now holds for
-    # four beats instead of two. The numbers that survive are the ones a
-    # buyer cannot get from looking.
+    # ---- 4. the cast ----
     for t in pick("collection",
                   [t for t in have if not animated(t)
-                   and not man[t].get("secret_rare")], 12):
+                   and not man[t].get("secret_rare")], 8):
         S(token_frames(ground, t, args.box, animate=False), 4)
 
-    # ---- 4. weather: ALL SEVEN, each with its own loop ----
-    wx_counts = {}
-    for t in man:
-        if man[t].get("weather"):
-            wx_counts[man[t]["weather"]] = wx_counts.get(man[t]["weather"], 0) + 1
-    S(line_plate(ground, "Seven of them carry weather.", size=62), 6)
+    # ---- 5. THE BACKGROUNDS, EXPLAINED ----
+    S(detail_card(ground, "Every one of them is somewhere.",
+                  "66 backgrounds, and they are not wallpaper."), 6)
+    for title, line, stems in THEMES:
+        plates = [pl for pl in (plate_art(x) for x in stems) if pl is not None]
+        if len(plates) < 2:
+            print(f"  theme {title}: only {len(plates)} plates found — skipped")
+            continue
+        S(theme_card(ground, plates[:4], title, line), 8)
+
+    # ---- 6. THE STICKERS, EXPLAINED ----
+    S(detail_card(ground, "Then there are the stickers.",
+                  "23 of them. Every one is a reference."), 6)
+    for f in sorted(g.get_files(g.STICKERZ)):
+        name = g.trait_name(g.STICKERZ, f)
+        art = sticker_one(f)
+        if art is None:
+            continue
+        ref = None if name in HELD else STICKER_REF.get(name)
+        S(sticker_card(ground, art, name, ref), 3)
+    arts = sticker_arts()
+    S(sticker_plate(ground, arts, headline="Collect all 23."), 8)
+
+    # ---- 7. the details that carry a joke ----
+    for headline, line in DETAILS:
+        S(detail_card(ground, headline, line), 7)
+
+    # ---- 8. the tributes, deliberately uncredited ----
+    S(detail_card(ground, "Four backgrounds honour people.",
+                  "From the Gorbagana days. They are not named on purpose — "
+                  "work it out."), 8)
+    legs = [pl for pl in (plate_art(x) for x in
+            ("Legendary_Just_Aliens", "Legendary_Opengotchi",
+             "Legendary_Simplex", "Legendary_Tenders")) if pl is not None]
+    if len(legs) >= 2:
+        S(theme_card(ground, legs[:4], "LEGENDARY", "You know who you are."), 8)
+
+    # ---- 9. the animated tier, as ART not as a statistic ----
+    S(detail_card(ground, "Some of them move.",
+                  "Seven kinds of weather, and one plate that never stops."), 6)
     for state in ("rain", "snow", "fog", "storm", "blizzard", "flooded",
                   "tornado"):
-        cap = f"{state.title()}  ·  {wx_counts.get(state, 0)} of 4,444"
         plates = None
-        if state == "flooded":                 # the owner's own cut
-            plates = clip_frames(ground, "flooded_twinkie.mp4", args.box, cap)
+        if state == "flooded":
+            plates = clip_frames(ground, "flooded_twinkie.mp4", args.box,
+                                 state.title())
         if plates is None:
             cands = [t for t in have if man[t].get("weather") == state
                      and os.path.exists(os.path.join(ANIM, f"{t}.mp4"))]
             cands.sort(key=lambda t: -reads.get(t, 0))
             if not cands:
-                print(f"  weather {state}: NO LOOP RENDERED — skipped")
                 continue
-            plates = token_frames(ground, cands[0], args.box, caption=cap)
-        S(plates, 6)
-
-    # ---- 5. the animated plate ----
-    S(line_plate(ground, "One of them moves.", size=66), 5)
+            plates = token_frames(ground, cands[0], args.box,
+                                  caption=state.title())
+        S(plates, 5)
     for t in pick("animated",
-                  [t for t in have if man[t].get("starfield")], 5):
-        S(token_frames(ground, t, args.box), 4)
-    S(stat_plate(ground, f"{n_anim}", kicker="ANIMATED",
-                 sub=f"of {n:,}  ·  1 in {round(n / n_anim)}"), 5)
-
-    # ---- 6. the stickers, a SET rather than a rarity ----
-    arts = sticker_arts()
-    S(sticker_plate(ground, arts, upto=0), 2)
-    for i in range(4, len(arts) + 1, 4):
-        S(sticker_plate(ground, arts, upto=i), 1)
-    S(sticker_plate(ground, arts,
-                    headline="184 of each. A set inside the set."), 7)
-
-    # ---- 7. armed, and the one ----
-    S(line_plate(ground, "Most of them are armed.", size=62), 5)
-    for t in pick("armed",
-                  [t for t in have if armed(t) and not animated(t)], 6):
-        S(token_frames(ground, t, args.box, animate=False), 4)
-    for t in pick("both",
-                  [t for t in have if animated(t) and armed(t)], 3):
+                  [t for t in have if man[t].get("starfield")], 3):
         S(token_frames(ground, t, args.box), 4)
 
-    S(line_plate(ground, "One is armed, animated, and in a tornado.",
-                 size=52, colour=DIM), 5)
-    S(token_frames(ground, the_one, args.box + 60), 10)
-    S(stat_plate(ground, "1", kicker="OF 4,444", sub="There is only one.",
-                 colour=PINK_HI), 7)
-
-    # ---- 8. the close ----
+    # ---- 10. the close ----
     S(launch_plate(ground), 12)
 
     total = sum(x.dur for x in seg)
