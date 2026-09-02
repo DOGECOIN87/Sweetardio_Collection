@@ -536,18 +536,19 @@ def build(args):
             continue
         S(theme_card(ground, plates[:4], title, line), 8)
 
-    # ---- 6. THE STICKERS, EXPLAINED ----
-    S(detail_card(ground, "Then there are the stickers.",
-                  "23 of them. Every one is a reference."), 6)
-    for f in sorted(g.get_files(g.STICKERZ)):
-        name = g.trait_name(g.STICKERZ, f)
-        art = sticker_one(f)
-        if art is None:
-            continue
-        ref = None if name in HELD else STICKER_REF.get(name)
-        S(sticker_card(ground, art, name, ref), 3)
+    # ---- 6. the stickers, as a wall ----
+    #
+    # NO BLOWN-UP SINGLES. The art is only ~180x190 px of ink, so a 560px
+    # card upscales it 3x and it shows -- the owner's note was that the
+    # stickers looked low quality, and he was right about the cause. The
+    # grid runs them at 150px, which is a slight DOWNscale and therefore
+    # sharp. Naming each reference needs source art re-exported larger;
+    # until then this is the only size they hold up at.
     arts = sticker_arts()
-    S(sticker_plate(ground, arts, headline="Collect all 23."), 8)
+    S(sticker_plate(ground, arts, upto=0), 2)
+    for i in range(4, len(arts) + 1, 4):
+        S(sticker_plate(ground, arts, upto=i), 1)
+    S(sticker_plate(ground, arts, headline="23 stickers. Collect them all."), 9)
 
     # ---- 7. the details that carry a joke ----
     for headline, line in DETAILS:
