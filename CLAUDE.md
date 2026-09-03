@@ -847,6 +847,32 @@ it sits on. Same limitation this file already records for the band-pass.
 **It has no `SECRET_RARE_ARTISTS` entry**, and that is correct — it is
 in-house, so there is no guest to credit. Artist stays a 2-of-4441 signal.
 
+### The token name has 32 BYTES, and all three were over
+
+Metaplex's on-chain `Metadata` account is fixed-width — **name 32 bytes,
+symbol 10, uri 200** — and launchmynft writes the JSON's own `name` into it.
+An over-length name is not a display problem: the mint truncates it or
+refuses the config line.
+
+`Secret Rarez #N — <piece>` never fit, and had not since the guest pieces
+shipped: **Radbro Webring measured 34 bytes and Duhnut Candy Man 36**, before
+Cookboy took it to 42. **The em-dash is the trap** — one character, three
+bytes — so a character count passes a name the chain rejects. Measure names
+in bytes.
+
+The format is now `1/1 #N <piece>` (21–29 bytes). `1/1` says what
+`Secret Rarez` did in a quarter of the room, and it **leads rather than
+trails because marketplace grids truncate from the right**: the tier marker
+has to survive the ellipsis. The number is kept because the `Secret Rarez`
+attribute carries it too and the two disagreeing would be worse than either.
+
+Two gates, because one is not enough. `secret_rare_token_name()` **raises**
+on an over-limit name — the thing that would slip through is a future piece
+with a long title, and it should fail at the function rather than at the
+candy machine. `verify_mint.py` checks all five string fields against their
+real limits on the finished mint, which is where a name that was fine in
+`generator.py` and wrong after a rename would show up.
+
 ### DO NOT resurrect the old Artist Series
 
 The unmerged branch `claude/rarity-collection-generation-3j2o6v` made these
@@ -854,6 +880,36 @@ The unmerged branch `claude/rarity-collection-generation-3j2o6v` made these
 `is_quota_bg()` and an `ARTIST_BARE` rule. That is the opposite of standalone
 1/1s. Take only the ART from that branch — its `is_quota_bg` idea already
 exists on main, in better form, as `generator.is_allocator_only_bg()`.
+
+### Adding the THIRD one DID move them, and it was re-solved
+
+The two-piece finding below does not generalise, and the difference is worth
+understanding before the next asset lands. Adding Cookboy moves the
+composited pool 4442 → **4441 — one token** — and that was enough to break
+the fit at seed 4444:
+
+| | worst eye | worst mouth |
+|---|---|---|
+| 2 secret rares (4442) | 0.56 | 0.16 |
+| 3 secret rares (4441) | **1.34** (Smug) | **1.29** (Tasty) |
+
+**It is not the denominator, it is the re-randomisation.** One token in 4,441
+cannot move a share by 1.3 points; a changed allocation re-randomises every
+draw downstream of it, and the gains are fitted to seed 4444's exact draw.
+So the "before" column is what a fit looks like and the "after" column is
+roughly what an *unfitted* seed looks like — compare the +0.31 / +1.70 / +1.25
+Side Eye readings this file already records across three seeds.
+
+Re-solved at seed 4444 (2 passes, converged): eyes now within **±0.23**,
+mouths **±0.16**, backgrounds **±0.23**.
+
+The lesson is the one `calibrate_rarity.py`'s docstring already states and
+this file half-contradicted: **re-solve whenever the allocation moves, and
+do not reason about it from the size of the change.** The earlier two-piece
+result was luck, not a rule.
+
+`catalog/RARITY.md` is derived from a mint and is stale until the next full
+build.
 
 ### It did not move the rarity gains either
 
@@ -1302,6 +1358,14 @@ off `FACE_HOLE_WIDTH`. Run both — they catch opposite failures.
 character-locked arms. Its lock audit includes a **synthetic** lock, so it
 still tests the rule while `ARMZ_CHAR_LOCK` is empty.
 
+`calibrate_rarity.py` builds a THROWAWAY allocation per solver step, into
+`$TMPDIR/sweetardio_calibrate` rather than `output/`. It has to: `build_mint`
+refuses to start against a dirty tree, so the second call would die — and
+`--fresh` is not the answer there, because in a repo holding a finished mint
+it would delete it. `build_mint.py --out-dir` is what makes that possible,
+and it re-roots **every** mint path in one place so a preflight can never
+delete one tree while the writers fill another.
+
 `verify_mint.py` is the only gate that looks at the **output** rather than
 the art, and it exists for one failure the others cannot see: a MISPAIRED
 collection. `build_mint.py` keys every path by token id, so a re-run
@@ -1312,8 +1376,10 @@ file still validates; the folder holds two collections. `--fresh` is the fix
 (the mint now refuses to start against a dirty `output/`) and this is the
 proof it worked: ids 1..N with no orphan either way, every `image` naming the
 file that is there, `animation_url` on exactly the animated tiers with its
-Metaplex `properties`, attributes agreeing with the manifest, and every
-designed count minted exactly. It does **not** check that a token's picture
+Metaplex `properties`, attributes agreeing with the manifest, every
+designed count minted exactly, and every string field inside its Metaplex
+on-chain byte limit (name 32, symbol 10, uri 200 — **bytes, not
+characters**). It does **not** check that a token's picture
 shows the traits it claims — that needs a re-render. See `MINT_PROCESS.md`.
 
 `dynamic/starfield.py --verify` is the gate on the animated plate, and it

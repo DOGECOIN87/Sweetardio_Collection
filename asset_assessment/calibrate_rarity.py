@@ -57,14 +57,15 @@ import argparse
 import collections
 import json
 import os
+import shutil
 import subprocess
+import tempfile
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import generator as g  # noqa: E402
 
 RARITY_PATH = g.RARITY_PATH
-MANIFEST = "output/mint_manifest.json"
 CATS = {"eyez": ("eye", g.EYEZ),
         "mouthz": ("mouth", g.MOUTHZ),
         "backgroundz": ("bg", g.BACKGROUNDZ)}
@@ -81,14 +82,23 @@ def save(doc):
         f.write("\n")
 
 
+# Allocations built here are THROWAWAY -- one per solver step, several per
+# --check. They go to a scratch tree of their own rather than to output/,
+# for two reasons that pull the same way: build_mint refuses to start
+# against a dirty tree (so the second call would die), and --fresh is not
+# the answer, because in a repo holding a finished mint it would delete it.
+ALLOC_DIR = os.path.join(tempfile.gettempdir(), "sweetardio_calibrate")
+
+
 def run_alloc(n, seed):
+    shutil.rmtree(ALLOC_DIR, ignore_errors=True)
     r = subprocess.run(
         [sys.executable, "asset_assessment/build_mint.py",
-         "--n", str(n), "--seed", str(seed)],
+         "--n", str(n), "--seed", str(seed), "--out-dir", ALLOC_DIR],
         capture_output=True, text=True)
     if r.returncode != 0:
         sys.exit("build_mint failed:\n" + r.stdout[-3000:] + r.stderr[-3000:])
-    with open(MANIFEST) as f:
+    with open(os.path.join(ALLOC_DIR, "mint_manifest.json")) as f:
         return list(json.load(f).values())
 
 

@@ -76,6 +76,21 @@ CLEAR_DIR = os.path.join(MINT_DIR, "images_clear")
 MANIFEST_PATH = os.path.join(OUT_DIR, "mint_manifest.json")
 REPORT_PATH = os.path.join(MINT_DIR, "rarity_report.txt")
 
+
+def _rebind_out_dir(root):
+    """Re-root every path above at `root`. Spelled once, for the reason the
+    block above is: a --fresh that deletes one tree while the writers fill
+    another is worse than no --fresh at all."""
+    g = globals()
+    g["OUT_DIR"] = root
+    g["MINT_DIR"] = os.path.join(root, "mint")
+    for name, leaf in (("IMG_DIR", "images"), ("META_DIR", "metadata"),
+                       ("MASK_DIR", "masks"), ("FLOAT_DIR", "float_masks"),
+                       ("ANIM_DIR", "anim"), ("CLEAR_DIR", "images_clear")):
+        g[name] = os.path.join(g["MINT_DIR"], leaf)
+    g["MANIFEST_PATH"] = os.path.join(root, "mint_manifest.json")
+    g["REPORT_PATH"] = os.path.join(g["MINT_DIR"], "rarity_report.txt")
+
 TRAIT_KEYS = ("character", "bg", "skin", "eye", "mouth", "arm", "wat", "sticker")
 
 # Weather is deliberately NOT in TRAIT_KEYS, so it is not part of the
@@ -345,8 +360,20 @@ def main():
     ap.add_argument("--symbol", default=None)
     ap.add_argument("--royalty-bps", type=int, default=None,
                     help="seller_fee_basis_points, e.g. 500 for 5%%")
+    ap.add_argument("--out-dir", default=OUT_DIR,
+                    help="where the mint is written (default: output). "
+                         "calibrate_rarity.py points this at a scratch dir: "
+                         "it builds an allocation per solver step and the "
+                         "dirty-tree preflight would otherwise stop it on "
+                         "the second one -- and --fresh is not the answer "
+                         "there, because it would delete a real mint.")
     args = ap.parse_args()
     random.seed(args.seed)
+
+    # Every mint path hangs off --out-dir, rebound once here so the preflight
+    # and the writers below cannot end up pointing at different trees.
+    if args.out_dir != OUT_DIR:
+        _rebind_out_dir(args.out_dir)
 
     img_dir = IMG_DIR
     # The protect mask for the dynamic sky pass (dynamic/sky.py): the union

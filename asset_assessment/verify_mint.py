@@ -171,6 +171,27 @@ def check(args):
 
         attrs = {a["trait_type"]: a["value"] for a in tok.get("attributes", [])}
 
+        # METAPLEX ON-CHAIN FIELD LIMITS, in BYTES not characters.
+        #
+        # The Metadata account's Data struct is fixed-width -- name 32,
+        # symbol 10, uri 200 -- and launchmynft writes the JSON's own name
+        # into it. A name that does not fit is not a display problem; the
+        # mint either truncates it or refuses the config line, and neither
+        # is something to discover on launch day.
+        #
+        # Measured in bytes because an em-dash is 3 of them: "Secret Rarez
+        # #1 - Radbro Webring" is 32 characters and 34 bytes, so a
+        # character count passes it and the chain does not.
+        for field, limit in (("name", 32), ("symbol", 10), ("image", 200),
+                             ("animation_url", 200), ("external_url", 200)):
+            v = tok.get(field)
+            if v is None:
+                continue
+            b = len(str(v).encode("utf-8"))
+            if b > limit:
+                r.bad(f"`{field}` exceeds the Metaplex {limit}-byte on-chain "
+                      f"limit", f"{tid}.json -> {b} bytes, {str(v)!r}")
+
         # THE LINK: the image field must name this token's own file.
         img = tok.get("image")
         if img is None:

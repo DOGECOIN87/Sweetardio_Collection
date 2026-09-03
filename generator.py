@@ -321,10 +321,40 @@ def secret_rare_number(filename):
     base = os.path.basename(filename)
     return keys.index(base) + 1 if base in keys else 0
 
+# Metaplex's on-chain Metadata account is fixed-width: name 32 BYTES, symbol
+# 10, uri 200. launchmynft writes the JSON's own `name` into it, so a name
+# that does not fit is not a display problem -- the mint truncates it or
+# refuses the config line.
+METAPLEX_NAME_BYTES = 32
+
+
 def secret_rare_token_name(filename):
-    """Drop-ready token name, e.g. 'Secret Rarez #1 — Milk Dunk'."""
-    return (f"Secret Rarez #{secret_rare_number(filename)} — "
+    """Drop-ready token name, e.g. '1/1 #1 Milk Dunk'.
+
+    IT HAS TO FIT IN 32 BYTES. The old 'Secret Rarez #1 — <piece>' did not
+    and never had: measured, Radbro Webring came to 34 bytes and Duhnut
+    Candy Man to 36, both over before this format changed. The em-dash is
+    the trap -- it is one character and THREE bytes, so a character count
+    passes a name the chain rejects.
+
+    '1/1' says the same thing 'Secret Rarez' did in a quarter of the room,
+    and it leads rather than trails because marketplace grids truncate from
+    the right: the tier marker has to survive the ellipsis. The piece's
+    number is kept because the `Secret Rarez` attribute carries it too, and
+    the two disagreeing would be worse than either alone.
+
+    The budget is asserted, not assumed. A future piece with a long title
+    is exactly the thing that would slip through, and it fails here rather
+    than at the candy machine."""
+    name = (f"1/1 #{secret_rare_number(filename)} "
             f"{trait_name(SECRET_RAREZ, os.path.basename(filename))}")
+    if len(name.encode("utf-8")) > METAPLEX_NAME_BYTES:
+        raise ValueError(
+            f"secret rare token name is {len(name.encode('utf-8'))} bytes, "
+            f"over Metaplex's {METAPLEX_NAME_BYTES}-byte on-chain limit: "
+            f"{name!r}. Shorten the artwork's filename -- the display name "
+            f"falls back from it.")
+    return name
 
 
 # Who actually drew a secret rare, for the pieces made by a GUEST artist, and
