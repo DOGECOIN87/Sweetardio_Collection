@@ -665,6 +665,48 @@ That helper must run **after** `extract_metadata()`, because the Background
 attribute is read off `layers[0]`'s filename and the swapped stack carries a
 temp name.
 
+#### The FIGURE is centred per token too, because the field has no floor
+
+A **second** per-token measurement, and it is `starfield.centre_figure()`.
+It runs **before** `centre_layers()` — the trail is placed against where the
+body ended up, so reverse the two and the rainbow is drawn for a character
+that then moves out from under it.
+
+Everywhere else the plate carries the composition: there is scenery below
+the character, a horizon to read it against, and the figure only has to be
+grounded consistently — which `VERTICAL_OFFSET`, `CHAR_Y_ADJUST` and
+`CENTERED_FOOTWEARLESS_DY` already do. **On a flat field none of that is
+there, so the figure's own frame margins ARE the composition.**
+
+The placement itself is plate-independent and was verified so: measured
+against 220 non-starfield tokens the tier's bodies sit *lower* on average
+(bottom 1072 vs 1058), and a bare glazed doughnut renders at exactly the
+same y on Starfield, RIP Gorbagana and Straight of America. What differs is
+what is under it. Over the 22 minted tokens the body's centre runs **121px
+above the frame centre to 56px below**, and the ones that read wrong are
+exactly the `CENTERED_CHARS` round bodies — a bare glazed doughnut sits 48px
+high with **367px of empty blue under it against 272 above**. That is the
+float this file calls a feature, and it *is* one in front of scenery.
+
+- **Anchor on body + footwear.** Footwear is IN, because a slipper is what a
+  figure stands in: the two shod doughnuts measure a 118px *body* drop and a
+  22px *standing* drop, and 22 is right — their bunny slippers already fill
+  the space the bare ones leave empty. Arms are OUT, for the reason
+  `centre_dy` already gives: a saber blade reaches y=105 and would drag its
+  figure down 90px for a prop.
+- **Down only.** Nothing in the tier reads low, so a negative drop clamps to
+  0 and **13 of the 22 tokens are bit-identical** to what they were.
+- **The plate and the corner sticker do not move.** The sticker is a decal in
+  the frame's corner, and it is authored at y 1114..1338 — include it in the
+  figure and it reads as the figure's own bottom on nearly every token.
+
+Chosen off a rendered ladder at 0 / 0.5x / 1.0x of the drop; full reads best
+on all five cases rendered. `--verify` now measures it: over 196 renders the
+drop runs **0..121px on 92 of them**, worst cut margin is unchanged at 140px,
+and the least room under body+footwear is 182px. The gate checks the frame on
+the **anchor**, not the full silhouette — a saber blade already runs off the
+frame by design, so failing on that would fail legitimate renders.
+
 #### Rebuilding the compat maps moved nothing
 
 Repainting the plate changes what `build_char_compat.py` and
@@ -704,9 +746,10 @@ token with no character, plate, skin, eyes or mouth over them. Each is **1 of
 4444 — 0.0225 %, ten times rarer than the Starfield** and fifty times rarer
 than a legendary plate.
 
-The tier holds two guest-artist pieces: **Duhnut Candy Man** (#1, by Emily
-Cartoons) and **Radbro Webring** (#2, by Radbro Webring). The 23 in-house
-pieces of the original tier stay retired in `traits/secret_rarez_retired/`.
+The tier holds three pieces: **Cookboy Blue Raspberry** (#1, in-house),
+**Duhnut Candy Man** (#2, by Emily Cartoons) and **Radbro Webring** (#3, by
+Radbro Webring). The 23 in-house pieces of the original tier stay retired in
+`traits/secret_rarez_retired/`.
 
 **The mechanism already existed — do not build a new one.** `build_mint.py`
 step 0 gives each a fixed slot and excludes it from every other pool;
@@ -715,7 +758,10 @@ Restoring the tier is *only* dropping files into the folder:
 
 - **The `Secret_` prefix is required** — `is_secret_rare()` matches on it.
 - **Numbering is `secret_rare_number()`, which indexes SORTED FILENAMES.**
-  D sorts before R, hence #1 Duhnut and #2 Radbro. Adding or renaming a piece
+  C sorts before D before R, hence #1 Cookboy, #2 Duhnut, #3 Radbro — adding
+  Cookboy **renumbered both guest pieces**, which was accepted only because
+  nothing is minted yet and the site credits them by name rather than by
+  number. Adding or renaming a piece
   renumbers the set, which is why restoring a retired piece would not give it
   back its old number.
 - **There is deliberately no `TRAIT_NAMES[SECRET_RAREZ]` block.** Names fall
@@ -755,7 +801,7 @@ It lives in `generator.py`, not `build_mint.py`, because the credit is a
 property of the ARTWORK — every path that builds a secret rare's metadata goes
 through `extract_metadata()` and so cannot drop it. **A missing entry is
 legitimate and must never be fatal**: the 23 retired pieces are in-house art
-with no guest to credit.
+with no guest to credit, and so is Cookboy.
 
 It matters unevenly. "Radbro Webring" is both the piece and the artist, so
 that one carried the name by accident; Emily Cartoons appeared in no metadata
@@ -763,6 +809,43 @@ at all — her signature is painted into the art and vanishes at thumbnail size.
 The same two links are the site's own attribution, in the `Sweetarded-Games`
 repo at `src/content/artistRares.ts`. Minted with both artists' permission
 (confirmed by the owner, 2026-08).
+
+### Cookboy Blue Raspberry is built THROUGH the compositor
+
+The in-house 1/1 is the Cookboy motif — the pixel face embossed across the
+`Cookboy.png` / `Cookboy_Chocolate.png` plates and die-cut as sticker
+`Sweetardio_200 (30).png` — rendered as a blue gummy and flown across the
+starfield on the 8-bit rainbow.
+
+**A secret rare composites with NOTHING, so anything the tier does at
+composite time has to be baked in.** The 22 minted starfield tokens get
+`GROUND_SHADOW` and `SUBJECT_SEPARATION` from `create_image()`; a 1/1 gets
+neither, and painted by hand it would sit visibly flatter than the tier it
+belongs to. So it is built by running the real compositor over
+`[plate, figure]` — `create_image()` takes `layers[0]` as the plate and
+everything after it as the figure, which is the whole mechanism. Do not
+hand-paint a shadow onto a piece like this; hand it to the compositor.
+
+Three things measured rather than assumed:
+
+- **The cut from the source is a luma ramp plus an UNPREMULTIPLY.** The art
+  arrived composited over pure black (the frame's outer 6px band peaks at
+  luma 1), so its RGB is already premultiplied — a straight threshold keeps
+  black RGB at partial alpha and leaves a dark fringe all the way round.
+- **880px tall**, off a ladder at 760 / 860 / 960 / 1060. Above that it
+  crowds the frame; below it the piece stops reading as a hero.
+- **The rainbow's flat cut is checked here too.** The trail stops on a
+  straight vertical line at canvas x 721 and the figure has to hide it over
+  the band's full swept height — the same failure `verify_cover()` gates for
+  the tier, asserted in the build rather than trusted.
+
+`audit_art_quality.py` flags it **SOFT** (sharpness 0.049). That is the
+metric reading a flat field, not soft art: `Starfield.png` itself reads
+0.010 and is flagged the same way, so the piece is 5x sharper than the plate
+it sits on. Same limitation this file already records for the band-pass.
+
+**It has no `SECRET_RARE_ARTISTS` entry**, and that is correct — it is
+in-house, so there is no guest to credit. Artist stays a 2-of-4441 signal.
 
 ### DO NOT resurrect the old Artist Series
 

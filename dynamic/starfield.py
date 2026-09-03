@@ -314,19 +314,28 @@ def band_bbox(dy=0):
 FIGURE_PAD = 12        # canvas px of cut column that must be covered
 
 
-def _figure(layers, gen, body_only=False):
-    """The placed silhouette, as a bool array. `body_only` = the character.
+def _folders(gen, *names):
+    """Trait folders as path prefixes, for testing which part a layer is."""
+    return tuple(os.path.normpath(os.path.join(gen.TRAITS_DIR, n)) + os.sep
+                 for n in names)
+
+
+def _figure(layers, gen, parts=None):
+    """The placed silhouette, as a bool array.
+
+    `parts` narrows it to those trait folders -- (CHARACTERZ,) is the body
+    alone and (CHARACTERZ, WHAT_ARE_THOSEZ) the figure as it stands. None
+    is everything the token composites except the plate.
 
     Built from gen._render_layer(), which is the same function create_image
     composites with, so the placement cannot drift from the real render.
     """
-    czs = os.path.normpath(os.path.join(gen.TRAITS_DIR, gen.CHARACTERZ))
+    keep = _folders(gen, *parts) if parts else None
     out = None
     for i, l in enumerate(layers):
         if i == 0:
             continue                        # the plate is not the figure
-        if body_only and not os.path.normpath(
-                l["path"]).startswith(czs + os.sep):
+        if keep and not os.path.normpath(l["path"]).startswith(keep):
             continue
         img = gen._render_layer(l)
         if img is None:
@@ -344,7 +353,7 @@ def centre_dy(layers, gen):
     whole number of source pixels -- 3.4825 canvas px of resolution, which
     is finer than the 251px spread it is correcting for by a wide margin.
     """
-    body = _figure(layers, gen, body_only=True)
+    body = _figure(layers, gen, (gen.CHARACTERZ,))
     fig = _figure(layers, gen)
     if body is None or fig is None:
         return 0
@@ -390,6 +399,78 @@ def cover_runs(fig, lead=None, pad=FIGURE_PAD):
     if start is not None:
         runs.append((start, col.size - 1))
     return runs
+
+
+# --------------------------------------------------- centring the FIGURE
+#
+# A SECOND per-token measurement, and the reason it exists is that this is
+# the one plate with no floor in it.
+#
+# Everywhere else the plate carries the composition: there is scenery below
+# the character, a horizon to read it against, and the figure only has to
+# be grounded consistently -- which VERTICAL_OFFSET, CHAR_Y_ADJUST and
+# CENTERED_FOOTWEARLESS_DY already do. On a flat field none of that is
+# there, so the figure's own frame margins ARE the composition.
+#
+# Measured over the 22 minted tokens, the body's centre runs from 121px
+# ABOVE the frame centre to 56px below, and the ones that read wrong are
+# exactly the CENTERED_CHARS round bodies: a bare glazed doughnut sits 48px
+# high with 367px of empty blue under it against 272 above. That placement
+# is CORRECT on every other plate -- CLAUDE.md is explicit that "these
+# bodies float, the standing ones stand" and the 70px shared drop was
+# chosen off a rendered ladder -- so this is a property of the FIELD and is
+# corrected here rather than in generator's placement tables.
+#
+# ANCHOR ON BODY + FOOTWEAR, the same discipline centre_dy() uses one
+# function up:
+#   * Footwear is IN the anchor, because a slipper is what a figure stands
+#     in. The two shod doughnuts measure a 118px body drop and a 22px
+#     standing drop, and 22 is the right answer -- their bunny slippers
+#     already fill the space the bare ones leave empty.
+#   * Arms are OUT of it. A saber's blade reaches y=105 and would drag its
+#     whole figure down 90px for a prop rather than a body -- the same
+#     reason centre_dy() will not anchor on them.
+#
+# DOWN ONLY. Nothing in the tier reads low, and clamping a negative drop to
+# zero leaves 13 of the 22 tokens bit-identical to what they were.
+#
+# The plate and the corner sticker do not move: the sticker is a decal in
+# the frame's corner, not part of the figure.
+FIGURE_ANCHOR = ("CHARACTERZ", "WHAT_ARE_THOSEZ")
+FIGURE_MOVES = ("CHARACTERZ", "SKINZ", "EYEZ", "MOUTHZ", "ARMZ",
+                "WHAT_ARE_THOSEZ")
+
+
+def figure_drop(layers, gen):
+    """How far to lower this figure so it sits in the middle of the field."""
+    stand = _figure(layers, gen, [getattr(gen, n) for n in FIGURE_ANCHOR])
+    if stand is None:
+        return 0
+    ys = np.nonzero(stand.any(1))[0]
+    if not ys.size:
+        return 0
+    mid = (int(ys.min()) + int(ys.max())) / 2.0
+    return int(round(max(0.0, gen.CANVAS_SIZE / 2.0 - mid)))
+
+
+def centre_figure(layers, gen):
+    """Lower the whole figure onto the field's centre. -> (layers, drop).
+
+    CALL IT BEFORE centre_layers(), which measures the placed body to put
+    the rainbow band on it: run the two the other way round and the trail
+    is drawn for a character that then moves out from under it.
+    """
+    d = figure_drop(layers, gen)
+    if not d:
+        return layers, 0
+    moves = _folders(gen, *[getattr(gen, n) for n in FIGURE_MOVES])
+    out = []
+    for i, l in enumerate(layers):
+        l = dict(l)
+        if i and os.path.normpath(l["path"]).startswith(moves):
+            l["dy"] = l.get("dy", 0) + d
+        out.append(l)
+    return out, d
 
 
 def from_gif(path, size=(1393, 1393), clean=True, field=None,
@@ -606,7 +687,11 @@ def verify_cover(gen, rolls=3, seed=1000, pad=12):
             layers, _ = gen.generate_random_combination(
                 force_bg=(gen.BACKGROUNDZ, gen.STARFIELD_BG),
                 force_char=char)
-            # the SHIPPING placement, not the default one
+            # the SHIPPING placement, not the default one -- and BOTH halves
+            # of it, in the order build_mint runs them: the figure is lowered
+            # onto the field's centre first, then the band is measured
+            # against where the body ended up.
+            layers, drop = centre_figure(layers, gen)
             dy = centre_dy(layers, gen)
             top, bot = band_bbox(dy)
             top, bot = int(np.floor(top)), int(np.ceil(bot))
@@ -619,12 +704,27 @@ def verify_cover(gen, rolls=3, seed=1000, pad=12):
             dn = bot + 1
             while dn < col.size and col[dn]:
                 dn += 1
-            body = _figure(layers, gen, body_only=True)
+            body = _figure(layers, gen, (gen.CHARACTERZ,))
             ys = np.nonzero(body.any(1))[0]
             off = (top + bot) // 2 - (ys.min() + ys.max()) // 2
-            rows.append((char, r, covered, top - up - 1, dn - bot - 1,
-                         dy, int(off)))
-            ok = ok and covered
+            # The drop is DOWN-only, so the one way it goes wrong is by
+            # pushing the figure off the bottom edge -- measured rather than
+            # capped, because a cap would be a number nobody could justify
+            # and this fails loudly the day an asset needs one.
+            #
+            # ON THE ANCHOR, body and footwear, for the two reasons the
+            # anchor itself is that: a saber blade already runs off the
+            # frame by design (it exits left and right at rest, so exiting
+            # the bottom introduces no stub either), and _figure()'s full
+            # silhouette also carries the corner sticker, which is authored
+            # at y 1114..1338 and does not move with the figure.
+            stand = _figure(layers, gen, [getattr(gen, n)
+                                          for n in FIGURE_ANCHOR])
+            room = gen.CANVAS_SIZE - 1 - int(np.nonzero(stand.any(1))[0].max())
+            inframe = room >= 0
+            rows.append((char, r, covered and inframe, top - up - 1,
+                         dn - bot - 1, dy, int(off), drop, room))
+            ok = ok and covered and inframe
     return ok, rows
 
 
@@ -672,18 +772,25 @@ def _main(argv=None):
               f"({(len(RAINBOW) * STRIPE + 2 * STEP) * CANVAS_PER_SRC:.0f} "
               f"canvas) swept")
         ok, rows = verify_cover(gen, rolls=a.rolls)
-        for char, r, covered, up, dn, dy, off in rows:
-            if not covered:
-                print(f"  FAIL {char} roll {r}: the cut is exposed "
-                      f"(dy {dy:+d})")
+        for char, r, good, up, dn, dy, off, drop, room in rows:
+            if not good:
+                why = ("the figure is off the bottom edge" if room < 0
+                       else "the cut is exposed")
+                print(f"  FAIL {char} roll {r}: {why} "
+                      f"(dy {dy:+d}, drop {drop}px)")
         worst = min(rows, key=lambda r: min(r[3], r[4]))
         dys = [r[5] for r in rows]
         offs = [abs(r[6]) for r in rows]
+        drops = [r[7] for r in rows]
         print(f"       {len(rows)} renders, worst margin "
               f"{min(worst[3], worst[4])}px ({worst[0]})")
         print(f"       dy {min(dys):+d}..{max(dys):+d} src px; band centre is "
               f"within {max(offs)}px of the body's on the worst render, "
               f"{sum(offs) // len(offs)}px on average")
+        print(f"       figure drop {min(drops)}..{max(drops)}px "
+              f"({sum(1 for d in drops if d)}/{len(drops)} moved); "
+              f"least room under body+footwear "
+              f"{min(r[8] for r in rows)}px")
         print(f"cover  {'OK' if ok else 'FAIL'}")
         rc = 0 if (seam and left and ok) else 1
 

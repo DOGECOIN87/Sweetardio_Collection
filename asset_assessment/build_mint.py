@@ -435,6 +435,15 @@ def main():
         plate = None
         dy = 0
         if starfield:
+            # Two per-token measurements, in this order. The flat field has
+            # no floor in it, so the figure's own frame margins are the
+            # whole composition and a body that floats by design (the round
+            # CENTERED_CHARS) reads as stuck to the top of the frame with a
+            # third of the canvas empty below it. centre_figure lowers the
+            # figure onto the field's centre; centre_layers then measures
+            # THAT body to put the rainbow on it. Run them the other way
+            # round and the trail is drawn for a character that then moves.
+            layers, _drop = sfmod.centre_figure(layers, g)
             layers, dy, plate = sfmod.centre_layers(layers, anim_dir, tid, g)
         g.create_image(
             layers, os.path.join(img_dir, f"{tid}.png"),
