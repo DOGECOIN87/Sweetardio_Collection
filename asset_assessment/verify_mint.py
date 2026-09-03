@@ -205,13 +205,16 @@ def check(args):
         # ANIMATION: exactly the two animated tiers, and nothing else. A
         # static token that claims a loop shows a broken player on every
         # surface that believes it.
-        wants_anim = bool(row.get("weather") or row.get("starfield"))
+        anim_sr = row.get("secret_rare") and g.is_animated_secret_rare(row["secret_rare"])
+        wants_anim = bool(row.get("weather") or row.get("starfield") or anim_sr)
         if wants_anim:
             animated_expected.add(tid)
         has_anim = "animation_url" in tok
         if args.expect_anim and wants_anim and not has_anim:
+            kind = ("weather" if row.get("weather")
+                   else "starfield" if row.get("starfield") else "secret_rare")
             r.bad("animated token carries no animation_url",
-                  f"{tid}.json ({'weather' if row.get('weather') else 'starfield'})")
+                  f"{tid}.json ({kind})")
         if has_anim and not wants_anim:
             r.bad("static token claims an animation_url", f"{tid}.json")
         if has_anim:

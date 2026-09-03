@@ -847,6 +847,66 @@ it sits on. Same limitation this file already records for the band-pass.
 **It has no `SECRET_RARE_ARTISTS` entry**, and that is correct — it is
 in-house, so there is no guest to credit. Artist stays a 2-of-4441 signal.
 
+### Cookboy is the one 1/1 that ANIMATES, and it owns its own module
+
+Duhnut Candy Man and Radbro Webring are static full-canvas artwork — each
+is its own scene, lit by the artist, with nothing underneath it to move.
+Cookboy is built on the **same moving starfield plate** the 22 composited
+starfield tokens use, so it is the only secret rare with anything to loop.
+`generator.ANIMATED_SECRET_RAREZ` records this by filename rather than
+inferring it from the art, because inference has no way to tell "sits on a
+plate that moves" from "sits on a plate" — a future guest piece on its own
+artwork would not belong in that set for the same reason the first two do
+not, and adding one is one line, not a rule to reverse-engineer from pixels.
+
+**It does not route through `dynamic/starfield.py`'s character path**
+(`centre_figure`/`centre_layers`, the machinery `build_mint.py` drives for
+the 22 real characters), and the reason is structural rather than a missed
+reuse. That path filters a layer stack by trait folder —
+`traits/characterz/` for the body, `traits/characterz/` +
+`traits/what_are_thosez/` for the standing figure — because a character's
+stack genuinely mixes parts that should and shouldn't drive each
+measurement: footwear belongs in the drop, an arm must not. Cookboy's stack
+is one flat cutout with none of that structure. Routing it through the
+folder filters would not crash — `_figure()` would just match nothing and
+both `centre_figure`'s drop and `centre_dy`'s clamp would silently fall
+back to 0 — but 0 is not this piece's answer (it needs `dy +22`), so a
+silent wrong answer is worse than no shortcut at all. `dynamic/cookboy.py`
+instead owns its construction end to end and reuses only the parts that
+don't care what kind of figure they're placing: `from_gif`, `loop_layers`,
+and the swept-band centring math.
+
+**That math is shared, not reimplemented.** `centre_dy()` used two masks —
+a body-only one to centre the band, a full-figure one to clamp it into
+whatever the cut actually covers — because a character's footwear should
+count for the clamp but not the centring. Cookboy has no such split, so it
+was tempting to write a second, simpler formula for it; instead
+`dynamic/starfield.py` now exposes `_centre_dy_from_masks(body, fig)` as
+the pulled-out core, and Cookboy calls it with **the same mask for both
+arguments**. Verified rather than assumed: computed by hand for the actual
+880px figure, the two-mask clamp path and the original single-purpose
+formula agree exactly (`dy +22`, both ways) — the clamp simply never bites
+because the figure already covers the cut column at that height. Confirmed
+harmless to the character path too: `dynamic/starfield.py --verify --rolls
+6` reads byte-for-byte identical before and after the refactor.
+
+**The still stays the one already committed.** `build_still()` reproduces
+`traits/secret_rarez/Secret_Cookboy_Blue_Raspberry.png` bit-for-bit
+(verified by hash — `dynamic/cookboy.py --verify` rebuilds it to a temp
+path and compares); the loop is new. Both come from
+`dynamic/cookboy_source.webp`, committed alongside the module for the same
+reason `Nyan_Blank.gif` sits next to `dynamic/starfield.py` — generated,
+not hand-finished per output, so re-deriving either the still or the loop
+never drifts from what shipped.
+
+**Wiring it into a mint already rendered without it does not require a
+`--fresh` re-run.** The loop and the metadata patch were built with the
+exact functions `build_mint.py` itself calls (`cookboy.build_loop()`,
+`generator.token_metadata()` with the same args the mint used), so a
+patched token is indistinguishable from one a fresh full build would have
+produced — confirmed by re-running `verify_mint.py` and `verify_media.py`
+over the whole mint afterward, both clean, loop count 466 → 467.
+
 ### The token name has 32 BYTES, and all three were over
 
 Metaplex's on-chain `Metadata` account is fixed-width — **name 32 bytes,
@@ -1332,6 +1392,7 @@ python3 asset_assessment/verify_trait_names.py    # do the names still resolve
 python3 asset_assessment/clean_trait_art.py --report   # cut-out residue on trait art
 python3 dynamic/starfield.py --verify             # the rainbow: seam, direction, cut
 python3 dynamic/starfield.py --write              # rebuild the reference plate
+python3 dynamic/cookboy.py --verify               # the 1/1's still + loop reproduce
 python3 asset_assessment/verify_mint.py           # does the OUTPUT pair up
 ```
 

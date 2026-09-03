@@ -56,6 +56,7 @@ from verify_separation import at_risk, plate_stats   # noqa: E402
 from build_char_compat import char_table              # noqa: E402
 from dynamic import sky as skymod                     # noqa: E402
 from dynamic import starfield as sfmod                # noqa: E402
+from dynamic import cookboy as cbmod                   # noqa: E402
 from dynamic.animate import write_mp4                 # noqa: E402
 
 # ---- every path the mint writes, named once ----
@@ -446,7 +447,7 @@ def main():
     render_only = (None if not args.render_only else
                    {int(x) for x in args.render_only.replace(",", " ").split()})
 
-    def render(layers, tid, starfield=False):
+    def render(layers, tid, starfield=False, secret_rare=None):
         # A subset render for a proof or a promo. Gated HERE rather than at the
         # call sites so it cannot miss one -- the secret rares are rendered
         # from a different branch than the composited tokens.
@@ -494,6 +495,15 @@ def main():
                 sys.exit("no ffmpeg — pip install imageio-ffmpeg")
         if plate is not None:
             os.remove(plate)
+        # The one 1/1 built on the moving starfield plate (see
+        # dynamic/cookboy.py's module docstring for why it is not routed
+        # through the character path above): same re-composite-per-frame
+        # mechanism, its own construction.
+        if secret_rare and args.animation and g.is_animated_secret_rare(secret_rare):
+            frames = cbmod.build_loop(anim_dir, tid, size=args.anim_size)
+            if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
+                         1000.0 / args.anim_ms) is None:
+                sys.exit("no ffmpeg — pip install imageio-ffmpeg")
 
     bg_dir = os.path.join(g.TRAITS_DIR, g.BACKGROUNDZ)
     legs = sorted(f for f in os.listdir(bg_dir)
@@ -713,7 +723,7 @@ def main():
             t["attributes"] = meta
             manifest[i + 1] = t
             if args.render:
-                render(layers, i + 1)
+                render(layers, i + 1, secret_rare=srf)
             continue
 
         leg = forced_bg[i]
@@ -793,7 +803,10 @@ def main():
         # starfield plate. They are allocated mutually exclusive, so a token
         # never has two loops competing for the one field.
         anim = (args.animation.replace("{id}", str(tid))
-                if args.animation and (t.get("weather") or t.get("starfield"))
+                if args.animation and (
+                    t.get("weather") or t.get("starfield")
+                    or (t.get("secret_rare")
+                        and g.is_animated_secret_rare(t["secret_rare"])))
                 else None)
         token = g.token_metadata(
             t["attributes"], token_id=tid, image=f"{tid}.png", name=name,

@@ -389,6 +389,20 @@ def secret_rare_artist(filename):
     return SECRET_RARE_ARTISTS.get(os.path.basename(filename))
 
 
+# Which 1/1s carry a loop. Duhnut Candy Man and Radbro Webring are static
+# full-canvas artwork -- each is its own scene with nothing underneath it to
+# move, so there is nothing to re-composite frame to frame. Cookboy Blue
+# Raspberry is built on the SAME moving starfield plate the 22 composited
+# starfield tokens use (dynamic/cookboy.py), so it is the only secret rare
+# that can loop at all. A future guest piece on its own artwork would not
+# belong here for the same reason the first two do not.
+ANIMATED_SECRET_RAREZ = {"Secret_Cookboy_Blue_Raspberry.png"}
+
+
+def is_animated_secret_rare(filename):
+    return os.path.basename(filename) in ANIMATED_SECRET_RAREZ
+
+
 def secret_rare_artist_url(filename):
     """The artist's own site, for the token's external_url. None when the piece
     has no guest artist."""

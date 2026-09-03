@@ -345,16 +345,15 @@ def _figure(layers, gen, parts=None):
     return out
 
 
-def centre_dy(layers, gen):
-    """The band offset for THIS token, in source px, rounded to the grid.
-
-    A fractional offset would resample the trail off the source pixel grid
-    and cost it the hard 8-bit edge that is the whole point, so it is a
-    whole number of source pixels -- 3.4825 canvas px of resolution, which
-    is finer than the 251px spread it is correcting for by a wide margin.
+def _centre_dy_from_masks(body, fig):
+    """The band-placement math centre_dy() runs, lifted out so a piece with
+    no separate body/figure split (dynamic/cookboy.py's flat cutout, which
+    has no arms or footwear to exclude) can drive the same computation with
+    one mask standing in for both -- verified to reproduce the SAME dy the
+    two-mask path gives when body and fig happen to be identical (both
+    branches share cover_runs()'s cut-column measurement either way, so
+    there is no second implementation to drift out of step with this one).
     """
-    body = _figure(layers, gen, (gen.CHARACTERZ,))
-    fig = _figure(layers, gen)
     if body is None or fig is None:
         return 0
     lead = int(round(LEAD * CANVAS_PER_SRC))
@@ -378,6 +377,18 @@ def centre_dy(layers, gen):
         want = top + (bot - top - swept) / 2.0            # too short: centre
     default = (BAND_TOP - STEP) * CANVAS_PER_SRC
     return int(round((want - default) / CANVAS_PER_SRC))
+
+
+def centre_dy(layers, gen):
+    """The band offset for THIS token, in source px, rounded to the grid.
+
+    A fractional offset would resample the trail off the source pixel grid
+    and cost it the hard 8-bit edge that is the whole point, so it is a
+    whole number of source pixels -- 3.4825 canvas px of resolution, which
+    is finer than the 251px spread it is correcting for by a wide margin.
+    """
+    return _centre_dy_from_masks(_figure(layers, gen, (gen.CHARACTERZ,)),
+                                 _figure(layers, gen))
 
 
 def cover_runs(fig, lead=None, pad=FIGURE_PAD):
