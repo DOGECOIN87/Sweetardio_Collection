@@ -336,9 +336,9 @@ def main():
     ap.add_argument("--animation", default=None, metavar="TEMPLATE",
                     help="animation_url template, '{id}' substituted — "
                          "e.g. '{id}.mp4' or 'ipfs://CID/{id}.mp4'. Applied "
-                         "ONLY to the tokens that drew a weather state; the "
-                         "other 4,000 are stills and must not claim an "
-                         "animation they do not have")
+                         "to BOTH animated tiers, weather and starfield "
+                         "(466 tokens); the other ~3,975 are stills and must "
+                         "not claim an animation they do not have")
     ap.add_argument("--anim-size", type=int, default=640,
                     help="starfield loop resolution (the STILL is full canvas)")
     ap.add_argument("--anim-ms", type=int, default=70,
