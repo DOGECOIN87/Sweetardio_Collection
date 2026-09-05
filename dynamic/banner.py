@@ -43,20 +43,27 @@ PANELS = [
     dict(name="flooded_twinkie",
          char="Twinkie", bg="Empty_Fridge.png",
          sticker="20_The_meme_is_the_tech.png", arm=None, wat=None,
-         phase="blue_dusk", weather="storm", seed=101),
+         phase="blue_dusk", weather="flooded", seed=101),
+    # The arcade plate is the one that carries the mark: its own neon is
+    # the same register as the sign, so the logo reads as part of the scene
+    # instead of pasted onto it. Katana held high leaves the lower third
+    # clear for the lockup.
     dict(name="hero",
          char="chocolate_chip_cookie", bg="Legendary_Simplex.png",
-         sticker=None, arm="Armz_Katana.png", wat=None,
+         sticker="Sweetardio_200 (30).png",
+         arm="Armz_Katana.png", wat=None,
          phase="blue_dusk", weather="snow", seed=202),
     dict(name="og_poptart_starfield",
          char="og_poptart", bg="Legendary_Tenders.png",
-         sticker=None, arm=None, wat=None,
+         sticker="21_Straight_outta_Gulag.png",
+         arm="Sweetardio_114 (6).png", wat=None,
          # night + snow, not fog: fog lifts the blacks and erases the star
          # field entirely, while fine snow over it reads as drifting dust
          phase="night", weather="snow", seed=303),
 ]
 
-WORDMARK = "Sweetardio"
+LOGO = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                    "assets", "sweetardio_logo.png")
 
 
 def font(name, size):
@@ -95,46 +102,47 @@ def mint_panels(force=False):
     return out
 
 
-def draw_wordmark(img, fontname, size, scrim, wy=0.5):
-    """The wordmark, centred over the whole banner.
+def draw_wordmark(img, width, wy, scrim):
+    """Composite the REAL Sweetardio mark -- the pink neon sign that already
+    exists on traits/backgroundz_originals/Sweetardio.png, cut out by
+    dynamic/extract_logo.py.
 
-    It sits BELOW centre by default (wy=0.80). Dead-centre put it straight
-    across the hero token's face and deleted it; low, it clears the
-    character, still reads as centred on a 1500x500 banner, and spilling
-    slightly over the outer two panels is what ties the three together.
+    It sits BELOW centre. Dead-centre put it straight across the hero
+    token's face and deleted it; low, it clears the character and still
+    reads as centred on a 1500x500 banner.
 
-    It lands on the middle panel, so it carries its own contrast rather
-    than relying on whatever happens to be behind it: a soft dark bloom
-    lifted straight from the text's own silhouette, then the type over it.
-    That keeps the middle token visible -- a solid bar would just delete it.
+    The scrim is a bloom lifted from the mark's OWN alpha rather than a
+    drawn box, so it darkens exactly what sits behind the neon and nothing
+    else -- a solid bar would just delete the middle token.
     """
-    f = font(fontname, size)
-    d = ImageDraw.Draw(img)
-    x0, y0, x1, y1 = d.textbbox((0, 0), WORDMARK, font=f)
-    tx = (W - (x1 - x0)) / 2 - x0
-    ty = (H - (y1 - y0)) * wy - y0
+    if not os.path.exists(LOGO):
+        raise SystemExit("run: python3 dynamic/extract_logo.py")
+    logo = Image.open(LOGO).convert("RGBA")
+    h = max(1, round(logo.height * width / logo.width))
+    logo = logo.resize((width, h), Image.Resampling.LANCZOS)
+
+    x = (W - width) // 2
+    y = int((H - h) * wy)
 
     if scrim > 0:
-        glow = Image.new("L", (W, H), 0)
-        ImageDraw.Draw(glow).text((tx, ty), WORDMARK, font=f, fill=255)
-        glow = glow.filter(ImageFilter.GaussianBlur(size * 0.28))
-        glow = glow.point(lambda v: min(255, int(v * 2.6 * scrim)))
+        a = logo.split()[3].filter(ImageFilter.GaussianBlur(width * 0.09))
+        a = a.point(lambda v: min(255, int(v * 2.4 * scrim)))
+        pad = Image.new("L", (W, H), 0)
+        pad.paste(a, (x, y))
         img.alpha_composite(Image.merge(
-            "RGBA", (Image.new("L", (W, H), 6), Image.new("L", (W, H), 7),
-                     Image.new("L", (W, H), 12), glow)))
+            "RGBA", (Image.new("L", (W, H), 5), Image.new("L", (W, H), 6),
+                     Image.new("L", (W, H), 11), pad)))
 
-    d = ImageDraw.Draw(img)
-    d.text((tx, ty + 3), WORDMARK, font=f, fill=(0, 0, 0, 150))     # drop
-    d.text((tx, ty), WORDMARK, font=f, fill=(255, 255, 255, 255))
+    img.alpha_composite(logo, (x, y))
     return img
 
 
-def compose(panels, t, fontname, size, scrim, wy=0.5):
+def compose(panels, t, width, scrim, wy):
     banner = Image.new("RGBA", (W, H), (0, 0, 0, 255))
     for i, (p, b, m, static) in enumerate(panels):
         fr = skymod.frame(static, m, t=t, seed=p["seed"])
         banner.paste(fr.convert("RGB"), (i * CELL, 0))
-    return draw_wordmark(banner, fontname, size, scrim, wy)
+    return draw_wordmark(banner, width, wy, scrim)
 
 
 def main():
@@ -142,10 +150,10 @@ def main():
     ap.add_argument("--still", action="store_true", help="one frame only")
     ap.add_argument("--frames", type=int, default=60)
     ap.add_argument("--ms", type=int, default=50)
-    ap.add_argument("--font", default="Boldonse-Regular.ttf")
-    ap.add_argument("--size", type=int, default=78)
-    ap.add_argument("--scrim", type=float, default=1.0)
-    ap.add_argument("--wy", type=float, default=0.80,
+    ap.add_argument("--logo-w", dest="logo_w", type=int, default=430,
+                    help="rendered width of the neon mark, px")
+    ap.add_argument("--scrim", type=float, default=1.5)
+    ap.add_argument("--wy", type=float, default=0.88,
                     help="wordmark vertical position, 0=top 1=bottom")
     ap.add_argument("--gif", action="store_true",
                     help="also write a half-size GIF fallback")
@@ -160,13 +168,13 @@ def main():
 
     if args.still:
         path = os.path.join(OUT, f"banner_still{args.tag}.png")
-        compose(panels, 0.12, args.font, args.size, args.scrim,
+        compose(panels, 0.12, args.logo_w, args.scrim,
                 args.wy).convert("RGB").save(path)
         print(path)
         return
 
-    frames = [compose(panels, i / args.frames, args.font, args.size,
-                      args.scrim, args.wy).convert("RGB")
+    frames = [compose(panels, i / args.frames, args.logo_w, args.scrim,
+                      args.wy).convert("RGB")
               for i in range(args.frames)]
     exe = _ffmpeg()
     if exe is None:

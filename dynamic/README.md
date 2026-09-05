@@ -114,6 +114,7 @@ filmstrip; only a numeric check catches it.
 | `fog` | haze density rolling through, thickening and thinning |
 | `rain` | two depth bands falling down-and-right, near band 2x faster |
 | `snow` | slow fall with a sideways sway, one cycle per loop |
+| `flooded` | standing water: the plate below a waterline becomes its own rippled reflection |
 | `storm` | heavy rain, plus a lightning strike and its echo |
 
 **A motionless state is never exported as an animation.** Encoding N
@@ -171,6 +172,43 @@ Three things hold regardless of format:
 - **Test one token before committing 4,444.** Support differs per surface
   and changes without notice; this table is a starting point, not a
   guarantee.
+
+## `flooded`, and why it is not just heavy rain
+
+Storm is weather falling. **Flooded is water standing.** Below a waterline
+the plate is replaced by a mirror of the plate above it — compressed
+(water foreshortens what it reflects), displaced by a travelling sine whose
+amplitude grows with depth, and pulled toward a murky green-blue that
+thickens further down. The ripple runs a whole number of cycles per loop,
+so it wraps like every other motion here.
+
+Because the pass is plate-only, **the flood rises behind the character**:
+the figure stands in it rather than being tinted by it. That is the rule
+paying off rather than getting in the way.
+
+The waterline lip has to be **wide and weak**. A tight bright line reads as
+a scanline across the plate, not as water — the first version was exactly
+that. It also rides the same ripple as the reflection, so the waterline is
+never a perfect ruler edge.
+
+## The logo is a real asset, not a typeface
+
+The collection already has a mark — a pink neon script *Sweetardio* over a
+teal *COLLECTION* pill — but it existed only inside the shop-window
+photograph at `traits/backgroundz_originals/Sweetardio.png`.
+`extract_logo.py` cuts a standalone transparent asset from it.
+
+The key is by **hue, not brightness**, and that is the whole trick: the
+sign sits on a light grey mesh, so a luminance key keeps the background,
+and a warm gold bokeh flare overlaps its lower left, so a plain chroma key
+keeps that too. Gating on the two colours the logo is actually made of —
+pink around 295-360°, teal around 150-225° — drops both, while a separate
+low-chroma highlight pass picks up the white tube outlines the hue gate
+cannot see.
+
+A gamma on the resulting alpha collapses the wide haze. Keeping it made the
+mark look like a lit sign over a **dark** panel and like a dirty rectangle
+over a bright one — and the banner has both.
 
 ## Locale is a property of the token
 

@@ -175,6 +175,18 @@ WEATHER_STATES = {
         exposure=0.99, contrast=-0.11, lift=0.055, sat=0.58, diffuse=0.6,
         particles="snow", density=1.0),
 
+    # Standing water, not just weather falling: the plate below the
+    # waterline is replaced by a rippling mirror of the plate above it.
+    # Because the pass is plate-only, the flood rises BEHIND the character
+    # and the figure stands in it rather than being tinted by it.
+    "flooded": dict(
+        exposure=0.72, contrast=-0.04, lift=0.030, sat=0.74, diffuse=0.8,
+        sh_tint=(0.05, 0.09, 0.13), sh_amt=0.16,
+        particles="rain", density=1.35,
+        flood=dict(level=0.66, compress=0.52, reflect=0.78, ripple=6.5,
+                   wavelength=26.0, cycles=2, murk=0.50,
+                   tint=(0.07, 0.13, 0.16), glint=0.10)),
+
     "storm": dict(
         exposure=0.54, contrast=0.10, lift=0.015, sat=0.60, diffuse=1.0,
         sh_tint=(0.05, 0.06, 0.13), sh_amt=0.22,
@@ -398,6 +410,58 @@ def _combine(sky, wet):
 _SPATIAL_KEYS = ("diffuse", "particles", "drift", "flash")
 
 
+def _flood(fx, cfg, t):
+    """Replace the plate below a waterline with its own rippled reflection.
+
+    The reflection is the rows ABOVE the line, mirrored and compressed
+    (water foreshortens what it reflects), displaced horizontally by a
+    travelling sine whose amplitude grows with depth, then pulled toward a
+    murky green-blue that thickens further down.
+
+    The ripple runs a whole number of cycles per loop, so it wraps exactly
+    like every other motion here.
+    """
+    h, w = fx.shape[:2]
+    y0 = int(h * cfg.get("level", 0.62))
+    if y0 < 2 or y0 >= h - 2:
+        return fx
+
+    rows = np.arange(y0, h)
+    depth = (rows - y0).astype(_F)
+    dnorm = depth / max(float(depth[-1]), 1.0)
+
+    src = np.clip(y0 - depth * _F(cfg.get("compress", 0.52)),
+                  0, y0 - 1).astype(np.int32)
+    amp = _F(cfg.get("ripple", 6.0)) * (0.3 + 0.7 * dnorm)
+    phase = 2.0 * np.pi * (rows / _F(cfg.get("wavelength", 26.0))
+                           + cfg.get("cycles", 2) * t)
+    dx = np.round(amp * np.sin(phase)).astype(np.int32)
+    xs = np.clip(np.arange(w)[None, :] + dx[:, None], 0, w - 1)
+
+    refl = fx[src[:, None], xs]
+    below = fx[y0:]
+    water = below + (refl - below) * _F(cfg.get("reflect", 0.62))
+
+    murk = (_F(cfg.get("murk", 0.55)) * (0.35 + 0.65 * dnorm))[:, None, None]
+    water = water + (_c(cfg.get("tint", (0.07, 0.13, 0.16))) - water) * murk
+
+    # A lip where the surface catches the sky. It has to be WIDE and weak:
+    # a tight bright line reads as a scanline across the plate, not as
+    # water. It also rides the same ripple as the reflection, so the
+    # waterline is never a perfect ruler edge.
+    glint = cfg.get("glint", 0.0)
+    if glint > 1e-3:
+        lip = np.exp(-(depth / 7.0) ** 2).astype(_F)[:, None]
+        wobble = 1.0 + 0.5 * np.sin(
+            2.0 * np.pi * (np.arange(w) / _F(90.0)
+                           + cfg.get("cycles", 2) * t)).astype(_F)[None, :]
+        water = water + (1.0 - water) * (lip * wobble * _F(glint))[..., None]
+
+    fx = fx.copy()
+    fx[y0:] = water
+    return fx
+
+
 def has_motion(weather):
     """True if this weather state actually moves.
 
@@ -407,7 +471,7 @@ def has_motion(weather):
     """
     wet = WEATHER_STATES[weather]
     return bool(wet.get("particles") or wet.get("flash")
-                or wet.get("drift", 0.0) > 1e-4)
+                or wet.get("flood") or wet.get("drift", 0.0) > 1e-4)
 
 
 def is_spatial(weather):
@@ -415,7 +479,7 @@ def is_spatial(weather):
     wet = WEATHER_STATES[weather]
     return (wet.get("diffuse", 0.0) > 0.05
             or bool(wet.get("particles")) or bool(wet.get("flash"))
-            or wet.get("drift", 0.0) > 1e-4)
+            or bool(wet.get("flood")) or wet.get("drift", 0.0) > 1e-4)
 
 
 def is_identity(phase, weather):
@@ -481,6 +545,11 @@ def frame(static, protect, t=0.0, seed=0, strength=1.0):
         field = _noise_field(h, w, seed | 1, max(h, w) / 22.0)
         rolled = np.roll(field, int(round(t * w)), axis=1)
         fx = fx + rolled[..., None] * _F(wet["drift"])
+
+    # Standing water first, so the rain falls IN FRONT of the flood
+    # rather than being mirrored by it.
+    if wet.get("flood"):
+        fx = _flood(fx, wet["flood"], t)
 
     # Particles, screened in so they glow rather than paint over.
     if wet.get("particles"):
