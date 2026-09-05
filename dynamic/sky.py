@@ -269,6 +269,7 @@ def _tone(rgb, exposure, contrast, lift, sat, sh_tint, sh_amt,
 # so the streaks always point along the direction they actually travel. On
 # the square canvas it works out at 1/3 -- down and to the right, matching
 # the collection's cast-shadow convention rather than fighting it.
+CANVAS = 1393             # the mint canvas the particle sizes are authored to
 _MARGIN = 80
 _RAIN_TILES = (1, 3)     # (across, down) tiles travelled per loop
 _SNOW_TILES = (0, 1)
@@ -317,24 +318,31 @@ def _particles(size, kind, density, seed, t=0.0):
     It is that token's weather, not a different random field every refresh.
     """
     w, h = size
-    m = _MARGIN
+    # Particle sizes are authored against the 1393 mint canvas, so they must
+    # SCALE with the render or a preview lies about the art: at 500px an
+    # unscaled flake comes out 2.8x oversized and snow reads as golf balls.
+    # Counts stay fixed -- it is the marks that shrink, not the density --
+    # so a small render matches the full one downscaled.
+    px = min(w, h) / float(CANVAS)
+    m = max(8, int(round(_MARGIN * px)))
     tile_w, tile_h = w + 2 * m, h + 2 * m
     rng = np.random.default_rng(seed)
     out = np.zeros((h, w), dtype=_F)
 
     if kind == "rain":
-        bands = [(int(260 * density), 34, 0.16, 2.6),
-                 (int(90 * density), 66, 0.30, 1.1)]
+        bands = [(int(260 * density), 34 * px, 0.16, 2.6 * px),
+                 (int(90 * density), 66 * px, 0.30, 1.1 * px)]
         across, down = _RAIN_TILES
     else:
-        bands = [(int(300 * density), 5, 0.30, 2.4),
-                 (int(110 * density), 11, 0.55, 1.0)]
+        bands = [(int(300 * density), 5 * px, 0.30, 2.4 * px),
+                 (int(110 * density), 11 * px, 0.55, 1.0 * px)]
         across, down = _SNOW_TILES
 
     # streaks point along their own velocity vector
     lean = (tile_w * across) / float(tile_h * down)
 
     for depth, (count, extent, opacity, blur) in enumerate(bands):
+        extent = max(2.0, extent)
         speed = depth + 1          # near band twice as fast -> parallax
         layer = Image.new("L", (w, h), 0)
         draw = ImageDraw.Draw(layer)
@@ -344,15 +352,18 @@ def _particles(size, kind, density, seed, t=0.0):
         ys = (y0 + tile_h * down * speed * t) % tile_h - m
 
         if kind == "rain":
-            lens = rng.integers(int(extent * 0.6), extent, count)
+            lens = rng.integers(max(1, int(extent * 0.6)),
+                                max(2, int(extent)), count)
+            width = max(1, int(round(2 * px)))
             for x, y, ln in zip(xs, ys, lens):
                 draw.line([(x, y), (x + ln * lean, y + ln)],
-                          fill=255, width=2)
+                          fill=255, width=width)
         else:
             phase = rng.random(count) * 2.0 * np.pi
             xs = xs + np.sin(2.0 * np.pi * _SNOW_SWAY_CYCLES * t
                              + phase) * (extent * 1.6)
-            rads = rng.integers(max(2, extent // 3), extent, count)
+            rads = rng.integers(max(1, int(extent / 3)),
+                                max(2, int(extent)), count)
             for x, y, r in zip(xs, ys, rads):
                 draw.ellipse([x - r, y - r, x + r, y + r], fill=255)
 
