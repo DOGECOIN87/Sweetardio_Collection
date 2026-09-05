@@ -94,15 +94,17 @@ def mint_panels(force=False):
                 force_wat=p["wat"], force_sticker=p["sticker"])
             gen.create_image(layers, base, mask_path=mask)
             print(f"  minted {char} on {p['bg']}")
-        b = Image.open(base).convert("RGBA").resize(
-            (CELL, CELL), Image.Resampling.LANCZOS)
-        m = Image.open(mask).convert("L").resize(
-            (CELL, CELL), Image.Resampling.LANCZOS)
+        # Kept at the FULL 1393 mint size and graded there, then
+        # downsampled once at the end. Grading at the panel size instead
+        # throws away 2.8x of linear detail before the codec ever sees it,
+        # which is what made the first cut look soft.
+        b = Image.open(base).convert("RGBA")
+        m = Image.open(mask).convert("L")
         out.append((p, b, m, skymod.grade_static(b, p["phase"], p["weather"])))
     return out
 
 
-def draw_wordmark(img, width, wy, scrim):
+def draw_wordmark(img, width, wy, scrim, scale=1):
     """Composite the REAL Sweetardio mark -- the pink neon sign that already
     exists on traits/backgroundz_originals/Sweetardio.png, cut out by
     dynamic/extract_logo.py.
@@ -120,29 +122,39 @@ def draw_wordmark(img, width, wy, scrim):
     logo = Image.open(LOGO).convert("RGBA")
     h = max(1, round(logo.height * width / logo.width))
     logo = logo.resize((width, h), Image.Resampling.LANCZOS)
-
-    x = (W - width) // 2
-    y = int((H - h) * wy)
+    if width > logo.width:
+        pass  # already resized; the mark is soft-edged neon, it upscales well
+    bw, bh = img.size
+    x = (bw - width) // 2
+    y = int((bh - h) * wy)
 
     if scrim > 0:
         a = logo.split()[3].filter(ImageFilter.GaussianBlur(width * 0.09))
         a = a.point(lambda v: min(255, int(v * 2.4 * scrim)))
-        pad = Image.new("L", (W, H), 0)
+        pad = Image.new("L", (bw, bh), 0)
         pad.paste(a, (x, y))
         img.alpha_composite(Image.merge(
-            "RGBA", (Image.new("L", (W, H), 5), Image.new("L", (W, H), 6),
-                     Image.new("L", (W, H), 11), pad)))
+            "RGBA", (Image.new("L", (bw, bh), 5), Image.new("L", (bw, bh), 6),
+                     Image.new("L", (bw, bh), 11), pad)))
 
     img.alpha_composite(logo, (x, y))
     return img
 
 
-def compose(panels, t, width, scrim, wy):
-    banner = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+def compose(panels, t, width, scrim, wy, scale=2):
+    """One banner frame at `scale` x 1500x500.
+
+    Each panel is rendered at the full 1393 mint canvas and downsampled
+    once, so the particles and the plate arrive at the banner supersampled
+    rather than graded at a size they were never authored for.
+    """
+    cell = CELL * scale
+    banner = Image.new("RGBA", (W * scale, H * scale), (0, 0, 0, 255))
     for i, (p, b, m, static) in enumerate(panels):
         fr = skymod.frame(static, m, t=t, seed=p["seed"])
-        banner.paste(fr.convert("RGB"), (i * CELL, 0))
-    return draw_wordmark(banner, width, wy, scrim)
+        banner.paste(fr.convert("RGB").resize(
+            (cell, cell), Image.Resampling.LANCZOS), (i * cell, 0))
+    return draw_wordmark(banner, width * scale, wy, scrim, scale)
 
 
 def main():
@@ -152,11 +164,15 @@ def main():
     ap.add_argument("--ms", type=int, default=50)
     ap.add_argument("--logo-w", dest="logo_w", type=int, default=430,
                     help="rendered width of the neon mark, px")
-    ap.add_argument("--scrim", type=float, default=1.5)
-    ap.add_argument("--wy", type=float, default=0.88,
+    ap.add_argument("--scrim", type=float, default=0.9)
+    ap.add_argument("--wy", type=float, default=0.90,
                     help="wordmark vertical position, 0=top 1=bottom")
     ap.add_argument("--gif", action="store_true",
                     help="also write a half-size GIF fallback")
+    ap.add_argument("--scale", type=int, default=2,
+                    help="render at N x 1500x500 (2 = 3000x1000, retina)")
+    ap.add_argument("--crf", type=int, default=14,
+                    help="H.264 quality; lower is better, 14 is near-visually-lossless")
     ap.add_argument("--remint", action="store_true")
     ap.add_argument("--tag", default="")
     args = ap.parse_args()
@@ -168,32 +184,45 @@ def main():
 
     if args.still:
         path = os.path.join(OUT, f"banner_still{args.tag}.png")
-        compose(panels, 0.12, args.logo_w, args.scrim,
-                args.wy).convert("RGB").save(path)
+        compose(panels, 0.12, args.logo_w, args.scrim, args.wy,
+                args.scale).convert("RGB").save(path)
         print(path)
         return
 
     frames = [compose(panels, i / args.frames, args.logo_w, args.scrim,
-                      args.wy).convert("RGB")
+                      args.wy, args.scale).convert("RGB")
               for i in range(args.frames)]
     exe = _ffmpeg()
     if exe is None:
         sys.exit("no ffmpeg (pip install imageio-ffmpeg)")
-    path = os.path.join(OUT, "sweetardio_banner.mp4")
-    cmd = [exe, "-y", "-loglevel", "error", "-f", "rawvideo",
-           "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-           "-r", f"{1000.0 / args.ms:.4f}", "-i", "-", "-an",
-           "-c:v", "libx264", "-preset", "slow", "-crf", "18",
-           "-profile:v", "main", "-pix_fmt", "yuv420p",
-           "-movflags", "+faststart", path]
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-    for f in frames:
-        proc.stdin.write(f.tobytes())
-    proc.stdin.close()
-    if proc.wait() != 0:
-        sys.exit(proc.stderr.read().decode()[:400])
-    print(f"{path}  {os.path.getsize(path) / 1024:.0f} KB  "
-          f"{args.frames * args.ms / 1000:.2f}s loop")
+    def encode(seq, size, path, crf):
+        w, h = size
+        cmd = [exe, "-y", "-loglevel", "error", "-f", "rawvideo",
+               "-pix_fmt", "rgb24", "-s", f"{w}x{h}",
+               "-r", f"{1000.0 / args.ms:.4f}", "-i", "-", "-an",
+               "-c:v", "libx264", "-preset", "veryslow", "-crf", str(crf),
+               "-profile:v", "high", "-pix_fmt", "yuv420p",
+               "-x264-params", "ref=6:bframes=6:aq-mode=3",
+               "-movflags", "+faststart", path]
+        pr = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+        for fr in seq:
+            pr.stdin.write(fr.tobytes())
+        pr.stdin.close()
+        if pr.wait() != 0:
+            sys.exit(pr.stderr.read().decode()[:400])
+        print(f"{path}  {w}x{h}  {os.path.getsize(path) / 1024:.0f} KB")
+
+    big = os.path.join(OUT, f"sweetardio_banner_{args.scale}x.mp4")
+    encode(frames, frames[0].size, big, args.crf)
+
+    # The 1:1 deliverable is downsampled from the supersampled render, not
+    # rendered at 1500x500 directly -- same pixels, visibly cleaner edges.
+    if args.scale != 1:
+        small = [f.resize((W, H), Image.Resampling.LANCZOS) for f in frames]
+        encode(small, (W, H), os.path.join(OUT, "sweetardio_banner.mp4"),
+               args.crf)
+    print(f"{args.frames * args.ms / 1000:.2f}s loop")
 
     # A GIF of this is 26MB at full size and still bands -- opt-in only,
     # and halved, for a surface that genuinely cannot take video.

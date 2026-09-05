@@ -191,15 +191,42 @@ a scanline across the plate, not as water — the first version was exactly
 that. It also rides the same ripple as the reflection, so the waterline is
 never a perfect ruler edge.
 
+## Banner quality: supersample, do not grade small
+
+The banner renders each panel at the **full 1393 mint canvas** and
+downsamples once at the end. Grading at the 500px panel size instead threw
+away 2.8x of linear detail before the codec ever saw it, which is what made
+the first cut look soft — the encoder was not the problem.
+
+Output is 3000x1000 (`_2x`, for retina) plus a 1500x500 cut **downsampled
+from that same supersampled render** rather than rendered at 1500 directly:
+same pixels, visibly cleaner edges. H.264 High profile, yuv420p, CRF 14,
+`preset veryslow`.
+
 ## The logo is a real asset, not a typeface
 
-The collection already has a mark — a pink neon script *Sweetardio* over a
-teal *COLLECTION* pill — but it existed only inside the shop-window
-photograph at `traits/backgroundz_originals/Sweetardio.png`.
-`extract_logo.py` cuts a standalone transparent asset from it.
+The collection already has **two** marks, on two different plates, and
+neither existed as a standalone file. `extract_logo.py` cuts both.
 
-The key is by **hue, not brightness**, and that is the whole trick: the
-sign sits on a light grey mesh, so a luminance key keeps the background,
+- **`red`** (the default) — red script on a silver sign board with a dark
+  green *COLLECTION* pill, from `Sweetardio (16).png`. Solid edges, high
+  contrast, and it holds up when scaled.
+- **`neon`** — pink neon tubing in a shop window, from `Sweetardio.png`.
+  Atmospheric, but it is glass and glow: it goes soft at size and needs a
+  dark backing to read at all. That is why it is not the default.
+
+The board needs a different cut from the neon. Its *COLLECTION* pill is
+dark green, so a brightness key drops it while keeping the plaque around
+it — but the plaque is a solid board, so **filling each row between its own
+extremes** recovers the pill without keying that colour at all. The wall
+behind is dark navy and nearly the pill's luminance, so the key keeps only
+the largest connected component first; without that the row fill would run
+from a wall tile on one side to the board on the other and swallow the gap.
+
+The neon cut is a different problem entirely:
+
+its key is by **hue, not
+brightness**. The sign sits on a light grey mesh, so a luminance key keeps the background,
 and a warm gold bokeh flare overlaps its lower left, so a plain chroma key
 keeps that too. Gating on the two colours the logo is actually made of —
 pink around 295-360°, teal around 150-225° — drops both, while a separate

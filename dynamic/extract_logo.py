@@ -31,12 +31,22 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "..", "traits", "backgroundz_originals",
-                   "Sweetardio.png")
-DST = os.path.join(HERE, "assets", "sweetardio_logo.png")
+TRAITS = os.path.join(HERE, "..", "traits", "backgroundz_originals")
 
-# The sign's box on the 1393 plate, measured by eye and then tightened.
-CROP = (50, 10, 670, 300)
+# TWO signs exist, on two different plates, and they want different cuts.
+#
+#   red   Sweetardio (16).png -- a lit sign BOARD: red script on a silver
+#         plaque with a dark green COLLECTION pill. Solid edges, high
+#         contrast, and it holds up when scaled. This is the default.
+#   neon  Sweetardio.png -- pink neon tubing in a shop window. Atmospheric,
+#         but it is glass and glow, so it goes soft at size and needs a
+#         dark backing to read at all.
+VARIANTS = {
+    "red": dict(src="Sweetardio (16).png", crop=(395, 60, 995, 292),
+                dst="sweetardio_logo.png"),
+    "neon": dict(src="Sweetardio.png", crop=(50, 10, 670, 300),
+                 dst="sweetardio_logo_neon.png"),
+}
 GAMMA = 2.1
 
 
@@ -59,8 +69,59 @@ def _hue_deg(a):
     return h * 60.0
 
 
-def extract():
-    im = Image.open(SRC).convert("RGB").crop(CROP)
+def extract_red(v):
+    """Cut the sign BOARD out of the tiled wall behind it.
+
+    Two things make this awkward and both are handled here:
+
+    The COLLECTION pill is dark green, so a brightness key drops it while
+    keeping the plaque around it. But the plaque is a solid board, so
+    filling each row between its own extremes recovers the pill (and the
+    script's interior) without needing to key those colours at all.
+
+    The wall is dark navy and nearly the pill's luminance, so the key runs
+    first on brightness OR chroma, then keeps only the largest connected
+    component -- which is the board -- before the row fill. Without that
+    step the fill would run from a wall tile on one side to the board on
+    the other and swallow the gap between them.
+    """
+    from scipy import ndimage
+
+    im = Image.open(os.path.join(TRAITS, v["src"])).convert("RGB").crop(
+        v["crop"])
+    a = np.asarray(im, dtype=np.float32) / 255.0
+    luma = 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
+    chroma = a.max(-1) - a.min(-1)
+
+    raw = np.maximum(_smoothstep(0.22, 0.36, luma),
+                     _smoothstep(0.12, 0.24, chroma)) > 0.5
+    raw = ndimage.binary_closing(raw, np.ones((7, 7)))
+
+    def largest(mask):
+        lab, n = ndimage.label(mask)
+        if n == 0:
+            return mask
+        sizes = ndimage.sum(mask, lab, range(1, n + 1))
+        return lab == int(np.argmax(sizes)) + 1
+
+    keep = largest(raw)
+    board = np.zeros_like(keep)
+    for y in range(keep.shape[0]):
+        xs = np.flatnonzero(keep[y])
+        if xs.size > 40:
+            board[y, xs[0]:xs[-1] + 1] = True
+    board = largest(ndimage.binary_opening(board, np.ones((5, 5))))
+
+    mask = Image.fromarray((board * 255).astype(np.uint8), "L").filter(
+        ImageFilter.GaussianBlur(1.2))
+    out = im.convert("RGBA")
+    out.putalpha(mask)
+    return out
+
+
+def extract_neon(v):
+    im = Image.open(os.path.join(TRAITS, v["src"])).convert("RGB").crop(
+        v["crop"])
     a = np.asarray(im, dtype=np.float32) / 255.0
     chroma = a.max(-1) - a.min(-1)
     luma = 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
@@ -93,20 +154,32 @@ def extract():
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--variant", default="all",
+                    choices=["all", "red", "neon"])
     ap.add_argument("--preview", action="store_true")
     args = ap.parse_args()
-    if not os.path.exists(SRC):
-        sys.exit(f"missing source plate: {SRC}")
-    logo = extract()
-    os.makedirs(os.path.dirname(DST), exist_ok=True)
-    logo.save(DST)
+    names = list(VARIANTS) if args.variant == "all" else [args.variant]
+    for name in names:
+        v = VARIANTS[name]
+        src = os.path.join(TRAITS, v["src"])
+        if not os.path.exists(src):
+            sys.exit(f"missing source plate: {src}")
+        logo = extract_red(v) if name == "red" else extract_neon(v)
+        dst = os.path.join(HERE, "assets", v["dst"])
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        logo.save(dst)
+        _report(name, logo, dst, args.preview)
+
+
+def _report(name, logo, dst, preview):
+    DST = dst
     cover = (np.asarray(logo)[..., 3] > 127).mean() * 100
-    print(f"{DST}  {logo.size[0]}x{logo.size[1]}  "
+    print(f"  {name:<5} {DST}  {logo.size[0]}x{logo.size[1]}  "
           f"{os.path.getsize(DST) / 1024:.0f} KB  {cover:.0f}% opaque")
-    if args.preview:
+    if preview:
         card = Image.new("RGBA", logo.size, (14, 15, 20, 255))
         card.alpha_composite(logo)
-        p = os.path.join(HERE, "assets", "sweetardio_logo_preview.png")
+        p = DST.replace(".png", "_preview.png")
         card.convert("RGB").save(p)
         print(p)
 
