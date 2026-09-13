@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Register an AI-enhanced face trait back onto the 1393x1393 trait canvas.
 
-Handles skinz, eyez and mouthz. An image generator hands back the art at some
+Handles skinz, eyez, mouthz and stickerz. An image generator hands back the art at some
 arbitrary size, usually on a flat green/magenta key field rather than real
 transparency. The compositor needs the opposite: a 1393x1393 RGBA canvas with
 the art at an exact size and an exact position, because skins, eyes and mouths
@@ -30,6 +30,13 @@ Usage (from repo root):
       --preview /tmp/blue_ab.png            # before/after comparison
   python3 asset_assessment/register_trait.py enhanced.png "layer-Mouth_Fang (1).png" \
       --replace                             # write into traits/mouthz/
+  python3 asset_assessment/register_trait.py new_art.png "18_Pwease_Lollipop.png" \
+      --fit contain --replace               # a sticker: see the note below
+
+STICKERS: use --fit contain, not the default --fit exact. Replacement art
+rarely comes back at the slot's exact aspect, and "exact" would stretch it to
+hit the old bounding box; "contain" keeps the art's own proportions and
+centres it in that box, which is what keeps it inside the corner footprint.
 
 See SKIN_ENHANCE_PROMPTS.md, EYEZ_ENHANCE_PROMPTS.md and
 MOUTHZ_ENHANCE_PROMPTS.md for the prompts that produce the input, and for the
@@ -46,8 +53,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import generator  # noqa: E402
 
 ALPHA_THRESH = 128  # matches generator._opaque_bbox
+# stickerz is here for the same reason the face traits are: a sticker is
+# authored into a FIXED corner footprint (all 23 live in x 56..287,
+# y 1114..1338 on the 1393 canvas) and nothing moves to meet one that drifted.
+# create_image() writes the FLOAT MASK from a sticker's alpha and the flood
+# state rests the piece on the water using it, so a sticker dropped in at the
+# wrong place or size does not merely look wrong -- it floats wrong.
+# ball_fit() does not read a sticker, so there is no cross-trait knock-on.
 TRAIT_CLASSES = {"skinz": generator.SKINZ, "eyez": generator.EYEZ,
-                 "mouthz": generator.MOUTHZ}
+                 "mouthz": generator.MOUTHZ, "stickerz": generator.STICKERZ}
 KEYS = {
     # name: (backdrop rgb, channel metric)
     "green": (0, 255, 0),
@@ -229,7 +243,7 @@ def parse_args():
     ap.add_argument("enhanced", help="the AI-generated image")
     ap.add_argument("target",
                     help="trait filename to match, from traits/skinz, "
-                         "traits/eyez or traits/mouthz")
+                         "traits/eyez, traits/mouthz or traits/stickerz")
     ap.add_argument("--class", dest="trait_class",
                     choices=sorted(TRAIT_CLASSES),
                     help="force the trait class (default: infer from filename)")

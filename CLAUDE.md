@@ -1377,6 +1377,452 @@ meanings**:
 
 Check what a folder already means before writing into it.
 
+## Face height is a function of BODY SIZE, and that is what "sits too low" means
+
+The collection aligns BOTTOMS. Every character-anchored layer shares one dy,
+so the face rides to `601 + dy` — which means a SHORT body, having to travel
+further down to reach its group's floor, **carries its own face down with
+it**. Measured across the bare cast, face height tracks body height almost
+perfectly. That is the mechanism behind every "X sits too low" report, and it
+is invisible to every gate: `verify_placement.py` passes clean because each
+character IS on its group's line.
+
+**The target is the POPTART line (686), not the group median.** This took two
+wrong passes to learn. Aiming at the median (717) looked principled and fixed
+nothing, because the median was being dragged down by the very characters
+being complained about. The signal was in which characters were NEVER flagged:
+the three poptarts, at 686, and everything below them. Every standing
+character at 700+ was flagged, in the end all eight of them. So the cut is
+~690, and the poptarts define it.
+
+Two levers, and it needs both:
+
+- **`VERTICAL_OFFSET` 150 -> 130** lifts the whole group 20px for free. Its
+  FLOOR is 125: the bare bottom is `957 + VERTICAL_OFFSET`, and below 1053
+  (`GROUND_SHADOW`'s `ground_line`) the group flips from a contact pool to the
+  floating drop shadow and stops reading as standing. 130 leaves 34px.
+- **`CHAR_SCALE`** does the rest. It works about the ball centre, so the body
+  grows symmetrically around the face and `CHAR_Y_ADJUST` absorbs the extra
+  foot-drop — the bottom line does not move at all.
+
+Scaling ALONE cannot reach 686: zebra_cake needed 890px of width against a
+cast that tops out at 803, and marshmallow 850px of height. Dropping the
+shared offset first keeps every body inside the cast's existing size band.
+
+| character | scale | face before | face now | area |
+|---|---|---|---|---|
+| sugar_cube | 1.227 | 770 | 703 | 1.24x |
+| brownie_bite | 1.131 | 750 | 710 | 1.24x |
+| rice_crispy_treat | 1.058 | 751 | 709 | 1.24x |
+| smores | 1.014 | 722 | 722 | 1.23x |
+| marshmallow | 1.12 | 751 | 686 | 1.18x |
+| gold_waffle | 1.072 | 733 | 686 | 1.25x |
+| zebra_cake | 1.061 | 729 | 686 | 1.22x |
+| waffle | 1.018 | 713 | 686 | 1.08x |
+| ding_dong (centred) | 1.12 | 705 | 666 | 0.92x |
+
+### You cannot have all three, and SIZE is the one with a hard ceiling
+
+Aligned bottoms, aligned faces and consistent body sizes are mutually
+exclusive on this art. Chasing 686 for everybody first produced exactly that
+failure: four bodies went to **1.35-1.49x the cast's median rendered area**
+and the owner called them too large — and the four they named were, measured
+afterwards, precisely the top four by area, with nothing else above 1.25x.
+
+**Rendered area is the metric, not width or height.** It is `opaque px x
+scale^2`, and it ranks the complaint perfectly where a width or height
+reading does not: zebra_cake is the WIDEST body in the cast (850) and was
+never flagged, because it is a flat hexagon at 1.22x area, while smores at
+845 wide was flagged at 1.49x.
+
+So the cap is **1.25x median area** — gold_waffle's level, the largest that
+was never questioned. Under it the four land 1.23-1.24x, and the cost is
+their faces: 703-722 against the group's 686, a 45px spread rather than 9.
+
+Two of the four should never have been scaled much in the first place, which
+the area numbers show at NATIVE size: smores is 1.22x before any scaling (the
+second-largest body in the cast) and rice_crispy_treat 1.12x. Only sugar_cube
+(0.83x) and brownie_bite (0.98x) were genuinely small. **Check native area
+before scaling a character for face height** — scaling a body that is already
+big trades a defect you can measure for one the owner will see.
+
+Four things to know before touching this again:
+
+- **A scale change REQUIRES re-warping the face hole**, and warp from the
+  ORIGINAL art, not from an already-warped file. The rule
+  `file hole x CHAR_SCALE == 250` still holds, so a body scaled UP needs a
+  SMALLER hole: sugar_cube at 1.277 carries a 196px hole. Each re-warp
+  resamples, so a second pass on top of a first visibly degrades the art —
+  `git checkout` the character files first, then warp once.
+  `normalize_face_hole.py <file> --target 250` divides out CHAR_SCALE for you.
+- **`FOOTWEARLESS_DY` is now EMPTY and should stay that way.** Every entry it
+  held existed to cancel the +150 overshoot. With 130 and re-derived trims
+  there is nothing left to correct, and keeping them spread the group's bare
+  bottoms over 29px.
+- **`CENTERED_FOOTWEARLESS_DY` contains the string `FOOTWEARLESS_DY = {`.**
+  A naive `s.index("FOOTWEARLESS_DY = {")` matches the CENTRED dict first and
+  silently wipes the seven round characters' placement. Anchor on the newline.
+- **The spread BETWEEN groups is structural, not a defect.** standing 686,
+  centred 665, no-offset 583. The no-offset group alone spans 66px because it
+  holds two bottom lines (cone/feet 1111, bars 1132) and three body
+  archetypes. `og_gummy_bear` reads 50px below the ice creams it is a family
+  with, and that is the documented 0.881 width-match doing its job — fixing
+  its face height would break the width match it was tuned for.
+
+Rebuilding `char_compat.json` after this moved pairing weights by at most
+0.012 and **no blocklist entry at all**; `calibrate_rarity.py --check --seed
+4444` then read eyes within +/-0.23, mouths +/-0.16, backgrounds +/-0.23 — the
+same figures the current calibration was solved to. **The gains did not move
+and were not re-solved.**
+
+## The floating drop shadow was too small to read
+
+`GROUND_SHADOW` switches mode at `ground_line` 1053: the standing cast gets a
+contact pool, the centred/floating group a drop shadow. `drop_dx`/`drop_dy`
+were **16**, which on a 639-716px round body puts the cast almost concentric
+with its caster — the body covers the dense middle and only a diffuse rim
+escapes. It reads as haze, and on a dark body (ding_dong) as nothing at all,
+which is how the owner noticed it.
+
+**34.** Measured on the plate the figure does not cover, peak shadow goes
+39 -> 75 against the contact pool's 44; chosen off a rendered ladder at
+16 / 28 / 34 / 40 / 48, where 40 and beyond start to read as a second object.
+Both keys are consulted **only** in the `drop` branch, so the standing cast's
+contact pool is untouched — verified.
+
+## Stepped edges: the repair ADDS a ramp, it never erodes
+
+`audit_edges.py`'s STEPPED flag is a fully-opaque pixel touching a fully-clear
+one — alpha cut with no ramp at all. 13 assets carried it, worst
+`Arms_Cash` (615), `Gorbhouse_overlay` (443), `Bunny_Slippers_Base` (376).
+
+`asset_assessment/soften_stepped_edges.py` fixes it, and the direction is the
+whole design. Blurring the alpha at the boundary is the obvious fix and it is
+**wrong here**: it pulls opaque pixels below 255 and so moves the `alpha > 200`
+silhouette, which is load-bearing twice over — `WAT_SCALE_PIVOT` was solved
+against the footwear sole line measured at that threshold, and
+`clean_trait_art.py` already refuses to touch a footwear asset whose solid
+bbox would move. So the tool paints one half-coverage ring (alpha 110) in the
+clear pixels just OUTSIDE the hard edge, with RGB taken from the nearest
+opaque neighbour. Every previously-visible pixel keeps its exact alpha and
+RGB, and 110 can never enter the `alpha > 200` box; the run asserts both.
+
+All 40 affected assets went to **0 stepped px**, and a check across all 61
+modified PNGs confirmed **0 unexpected silhouette changes**. Backups go to
+`traits/<class>_prestep/` — a fourth meaning for that folder family, kept
+distinct from `_originals` and `_prespeckle` for the reason this file already
+gives.
+
+**The same rule applies to a hand repair.** The smores cut-out fix below
+first filled its alpha to a flat 255 and introduced 23 stepped px doing it;
+the fill is now taken from a lightly blurred mask so the repaired edge carries
+the same soft ramp as the rest of the silhouette. Measured back at 0.
+
+## The smores had a torn cut-out, bottom left
+
+The chocolate drip between the two crackers was cut badly: three jagged
+transparent fingers reached UP into the chocolate from the body's bottom edge
+(x 316..365, y 856..912), tearing the silhouette and showing the plate through
+it. Not a speck — it is attached to the art, so stage 1 of
+`clean_trait_art.py` could never see it — and not a matte line either.
+
+The repair is a morphological CLOSE restricted to that window, so narrow
+inlets seal while the broad bottom boundary keeps its shape, with RGB
+inpainted from the nearest clean opaque pixel. Two details were both found by
+looking at the result:
+
+- **Inpaint from CHOCOLATE only.** Nearest-neighbour does not respect a
+  material boundary, and an unconstrained source painted the right-hand half
+  of the repair cracker-orange.
+- **The repaint band must straddle the boundary** — the tear's own dark
+  anti-aliased rim is interior once the tear is filled, and left alone it
+  reads as a hairline tracing the very tear being removed. Same failure
+  `fix_hole_matte_line.py` documents for face-hole rims.
+
+## Two audit flags that are NOT defects
+
+Both cost real time before being pinned down; check here before "fixing"
+either again.
+
+- **`audit_art_quality.py` GHOST-COLOUR on the arms is the CURE, not the
+  disease.** It flags mean luma of alpha-0 pixels above 8. A correct edge
+  bleed — which is exactly what `clean_alpha.py` produces, and what stops
+  colour bleeding into the fringe on resample — necessarily leaves non-zero
+  RGB there. `clean_alpha.py armz --dry-run` re-reports the same ghost values
+  it would write, i.e. the pass is already at its fixed point. `audit_edges.py`
+  measures this properly, as a difference from the neighbouring art.
+- **`clean_trait_art.py --report` reads from its BACKUP, not the live art.**
+  It always cleans from `traits/<class>_prespeckle/` so the pass is idempotent,
+  so `--report` will keep printing the original 979 components / 3,183 px
+  forever. That is not a regression and the live art is already clean.
+
+## The arms carried a baked cut-out path, and the Nerf Blaster's was a LASSO
+
+Four arms shipped with the background baked into their semi-transparent
+fringe, so every one of them drew a keyline around itself over a light body.
+Measured as fringe luma minus the luma of the art it borders:
+
+| arm | before | after |
+|---|---|---|
+| Cash | -80.6 | -7.7 |
+| Knives | -68.8 | -24.8 |
+| **Nerf Blaster** | **-53.8** | **+9.6** |
+| AR47 | -50.0 | -11.1 |
+
+**The Nerf Blaster was the worst of them and the metric said otherwise.** Its
+-53.8 is mid-pack, but the shape of the defect is what matters: Cash and
+Knives carry a thin UNIFORM line that reads as ordinary anti-aliasing, while
+the Nerf's fringe is a **dashed line** — a lasso selection path baked in,
+marching-ants and all, tracing the whole blaster. Over a marshmallow it is
+unmistakable. **Rank this defect by eye on a light body, not by the number.**
+
+**The blaster's +9.6 above is NOT a repair, and neither is the AR47's -11.1.**
+A positive reading means the fringe ended up LIGHTER than the art it borders.
+Both were re-done properly — see *The Nerf Blaster was cut with a SOFT
+selection* below, which is also where the reason `bleed` under-fixes a small
+detailed asset is written down.
+
+**`fix_matte_line.py`'s `fix()` is colour-agnostic — only its SELECTION is
+white-specific.** It bleeds trusted art colour over the fringe and puts the
+original alpha back, which repairs a DARK baked edge exactly as well as a
+white one; it is `white_pct()` and `--threshold` that stop it seeing this
+case, and `--dry-run` over the class reports "0 assets" because of them. Name
+the file and pass `--threshold 0`:
+
+    python3 asset_assessment/fix_matte_line.py armz "<file>.png" --threshold 0
+
+Alpha comes back bit-identical and the `alpha > 200` silhouette cannot move —
+both asserted — so this is a colour repair and no geometry gate is involved.
+
+**Two exclusions, and both matter:**
+
+- **NEVER the three sabers.** Their fringe measures 184-185% of the body
+  because it is the blade's GLOW, which this file already records as the art
+  working. Bleeding hilt colour over it would delete the glow.
+- **Never stickerz**, for the separate reason below.
+
+The Dual Uzis (-29.7) and Military Brat (-19.8) were left alone: both read as
+a normal edge on a light body, and the pass has diminishing returns once the
+delta is inside ~30.
+
+## The characters and the footwear carried the same baked line, on the OUTER edge
+
+The four arms above were the same defect measured on the same boundary the
+whole collection had never checked: **the outer silhouette**. Nineteen assets
+carried it — 13 of the 27 characters and 6 of the 11 footwear files — as a
+1px ragged dark line tracing the cut, invisible on a dark plate and
+unmistakable on a light one.
+
+**Rank it with a LOCAL metric.** The arms were ranked by fringe luma minus the
+luma of the art it borders, averaged over the whole edge, and on a character
+that reading is dominated by material changes rather than by the defect: a
+poptart's crust is genuinely darker than its sprinkled top, so it scores
+−49 with a perfectly clean edge, while the gummy bear — the worst asset in the
+cast — scored a mid-pack −33.7 and was nearly missed. Compare each rim pixel
+with the art **4px directly behind it** instead and the ranking inverts to
+match the eye: bear −113, churro −110, sugar cube −94.
+`asset_assessment/audit_rim_line.py` does this; the reference set is the
+five ice creams, which are cut cleanly and read −0.7 to −9.7.
+
+**The repair is `fix_matte_line.py --outer-only --threshold 0 <class> <file>`.**
+`fix()` was already colour-agnostic; what it lacked was a way to stay off the
+**face hole**. Its `band` is the boundary of the solid region, which on a
+character includes the hole rim — and that rim belongs to
+`fix_hole_matte_line.py`, which has already fixed the four assets that carried
+a real hairline there and left soft shading everywhere else on purpose.
+`--outer-only` floods in from the image border and restores everything the
+outside cannot reach.
+
+**Apply it per asset, on a measured improvement, never to a whole class.** On
+four characters the pass makes the edge WORSE — `chocolate_doughnut` −15.2 →
+−31.6, `chocolate_sandwich_cookie` +16.2 → −3.1 — because the colour it bleeds
+outward is the dark glaze while the true rim is the lighter cake underneath.
+The tool cannot know that. The rule used here was **improvement ≥ +8 on the
+local metric**, which excludes a regression by construction, then every
+survivor rendered over flat grey and looked at.
+
+`BAND` stays at **2**. Rendered as a ladder at 2 / 3 / 4 / 6 on the four assets
+whose numbers only half-moved, 2 already clears the line and 6 starts pulling
+trusted colour from the wrong material and puts a dark edge back.
+
+**And past `BAND = DEEP` the metric measures itself.** Widening the band to 6
+or 8 takes every remaining flagged character to ~0 and it means nothing: the
+audit compares the rim with the art 4px behind it, so once the repair rewrites
+more than 4px of opaque edge, both sides of the comparison are the same bled
+colour. BAND 3 and 4 are the only honest tests above the default, and neither
+helps. **A number that only moves when the band passes 4 is the tool grading
+its own homework.**
+
+**Five characters still flag and all five are the art.** Looked at over flat
+grey at 4x: `chocolate_frosted_poptart` (-68) is a *baked crust*, genuinely
+browner than the pastry behind it, with a soft shadow authored outside the
+corner; `chocolate_chip_cookie` (-26) and `sugar_doughnut` (-19) the same
+browned rim; `og_poptart` (-18) likewise. Only `churro` (-27, down from -110)
+keeps a faint stipple of the original line, invisible at token size. That is
+the local metric's own limit -- it cancels a change that follows the form, but
+a *baked good* is darker at its edge everywhere at once, which looks exactly
+like a cut.
+
+**Footwear is safe here, unlike the speck pass.** `clean_trait_art.py` refuses
+to touch a slipper whose `alpha > 200` bbox would move, because
+`WAT_SCALE_PIVOT` was solved against the sole line at that threshold. This
+pass never touches alpha at all — it asserts it byte-identical — so the sole
+line provably cannot move, and all eleven measured back unchanged. The bunny
+base (−121), both gorbhouse files (−75, −66) and all three shiba files (−45,
+−39, −39) had it; **Cookie Monster and Pepe did not**, which is what proves it
+is a defect in how those files were cut rather than house style.
+
+**Do not run this on eyez or mouthz.** They measure worst of all —
+`Awkward_smile` −160, `Mouth_Diamond_Grill` −161 — because a cartoon mouth is
+*drawn* with a black outline and an eye with a black lid. The metric cannot
+tell authored line art from a baked cut, and neither can the tool.
+
+Backups go to `traits/<class>_prematte/` — a fifth meaning for that folder
+family, and written only when absent, so a second run repairs from the live
+art rather than compounding its own output.
+
+## The Nerf Blaster was cut with a SOFT selection, and `bleed` cannot fix it
+
+The arms section above records the blaster's fringe going -53.8 -> +9.6 and
+calls it repaired. It was not. A vertical profile across its barrel reads
+
+    alpha   0   1   7  32  75  48  35 123 244 255
+    rgb              <-- pale lavender -->  <-- real blue
+
+Two defects in one: the alpha wobbles UP AND DOWN across a 6px transition
+instead of ramping once (a soft lasso, not a hard one), and the whole band
+carries the pale colour of whatever the toy was photographed against. On the
+drum magazine the same thing reads as a hard violet ring; on the orange stock
+as a white keyline. **The +9.6 is the defect, not the cure** — a POSITIVE
+reading means the fringe is LIGHTER than the art it borders, which on a blue
+and orange body is a light keyline.
+
+**`clean_alpha.bleed()` is why it survived the repair, and this is the part to
+remember.** Its radius is `max(8, size // 24)` — **58px on this canvas** — so
+it returns a far-field AVERAGE of everything within 58px, not the colour of
+the art the fringe actually touches. On a character that is harmless: a body
+is one large region, so the average near an edge is that body's colour. On a
+small, high-detail, multi-coloured asset it is useless. Measured on the
+blaster, `bleed` changed **exactly 0 pixels** — the average of blue, orange,
+black and a white decal within 58px is (91, 93, 159), and the lavender it was
+asked to replace was (91, 93, 159). `fix_matte_line.py` is built on `bleed`,
+so it inherits this.
+
+`asset_assessment/recut_soft_edge.py` takes the colour from the **nearest**
+trusted pixel instead, by distance transform — the same mechanism
+`soften_stepped_edges.py` and `fix_hole_matte_line.py` already use. It pulls
+the real blue from 3px away.
+
+**No audit sees this defect, and four were tried.** `audit_edges.py` flags
+nothing on the blaster — the ramp exists so it is not STEPPED, the colour is
+bled so not GHOST, the fringe is not white enough for HALO. `audit_rim_line.py`
+averages the rim against the art and a pale feather cancels a dark one. Feather
+width does not separate it: 1.77 mid-alpha px per px of boundary against an
+arms median of **1.51**. Fringe-colour distance ranks it **5th** of 11, behind
+the Military Brat, whose 231 is a cartoon glove's authored black outline.
+The one number that does separate it is boundary **roughness** — px displaced
+by a 2px smooth — at **39.6 %** against a class median of 13.0 %. Even that
+is only a pointer: fur, a lightsaber glow and a ridged churro all read high
+legitimately. **This is the second time this asset has proved the same rule:
+render it over flat grey and look at it.**
+
+### The recut has three stages and only the first is free
+
+1. **Colour** — nearest trusted pixel, as above. **Alpha comes back
+   bit-identical**, so no geometry is involved at all. This is the whole win
+   on most assets.
+2. **Shape** — a median filter on alpha. A median removes 1-2px protrusions
+   and notches while preserving straight runs and genuine corners, which a
+   gaussian does not. 39.6 % -> 13.2 %.
+3. **Ramp** — a contrast curve on alpha, **pinned at 128**, which is
+   `generator._opaque_bbox()`'s threshold. Pinning matters because
+   `armed_lift()` reads the arm's bottom edge off that box.
+
+**Stage 3 hardens the edge and so CREATES stepped pixels** — 732 on the
+blaster, where the soft cut had 0. So `soften_stepped_edges.py` is not
+optional after a recut; `--soften` runs it inline and the tool asserts the
+result is back to 0. Final: roughness **18.8 %**, 0 stepped px.
+
+The median in stage 2 can still move the `alpha >= 128` box by a pixel (it did
+here, 1px on every side), so the tool prints the box when it changes. Checked
+rather than assumed: **0 of 297 character x arm `armed_lift` decisions moved**,
+146 lifted before and after.
+
+**Only the blaster needed all three.** Rendered over flat grey, the **AK15**
+and **AR47** carry the same white keyline with a clean silhouette underneath
+(roughness 11.6 % and 10.0 %), so both took `--colour-only` and their alpha is
+bit-identical. The **Military Brat** looks similar and is not: its outline is
+authored cartoon line art. The **three sabers** stay excluded for the reason
+already recorded — their fringe is the blade's glow.
+
+Backups go to `traits/<class>_precut/` — a sixth meaning for that folder
+family, written only when absent.
+
+## fix_matte_line.py must NEVER be run on stickerz
+
+It flags 17 of the 23 with a 20-42% "white fringe" and offers to take it to
+0%. That fringe **is the die-cut border**, which is the sticker design. Run on
+`05_American_Pie.png` it bled the pie's orange outward and left an ugly
+keyline where a crisp white border had been — visibly worse, and reverted.
+
+The tool's metric cannot tell a white matte artefact from a deliberate white
+edge. `audit_edges.py` gets this right: it flags HALO on only two stickers,
+and both are the ones `clean_trait_art.py` already excludes by design.
+
+## Anti-clash: a TARGETED block is free, a broad rule is not
+
+`build_char_compat.py` has two rules and an owner override, and the split
+between them was settled by measuring the cost rather than by taste.
+
+**Rule 1, anti-camouflage**, is the original: `at_risk()` blocks a pairing
+only when luminance, saturation AND hue separation are all weak at once. That
+AND is narrow by design, and it blocks 6 of 1728 pairs.
+
+**Rule 2, washout**, exists because the AND is too strict in one specific way:
+a pairing can match in hue AND in value and still pass, purely because the
+character out-saturates the plate — and saturation alone does not separate
+figure from ground. `og_gummy_bear` is the worked example. It is hot magenta
+(hue 322, S 0.63, L 99), and on `Starburst` (hue gap **0**, luminance gap 11)
+and `Pink_Abyss` (hue gap 15, luminance gap **2**) its top half melts into the
+plate. Neither blocked, because the bear reads +0.27 and +0.30 MORE saturated
+than they do.
+
+**Rule 2 ships OFF, and the reason is the rarity fit.** At its gentlest useful
+setting (L<22 and H<25) it blocks 202 of 1728 pairs — no character is starved,
+every one keeps at least 42 of 64 plates — but it makes the calibration
+**unsolvable**: the worst eye deviation goes **0.23 -> 1.01** and stays there,
+oscillating 0.95-1.03 over eight solver passes without converging.
+
+The mechanism is worth understanding, because it is not obvious that a
+CHARACTER block should reach the EYES at all: `eyez_compat` blocks certain
+eyes on certain plates, so changing which plates get drawn moves the eye
+shares, and the eye gains cannot correct a constraint that lives in the plate
+draw. Blocking characters is therefore never a local change.
+
+**The same two pairings blocked BY NAME cost nothing**: eyes 0.23, mouths
+0.16, backgrounds 0.23 — bit-for-bit the fit the collection already had, no
+re-solve needed. That is the whole finding: **name the pairings you do not
+want; do not reach for a threshold.**
+
+### MANUAL_BLOCKS is the place for "I never want to see X on Y"
+
+`char_compat.json` is REGENERATED from measurement on every run, so a pairing
+blocked by hand in the JSON is silently lost at the next rebuild. Entries in
+`MANUAL_BLOCKS` survive. Unknown character names and unknown plate filenames
+both `sys.exit`, so a typo or a renamed asset fails loudly rather than quietly
+blocking nothing.
+
+### Allocator-only plates are EXEMPT from both rule 2 and MANUAL_BLOCKS
+
+The four `Legendary_*` plates and `Starfield.png` are placed by the allocator,
+not the weighted draw. Those slots re-roll the character on camouflage and a
+re-roll **cannot** change a FORCED character — which is exactly how every
+chase character ended up barred from every legendary and starfield token (see
+the rarity ladder section). Adding blocks there re-opens that failure. The
+starfield also has its own curated cast list, `STARFIELD_CHARS`, so a second
+overlapping rule would be redundant as well as risky. Rule 1 still applies
+everywhere; it was always narrow enough to be safe.
+
 ## Verification tools
 
 ```bash
@@ -1390,6 +1836,10 @@ python3 asset_assessment/register_eyes.py --report        # eye size + baseline
 python3 asset_assessment/fix_hole_matte_line.py --report  # dark rings on hole rims
 python3 asset_assessment/verify_trait_names.py    # do the names still resolve
 python3 asset_assessment/clean_trait_art.py --report   # cut-out residue on trait art
+python3 asset_assessment/soften_stepped_edges.py --dry-run # un-anti-aliased (stepped) edges
+python3 asset_assessment/audit_edges.py           # halo / stepped / binary / ghost / specks
+python3 asset_assessment/audit_rim_line.py        # baked dark line on the OUTER silhouette
+python3 asset_assessment/recut_soft_edge.py --report armz  # soft-lasso edges (rank, then LOOK)
 python3 dynamic/starfield.py --verify             # the rainbow: seam, direction, cut
 python3 dynamic/starfield.py --write              # rebuild the reference plate
 python3 dynamic/cookboy.py --verify               # the 1/1's still + loop reproduce

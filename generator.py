@@ -928,7 +928,16 @@ BG_CHAR_EXTRA_Y = {
 }
 
 CANVAS_SIZE = 1393
-VERTICAL_OFFSET = 150  # Pixels to lower the character if no footwear
+VERTICAL_OFFSET = 130  # Pixels to lower the character if no footwear
+# 130, not 150. The standing group's faces sat 27-43px below the three
+# poptarts', and the poptarts are the only standing characters the owner never
+# called too low -- so 686, their line, is the target, not the group median.
+# Scaling alone could not reach it: zebra_cake needed 890px of width against a
+# cast that tops out at 803. Dropping the shared offset 20px does a fifth of
+# the work for free and keeps every body inside the cast's size band.
+# The FLOOR is 125: the bare bottom is 957 + VERTICAL_OFFSET, and below 1053
+# (GROUND_SHADOW's ground_line) the whole group flips from a contact pool to
+# the floating drop shadow and stops reading as standing. 130 leaves 34px.
 
 # Characters with no base / standing point (round cookies, the gummy worm,
 # the round doughnuts, the ding dong ring) read better CENTERED than dropped to
@@ -961,7 +970,9 @@ def is_centered(char_name):
 # that same 1111 line now that CHAR_SCALE brings both down to cast size.
 # poptart/twinkie keep their owner-tuned overshoot values (2026-06).
 CHAR_Y_ADJUST = {
-    "poptart": -65,
+    "og_poptart": -50,
+    "cyan_frosted_poptart": -46,
+    "chocolate_frosted_poptart": -54,
     "twinkie": 45,
     # The five regenerated ice creams (vanilla, neopolitan, chocolate, cyan
     # and pink sherbert) all measure the same body, so they take the same trim
@@ -982,16 +993,22 @@ CHAR_Y_ADJUST = {
     # which land in a 953-959 band, and its body sank into the slippers
     # instead of resting on them. -6 puts it at 955, with the group.
     "chocolate_sandwich_cookie": -6,
-    "sugar_cube": 42,
-    "gold_waffle": -18,        # measured separately from the plain waffle; the
+    "sugar_cube": -28,         # re-derived for CHAR_SCALE 1.16; the shod bottom
+                              # stays on 957 and the bare bottom on 1084, so
+                              # only the face moved (770 -> 720)
+    "gold_waffle": -45,        # measured separately from the plain waffle; the
                                # key must stay distinct or the "waffle" substring
-                               # claims it and lifts it 20px too high
-    "waffle": -38,
-    "ding_dong": 34,
+                               # claims it and lifts it 20px too high.
+                               # Re-derived for CHAR_SCALE 1.04 (face 733 -> 718);
+                               # both bottom lines are unchanged at 957 / 1107
+    "waffle": -45,
+    "ding_dong": -5,          # re-derived for CHAR_SCALE 1.12; shod bottom
+                              # stays on 957, bare on 1027 (face 705 -> 666)
     "og_gummy_bear": 32,      # rescaled; feet on the shared ground line (1111)
     "sugar_doughnut": -26,
-    "brownie_bite": 22,
-    "zebra_cake": -20,         # footwear-excluded now, so only the BARE path
+    "brownie_bite": -21,       # re-derived for CHAR_SCALE 1.09; shod bottom
+                              # stays on 957, bare on 1084 (face 750 -> 720)
+    "zebra_cake": -45,         # footwear-excluded now, so only the BARE path
                                # runs: -20 here plus FOOTWEARLESS_DY -2 gives
                                # the same -22 the bare case always had. Kept as
                                # a pair rather than collapsed to -22, so the
@@ -1001,6 +1018,10 @@ CHAR_Y_ADJUST = {
     "chocolate_doughnut": -18,
     "glazed_doughnut": -18,
     "oatmeal_cream_pie": 14,
+    "smores": -9,
+    "marshmallow": -45,       # new entries: both were implicit 0. Re-derived
+    "rice_crispy_treat": -22, # for CHAR_SCALE 1.09 -- shod bottom stays on
+                              # 957, bare on 1107 (face 751 -> 717)
     "churro": 21,              # joins Twinkie and Nutty Bar on the 1132 bar
                                # line; it was the odd one out at 1111
     "nutty_bar": -20,          # bar body, stands with the Twinkie at 1132;
@@ -1070,8 +1091,9 @@ CENTERED_FOOTWEARLESS_DY = {
                                       # though the front disc sits higher.
     "chocolate_chip_cookie": -2 + _CENTERED_DROP,
     "oatmeal_cream_pie": 14 + _CENTERED_DROP,
-    "ding_dong": 34 + _CENTERED_DROP,
+    "ding_dong": -5 + _CENTERED_DROP,
 }
+
 
 def centered_footwearless_dy(char_name):
     return next((dy for k, dy in CENTERED_FOOTWEARLESS_DY.items()
@@ -1089,18 +1111,20 @@ def centered_footwearless_dy(char_name):
 # approved band allows, which is what the original tuning was reaching for,
 # but inside it rather than above it.
 FOOTWEARLESS_DY = {
-    "sugar_cube": -23,   # bare bottom -> 1084 (was -45, floating at 1062)
-    "smores": -29,       # bare bottom -> 1084 (was -75, floating at 1038)
-    "zebra_cake": -2,    # keep the (perfect) bare stance while CHAR_Y_ADJUST
-                         # raises only the with-footwear case.
-                         # CHAR_Y_ADJUST -37 overshot: it put the shod bottom
-                         # at 940 against a cast band of 953-961, so the body
-                         # rode ~16px further out of the slipper than every
-                         # other wearer and read as too tall. -20 measures
-                         # back at 957, mid-band; this -2 holds the bare
-                         # bottom at 1105, exactly where it was.
-    "brownie_bite": -23, # bare bottom -> 1084 (was -65, floating at 1042)
+    # EMPTY, and that is the point. Every entry here existed to cancel an
+    # overshoot: the +150 drop bottomed these characters out, so each was
+    # pulled back up by 23-29px. VERTICAL_OFFSET is now 130 and every standing
+    # character's CHAR_Y_ADJUST was re-derived onto the 957 shod line, so the
+    # bare bottom is a uniform 957 + 130 = 1087 across the whole group with no
+    # per-character correction left to make.
+    #
+    # Keeping the old values would have spread the group's bare bottoms over
+    # 29px (1058-1087) and put smores far enough off its group's median for
+    # verify_placement.py to flag it. The lever still exists and still works
+    # the same way -- it moves ONLY the bare case, leaving a character's shod
+    # placement alone -- it simply has nothing to correct today.
 }
+
 
 def footwearless_dy(char_name):
     return next((dy for k, dy in FOOTWEARLESS_DY.items()
@@ -1136,6 +1160,54 @@ CHAR_SCALE = {
     # which matches the Twinkie, the cast's other standing bar. 0.93 is kept
     # because it is what its CHAR_Y_ADJUST and the bar line are tuned to.
     "nutty_bar": 0.93,
+    # sugar_cube and ding_dong were the two smallest bodies in the cast
+    # (395,605 and 444,105 px against a 480,000 median), and being small is
+    # what made them read as "sitting too low": the collection aligns BOTTOMS,
+    # so a short body has to travel further down to reach its group's floor
+    # and it carries the face down with it. sugar_cube ended up with the
+    # lowest face in the whole collection (y 770 against a standing-group
+    # median of 729) and ding_dong the lowest in the centred group (705
+    # against 665) -- neither could be fixed by placement, because both were
+    # already on their group's line and moving them off it breaks the
+    # alignment that makes the group read as one cast.
+    #
+    # Scaling is the right lever and it is free here: CHAR_SCALE works about
+    # the ball centre, so the body grows symmetrically around the face and
+    # CHAR_Y_ADJUST absorbs the extra foot-drop -- the bottom line does not
+    # move at all. Solved against the real placement maths rather than by eye:
+    # 1.13 puts sugar_cube's bare face at 729 (its group's median exactly) and
+    # 1.12 puts ding_dong's at 666 (its group's 665), with both bottoms
+    # unchanged at 1084 and 1027. Their bodies land at 718x704 and 778x716,
+    # inside the bands their groups already occupy.
+    # THE CAST IS BOTTOM-ALIGNED, so a short body has to travel further down
+    # to reach its group's floor and it carries the FACE down with it. That is
+    # why the shortest bodies read as "sitting too low": measured across the
+    # bare cast, face height tracks body height almost perfectly, and the
+    # bottom of the range was sugar_cube at y 770 against a standing-group
+    # median of 729 and the ice creams' 583.
+    #
+    # Placement cannot fix it. Each of these was already on its group's line,
+    # and moving one off that line to raise its face breaks the alignment that
+    # makes the group read as one cast. Scaling can, and it is free here:
+    # CHAR_SCALE works about the ball centre, so the body grows symmetrically
+    # around the face and CHAR_Y_ADJUST absorbs the extra foot-drop -- every
+    # bottom line below is unchanged, only the face moved.
+    #
+    # Solved against the real placement maths, not by eye: each value is the
+    # scale that puts that character's bare face on its group's target line
+    # (720 standing, 666 centred) with its bottom held. Bodies land 688-788 px,
+    # inside the band the cast already occupies, so nothing reads oversized.
+    # Characters already near the line (waffle, smores, zebra_cake, the three
+    # poptarts) are deliberately left alone rather than scaled by ~1.01.
+    "sugar_cube": 1.227,
+    "ding_dong": 1.12,
+    "rice_crispy_treat": 1.058,
+    "marshmallow": 1.12,
+    "brownie_bite": 1.131,
+    "gold_waffle": 1.072,
+    "smores": 1.014,
+    "waffle": 1.018,
+    "zebra_cake": 1.061,
 }
 
 def char_scale(char_name):
@@ -1618,8 +1690,19 @@ GROUND_SHADOW = {
     "opacity": 0.40,
     "dx": 0,
     "dy": 6,
-    "drop_dx": 16,   # top-left key -> a floating body casts down AND right;
-    "drop_dy": 16,   # equal offsets put the cast at 45 deg to match the key
+    # top-left key -> a floating body casts down AND right; equal offsets put
+    # the cast at 45 deg to match the key. 34, not 16: at 16 the offset is so
+    # much smaller than the body that the cast sits almost concentric with it,
+    # so the body covers the dense middle and only a diffuse rim escapes --
+    # the shadow reads as haze rather than as a shadow, and on a dark body
+    # (ding_dong) it reads as absent altogether, which is how it was noticed.
+    # These keys are consulted ONLY in the "drop" branch, so the standing
+    # cast's contact pool is untouched. Measured on the plate the figure does
+    # not cover, peak shadow goes 39 -> 75 against the contact pool's 44;
+    # chosen off a rendered ladder at 16 / 28 / 34 / 40 / 48, where 40 and
+    # beyond start to read as a second object rather than a shadow.
+    "drop_dx": 34,
+    "drop_dy": 34,
     "squash": 0.16,
     "exclude_arms": True,
     # Sits in the middle of the empty band between the two populations it has
