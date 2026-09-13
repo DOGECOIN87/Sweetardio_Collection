@@ -1758,6 +1758,51 @@ already recorded — their fringe is the blade's glow.
 Backups go to `traits/<class>_precut/` — a sixth meaning for that folder
 family, written only when absent.
 
+## The stickers kept measuring clean and were not: 112 bright specks
+
+Cut-out debris orbiting the die-cut border -- fragments of the original lasso
+left floating outside the white edge. On a light plate they vanish; on a dark
+one, which is most of the collection's plates, they read as a scatter of white
+dots around the sticker. 112 of them across 17 of the 23 files, several at
+full alpha 255.
+
+**Three separate audits called the set clean, and each was measuring the wrong
+thing.** This is the part worth remembering, because the same trap is waiting
+in any speck check:
+
+- **A component count at `alpha > 2` or `> 20` does not see them.** Each bright
+  speck is joined to the body by a film of `alpha <= 8` ghost bleed, so at a
+  low threshold it is *part of the main blob*. Worse, that threshold surfaces
+  30-80 OTHER fragments per file, all capped at alpha 8 -- real debris, but
+  invisible, and a decoy that looks like the whole problem.
+- **A count at `alpha > 80` over-reports instead.** Raising the cut fragments
+  the ARTWORK, so the extra components are the sticker's own thin parts.
+  American Pie reads 11 "specks" at that threshold and none of them are specks.
+- **"Opaque pixels far from the body" misses them at any sane distance.** They
+  hug the border, 3-6px out. Measured at 6px the whole set reads 0.
+
+The framing that works is a component analysis at **`alpha > 128`** -- high
+enough that the ghost film no longer bridges, low enough that the artwork is
+still one piece. Mr Owl: 16 components, 15 of them specks totalling 52px, the
+largest 12px.
+
+**And that pass alone is not enough either.** It only catches debris whose
+PEAK clears 128. After it cleared every bright speck, Mr Owl still carried a
+fragment peaking at alpha 94 and the Hunny Pot one at 102 -- both plainly
+visible on a dark plate. So `despeck_stickers.py` runs a second stage at the
+ghost floor: anything not joined to the body at `alpha > 2` is debris whatever
+its peak. The end state is the one that is actually checkable -- **exactly one
+connected component per file at every threshold**, which Cookboy.png already
+satisfied and is the reference for.
+
+Colour is never touched and the body's alpha is asserted unchanged, so this
+cannot alter the artwork; the run also asserts no removed pixel lies inside
+the filled body, which held on all 17 files. Backups in
+`traits/stickerz_prespeck/`.
+
+**Do not judge a sticker on a light field.** The whole set looked correct
+there through several passes. Composite on something dark.
+
 ## fix_matte_line.py must NEVER be run on stickerz
 
 It flags 17 of the 23 with a 20-42% "white fringe" and offers to take it to
@@ -1840,6 +1885,7 @@ python3 asset_assessment/soften_stepped_edges.py --dry-run # un-anti-aliased (st
 python3 asset_assessment/audit_edges.py           # halo / stepped / binary / ghost / specks
 python3 asset_assessment/audit_rim_line.py        # baked dark line on the OUTER silhouette
 python3 asset_assessment/recut_soft_edge.py --report armz  # soft-lasso edges (rank, then LOOK)
+python3 asset_assessment/despeck_stickers.py --report    # cut-out debris orbiting a die-cut
 python3 dynamic/starfield.py --verify             # the rainbow: seam, direction, cut
 python3 dynamic/starfield.py --write              # rebuild the reference plate
 python3 dynamic/cookboy.py --verify               # the 1/1's still + loop reproduce
