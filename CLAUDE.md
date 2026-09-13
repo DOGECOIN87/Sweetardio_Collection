@@ -814,7 +814,7 @@ repo at `src/content/artistRares.ts`. Minted with both artists' permission
 
 The in-house 1/1 is the Cookboy motif — the pixel face embossed across the
 `Cookboy.png` / `Cookboy_Chocolate.png` plates and die-cut as sticker
-`Sweetardio_200 (30).png` — rendered as a blue gummy and flown across the
+`Cookboy.png` — rendered as a blue gummy and flown across the
 starfield on the 8-bit rainbow.
 
 **A secret rare composites with NOTHING, so anything the tier does at

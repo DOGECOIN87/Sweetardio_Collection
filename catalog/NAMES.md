@@ -206,7 +206,7 @@ holds 11 PNGs for 5 names.
 | Candy Land | `12_Candy_Land.png` |
 | Candy Shop | `10_Candy_Shop.png` |
 | Caroline Ellison | `26_Caroline_Ellison.png` |
-| Cookboy | `Sweetardio_200 (30).png` |
+| Cookboy | `Cookboy.png` |
 | Dude Sweet | `06_Dude_Sweet.png` |
 | Golden Ticket | `24_Golden_Ticket.png` |
 | Hunny Pot | `17_Hunny_Pot.png` |

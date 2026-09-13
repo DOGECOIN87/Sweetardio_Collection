@@ -85,7 +85,7 @@ re-rendering. What changed is that position and scale are now explicit in the
 art instead of emerging from a runtime resize, and the whole class conforms.
 
 No higher-resolution sticker sources exist, so there was no detail to recover;
-this is a hygiene fix, not a quality gain. `Sweetardio_200 (30).png` remains
+this is a hygiene fix, not a quality gain. `Cookboy.png` remains
 the softest of the class (0.178 against a 0.317 median) — soft in origin, not
 in handling.
 

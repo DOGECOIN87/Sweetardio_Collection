@@ -590,7 +590,7 @@ TRAIT_NAMES = {
         "25_Zombieland_Twinkie.png":        "Zombieland Twinkie",
         "26_Caroline_Ellison.png":          "Caroline Ellison",
         "28_opengotchi.png":                "Opengotchi",
-        "Sweetardio_200 (30).png":          "Cookboy",
+        "Cookboy.png":                    "Cookboy",
     },
     # 1/1 secret rares (standalone full-canvas artworks, never composited).
     # SECRET_RAREZ has no names block ON PURPOSE, and the live tier depends on
@@ -750,8 +750,8 @@ def extract_metadata(layers, char_name):
 # ---- OpenSea token metadata ----
 COLLECTION_NAME = "Sweetardio Collection"
 COLLECTION_DESCRIPTION = (
-    "Sweetardio Collection — 4,444 hand-crafted sweet degens. Every trait "
-    "is composited and graded for the cleanest, most collectible look on-chain."
+    "4444 Sugar addicted conspiracy theorists armed to the teeth who "
+    "refuse to take their meds"
 )
 
 
