@@ -1,0 +1,1298 @@
+[
+  {
+    "file": "brownie_bite_1.png",
+    "character": "Brownie Bite",
+    "character_key": "brownie_bite",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Brownie Bite"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "brownie_bite_2.png",
+    "character": "Brownie Bite",
+    "character_key": "brownie_bite",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Brownie Bite"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_chip_cookie_1.png",
+    "character": "Chocolate Chip Cookie",
+    "character_key": "chocolate_chip_cookie",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Chip Cookie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_chip_cookie_2.png",
+    "character": "Chocolate Chip Cookie",
+    "character_key": "chocolate_chip_cookie",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Chip Cookie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_doughnut_1.png",
+    "character": "Chocolate Doughnut",
+    "character_key": "chocolate_doughnut",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Smug"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_doughnut_2.png",
+    "character": "Chocolate Doughnut",
+    "character_key": "chocolate_doughnut",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Clueless"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_frosted_poptart_1.png",
+    "character": "Chocolate Frosted Pop Tart",
+    "character_key": "chocolate_frosted_poptart",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Frosted Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cerise"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_frosted_poptart_2.png",
+    "character": "Chocolate Frosted Pop Tart",
+    "character_key": "chocolate_frosted_poptart",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Frosted Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyan"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_ice_cream_1.png",
+    "character": "Chocolate Ice Cream",
+    "character_key": "chocolate_ice_cream",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_ice_cream_2.png",
+    "character": "Chocolate Ice Cream",
+    "character_key": "chocolate_ice_cream",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Googly"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_sandwich_cookie_1.png",
+    "character": "Chocolate Sandwich Cookie",
+    "character_key": "chocolate_sandwich_cookie",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Sandwich Cookie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "chocolate_sandwich_cookie_2.png",
+    "character": "Chocolate Sandwich Cookie",
+    "character_key": "chocolate_sandwich_cookie",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Chocolate Sandwich Cookie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "churro_1.png",
+    "character": "Churro",
+    "character_key": "churro",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Churro"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "churro_2.png",
+    "character": "Churro",
+    "character_key": "churro",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Churro"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "cyan_frosted_poptart_1.png",
+    "character": "Cyan Frosted Pop Tart",
+    "character_key": "cyan_frosted_poptart",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Cyan Frosted Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Smug"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "cyan_frosted_poptart_2.png",
+    "character": "Cyan Frosted Pop Tart",
+    "character_key": "cyan_frosted_poptart",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Cyan Frosted Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Clueless"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "cyan_sherbert_ice_cream_1.png",
+    "character": "Cyan Sherbert Ice Cream",
+    "character_key": "cyan_sherbert_ice_cream",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Cyan Sherbert Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cerise"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "cyan_sherbert_ice_cream_2.png",
+    "character": "Cyan Sherbert Ice Cream",
+    "character_key": "cyan_sherbert_ice_cream",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Cyan Sherbert Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyan"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  },
+  {
+    "file": "ding_dong_1.png",
+    "character": "Ding Dong",
+    "character_key": "ding_dong",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Ding Dong"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "ding_dong_2.png",
+    "character": "Ding Dong",
+    "character_key": "ding_dong",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Ding Dong"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Googly"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "glazed_doughnut_1.png",
+    "character": "Glazed Doughnut",
+    "character_key": "glazed_doughnut",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Glazed Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "glazed_doughnut_2.png",
+    "character": "Glazed Doughnut",
+    "character_key": "glazed_doughnut",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Glazed Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "gold_waffle_1.png",
+    "character": "Gold Waffle",
+    "character_key": "gold_waffle",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Gold Waffle"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "gold_waffle_2.png",
+    "character": "Gold Waffle",
+    "character_key": "gold_waffle",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Gold Waffle"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "marshmallow_1.png",
+    "character": "Marshmallow",
+    "character_key": "marshmallow",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Marshmallow"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Smug"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "marshmallow_2.png",
+    "character": "Marshmallow",
+    "character_key": "marshmallow",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Marshmallow"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Clueless"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "neopolitan_ice_cream_1.png",
+    "character": "Neapolitan Ice Cream",
+    "character_key": "neopolitan_ice_cream",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Neapolitan Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cerise"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  },
+  {
+    "file": "neopolitan_ice_cream_2.png",
+    "character": "Neapolitan Ice Cream",
+    "character_key": "neopolitan_ice_cream",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Neapolitan Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyan"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "Nutty_Bar_1.png",
+    "character": "Nutty Bar",
+    "character_key": "Nutty_Bar",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Nutty Bar"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "Nutty_Bar_2.png",
+    "character": "Nutty Bar",
+    "character_key": "Nutty_Bar",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Nutty Bar"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Googly"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "oatmeal_cream_pie_1.png",
+    "character": "Oatmeal Cream Pie",
+    "character_key": "oatmeal_cream_pie",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Oatmeal Cream Pie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "oatmeal_cream_pie_2.png",
+    "character": "Oatmeal Cream Pie",
+    "character_key": "oatmeal_cream_pie",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Oatmeal Cream Pie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "og_gummy_bear_1.png",
+    "character": "OG Gummy Bear",
+    "character_key": "og_gummy_bear",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "OG Gummy Bear"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "og_gummy_bear_2.png",
+    "character": "OG Gummy Bear",
+    "character_key": "og_gummy_bear",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "OG Gummy Bear"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "og_poptart_1.png",
+    "character": "OG Pop Tart",
+    "character_key": "og_poptart",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "OG Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Smug"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "og_poptart_2.png",
+    "character": "OG Pop Tart",
+    "character_key": "og_poptart",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "OG Pop Tart"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Clueless"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  },
+  {
+    "file": "pink_sherbert_ice_cream_1.png",
+    "character": "Pink Sherbert Ice Cream",
+    "character_key": "pink_sherbert_ice_cream",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Pink Sherbert Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cerise"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "pink_sherbert_ice_cream_2.png",
+    "character": "Pink Sherbert Ice Cream",
+    "character_key": "pink_sherbert_ice_cream",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Pink Sherbert Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyan"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "rice_crispy_treat_1.png",
+    "character": "Rice Crispy Treat",
+    "character_key": "rice_crispy_treat",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Rice Crispy Treat"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "rice_crispy_treat_2.png",
+    "character": "Rice Crispy Treat",
+    "character_key": "rice_crispy_treat",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Rice Crispy Treat"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Googly"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "smores_1.png",
+    "character": "S'mores",
+    "character_key": "smores",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "S'mores"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "smores_2.png",
+    "character": "S'mores",
+    "character_key": "smores",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "S'mores"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "sugar_cube_1.png",
+    "character": "Sugar Cube",
+    "character_key": "sugar_cube",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Sugar Cube"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "sugar_cube_2.png",
+    "character": "Sugar Cube",
+    "character_key": "sugar_cube",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Sugar Cube"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "sugar_doughnut_1.png",
+    "character": "Sugar Doughnut",
+    "character_key": "sugar_doughnut",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Sugar Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Smug"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  },
+  {
+    "file": "sugar_doughnut_2.png",
+    "character": "Sugar Doughnut",
+    "character_key": "sugar_doughnut",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Sugar Doughnut"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Clueless"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Flat"
+      }
+    ]
+  },
+  {
+    "file": "Twinkie_1.png",
+    "character": "Twinkie",
+    "character_key": "Twinkie",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Twinkie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cerise"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Tasty"
+      }
+    ]
+  },
+  {
+    "file": "Twinkie_2.png",
+    "character": "Twinkie",
+    "character_key": "Twinkie",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Twinkie"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyan"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Awkward Smile"
+      }
+    ]
+  },
+  {
+    "file": "vanilla_ice_cream_1.png",
+    "character": "Vanilla Ice Cream",
+    "character_key": "vanilla_ice_cream",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Vanilla Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smoke"
+      }
+    ]
+  },
+  {
+    "file": "vanilla_ice_cream_2.png",
+    "character": "Vanilla Ice Cream",
+    "character_key": "vanilla_ice_cream",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Vanilla Ice Cream"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Googly"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Sad"
+      }
+    ]
+  },
+  {
+    "file": "waffle_1.png",
+    "character": "Waffle",
+    "character_key": "waffle",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Waffle"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Beady"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Lollipop"
+      }
+    ]
+  },
+  {
+    "file": "waffle_2.png",
+    "character": "Waffle",
+    "character_key": "waffle",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Waffle"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Alien"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Side Eye"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Smirk"
+      }
+    ]
+  },
+  {
+    "file": "zebra_cake_1.png",
+    "character": "Zebra Cake",
+    "character_key": "zebra_cake",
+    "variant": 1,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Zebra Cake"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Black"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyborg"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Diamond Grill"
+      }
+    ]
+  },
+  {
+    "file": "zebra_cake_2.png",
+    "character": "Zebra Cake",
+    "character_key": "zebra_cake",
+    "variant": 2,
+    "attributes": [
+      {
+        "trait_type": "Character",
+        "value": "Zebra Cake"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "White"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Blue"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Fang"
+      }
+    ]
+  }
+]
