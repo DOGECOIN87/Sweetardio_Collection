@@ -20,3 +20,7 @@ promo/*.mp4
 # to redistribute in this repo. make_intro.py renders a labelled placeholder
 # for any slot that is empty, so the video builds without them.
 promo/lineage/
+
+# Cookie Chain Edition build scratch (candidate thumbs, pool, sheet renders);
+# cookie_chain/plan.json is the record and IS committed.
+cookie_chain/build/
