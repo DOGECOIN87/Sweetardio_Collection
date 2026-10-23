@@ -9,6 +9,7 @@ assets in `cookie_chain/assets/`. The finished images and metadata live in the
 ```bash
 pip install pillow numpy scipy
 python3 cookie_chain/prepare_assets.py                 # stickers + plaque
+python3 cookie_chain/prepare_footwear.py               # footwear outlines
 python3 cookie_chain/build_cookie_chain.py plan        # pool -> score -> select (~50 min)
 python3 cookie_chain/build_cookie_chain.py sheet       # 50-token approval sheet
 python3 cookie_chain/build_cookie_chain.py render  --out ../sweetardio-cookie-chain-edition
@@ -17,7 +18,8 @@ python3 cookie_chain/build_cookie_chain.py validate --out ../sweetardio-cookie-c
 
 `plan.json` is the record of the edition: the exact layer stack of every
 token. `sheet` and `render` only read it, so what was approved on the sheet is
-what ships. `plan --reuse` re-selects from the scored pool without
+what ships. Scratch output (thumbs, pool, sheets) goes to `cookie_chain/work/`.
+`plan --reuse` re-selects from the scored pool without
 re-rendering it.
 
 ## Assets
@@ -27,6 +29,7 @@ re-rendering it.
 | `assets/backgroundz/` | 19 Cookie Chain plates + 5 one-of-one Legendary plates |
 | `assets/stickerz/` | 22 die-cut stickers, built by `prepare_assets.py` |
 | `assets/sticker_sources/` | the source art they are built from |
+| `assets/what_are_thosez/` | the five footwear sets with re-cut outlines, built by `prepare_footwear.py` |
 | `assets/armz/` | Cookboy Handheld, Printer |
 | `assets/branding/` | the Cookie Chain Edition plaque (built from `plaque_source.png`) |
 
@@ -45,6 +48,13 @@ written into `traits/`, so the main mint cannot pick any of it up.
   (the collection's top-left key light), and every sticker sized by die-cut
   AREA so badges, characters and wordmarks carry the same weight. Each output
   is asserted to be one piece.
+- **Footwear outlines re-cut** (`prepare_footwear.py`): baked shadows off
+  both Cookie Monster files (~52k px each) and the Bunny overlay, the
+  chewed Bunny outline and the ragged Pepe / Gorbhouse / Shiba edges
+  smoothed at 4x, the 3-4px baked dark or light ring recoloured from inside
+  the slipper, and each base trimmed to its overlay so no darker crescent
+  peeks out. Sole lines (`alpha > 200`) held within 2px. Edition-only:
+  `traits/what_are_thosez` is untouched.
 - **Plaque re-cut** with an anti-aliased pill mask fitted to the source's rim;
   the old one was a binary-alpha rounded rectangle that kept a ring of the
   source's glow backdrop at both ends.

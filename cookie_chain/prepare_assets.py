@@ -51,7 +51,8 @@ from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage
 
 CC_ROOT = Path(__file__).resolve().parent
-ASSETS = CC_ROOT / "assets"
+# Sweetardio_Collection/cookie_chain/assets, or <edition repo>/assets beside scripts/
+ASSETS = CC_ROOT / "assets" if (CC_ROOT / "assets").is_dir() else CC_ROOT.parent / "assets"
 SRC = ASSETS / "sticker_sources"
 OUT = ASSETS / "stickerz"
 PLAQUE_SRC = ASSETS / "plaque_source.png"
@@ -409,7 +410,7 @@ def main():
         (OUT / "STICKER_BUILD.json").write_text(json.dumps(report, indent=2) + "\n")
         PLAQUE_OUT.parent.mkdir(parents=True, exist_ok=True)
         make_plaque().save(PLAQUE_OUT, optimize=True)
-        print(f"plaque -> {PLAQUE_OUT.relative_to(CC_ROOT.parent)}")
+        print(f"plaque -> {PLAQUE_OUT}")
     if args.sheet:
         review_sheet(args.sheet)
 

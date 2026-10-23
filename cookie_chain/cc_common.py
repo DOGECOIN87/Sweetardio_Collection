@@ -4,14 +4,23 @@ The edition is composited by the main collection's compositor
 (`generator.py`) over the main collection's figure art (`traits/characterz`,
 `skinz`, `eyez`, `mouthz`, `what_are_thosez`, `armz`), so every fix made to
 that art and to its placement rules carries over. What is the edition's own
-lives under `cookie_chain/assets/`:
+lives under `assets/`:
 
-    backgroundz/   the 19 Cookie Chain plates + 4 one-of-one Legendary plates
-    stickerz/      the 22 Cookie Chain stickers (built by prepare_stickers.py)
+    backgroundz/   the 19 Cookie Chain plates + 5 one-of-one Legendary plates
+    stickerz/      the 22 Cookie Chain stickers (built by prepare_assets.py)
+    what_are_thosez/  the five footwear sets, outlines re-cut (prepare_footwear.py)
     armz/          the two Cookie Chain held items: Cookboy Handheld, Printer
     branding/      the Cookie Chain Edition plaque, bottom right of every token
 
-`setup()` points the compositor at those folders. It never writes into
+The same scripts run from two layouts:
+
+    Sweetardio_Collection/            sweetardio-cookie-chain-edition/
+      generator.py, traits/             compositor/generator.py, traits/  (vendored)
+      cookie_chain/                     scripts/   <- these files
+        <these files>, assets/,         assets/, plan.json
+        plan.json
+
+`setup()` points the compositor at the edition's folders. It never writes into
 `traits/`, so nothing here can leak into the main mint.
 """
 
@@ -22,11 +31,21 @@ from pathlib import Path
 from PIL import Image
 
 CC_ROOT = Path(__file__).resolve().parent
-REPO_ROOT = CC_ROOT.parent
-ASSETS = CC_ROOT / "assets"
+if (CC_ROOT / "assets").is_dir():           # Sweetardio_Collection/cookie_chain/
+    EDITION_ROOT = CC_ROOT
+    REPO_ROOT = CC_ROOT.parent
+else:                                       # sweetardio-cookie-chain-edition/scripts/
+    EDITION_ROOT = CC_ROOT.parent
+    REPO_ROOT = Path(os.environ.get("SWEETARDIO_COMPOSITOR",
+                                    EDITION_ROOT / "compositor")).resolve()
+# REPO_ROOT is the COMPOSITOR root: generator.py and its traits/ live there.
+ASSETS = EDITION_ROOT / "assets"
+PLAN = EDITION_ROOT / "plan.json"
+WORK = EDITION_ROOT / "work"                # scratch: candidate thumbs, pool, sheet
 BACKGROUNDS = ASSETS / "backgroundz"
 STICKERS = ASSETS / "stickerz"
 CC_ARMS = ASSETS / "armz"
+FOOTWEAR = ASSETS / "what_are_thosez"
 PLAQUE = ASSETS / "branding" / "cookie_chain_edition.png"
 
 EDITION = "Cookie Chain Edition"
@@ -203,6 +222,8 @@ def setup():
     g.scale_about = scale_about
 
     g.BACKGROUNDZ = str(BACKGROUNDS)        # os.path.join(traits, <abs>) -> <abs>
+    if FOOTWEAR.is_dir():                   # the re-cut outlines (prepare_footwear.py)
+        g.WHAT_ARE_THOSEZ = str(FOOTWEAR)
     g.STICKERZ = str(STICKERS)
     g.ARMZ = str(_stage_arms(g))
 

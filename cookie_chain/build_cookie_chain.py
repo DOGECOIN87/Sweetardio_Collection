@@ -52,8 +52,8 @@ from scipy import ndimage
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cc_common as cc  # noqa: E402
 
-PLAN = cc.CC_ROOT / "plan.json"
-WORK = cc.CC_ROOT / "build"
+PLAN = cc.PLAN
+WORK = cc.WORK
 
 # ---- exact trait counts (supply 444) ----------------------------------------
 # Characters: the main collection's ladder at 444 scale -- the four chase
@@ -96,9 +96,10 @@ RARITY_TIERS = [("Mythic Chase", 5), ("Legendary Chase", 17), ("Rare", 66),
                 ("Uncommon", 134), ("Core", 222)]
 
 SOFT_TOL = 0.25      # eyes / mouths / skins may sit within +-25% of target
-EDGE_FLOOR = 18      # dE at the worst fifth of the outline; below it a figure
+EDGE_FLOOR = 21      # dE at the worst fifth of the outline; below it a figure
                      # visibly melts into its plate (a brownie on chocolate emboss)
-PAIR_CAP = 2         # at most this many tokens share a character x plate
+PAIR_CAP = 3         # at most this many tokens share a character x plate; at 2 the
+                     # dark bodies cannot all reach the camouflage floor below
 
 
 def apportion(total, weights):
@@ -168,7 +169,8 @@ def describe(g, layers, char):
             d["eyes"] = f
         elif folder == g.MOUTHZ:
             d["mouth"] = f
-        elif folder == g.WHAT_ARE_THOSEZ and "_base" in f.lower():
+        elif p.startswith(os.path.normpath(os.path.join(g.TRAITS_DIR, g.WHAT_ARE_THOSEZ)) + os.sep) \
+                and "_base" in f.lower():
             d["footwear"] = ("gorbhouse" if "gorbhouse" in f.lower()
                              else f.split("_Base")[0].split("_base")[0]
                              .replace(" (1)", ""))
@@ -503,10 +505,12 @@ def attributes(g, cand):
     attrs.append({"trait_type": "Mouth", "value": g.trait_name(g.MOUTHZ, t["mouth"])})
     if t["footwear"]:
         key = "Gorbhouse" if t["footwear"] == "gorbhouse" else t["footwear"]
-        attrs.append({"trait_type": "Footwear", "value": g.trait_name(g.WHAT_ARE_THOSEZ, key)})
+        # by the CATEGORY key, never g.WHAT_ARE_THOSEZ / g.ARMZ: setup() points
+        # those at the edition's folders, and TRAIT_NAMES is keyed by category
+        attrs.append({"trait_type": "Footwear", "value": g.trait_name("what_are_thosez", key)})
     if t["arm"]:
         attrs.append({"trait_type": "Arms",
-                      "value": cc.ARM_NAMES.get(t["arm"]) or g.trait_name(g.ARMZ, t["arm"])})
+                      "value": cc.ARM_NAMES.get(t["arm"]) or g.trait_name("armz", t["arm"])})
     attrs.append({"trait_type": "Sticker", "value": cc.STICKER_NAMES[t["sticker"]]})
     attrs.append({"trait_type": "Edition", "value": cc.EDITION})
     attrs.append({"trait_type": "Rarity", "value": cand["rarity"]})
@@ -536,17 +540,22 @@ def _jsonable(v):
 
 
 def _portable(layers):
-    """Plan paths relative to the repo, so the plan is not tied to a checkout."""
+    """Plan paths are layout-free: `traits/...` for the compositor's figure
+    art, `assets/...` for the edition's own, so plan.json reads the same from
+    Sweetardio_Collection/cookie_chain and from the edition repo."""
     out = []
     for li in layers:
         li = _jsonable(dict(li))
-        p = Path(os.path.realpath(li["path"])) if os.path.islink(li["path"]) else Path(li["path"])
+        p = Path(li["path"])
         if not p.is_absolute():
             p = cc.REPO_ROOT / p
-        li["path"] = os.path.relpath(p, cc.REPO_ROOT)
-        for k in ("gcenter", "ccenter", "fcenter", "acenter"):
-            if k in li:
-                li[k] = list(li[k])
+        if p.parent == Path(cc.setup().ARMZ):            # staged arm symlink
+            p = Path(os.path.realpath(p))
+        p = p.resolve()
+        if p.is_relative_to(cc.ASSETS.resolve()):
+            li["path"] = "assets/" + str(p.relative_to(cc.ASSETS.resolve()))
+        else:
+            li["path"] = str(p.relative_to(cc.REPO_ROOT.resolve()))
         out.append(li)
     return out
 
@@ -555,9 +564,16 @@ def _resolve(g, layers):
     out = []
     for li in layers:
         li = dict(li)
-        p = cc.REPO_ROOT / li["path"]
-        if str(p).startswith(str(cc.REPO_ROOT / "traits" / "armz")) or \
-                str(p).startswith(str(cc.CC_ARMS)):
+        rel = li["path"]
+        if rel.startswith("cookie_chain/assets/"):       # plans written before
+            rel = rel[len("cookie_chain/"):]             # the layout-free paths
+        if rel.startswith("traits/what_are_thosez/") and cc.FOOTWEAR.is_dir():
+            rel = "assets/what_are_thosez/" + rel[len("traits/what_are_thosez/"):]
+        if rel.startswith("assets/"):
+            p = cc.ASSETS / rel[len("assets/"):]
+        else:
+            p = cc.REPO_ROOT / rel
+        if rel.startswith("traits/armz/") or rel.startswith("assets/armz/"):
             p = Path(g.ARMZ) / p.name          # arms are read through the stage
         li["path"] = str(p)
         for k in ("gcenter", "ccenter", "fcenter", "acenter"):
@@ -570,7 +586,7 @@ def _resolve(g, layers):
 def cmd_plan(args):
     g = cc.setup()
     q = quotas(g)
-    WORK.mkdir(exist_ok=True)
+    WORK.mkdir(parents=True, exist_ok=True)
     thumbs = WORK / "thumbs"
     if args.reuse or args.extend:
         # re-select from the scored pool without re-rendering it
@@ -629,7 +645,7 @@ def cmd_plan(args):
     allsc = np.array([c["score"] for c in pool])
     print(f"selected {len(chosen)} of {len(pool)}: mean score {sel.mean():.3f} "
           f"(pool {allsc.mean():.3f}), min {sel.min():.3f}")
-    print(f"plan -> {PLAN.relative_to(cc.REPO_ROOT)}")
+    print(f"plan -> {PLAN}")
 
 
 def load_plan(g):
@@ -730,6 +746,43 @@ def cmd_render(args):
     print(f"wrote {len(plan['tokens'])} images + metadata + README -> {out}")
 
 
+REBUILD_SECTION = """## Rebuilding the collection
+
+Everything the build needs is in this repository:
+
+| Path | What it is |
+| --- | --- |
+| `scripts/` | the build scripts |
+| `assets/` | the edition's plates, stickers (+ sources), re-cut footwear, two held items and plaque |
+| `compositor/` | the Sweetardio compositor and figure art it draws from (vendored; see its README) |
+| `plan.json` | the curated 444: every token's exact layer stack, traits and rarity |
+
+Requirements: Python 3.10+ and `pip install -r requirements.txt` (Pillow,
+NumPy, SciPy). About 2 GB of free disk for the output.
+
+```bash
+python3 scripts/build_cookie_chain.py render   --out .   # rewrites images/ + metadata/ + this README (~10 min on 4 cores)
+python3 scripts/build_cookie_chain.py validate --out .   # checks pairing, counts, uniqueness, name bytes
+```
+
+`render` reads only `plan.json`, so it reproduces this exact collection.
+`--workers N` sets the number of parallel renders (default 4).
+
+Optional steps:
+
+```bash
+python3 scripts/build_cookie_chain.py sheet            # the 50-token preview sheet -> work/approval_sheet_50.jpg
+python3 scripts/prepare_assets.py --sheet work/s.png   # rebuild the 22 stickers + plaque from assets/sticker_sources
+python3 scripts/prepare_footwear.py --sheet work/f.jpg # re-cut the footwear outlines from compositor/traits
+python3 scripts/build_cookie_chain.py plan             # re-curate from scratch: new pool, scores, selection (~1.5 h)
+python3 scripts/build_cookie_chain.py plan --extend 1100   # add candidates aimed at the best pairings, re-select
+```
+
+Re-running `plan` writes a NEW `plan.json` — a different 444. Commit it only
+if that is the intent.
+"""
+
+
 def write_readme(g, plan, out):
     """The edition repo's README, with every count read from the output."""
     counts = defaultdict(Counter)
@@ -757,10 +810,9 @@ metadata files.
 
 The numbers pair up: `metadata/007.json` describes `images/007.png`.
 
-The collection is built from the
-[Sweetardio Collection](https://github.com/DOGECOIN87/Sweetardio_Collection)
-repository (`cookie_chain/`), whose `cookie_chain/plan.json` records the exact
-layer stack of every token here.
+Everything needed to rebuild it is in this repository too — see
+[Rebuilding the collection](#rebuilding-the-collection). `plan.json` records
+the exact layer stack of every token.
 
 ## How to download
 
@@ -840,7 +892,8 @@ label agrees with what a trait-frequency ranking would say.
 | Sticker | Tokens |
 | --- | --- |
 {table("Sticker")}
-"""
+
+{REBUILD_SECTION}"""
     (out / "README.md").write_text(text)
 
 
@@ -914,7 +967,7 @@ def main():
     p.add_argument("--seed", type=int, default=871004)
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--reuse", action="store_true",
-                   help="re-select from build/pool.json without re-rendering")
+                   help="re-select from work/pool.json without re-rendering")
     p.add_argument("--extend", type=int, default=0,
                    help="add N candidates targeted at the best pairings, then select")
     s = sub.add_parser("sheet")
