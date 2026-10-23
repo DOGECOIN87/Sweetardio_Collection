@@ -761,7 +761,7 @@ Requirements: Python 3.10+ and `pip install -r requirements.txt` (Pillow,
 NumPy, SciPy). About 2 GB of free disk for the output.
 
 ```bash
-python3 scripts/build_cookie_chain.py render   --out .   # rewrites images/ + metadata/ + this README (~10 min on 4 cores)
+python3 scripts/build_cookie_chain.py render   --out .   # rewrites images/ + metadata/ + this README (~5 min on 4 cores)
 python3 scripts/build_cookie_chain.py validate --out .   # checks pairing, counts, uniqueness, name bytes
 ```
 
