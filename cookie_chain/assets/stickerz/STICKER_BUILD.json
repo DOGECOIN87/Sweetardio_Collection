@@ -1,0 +1,179 @@
+{
+  "Anime_Detective.png": {
+    "die_cut_area": 24560,
+    "die_cut_w": 158,
+    "die_cut_h": 211,
+    "art_long": 197.2,
+    "source": "legacy/Anime_Detective.png"
+  },
+  "Armed_Hero.png": {
+    "die_cut_area": 21779,
+    "die_cut_w": 171,
+    "die_cut_h": 212,
+    "art_long": 197.1,
+    "source": "legacy/Armed_Hero.png"
+  },
+  "Baked_Bazaar.png": {
+    "die_cut_area": 27132,
+    "die_cut_w": 192,
+    "die_cut_h": 192,
+    "art_long": 172.5,
+    "source": "dapp_logos/baked_bazaar.png",
+    "shape": "circle"
+  },
+  "Candy_Shop.png": {
+    "die_cut_area": 22209,
+    "die_cut_w": 213,
+    "die_cut_h": 211,
+    "art_long": 197.9,
+    "source": "dapp_logos/candy_shop.png"
+  },
+  "Chibi_Monster.png": {
+    "die_cut_area": 25496,
+    "die_cut_w": 159,
+    "die_cut_h": 210,
+    "art_long": 199.5,
+    "source": "legacy/Chibi_Monster.png",
+    "core": 0.55
+  },
+  "CookBook.png": {
+    "die_cut_area": 17397,
+    "die_cut_w": 284,
+    "die_cut_h": 136,
+    "art_long": 271.5,
+    "source": "dapp_logos/cook_book.png",
+    "close": 11,
+    "wordmark": true
+  },
+  "CookOven.png": {
+    "die_cut_area": 12011,
+    "die_cut_w": 286,
+    "die_cut_h": 64,
+    "art_long": 273.0,
+    "source": "dapp_logos/cook_oven.png",
+    "close": 11,
+    "wordmark": true
+  },
+  "CookieScan.png": {
+    "die_cut_area": 27132,
+    "die_cut_w": 192,
+    "die_cut_h": 192,
+    "art_long": 172.5,
+    "source": "dapp_logos/cookie_scan.png",
+    "shape": "circle",
+    "ring": true
+  },
+  "CookieSwap.png": {
+    "die_cut_area": 27132,
+    "die_cut_w": 192,
+    "die_cut_h": 192,
+    "art_long": 172.5,
+    "source": "dapp_logos/cookie_swap.png",
+    "shape": "circle"
+  },
+  "Cookie_Chat.png": {
+    "die_cut_area": 26881,
+    "die_cut_w": 203,
+    "die_cut_h": 187,
+    "art_long": 186.1,
+    "source": "dapp_logos/cookie_chat.png"
+  },
+  "Cookie_Lock.png": {
+    "die_cut_area": 13115,
+    "die_cut_w": 284,
+    "die_cut_h": 82,
+    "art_long": 271.5,
+    "source": "dapp_logos/cookie_lock.png",
+    "close": 11,
+    "wordmark": true
+  },
+  "Cookie_MCP.png": {
+    "die_cut_area": 26870,
+    "die_cut_w": 194,
+    "die_cut_h": 191,
+    "art_long": 177.5,
+    "source": "dapp_logos/cookie_mcp.png"
+  },
+  "Cookie_Quads.png": {
+    "die_cut_area": 27132,
+    "die_cut_w": 192,
+    "die_cut_h": 192,
+    "art_long": 172.5,
+    "source": "dapp_logos/cookie_quads.png",
+    "shape": "circle",
+    "ring": true
+  },
+  "Cookiebox.png": {
+    "die_cut_area": 27013,
+    "die_cut_w": 185,
+    "die_cut_h": 194,
+    "art_long": 182.0,
+    "source": "legacy/Cookiebox.png"
+  },
+  "Emyr.png": {
+    "die_cut_area": 26686,
+    "die_cut_w": 161,
+    "die_cut_h": 209,
+    "art_long": 197.1,
+    "source": "legacy/Emyr.png"
+  },
+  "GORBOY.png": {
+    "die_cut_area": 26893,
+    "die_cut_w": 190,
+    "die_cut_h": 190,
+    "art_long": 185.4,
+    "source": "dapp_logos/gorboy.png",
+    "shape": "circle",
+    "inset": 0.035
+  },
+  "MomoSwap.png": {
+    "die_cut_area": 26971,
+    "die_cut_w": 192,
+    "die_cut_h": 188,
+    "art_long": 180.0,
+    "source": "dapp_logos/momo_swap.png",
+    "core": 0.6
+  },
+  "Morsel.png": {
+    "die_cut_area": 27009,
+    "die_cut_w": 180,
+    "die_cut_h": 198,
+    "art_long": 188.9,
+    "source": "legacy/Morsel.png",
+    "core": 0.6
+  },
+  "Nightly_Wallet.png": {
+    "die_cut_area": 27004,
+    "die_cut_w": 174,
+    "die_cut_h": 174,
+    "art_long": 155.0,
+    "source": "dapp_logos/nightly_wallet.png",
+    "shape": "roundrect"
+  },
+  "Out_Of_Order.png": {
+    "die_cut_area": 26973,
+    "die_cut_w": 155,
+    "die_cut_h": 205,
+    "art_long": 196.6,
+    "source": "legacy/Out_Of_Order.png",
+    "core": 0.8,
+    "open": 1.5
+  },
+  "Poptart_Cat.png": {
+    "die_cut_area": 20109,
+    "die_cut_w": 236,
+    "die_cut_h": 98,
+    "art_long": 222.5,
+    "source": "legacy/Poptart_Cat.png",
+    "close": 4
+  },
+  "Shorts_Doggo.png": {
+    "die_cut_area": 27036,
+    "die_cut_w": 195,
+    "die_cut_h": 184,
+    "art_long": 185.0,
+    "source": "legacy/Shorts_Doggo.png",
+    "soft": true,
+    "close": 5
+  }
+}

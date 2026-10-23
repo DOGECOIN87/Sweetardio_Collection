@@ -1868,6 +1868,31 @@ starfield also has its own curated cast list, `STARFIELD_CHARS`, so a second
 overlapping rule would be redundant as well as risky. Rule 1 still applies
 everywhere; it was always narrow enough to be safe.
 
+## The Cookie Chain Edition is built from here, in `cookie_chain/`
+
+The 444-token side edition (images + metadata ship in the
+`sweetardio-cookie-chain-edition` repo) is composited by THIS `generator.py`
+over THIS repo's figure art, plus its own plates, stickers, plaque and two
+held items in `cookie_chain/assets/`. `cookie_chain/cc_common.setup()` points
+the compositor at those folders at runtime and never writes into `traits/`,
+so nothing of the edition can leak into the main mint. See
+`cookie_chain/README.md`; `cookie_chain/plan.json` is the edition's record.
+
+Three things it does differently, on purpose:
+
+- **The whole figure is scaled** (`FIGURE_SCALE` 0.88, up to 7% more off the
+  bulkiest bodies) about a ground-line pivot, because the edition's bottom
+  corners carry a sticker and the edition plaque. Whole-figure, so the face
+  hole / ball / eye registration is untouched.
+- **Stickers are built, not copied**: `cookie_chain/prepare_assets.py` makes
+  each one a die-cut (solid core, Euclidean white border at 4x, cast shadow
+  down-right). Never feed them to `fix_matte_line.py` or the speck tools here.
+- **`scale_about()` is replaced for the edition.** The main one pastes a layer
+  with itself as the mask, which squares edge alpha (128 -> 64) and darkens
+  edge colour; the edition composites instead. Main-collection output is
+  unchanged -- fixing it there would change every scaled body and ball in the
+  main mint, which is the owner's call.
+
 ## Verification tools
 
 ```bash
