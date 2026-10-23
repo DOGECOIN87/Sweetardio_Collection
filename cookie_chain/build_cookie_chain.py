@@ -96,6 +96,8 @@ RARITY_TIERS = [("Mythic Chase", 5), ("Legendary Chase", 17), ("Rare", 66),
                 ("Uncommon", 134), ("Core", 222)]
 
 SOFT_TOL = 0.25      # eyes / mouths / skins may sit within +-25% of target
+EDGE_FLOOR = 18      # dE at the worst fifth of the outline; below it a figure
+                     # visibly melts into its plate (a brownie on chocolate emboss)
 PAIR_CAP = 2         # at most this many tokens share a character x plate
 
 
@@ -178,7 +180,34 @@ def signature(d):
                                     "mouth", "footwear", "arm", "sticker"))
 
 
-def make_pool(g, q, size, seed):
+def affinity(pool):
+    """Expected score of each character x plate pairing, from a scored pool.
+
+    A pair has only a few samples, so its mean is shrunk toward the additive
+    estimate (character mean + plate mean - global mean): dark bodies score
+    low everywhere and the gold / chocolate emboss plates low for everyone,
+    and the additive part carries that where a pair has not been drawn."""
+    reg = [c for c in pool if c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS]
+    m = np.mean([c["score"] for c in reg])
+    by_c, by_p, by_cp = defaultdict(list), defaultdict(list), defaultdict(list)
+    for c in reg:
+        t = c["traits"]
+        by_c[t["character"]].append(c["score"])
+        by_p[t["background"]].append(c["score"])
+        by_cp[(t["character"], t["background"])].append(c["score"])
+    mc = {k: np.mean(v) for k, v in by_c.items()}
+    mp = {k: np.mean(v) for k, v in by_p.items()}
+    k = 2.0
+    return {(ch, pl): (sum(by_cp.get((ch, pl), [])) + k * (mc[ch] + mp[pl] - m))
+            / (len(by_cp.get((ch, pl), [])) + k)
+            for ch in mc for pl in mp}, mc
+
+
+def make_pool(g, q, size, seed, existing=None, aff=None, tau=0.35):
+    """Draw unique candidates. With `existing` + `aff` (from affinity()), the
+    draw is TARGETED: each character is drawn more often the worse it scored,
+    and its plate is drawn in proportion to quota x exp(affinity / tau), so
+    the pool fills in the pairings that will actually be chosen."""
     rng = random.Random(seed)
     chars, cw = zip(*q["character"].items())
     regular = {p: n for p, n in q["background"].items()
@@ -187,7 +216,15 @@ def make_pool(g, q, size, seed):
     arms = {a: n for a, n in q["arm"].items() if a}
     regular_wat = {w: n for w, n in q["footwear"].items() if w and w != "gorbhouse"}
     stickers = [s for s in q["sticker"] if s != NIGHTLY_STICKER] + [NIGHTLY_STICKER]
-    pool, seen = [], set()
+    pool = list(existing or [])
+    seen = {signature(c["traits"]) for c in pool}
+    target = len(pool) + size if existing else size
+    new_from = len(pool)
+
+    if aff:
+        table, char_mean = aff
+        top = max(char_mean.values())
+        cw = [w * (1 + 2.0 * (top - char_mean[c]) / max(1e-6, top)) for c, w in zip(chars, cw)]
 
     def add(i, **force):
         random.seed(seed * 1_000_003 + i)
@@ -205,20 +242,27 @@ def make_pool(g, q, size, seed):
         return True
 
     i = 0
-    # the one-of-one plates: a handful of candidates each, Nightly paired
-    # with its own wallet sticker as in the previous release
-    for plate in cc.ONE_OF_ONE_BACKGROUNDS:
-        made = 0
-        while made < 10:
-            i += 1
-            st = NIGHTLY_STICKER if plate == "Legendary_Nightly.png" else \
-                rng.choice(stickers[:-1])
-            made += add(i, force_bg=(g.BACKGROUNDZ, plate), force_char=rng.choices(chars, cw)[0],
-                        force_arm=None, force_wat=None, force_sticker=st)
-    while len(pool) < size:
+    if not existing:
+        # the one-of-one plates: a handful of candidates each, Nightly paired
+        # with its own wallet sticker as in the previous release
+        for plate in cc.ONE_OF_ONE_BACKGROUNDS:
+            made = 0
+            while made < 10:
+                i += 1
+                st = NIGHTLY_STICKER if plate == "Legendary_Nightly.png" else \
+                    rng.choice(stickers[:-1])
+                made += add(i, force_bg=(g.BACKGROUNDZ, plate),
+                            force_char=rng.choices(chars, cw)[0],
+                            force_arm=None, force_wat=None, force_sticker=st)
+    while len(pool) < target:
         i += 1
         char = rng.choices(chars, cw)[0]
-        plate = rng.choices(plates, pw)[0]
+        if aff:
+            best = max(table[(char, p)] for p in plates)
+            w = [n * math.exp((table[(char, p)] - best) / tau) for p, n in zip(plates, pw)]
+            plate = rng.choices(plates, w)[0]
+        else:
+            plate = rng.choices(plates, pw)[0]
         arm = None
         if rng.random() < 0.45:
             arm = rng.choices(list(arms), list(arms.values()))[0]
@@ -232,7 +276,7 @@ def make_pool(g, q, size, seed):
             wat = rng.choices(list(opts), list(opts.values()))[0]
         add(i, force_bg=(g.BACKGROUNDZ, plate), force_char=char, force_arm=arm,
             force_wat=wat, force_sticker=stickers[i % len(stickers)])
-    for c in pool:
+    for c in pool[new_from:]:
         c["layers"] = cc.apply_figure_scale(g, c["layers"], c["traits"]["character"])
     return pool
 
@@ -357,7 +401,23 @@ def combine(m):
 # ---- selection ----------------------------------------------------------------------
 
 def select(pool, q):
-    """Max total score, exact counts, via a 0/1 MILP (HiGHS)."""
+    """Max total score, exact counts, via a 0/1 MILP (HiGHS). Candidates whose
+    outline melts into the plate (edge_p20 under EDGE_FLOOR) are not eligible;
+    the floor steps down only if the exact counts cannot otherwise be met."""
+    for floor in range(EDGE_FLOOR, -1, -3):
+        eligible = [c for c in pool if c["edge_p20"] >= floor
+                    or c["traits"]["background"] in cc.ONE_OF_ONE_BACKGROUNDS]
+        try:
+            chosen, res = _select(eligible, q)
+            print(f"camouflage floor: edge_p20 >= {floor} "
+                  f"({len(eligible)} of {len(pool)} eligible)")
+            return chosen, res
+        except SystemExit as e:
+            print(f"floor {floor}: {e}")
+    raise SystemExit("selection infeasible at every floor")
+
+
+def _select(pool, q):
     from scipy.optimize import Bounds, LinearConstraint, milp
     from scipy.sparse import lil_matrix
 
@@ -512,12 +572,28 @@ def cmd_plan(args):
     q = quotas(g)
     WORK.mkdir(exist_ok=True)
     thumbs = WORK / "thumbs"
-    if args.reuse:
+    if args.reuse or args.extend:
         # re-select from the scored pool without re-rendering it
         pool = json.loads((WORK / "pool.json").read_text())
         for c in pool:
             c["layers"] = _resolve(g, c["layers"])
-    else:
+    if args.extend:
+        for c in pool:
+            c["score"] = combine(c)
+        n0 = len(pool)
+        pool = make_pool(g, q, args.extend, args.seed + len(pool), existing=pool,
+                         aff=affinity(pool))
+        print(f"extended pool by {len(pool) - n0} targeted candidates", flush=True)
+        jobs = [(c, str(thumbs)) for c in pool[n0:]]
+        with get_context("fork").Pool(args.workers) as p:
+            for k, (cid, sc) in enumerate(p.imap_unordered(score_candidate, jobs, chunksize=4), 1):
+                pool[cid].update(sc)
+                if k % 100 == 0 or k == len(jobs):
+                    print(f"scored {k}/{len(jobs)}", flush=True)
+        json.dump([{k: v for k, v in c.items() if k not in ("layers", "score")}
+                   | {"layers": _portable(c["layers"])} for c in pool],
+                  open(WORK / "pool.json", "w"))
+    elif not args.reuse:
         if thumbs.exists():
             shutil.rmtree(thumbs)
         thumbs.mkdir()
@@ -650,7 +726,122 @@ def cmd_render(args):
     for t in plan["tokens"]:
         (metadata / f"{t['token']:03d}.json").write_text(
             json.dumps(token_json(g, t, plan["seed"]), indent=2, ensure_ascii=False) + "\n")
-    print(f"wrote {len(plan['tokens'])} images + metadata -> {out}")
+    write_readme(g, plan, out)
+    print(f"wrote {len(plan['tokens'])} images + metadata + README -> {out}")
+
+
+def write_readme(g, plan, out):
+    """The edition repo's README, with every count read from the output."""
+    counts = defaultdict(Counter)
+    for t in plan["tokens"]:
+        for a in attributes(g, t):
+            counts[a["trait_type"]][a["value"]] += 1
+    one = sorted((t["token"], cc.BACKGROUND_NAMES[t["traits"]["background"]])
+                 for t in plan["tokens"]
+                 if t["traits"]["background"] in cc.ONE_OF_ONE_BACKGROUNDS)
+
+    def table(trait):
+        rows = sorted(counts[trait].items(), key=lambda kv: (-kv[1], kv[0]))
+        return "\n".join(f"| {k} | {n} |" for k, n in rows)
+
+    n_arm, n_wat = sum(counts["Arms"].values()), sum(counts["Footwear"].values())
+    text = f"""# Cookie Chain Edition — {cc.SUPPLY} Tokens
+
+This repository holds the finished collection: {cc.SUPPLY} images and their {cc.SUPPLY} matching
+metadata files.
+
+| Folder | Contents |
+| --- | --- |
+| `images/` | `001.png` … `{cc.SUPPLY}.png` — 1393×1393 PNG |
+| `metadata/` | `001.json` … `{cc.SUPPLY}.json` — one per image |
+
+The numbers pair up: `metadata/007.json` describes `images/007.png`.
+
+The collection is built from the
+[Sweetardio Collection](https://github.com/DOGECOIN87/Sweetardio_Collection)
+repository (`cookie_chain/`), whose `cookie_chain/plan.json` records the exact
+layer stack of every token here.
+
+## How to download
+
+### Option 1 — Download everything as a ZIP (no tools needed)
+
+1. Click the green **Code** button at the top of this page.
+2. Choose **Download ZIP**.
+3. Unzip the file. You'll get the `images` and `metadata` folders inside.
+
+### Option 2 — Clone with git (skips old history)
+
+```bash
+git clone --depth 1 https://github.com/iamabotama/sweetardio-cookie-chain-edition.git
+```
+
+### Option 3 — Grab a single token
+
+Open `images/` or `metadata/` above, click the file you want, then use the
+download button on the file page.
+
+## What a metadata file looks like
+
+```json
+{json.dumps(token_json(g, plan["tokens"][0], plan["seed"]), indent=2, ensure_ascii=False)}
+```
+
+The `image` path is relative, so it resolves as long as `images/` and
+`metadata/` sit side by side.
+
+`Footwear` and `Arms` are optional and appear only on the tokens that have them
+({n_wat} and {n_arm} tokens). Every other trait type is on every token.
+
+## What's in the collection
+
+{len(counts["Character"])} characters, {len(counts["Background"])} backgrounds,
+{len(counts["Sticker"])} stickers, {len(counts["Skin"])} skins, {len(counts["Eyes"])} eyes,
+{len(counts["Mouth"])} mouths, {len(counts["Footwear"])} footwear traits and
+{len(counts["Arms"])} arm traits. Every token is a unique combination.
+
+**Rarity tiers**
+
+| Tier | Count |
+| --- | --- |
+{chr(10).join(f"| {tier} | {counts['Rarity'][tier]} |" for tier, _ in RARITY_TIERS)}
+
+**Mythic Chase** is exactly the five one-of-one Legendary backgrounds:
+{", ".join(f"{name} (#{n:03d})" for n, name in one)}. Every other tier is
+ranked by statistical rarity (the sum of each trait's -ln(share)), so the
+label agrees with what a trait-frequency ranking would say.
+
+**Arms** ({n_arm} tokens)
+
+| Arm | Tokens |
+| --- | --- |
+{table("Arms")}
+
+**Footwear** ({n_wat} tokens)
+
+| Footwear | Tokens |
+| --- | --- |
+{table("Footwear")}
+
+**Backgrounds**
+
+| Background | Tokens |
+| --- | --- |
+{table("Background")}
+
+**Characters**
+
+| Character | Tokens |
+| --- | --- |
+{table("Character")}
+
+**Stickers** — one on every token
+
+| Sticker | Tokens |
+| --- | --- |
+{table("Sticker")}
+"""
+    (out / "README.md").write_text(text)
 
 
 def cmd_validate(args):
@@ -724,6 +915,8 @@ def main():
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--reuse", action="store_true",
                    help="re-select from build/pool.json without re-rendering")
+    p.add_argument("--extend", type=int, default=0,
+                   help="add N candidates targeted at the best pairings, then select")
     s = sub.add_parser("sheet")
     s.add_argument("--count", type=int, default=50)
     s.add_argument("--workers", type=int, default=4)
