@@ -1195,11 +1195,14 @@ Requirements: Python 3.10+ and `pip install -r requirements.txt` (Pillow,
 NumPy, SciPy). About 2 GB of free disk for the output.
 
 ```bash
-python3 scripts/build_cookie_chain.py render   --out .   # rewrites images/ + metadata/ + this README (~5 min on 4 cores)
-python3 scripts/build_cookie_chain.py validate --out .   # checks pairing, counts, uniqueness, name bytes
+python3 scripts/build_cookie_chain.py render   --out output   # writes output/images + output/metadata (~6 min on 4 cores)
+python3 scripts/build_cookie_chain.py validate --out output   # checks pairing, counts, uniqueness, name bytes
 ```
 
-`render` reads only `plan.json`, so it reproduces this exact collection.
+`render` reads only `plan.json`, so it reproduces this exact collection. It
+goes to `output/`, which git ignores, so a rebuild can never overwrite the
+collection at the top level by accident. Add `--no-animations` for a
+stills-only build, as this one is.
 `--workers N` sets the number of parallel renders (default 4).
 
 Optional steps:
@@ -1238,14 +1241,20 @@ def write_readme(g, plan, out):
     n_arm, n_wat = sum(counts["Arms"].values()), sum(counts["Footwear"].values())
     text = f"""# Cookie Chain Edition — {cc.SUPPLY} Tokens
 
-This repository holds the finished collection: {cc.SUPPLY} images and their {cc.SUPPLY} matching
-metadata files.
+## Start here: which files are the collection
 
-| Folder | Contents |
-| --- | --- |
-| `images/` | `001.png` … `{cc.SUPPLY}.png` — 1393×1393 PNG |
-| `metadata/` | `001.json` … `{cc.SUPPLY}.json` — one per image |{f"""
-| `animations/` | one H.264 `.mp4` loop per animated token ({len(looping)}): the animated 1/1, every Starfield token and every Weather token; its metadata's `animation_url` points at it |""" if looping else ""}
+| Folder / file | What it is | Upload for the mint? |
+| --- | --- | --- |
+| **`images/`** | `001.png` … `{cc.SUPPLY}.png`, 1393×1393 PNG | **YES** |
+| **`metadata/`** | `001.json` … `{cc.SUPPLY}.json`, one per image | **YES** |{f"""
+| **`animations/`** | one H.264 `.mp4` loop per animated token ({len(looping)}): the animated 1/1, every Starfield token and every Weather token; its metadata's `animation_url` points at it | **YES** |""" if looping else ""}
+| `plan.json` | the build record: exactly how each token was made | no |
+| `BUILD.md`, `scripts/`, `assets/`, `compositor/` | the tools that build the collection from the Rarity Board | no |
+
+**Only {"`images/`, `metadata/` and `animations/`" if looping else "`images/` and `metadata/`"} are the collection.**
+Everything else is the build kit and must not be uploaded. Always take the
+files from the `main` branch; other branches are work in progress.{"" if looping else """
+This build is stills only: no animations."""}
 
 The numbers pair up: `metadata/007.json` describes `images/007.png`.
 
