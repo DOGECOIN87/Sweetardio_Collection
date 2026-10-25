@@ -1073,6 +1073,7 @@ def render_full(g, t, path, anim_dir=None):
     # Weather: render clear WITH the protect and float masks, then grade.
     from dynamic import sky
     from dynamic.animate import write_mp4
+    WORK.mkdir(parents=True, exist_ok=True)     # absent in a fresh clone
     tmp = Path(tempfile.mkdtemp(dir=WORK))
     try:
         clear, mask, fl = tmp / "clear.png", tmp / "mask.png", tmp / "float.png"
