@@ -758,9 +758,14 @@ def attributes(g, cand):
     return attrs
 
 
+# render/validate --no-animations: a stills-only collection. Weather and
+# Starfield tokens keep their still; no token ships a loop or animation_url.
+ANIMATIONS = True
+
+
 def is_animated(t):
     """Ships a loop: the animated 1/1, a Starfield token, a Weather token."""
-    return (t.get("secret") in cc.ANIMATED_SECRET_RARES
+    return ANIMATIONS and (t.get("secret") in cc.ANIMATED_SECRET_RARES
             or t["traits"].get("background") == cc.STARFIELD
             or bool(t["traits"].get("weather")))
 
@@ -1135,6 +1140,8 @@ def _render_job(job):
 
 
 def cmd_render(args):
+    global ANIMATIONS
+    ANIMATIONS = not args.no_animations
     g = cc.setup()
     plan = load_plan(g)
     out = Path(args.out).resolve()
@@ -1153,7 +1160,8 @@ def cmd_render(args):
     if args.cache:
         cache = Path(args.cache).resolve()
         cache.mkdir(parents=True, exist_ok=True)
-    jobs = [(t, str(images / f"{t['token']:03d}.png"), anims, cache) for t in plan["tokens"]]
+    jobs = [(t, str(images / f"{t['token']:03d}.png"), anims if ANIMATIONS else None, cache)
+            for t in plan["tokens"]]
     with get_context("fork").Pool(args.workers) as p:
         for k, _ in enumerate(p.imap_unordered(_render_job, jobs), 1):
             if k % 25 == 0 or k == len(jobs):
@@ -1331,6 +1339,8 @@ ranked by {"the build's visual score" if METHOD == "looks" else "statistical rar
 
 def cmd_validate(args):
     """The finished output, checked against the plan and the edition rules."""
+    global ANIMATIONS
+    ANIMATIONS = not args.no_animations
     g = cc.setup()
     plan = load_plan(g)
     q = design_from_json(plan["design"])["q"] if "design" in plan else quotas(g)
@@ -1419,10 +1429,14 @@ def main():
     r = sub.add_parser("render")
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=4)
+    r.add_argument("--no-animations", action="store_true",
+                   help="stills only: no loops, no animation_url")
     r.add_argument("--cache", help="reuse renders of unchanged tokens from this folder "
                                    "(curation rebuilds); never for the final render")
     v = sub.add_parser("validate")
     v.add_argument("--out", required=True)
+    v.add_argument("--no-animations", action="store_true",
+                   help="check a stills-only render (render --no-animations)")
     args = ap.parse_args()
     sys.exit({"plan": cmd_plan, "sheet": cmd_sheet, "render": cmd_render,
               "validate": cmd_validate}[args.cmd](args) or 0)
