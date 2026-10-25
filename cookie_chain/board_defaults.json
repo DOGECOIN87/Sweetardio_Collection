@@ -1,0 +1,281 @@
+{
+ "backgrounds": {
+  "items": {
+   "Black_Cookie_Emboss": {
+    "keep": true,
+    "tier": "uncommon",
+    "name": "Cookboy Black Enamel"
+   },
+   "Chocolate_Cookie_Emboss": {
+    "keep": true,
+    "tier": "uncommon",
+    "name": "Cookboy Chocolate"
+   },
+   "Cookboy_Paisley": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Sarv Legendary"
+   },
+   "Cookie_Dough": {
+    "keep": true,
+    "tier": "common",
+    "name": "Cookie Dough"
+   },
+   "Cookie_Vault": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "M Power Legendary"
+   },
+   "Digital_Future_Mural": {
+    "keep": true,
+    "tier": "common",
+    "name": "NFTs Aren't Dead"
+   },
+   "Emyr_Gallery": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Emyr Legendary"
+   },
+   "Fairdevs_Night": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Fairdevs Legendary"
+   },
+   "Gold_Cookie_Emboss": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Cookboy Gold"
+   },
+   "Gorbhouse_Treasures": {
+    "keep": true,
+    "tier": "common",
+    "name": "Gorbhouse Treasures"
+   },
+   "Legendary_Mattrick": {
+    "keep": true,
+    "tier": "one",
+    "name": "Mattrick Legendary"
+   },
+   "Legendary_Nightly": {
+    "keep": true,
+    "tier": "one",
+    "name": "Nightly Legendary"
+   },
+   "Legendary_Opengotchi": {
+    "keep": true,
+    "tier": "one",
+    "name": "Opengotchi Legendary"
+   },
+   "Legendary_Shubbi": {
+    "keep": true,
+    "tier": "one",
+    "name": "Shubbi Legendary"
+   },
+   "Legendary_Tenders": {
+    "keep": true,
+    "tier": "one",
+    "name": "Tenders Legendary"
+   },
+   "Liberty_Cookie_Dime": {
+    "keep": true,
+    "tier": "common",
+    "name": "Liberty Cookie Dime"
+   },
+   "Marsel_Blue": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Morsel Legendary"
+   },
+   "Moon_Surface": {
+    "keep": true,
+    "tier": "common",
+    "name": "Moon Surface"
+   },
+   "Picnic_Stage": {
+    "keep": true,
+    "tier": "common",
+    "name": "Picnic Stage"
+   },
+   "Short_The_Banks_Vault": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Short The Banks Legendary"
+   },
+   "Silver_Cookie_Emboss": {
+    "keep": true,
+    "tier": "uncommon",
+    "name": "Cookboy Silver"
+   },
+   "Simplex_Arcade": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "Cookboy Legendary"
+   },
+   "Welders_Equipment": {
+    "keep": true,
+    "tier": "legendary",
+    "name": "GorWeld Legendary"
+   },
+   "Yatrah_Arcade": {
+    "keep": true,
+    "tier": "common",
+    "name": "Yatrah Arcade"
+   },
+   "Secret_Cookboy_Blue_Raspberry": {
+    "keep": true,
+    "tier": "one",
+    "name": "Cookboy Blue Raspberry"
+   }
+  }
+ },
+ "ladder": {
+  "legendary": 6,
+  "rare": 12,
+  "uncommon": 20
+ },
+ "label": {
+  "method": "traits",
+  "tiers": [
+   {
+    "name": "Mythic Chase",
+    "count": 0
+   },
+   {
+    "name": "Legendary Chase",
+    "count": 17
+   },
+   {
+    "name": "Rare",
+    "count": 66
+   },
+   {
+    "name": "Uncommon",
+    "count": 134
+   },
+   {
+    "name": "Core",
+    "count": 0
+   }
+  ]
+ },
+ "notes": {
+  "text": ""
+ },
+ "traits_characters": {
+  "items": {
+   "Nutty_Bar": 13,
+   "Twinkie": 13,
+   "brownie_bite": 23,
+   "chocolate_chip_cookie": 23,
+   "chocolate_doughnut": 23,
+   "chocolate_frosted_poptart": 23,
+   "chocolate_ice_cream": 22,
+   "chocolate_sandwich_cookie": 13,
+   "churro": 6,
+   "cyan_frosted_poptart": 13,
+   "cyan_sherbert_ice_cream": 22,
+   "ding_dong": 13,
+   "glazed_doughnut": 22,
+   "gold_waffle": 6,
+   "marshmallow": 13,
+   "neopolitan_ice_cream": 22,
+   "oatmeal_cream_pie": 13,
+   "og_gummy_bear": 6,
+   "og_poptart": 22,
+   "pink_sherbert_ice_cream": 22,
+   "rice_crispy_treat": 13,
+   "smores": 13,
+   "sugar_cube": 22,
+   "sugar_doughnut": 22,
+   "vanilla_ice_cream": 22,
+   "waffle": 13,
+   "zebra_cake": 6
+  }
+ },
+ "traits_skins": {
+  "items": {
+   "Alien": 37,
+   "Black": 190,
+   "White": 217
+  }
+ },
+ "traits_eyes": {
+  "items": {
+   "Alien": 51,
+   "Beady": 62,
+   "Blue": 29,
+   "Cerise": 33,
+   "Clueless": 50,
+   "Cyan": 39,
+   "Cyborg": 18,
+   "Googly": 53,
+   "Side_Eye": 39,
+   "Smug": 70
+  }
+ },
+ "traits_mouths": {
+  "items": {
+   "Awkward_Smile": 56,
+   "Diamond_Grill": 33,
+   "Fang": 49,
+   "Flat": 81,
+   "Lollipop": 13,
+   "Sad": 60,
+   "Smirk": 76,
+   "Smoke": 18,
+   "Tasty": 58
+  }
+ },
+ "traits_stickers": {
+  "items": {
+   "Anime_Detective": 21,
+   "Armed_Hero": 21,
+   "Baked_Bazaar": 21,
+   "Candy_Shop": 21,
+   "Chibi_Monster": 20,
+   "CookBook": 20,
+   "CookOven": 20,
+   "CookieScan": 20,
+   "CookieSwap": 20,
+   "Cookie_Chat": 20,
+   "Cookie_Lock": 20,
+   "Cookie_MCP": 20,
+   "Cookie_Quads": 20,
+   "Cookiebox": 20,
+   "Emyr": 20,
+   "GORBOY": 20,
+   "MomoSwap": 20,
+   "Morsel": 20,
+   "Nightly_Wallet": 20,
+   "Out_Of_Order": 20,
+   "Poptart_Cat": 20,
+   "Shorts_Doggo": 20
+  }
+ },
+ "traits_footwear": {
+  "items": {
+   "Bunny_Slippers": 22,
+   "Cookie_Monster_Slippers": 18,
+   "Gorbhouse": 18,
+   "Pepe_Slippers": 20,
+   "Shiba_Slippers": 22
+  }
+ },
+ "traits_arms": {
+  "items": {
+   "Cookboy_Handheld": 22,
+   "Printer": 22,
+   "Cash": 12,
+   "Katana": 11,
+   "Knives": 8,
+   "Blue_Saber": 4,
+   "Pink_Saber": 4,
+   "Cyan_Saber": 4,
+   "Dual_Uzis": 6,
+   "AK15": 3,
+   "AR47": 7,
+   "Military_Brat": 9,
+   "Nerf_Blaster": 10
+  }
+ }
+}

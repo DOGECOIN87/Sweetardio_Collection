@@ -10,7 +10,8 @@ assets in `cookie_chain/assets/`. The finished images and metadata live in the
 pip install pillow numpy scipy
 python3 cookie_chain/prepare_assets.py                 # stickers + plaque
 python3 cookie_chain/prepare_footwear.py               # footwear outlines
-python3 cookie_chain/build_cookie_chain.py plan        # pool -> score -> select (~50 min)
+python3 cookie_chain/board.py merge <export> cookie_chain/board.json   # the Rarity Board's picks
+python3 cookie_chain/build_cookie_chain.py plan --board cookie_chain/board.json   # pool -> score -> select (~50 min)
 python3 cookie_chain/build_cookie_chain.py sheet       # 50-token approval sheet
 python3 cookie_chain/build_cookie_chain.py render  --out ../sweetardio-cookie-chain-edition
 python3 cookie_chain/build_cookie_chain.py validate --out ../sweetardio-cookie-chain-edition
@@ -72,7 +73,52 @@ written into `traits/`, so the main mint cannot pick any of it up.
   pixels and darkens them. The edition replaces it (in `cc_common.setup()`)
   with a composite; main-collection renders are unchanged.
 
-## Trait design (exact counts)
+## The Rarity Board drives the counts
+
+The owner and co-creator decide the edition on a shared claude.ai page, the
+Rarity Board: which backgrounds stay, each one's tier and public name, the
+tokens per tier, an exact count for every character, skin, eye, mouth,
+sticker, footwear and arm, and how the Rarity attribute is ranked. Each
+section is one document in the page's `cfg` collection. Export the
+collection, fold it with `board.py merge`, and `plan --board` builds from it;
+`board_defaults.json` is the page's own starting state for any section
+nobody touched, and `plate_order.json` is the order the page lists plates in
+(Common plates split their remainder in that order, so the numbers the page
+shows are the numbers that ship). `board.py` maps the page's readable names
+onto the compositor's filenames and refuses an unknown one.
+
+`plan.json` records the resulting design, so `sheet`, `render` and `validate`
+check against what was planned. Without `--board` the constants below apply.
+
+- **Eyes, mouths and skins are exact** on a board build (the page promises
+  the number), and the pool draws them in proportion to the board so it can
+  meet them. Without `--board` they keep the +-25% / +-15% curation slack.
+- **The pool draws every plate, arm, footwear and sticker**, weighted by the
+  board plus a small floor, so after a change on the page `plan --reuse`
+  usually re-selects without re-rendering; anything the board sets to 0 or
+  removes is kept out of the selection.
+
+## The animated Cookboy 1/1, and no plaque
+
+**Cookboy Blue Raspberry** is the main collection's animated 1/1 (the Cookboy
+flown across the moving starfield, `dynamic/cookboy.py`). It is a whole-token
+1/1: no plate, figure or sticker is composited over it. It takes one of the
+444, so the composited pool is 443 and each list on the board that every
+token carries (characters, stickers, skins, eyes, mouths) gives up one token
+from its most common value; the background ladder already counts it as a
+1-token item. It ships as `images/NNN.png` (the still) plus
+`animations/NNN.mp4` (12 frames at 70 ms, 640 px, H.264), with
+`animation_url` and a Metaplex `properties.files` list in its metadata, and
+attributes `1/1`, `Edition`, `Rarity`.
+
+The top Rarity tier is exactly the kept 1/1s (plates plus the Cookboy); the
+bottom tier takes what the middle tiers leave.
+
+**The edition plaque is off** (`cc_common.PLAQUE_ON`, owner's call
+2026-10-25): no token carries it, the Cookboy included. The art stays in
+`assets/branding/`.
+
+## Trait design (exact counts, without `--board`)
 
 | trait | design |
 |---|---|

@@ -10,7 +10,7 @@ lives under `assets/`:
     stickerz/      the 22 Cookie Chain stickers (built by prepare_assets.py)
     what_are_thosez/  the five footwear sets, outlines re-cut (prepare_footwear.py)
     armz/          the two Cookie Chain held items: Cookboy Handheld, Printer
-    branding/      the Cookie Chain Edition plaque, bottom right of every token
+    branding/      the Cookie Chain Edition plaque (off since 2026-10-25: PLAQUE_ON)
 
 The same scripts run from two layouts:
 
@@ -135,6 +135,18 @@ BACKGROUND_NAMES = {
 ONE_OF_ONE_BACKGROUNDS = ("Legendary_Nightly.png", "Legendary_Mattrick.png",
                           "Legendary_Shubbi.png", "Legendary_Tenders.png",
                           "Legendary_Opengotchi.png")
+ALL_ONE_OF_ONE_BACKGROUNDS = ONE_OF_ONE_BACKGROUNDS   # the pool draws all five,
+                                                       # whichever the board keeps
+
+# ---- whole-token 1/1s -------------------------------------------------------
+# A secret rare is finished artwork that IS the token: no plate, figure or
+# sticker is composited over it. Cookboy Blue Raspberry is the main
+# collection's animated 1/1 -- the Cookboy flown across the moving starfield --
+# built by dynamic/cookboy.py; the still is traits/secret_rarez/<file> and the
+# loop is re-composited per plate frame at render time.
+SECRET_RARES = {"Secret_Cookboy_Blue_Raspberry.png": "Cookboy Blue Raspberry"}
+ANIMATED_SECRET_RARES = {"Secret_Cookboy_Blue_Raspberry.png"}
+LOOP_SIZE, LOOP_MS = 640, 70          # build_mint.py's --anim-size / --anim-ms
 
 STICKER_NAMES = {
     "Anime_Detective.png": "L",
@@ -282,10 +294,17 @@ def apply_figure_scale(g, layers, char_name):
     return layers
 
 
+# The owner took the edition plaque off every token (2026-10-25). The art
+# stays in assets/branding, so putting it back is this one flag.
+PLAQUE_ON = False
+
+
 def add_plaque(path):
-    """Composite the Cookie Chain Edition plaque over a finished token."""
+    """Composite the Cookie Chain Edition plaque over a finished token (when
+    PLAQUE_ON), and flatten it to RGB either way."""
     token = Image.open(path).convert("RGBA")
-    token.alpha_composite(Image.open(PLAQUE).convert("RGBA"))
+    if PLAQUE_ON:
+        token.alpha_composite(Image.open(PLAQUE).convert("RGBA"))
     token = token.convert("RGB")
     if str(path).endswith(".png"):
         token.save(path, compress_level=6)
