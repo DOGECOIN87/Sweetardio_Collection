@@ -270,7 +270,7 @@ def affinity(pool):
     estimate (character mean + plate mean - global mean): dark bodies score
     low everywhere and the gold / chocolate emboss plates low for everyone,
     and the additive part carries that where a pair has not been drawn."""
-    reg = [c for c in pool if c["traits"]["background"] not in cc.ALL_ONE_OF_ONE_BACKGROUNDS]
+    reg = [c for c in pool if c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS]
     m = np.mean([c["score"] for c in reg])
     by_c, by_p, by_cp = defaultdict(list), defaultdict(list), defaultdict(list)
     for c in reg:
@@ -298,8 +298,11 @@ def make_pool(g, q, size, seed, existing=None, aff=None, tau=0.35):
     # `plan --reuse` can then re-select for the next set without re-rendering.
     chars = sorted({g.char_base_name(f) for f in g.get_files(g.CHARACTERZ)})
     cw = [q["character"].get(c, 0) + 2 for c in chars]
+    # The Legendary_* art is drawn as a regular plate too: the board may give
+    # any of it a tier (Mattrick at 6, say), and a plate that only ever got the
+    # ten forced 1/1 candidates below would have nothing to select from.
     regular = {p: q["background"].get(p, 0) + 4 for p in sorted(cc.BACKGROUND_NAMES)
-               if p not in cc.ALL_ONE_OF_ONE_BACKGROUNDS}
+               if p not in cc.ONE_OF_ONE_BACKGROUNDS}
     plates, pw = zip(*regular.items())
     arms = {a: q["arm"].get(a, 0) + 2 for a in sorted(os.listdir(g.ARMZ)) if a.endswith(".png")}
     regular_wat = {w: q["footwear"].get(w, 0) + 3 for w in bd.FOOTWEAR.values()
@@ -367,8 +370,10 @@ def make_pool(g, q, size, seed, existing=None, aff=None, tau=0.35):
             if g.gets_gorbhouse_overlay(char):
                 opts["gorbhouse"] = (q["footwear"].get("gorbhouse", 0) + 3) * 2.5
             wat = rng.choices(list(opts), list(opts.values()))[0]
+        # the Nightly plate always carries its own wallet sticker
+        sticker = NIGHTLY_STICKER if plate == "Legendary_Nightly.png" else stickers[i % len(stickers)]
         add(i, force_bg=(g.BACKGROUNDZ, plate), force_char=char, force_arm=arm,
-            force_wat=wat, force_sticker=stickers[i % len(stickers)])
+            force_wat=wat, force_sticker=sticker)
     for c in pool[new_from:]:
         c["layers"] = cc.apply_figure_scale(g, c["layers"], c["traits"]["character"])
     return pool
@@ -493,20 +498,88 @@ def combine(m):
 
 # ---- selection ----------------------------------------------------------------------
 
-def select(pool, q):
+NO_CURATION = {"keep": {}, "add": set(), "reject": set(), "block": set()}
+QUOTA_KEYS = ("character", "background", "sticker", "arm", "footwear", "eyes", "mouth", "skin")
+
+
+def _fits(c, q):
+    return all(c["traits"].get(k) in q[k] for k in QUOTA_KEYS)
+
+
+def curated(pool, q, cur):
+    """The candidates the Curate tab forces in (kept and added tokens), and a
+    line for every mark the build could not honour. A mark loses only to a
+    harder rule -- a plate or trait removed on the board, a blocked pairing, or
+    more forced tokens than a count holds (the lowest-scoring go first)."""
+    by_cid = {c["cid"]: c for c in pool}
+    notes, forced = [], []
+    for cid in sorted(set(cur["keep"]) | cur["add"]):
+        c = by_cid.get(cid)
+        how = "kept" if cid in cur["keep"] else "added"
+        if c is None:
+            notes.append(f"{how} {cid}: not in the candidate pool, skipped")
+        elif cid in cur["reject"]:
+            notes.append(f"{how} {cid}: also rejected, rejected wins")
+        elif (c["traits"]["character"], c["traits"]["background"]) in cur["block"]:
+            notes.append(f"{how} {cid}: its pairing is blocked, skipped")
+        elif not _fits(c, q):
+            notes.append(f"{how} {cid}: uses something the board removed, skipped")
+        elif (c["traits"]["background"] == "Legendary_Nightly.png"
+              and c["traits"]["sticker"] != NIGHTLY_STICKER):
+            notes.append(f"{how} {cid}: Nightly needs its wallet sticker, skipped")
+        else:
+            forced.append(c)
+    caps = [(k, v, n) for k in QUOTA_KEYS for v, n in q[k].items()]
+    total = sum(q["character"].values())
+    changed = True
+    while changed:
+        changed = False
+        forced.sort(key=lambda c: -c["score"])
+        for k, v, n in caps:
+            hit = [c for c in forced if c["traits"].get(k) == v]
+            for c in hit[n:]:
+                notes.append(f"{c['cid']}: more tokens forced onto {v or 'no ' + k} than "
+                             f"its {n}, dropped the lowest-scoring")
+                forced.remove(c)
+                changed = True
+        pairs = defaultdict(list)
+        for c in forced:
+            pairs[(c["traits"]["character"], c["traits"]["background"])].append(c)
+        for (ch, pl), hit in pairs.items():
+            for c in hit[PAIR_CAP:]:
+                notes.append(f"{c['cid']}: more than {PAIR_CAP} forced {ch} on {pl}, dropped")
+                forced.remove(c)
+                changed = True
+    for c in forced[total:]:
+        forced.remove(c)
+    return {c["cid"] for c in forced}, notes
+
+
+def select(pool, q, cur=None):
     """Max total score, exact counts, via a 0/1 MILP (HiGHS). Candidates whose
     outline melts into the plate (edge_p20 under EDGE_FLOOR) are not eligible;
-    the floor steps down only if the exact counts cannot otherwise be met."""
+    the floor steps down only if the exact counts cannot otherwise be met.
+    `cur` is the Curate tab: kept and added tokens are forced in, whatever
+    their score; rejected ones and blocked pairings are out."""
+    cur = cur or NO_CURATION
+    for c in pool:
+        c.setdefault("cid", bd.combo_id(c["traits"]))
     # a candidate carrying anything the design does not ask for (a removed
     # plate, an arm set to 0) is not merely unconstrained -- it must be out
-    allowed = [c for c in pool if all(c["traits"].get(k) in q[k] for k in
-                                      ("character", "background", "sticker", "arm",
-                                       "footwear", "eyes", "mouth", "skin"))]
+    allowed = [c for c in pool if _fits(c, q) and c["cid"] not in cur["reject"]
+               and (c["traits"]["character"], c["traits"]["background"]) not in cur["block"]]
+    forced, notes = curated(pool, q, cur)
+    for line in notes:
+        print("curate:", line)
+    if forced or cur["reject"] or cur["block"]:
+        print(f"curate: {len(forced)} forced in, {len(cur['reject'])} rejected, "
+              f"{len(cur['block'])} pairings blocked")
     for floor in range(EDGE_FLOOR, -1, -3):
-        eligible = [c for c in allowed if c["edge_p20"] >= floor
+        eligible = [c for c in allowed if c["edge_p20"] >= floor or c["cid"] in forced
                     or c["traits"]["background"] in cc.ONE_OF_ONE_BACKGROUNDS]
         try:
-            chosen, res = _select(eligible, q)
+            chosen, res = _select(eligible, q, forced)
+            res.curate_notes = notes
             print(f"camouflage floor: edge_p20 >= {floor} "
                   f"({len(eligible)} of {len(pool)} eligible)")
             return chosen, res
@@ -515,7 +588,7 @@ def select(pool, q):
     raise SystemExit("selection infeasible at every floor")
 
 
-def _select(pool, q):
+def _select(pool, q, forced=()):
     from scipy.optimize import Bounds, LinearConstraint, milp
     from scipy.sparse import lil_matrix
 
@@ -559,8 +632,9 @@ def _select(pool, q):
         for i in idx:
             A[r, i] = 1
     cost = -np.array([c["score"] for c in pool])
+    lb = np.array([1.0 if c.get("cid") in forced else 0.0 for c in pool])
     res = milp(cost, constraints=LinearConstraint(A.tocsr(), lo, hi),
-               integrality=np.ones(n), bounds=Bounds(0, 1),
+               integrality=np.ones(n), bounds=Bounds(lb, 1),
                options={"time_limit": 600, "mip_rel_gap": 1e-4})
     if res.x is None:
         raise SystemExit(f"selection infeasible: {res.message}")
@@ -569,18 +643,35 @@ def _select(pool, q):
     return chosen, res
 
 
-def assign_weather(chosen, q, seed):
+def assign_weather(chosen, q, seed, pinned=None):
     """Weather is a grade laid over the finished token, so it changes nothing
     the selector scored; it lands at exact counts on the tokens it may cover
-    -- never a 1/1 plate, never the Starfield (both own animation_url)."""
+    -- never a 1/1 plate, never the Starfield (both own animation_url).
+    `pinned` ({combo: weather or None}) is the Curate tab's kept tokens: each
+    keeps the weather it was kept with, clear included, while its count lasts."""
     for c in chosen:
         c["traits"]["weather"] = None
     want = {w: n for w, n in q.get("weather", {}).items() if w}
-    if not want:
+    pinned = pinned or {}
+    can = [c for c in chosen if c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS
+           and c["traits"]["background"] != cc.STARFIELD]
+    fixed = set()
+    for c in can:
+        if c.get("cid") in pinned:
+            w = pinned[c["cid"]]
+            if w and want.get(w, 0) > 0:
+                c["traits"]["weather"] = w
+                want[w] -= 1
+            elif w:
+                print(f"curate: {c['cid']} was kept with {w}, which has no tokens left")
+            fixed.add(c["cid"])
+    if not any(want.values()):
         return
-    free = sorted((c for c in chosen
-                   if c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS
-                   and c["traits"]["background"] != cc.STARFIELD), key=lambda c: c["id"])
+    free = sorted((c for c in can if c.get("cid") not in fixed), key=lambda c: c["id"])
+    if sum(want.values()) > len(free):
+        # more kept clear tokens than weather can spare: they give way
+        free += sorted((c for c in can if c.get("cid") in fixed
+                        and not c["traits"]["weather"]), key=lambda c: c["id"])
     if sum(want.values()) > len(free):
         raise SystemExit(f"weather: {sum(want.values())} tokens asked for, "
                          f"{len(free)} can carry it")
@@ -784,8 +875,10 @@ def cmd_plan(args):
                    for c in pool], open(WORK / "pool.json", "w"))
     for c in pool:
         c["score"] = combine(c)
-    chosen, res = select(pool, q)
-    assign_weather(chosen, q, args.seed)
+        c["cid"] = bd.combo_id(c["traits"])
+    cur = bd.curation(bd.load(args.board)) if args.board else NO_CURATION
+    chosen, res = select(pool, q, cur)
+    assign_weather(chosen, q, args.seed, cur["keep"])
     assign_rarity(chosen, len(design["secrets"]))
     secrets = [{"secret": f, "traits": {}, "layers": [], "score": None,
                 "rarity": RARITY_TIERS[0][0] if RARITY_TIERS else None}
@@ -799,9 +892,13 @@ def cmd_plan(args):
             "pool": len(pool), "objective": round(-res.fun, 3),
             "figure_scale": cc.FIGURE_SCALE, "big_body_scale": cc.BIG_BODY_SCALE,
             "plaque": cc.PLAQUE_ON, "design": design_json(design),
+            "curation": {"kept": len(cur["keep"]), "added": len(cur["add"]),
+                         "rejected": len(cur["reject"]), "blocked": len(cur["block"]),
+                         "notes": getattr(res, "curate_notes", [])},
             "tokens": [({"token": c["token"], "secret": c["secret"], "traits": {},
                          "rarity": c["rarity"], "layers": []} if c.get("secret") else
-                        {"token": c["token"], "pool_id": c["id"], "traits": c["traits"],
+                        {"token": c["token"], "pool_id": c["id"], "cid": c["cid"],
+                         "traits": c["traits"],
                          "rarity": c["rarity"], "rarity_score": c["rarity_score"],
                          "score": c["score"],
                          "metrics": {k: c[k] for k in ("edge_p20", "edge_mean", "face",
@@ -934,6 +1031,9 @@ def render_full(g, t, path, anim_dir=None):
     Starfield or Weather token when `anim_dir` is given, its loop."""
     tid = f"{t['token']:03d}"
     layers, wx = t["layers"], t["traits"].get("weather")
+    # the weather pattern follows the combination, not the token number, so a
+    # token kept on the Curate tab looks the same after a rebuild renumbers it
+    wseed = int(t["cid"][:8], 16) % 1_000_003 if t.get("cid") else t["token"]
     if t["traits"].get("background") == cc.STARFIELD:
         import starfield as sf
         from dynamic.animate import write_mp4
@@ -964,7 +1064,7 @@ def render_full(g, t, path, anim_dir=None):
         base = Image.open(clear).convert("RGBA")
         protect = Image.open(mask).convert("L")
         afloat = Image.open(fl).convert("L") if fl.exists() else None
-        still = sky.apply_sky(base, protect, "day", wx, seed=t["token"], t=0.0, afloat=afloat)
+        still = sky.apply_sky(base, protect, "day", wx, seed=wseed, t=0.0, afloat=afloat)
         still.convert("RGB").save(path, compress_level=6)
         cc.add_plaque(path)
         if anim_dir is not None:
@@ -973,7 +1073,7 @@ def render_full(g, t, path, anim_dir=None):
             mk = protect.resize((n, n), Image.Resampling.LANCZOS)
             fk = afloat.resize((n, n), Image.Resampling.LANCZOS) if afloat else None
             static = sky.grade_static(sm, "day", wx)
-            frames = [sky.frame(static, mk, t=i / cc.WEATHER_FRAMES, seed=t["token"], afloat=fk)
+            frames = [sky.frame(static, mk, t=i / cc.WEATHER_FRAMES, seed=wseed, afloat=fk)
                       for i in range(cc.WEATHER_FRAMES)]
             if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
                          1000.0 / cc.WEATHER_MS) is None:
@@ -982,15 +1082,38 @@ def render_full(g, t, path, anim_dir=None):
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def render_key(t):
+    """What a token's pixels depend on, for `render --cache`: its layer stack,
+    its weather and the combination that seeds the weather. The token number
+    is not in it, so a rebuild that only renumbers re-renders nothing."""
+    import hashlib
+    body = {"secret": t.get("secret"), "layers": _portable(t["layers"]) if t["layers"] else [],
+            "wx": t["traits"].get("weather"), "cid": t.get("cid"),
+            "plaque": cc.PLAQUE_ON, "anim": is_animated(t)}
+    return hashlib.sha1(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
+
+
 def _render_job(job):
-    t, path, anim_dir = job
+    t, path, anim_dir, cache = job
     g = cc.setup()
     if str(cc.REPO_ROOT / "dynamic") not in sys.path:
         sys.path.insert(0, str(cc.REPO_ROOT / "dynamic"))
+    tid = f"{t['token']:03d}"
+    key = render_key(t) if cache else None
+    if key and (Path(cache) / f"{key}.png").exists() and \
+            (not is_animated(t) or (Path(cache) / f"{key}.mp4").exists()):
+        shutil.copyfile(Path(cache) / f"{key}.png", path)
+        if is_animated(t):
+            shutil.copyfile(Path(cache) / f"{key}.mp4", Path(anim_dir) / f"{tid}.mp4")
+        return path
     if t.get("secret"):
-        render_secret(g, t["secret"], path, anim_dir, f"{t['token']:03d}")
+        render_secret(g, t["secret"], path, anim_dir, tid)
     else:
         render_full(g, t, path, anim_dir)
+    if key:
+        shutil.copyfile(path, Path(cache) / f"{key}.png")
+        if is_animated(t):
+            shutil.copyfile(Path(anim_dir) / f"{tid}.mp4", Path(cache) / f"{key}.mp4")
     return path
 
 
@@ -1009,7 +1132,11 @@ def cmd_render(args):
         anims.mkdir(exist_ok=True)
     elif anims.exists():
         anims.rmdir()
-    jobs = [(t, str(images / f"{t['token']:03d}.png"), anims) for t in plan["tokens"]]
+    cache = None
+    if args.cache:
+        cache = Path(args.cache).resolve()
+        cache.mkdir(parents=True, exist_ok=True)
+    jobs = [(t, str(images / f"{t['token']:03d}.png"), anims, cache) for t in plan["tokens"]]
     with get_context("fork").Pool(args.workers) as p:
         for k, _ in enumerate(p.imap_unordered(_render_job, jobs), 1):
             if k % 25 == 0 or k == len(jobs):
@@ -1273,6 +1400,8 @@ def main():
     r = sub.add_parser("render")
     r.add_argument("--out", required=True)
     r.add_argument("--workers", type=int, default=4)
+    r.add_argument("--cache", help="reuse renders of unchanged tokens from this folder "
+                                   "(curation rebuilds); never for the final render")
     v = sub.add_parser("validate")
     v.add_argument("--out", required=True)
     args = ap.parse_args()

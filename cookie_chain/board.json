@@ -1,0 +1,247 @@
+{
+ "backgrounds": {
+  "items": {
+   "Black_Cookie_Emboss": {
+    "keep": true,
+    "name": "Cookboy Black Enamel",
+    "tier": "rare"
+   },
+   "Chocolate_Cookie_Emboss": {
+    "keep": false,
+    "name": "Cookboy Chocolate",
+    "tier": "common"
+   },
+   "Cookboy_Paisley": {
+    "keep": true,
+    "name": "Sarv Legendary",
+    "tier": "legendary"
+   },
+   "Cookie_Dough": {
+    "keep": true,
+    "name": "Cookie Dough",
+    "tier": "common"
+   },
+   "Cookie_Vault": {
+    "keep": true,
+    "name": "M Power Legendary",
+    "tier": "legendary"
+   },
+   "Digital_Future_Mural": {
+    "keep": true,
+    "name": "NFTs Aren't Dead",
+    "tier": "rare"
+   },
+   "Emyr_Gallery": {
+    "keep": true,
+    "name": "Emyr Legendary",
+    "tier": "legendary"
+   },
+   "Fairdevs_Night": {
+    "keep": true,
+    "name": "Fairdevs Legendary",
+    "tier": "legendary"
+   },
+   "Gold_Cookie_Emboss": {
+    "keep": true,
+    "name": "Cookboy Gold",
+    "tier": "rare"
+   },
+   "Gorbhouse_Treasures": {
+    "keep": true,
+    "name": "Gorbhouse Treasures",
+    "tier": "legendary"
+   },
+   "Legendary_Mattrick": {
+    "keep": true,
+    "name": "Mattrick Legendary",
+    "tier": "legendary"
+   },
+   "Legendary_Nightly": {
+    "keep": true,
+    "name": "Nightly Legendary",
+    "tier": "legendary"
+   },
+   "Legendary_Opengotchi": {
+    "tier": "legendary"
+   },
+   "Legendary_Shubbi": {
+    "keep": false,
+    "name": "Shubbi Legendary",
+    "tier": "legendary"
+   },
+   "Legendary_Tenders": {
+    "keep": false,
+    "name": "Tenders Legendary",
+    "tier": "legendary"
+   },
+   "Liberty_Cookie_Dime": {
+    "keep": true,
+    "name": "Liberty Cookie Dime",
+    "tier": "common"
+   },
+   "Marsel_Blue": {
+    "keep": true,
+    "name": "Morsel Legendary",
+    "tier": "legendary"
+   },
+   "Moon_Surface": {
+    "keep": true,
+    "name": "Moon Surface",
+    "tier": "uncommon"
+   },
+   "Picnic_Stage": {
+    "keep": true,
+    "name": "Picnic Stage",
+    "tier": "rare"
+   },
+   "Secret_Cookboy_Blue_Raspberry": {
+    "keep": true
+   },
+   "Short_The_Banks_Vault": {
+    "keep": true,
+    "name": "Short The Banks Legendary",
+    "tier": "legendary"
+   },
+   "Silver_Cookie_Emboss": {
+    "keep": true,
+    "name": "Cookboy Silver",
+    "tier": "uncommon"
+   },
+   "Simplex_Arcade": {
+    "keep": true,
+    "name": "Cookboy Legendary",
+    "tier": "legendary"
+   },
+   "Starfield": {
+    "keep": true
+   },
+   "Welders_Equipment": {
+    "keep": true,
+    "name": "GorWeld Legendary",
+    "tier": "legendary"
+   },
+   "Yatrah_Arcade": {
+    "keep": true,
+    "name": "Yatrah Arcade",
+    "tier": "legendary"
+   }
+  }
+ },
+ "traits_arms": {
+  "items": {
+   "Cookboy_Handheld": 22,
+   "Printer": 36
+  }
+ },
+ "traits_characters": {
+  "items": {
+   "Nutty_Bar": 14,
+   "Twinkie": 23,
+   "brownie_bite": 19,
+   "chocolate_chip_cookie": 16,
+   "chocolate_doughnut": 9,
+   "chocolate_frosted_poptart": 8,
+   "chocolate_ice_cream": 11,
+   "chocolate_sandwich_cookie": 13,
+   "churro": 14,
+   "cyan_frosted_poptart": 23,
+   "cyan_sherbert_ice_cream": 21,
+   "ding_dong": 12,
+   "glazed_doughnut": 11,
+   "gold_waffle": 16,
+   "marshmallow": 23,
+   "neopolitan_ice_cream": 12,
+   "oatmeal_cream_pie": 13,
+   "og_gummy_bear": 20,
+   "og_poptart": 20,
+   "pink_sherbert_ice_cream": 12,
+   "rice_crispy_treat": 20,
+   "smores": 11,
+   "sugar_cube": 21,
+   "sugar_doughnut": 20,
+   "vanilla_ice_cream": 21,
+   "waffle": 20,
+   "zebra_cake": 21
+  }
+ },
+ "traits_eyes": {
+  "items": {
+   "Alien": 17,
+   "Beady": 20,
+   "Blue": 27,
+   "Cerise": 40,
+   "Clueless": 71,
+   "Cyan": 32,
+   "Cyborg": 63,
+   "Googly": 72,
+   "Side_Eye": 71,
+   "Smug": 31
+  }
+ },
+ "traits_footwear": {
+  "items": {
+   "Bunny_Slippers": 17,
+   "Cookie_Monster_Slippers": 10,
+   "Gorbhouse": 13,
+   "Pepe_Slippers": 8,
+   "Shiba_Slippers": 24
+  }
+ },
+ "traits_mouths": {
+  "items": {
+   "Awkward_Smile": 42,
+   "Diamond_Grill": 75,
+   "Fang": 88,
+   "Flat": 21,
+   "Lollipop": 55,
+   "Sad": 22,
+   "Smirk": 59,
+   "Smoke": 26,
+   "Tasty": 56
+  }
+ },
+ "traits_skins": {
+  "items": {
+   "Alien": 49,
+   "Black": 140,
+   "White": 255
+  }
+ },
+ "traits_stickers": {
+  "items": {
+   "Anime_Detective": 21,
+   "Armed_Hero": 21,
+   "Baked_Bazaar": 21,
+   "Candy_Shop": 21,
+   "Chibi_Monster": 20,
+   "CookBook": 20,
+   "CookOven": 20,
+   "CookieScan": 20,
+   "CookieSwap": 20,
+   "Cookie_Chat": 20,
+   "Cookie_Lock": 20,
+   "Cookie_MCP": 20,
+   "Cookie_Quads": 20,
+   "Cookiebox": 20,
+   "Emyr": 20,
+   "GORBOY": 20,
+   "MomoSwap": 20,
+   "Morsel": 20,
+   "Nightly_Wallet": 20,
+   "Out_Of_Order": 20,
+   "Poptart_Cat": 20,
+   "Shorts_Doggo": 20
+  }
+ },
+ "traits_weather": {
+  "items": {
+   "blizzard": 12,
+   "flooded": 10,
+   "fog": 15,
+   "rain": 11,
+   "snow": 9,
+   "storm": 8,
+   "tornado": 4
+  }
+ }
+}

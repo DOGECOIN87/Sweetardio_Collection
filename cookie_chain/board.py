@@ -16,6 +16,7 @@ are computed exactly as the page computes them, so the number the board shows
 under a plate is the number that ships.
 """
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -57,14 +58,28 @@ ARMS = {
     "Nerf_Blaster": "layer-layer-layer-layer-Nerf_Blaster.png",
 }
 SKINS = {"Alien": "Alien", "Black": "Black", "White": "White"}
+
+# A combination is named by its traits, not by its token number or its place
+# in the pool: numbers are reshuffled on every plan, and a mark must still
+# find its token after a rebuild.
+COMBO_KEYS = ("character", "background", "skin", "eyes", "mouth", "footwear", "arm", "sticker")
+
+
+def combo_id(traits):
+    sig = "|".join(str(traits.get(k)) for k in COMBO_KEYS)
+    return hashlib.sha1(sig.encode()).hexdigest()[:12]
 WEATHER = {w: w for w in ("rain", "snow", "fog", "storm", "blizzard", "flooded", "tornado")}
 
 
 def load(path=None):
     """The page's starting state with an exported board laid over it."""
     board = json.loads(DEFAULTS.read_text())
+    board["marks"], board["blocks"] = {}, {}
     if path:
         for doc, body in json.loads(Path(path).read_text()).items():
+            if doc in ("marks", "blocks"):
+                board[doc] = body
+                continue
             if doc not in board:
                 continue
             for key, value in body.items():
@@ -141,6 +156,23 @@ def quotas(board, characters):
                 skin=_section(board, "skins", SKINS))
 
 
+def curation(board):
+    """The Curate tab's marks: {"keep": {combo: weather}, "add": set,
+    "reject": set, "block": {(character, plate file)}}. A kept token keeps
+    the weather it was shown with; an added one takes whatever it is dealt."""
+    out = {"keep": {}, "add": set(), "reject": set(), "block": set()}
+    for cid, m in board.get("marks", {}).items():
+        mark = m.get("mark")
+        if mark == "keep":
+            out["keep"][cid] = m.get("wx") or None
+        elif mark in ("add", "reject"):
+            out[mark].add(cid)
+    for b in board.get("blocks", {}).values():
+        if b.get("char") and b.get("plate"):
+            out["block"].add((b["char"], b["plate"] + ".png"))
+    return out
+
+
 def rarity_tiers(board, ones):
     """[(name, count)]: the first tier is exactly the 1-of-1 tokens, the last
     takes whatever the middle tiers leave."""
@@ -156,12 +188,18 @@ def rarity_tiers(board, ones):
 
 
 def merge(src, dst):
-    """Fold an export of the board's cfg collection into one JSON file."""
+    """Fold an export of the board's collections into one JSON file: each
+    `cfg` document is a section, and the Curate tab's `marks` and `blocks`
+    collections each become one section keyed by document id."""
     out = {}
     for p in sorted(Path(src).rglob("*.json")):
         body = json.loads(p.read_text())
-        out[body.get("id", p.stem)] = {k: v for k, v in body.get("data", body).items()
-                                       if k not in ("by", "at")}
+        data = {k: v for k, v in body.get("data", body).items() if k not in ("by", "at")}
+        coll = p.parent.name
+        if coll in ("marks", "blocks"):
+            out.setdefault(coll, {})[body.get("id", p.stem)] = data
+        else:
+            out[body.get("id", p.stem)] = data
     Path(dst).write_text(json.dumps(out, indent=1) + "\n")
     print(f"{len(out)} board sections -> {dst}: {', '.join(sorted(out)) or 'none'}")
 
