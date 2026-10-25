@@ -981,7 +981,7 @@ def cmd_sheet(args):
     picked = pick_sheet(plan["tokens"], args.count)
     out_dir = WORK / "sheet"
     out_dir.mkdir(parents=True, exist_ok=True)
-    jobs = [(t, str(out_dir / f"{t['token']:03d}.png"), None) for t in picked]
+    jobs = [(t, str(out_dir / f"{t['token']:03d}.png"), None, None) for t in picked]
     with get_context("fork").Pool(args.workers) as p:
         list(p.imap_unordered(_render_job, jobs))
     cols, cell, lab = 5, 560, 64
