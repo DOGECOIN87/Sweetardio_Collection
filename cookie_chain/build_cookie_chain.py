@@ -156,6 +156,7 @@ def quotas(g):
 # than against whatever the constants say on the day they run.
 
 METHOD = "traits"          # how the Rarity tiers below the 1/1s are ranked
+BG_TIERS = {}              # plate file -> board tier, for METHOD "background"
 EXACT_FACE = False         # eyes / mouths / skins exact (board) or within SOFT_TOL
 
 
@@ -191,15 +192,17 @@ def board_design(g, path):
     rtiers, method = bd.rarity_tiers(b, len(ones) + len(secrets))
     return {"q": q, "names": {f: n for f, n in names.items() if f not in secrets},
             "ones": ones, "secrets": secrets, "tiers": rtiers, "method": method,
+            "bg_tiers": {f: t for f, t in tiers.items() if f not in secrets},
             "exact_face": True}
 
 
 def apply_design(d):
-    global RARITY_TIERS, METHOD, EXACT_FACE
+    global RARITY_TIERS, METHOD, EXACT_FACE, BG_TIERS
     cc.BACKGROUND_NAMES.update(d["names"])
     cc.ONE_OF_ONE_BACKGROUNDS = tuple(d["ones"])
     RARITY_TIERS = [tuple(t) for t in d["tiers"]] if d["tiers"] else None
     METHOD, EXACT_FACE = d["method"], d.get("exact_face", False)
+    BG_TIERS = d.get("bg_tiers", {})
     return d
 
 
@@ -706,6 +709,10 @@ def assign_rarity(chosen, n_secret=0):
         for c in chosen:
             c["rarity"] = None
         return
+    if METHOD == "background":
+        for c in chosen:
+            c["rarity"] = bd.TIER_LABELS[BG_TIERS[c["traits"]["background"]]]
+        return
     first = lambda c: c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS
     if METHOD == "looks":
         ranked = sorted(chosen, key=lambda c: (first(c), -c["score"]))
@@ -913,6 +920,7 @@ def cmd_plan(args):
             "pool": len(pool), "objective": round(-res.fun, 3),
             "figure_scale": cc.FIGURE_SCALE, "big_body_scale": cc.BIG_BODY_SCALE,
             "plaque": cc.PLAQUE_ON, "design": design_json(design),
+            "free": list(FREE_KEYS),
             "curation": {"kept": len(cur["keep"]), "added": len(cur["add"]),
                          "rejected": len(cur["reject"]), "blocked": len(cur["block"]),
                          "notes": getattr(res, "curate_notes", [])},
@@ -1295,7 +1303,7 @@ composited character, so it carries `1/1`, `Edition` and `Rarity` only, plus an
 
 **{RARITY_TIERS[0][0] if RARITY_TIERS else "The 1/1s"}** {"is" if RARITY_TIERS else "are"} exactly the {len(one)} one-of-one tokens:
 {", ".join(f"{name} (#{n:03d})" for n, name in one)}. Every other tier is
-ranked by {"the build's visual score" if METHOD == "looks" else "statistical rarity (the sum of each trait's -ln(share)), so the label agrees with what a trait-frequency ranking would say"}.
+{"labelled by its background's tier, the same tier the background holds on the Rarity Board" if METHOD == "background" else "ranked by " + ("the build's visual score" if METHOD == "looks" else "statistical rarity (the sum of each trait's -ln(share)), so the label agrees with what a trait-frequency ranking would say")}.
 
 {f"""**Weather** ({sum(counts["Weather"].values())} tokens) — a still showing the weather, plus a loop
 
@@ -1387,12 +1395,17 @@ def cmd_validate(args):
     tiers = dict(RARITY_TIERS or [])
     if dict(counts["Rarity"]) != tiers:
         errors.append(f"rarity tiers {dict(counts['Rarity'])} != {tiers}")
-    names = {"Background": {cc.BACKGROUND_NAMES[k]: n for k, n in q["background"].items()},
-             "Sticker": {cc.STICKER_NAMES[k]: n for k, n in q["sticker"].items()}}
+    # groups the plan left free (plan --free) follow the picks, not the design
+    free = set(plan.get("free", []))
+    names = {"Background": {cc.BACKGROUND_NAMES[k]: n for k, n in q["background"].items()}}
+    if "sticker" not in free:
+        names["Sticker"] = {cc.STICKER_NAMES[k]: n for k, n in q["sticker"].items()}
     for trait, expect in names.items():
         if dict(counts[trait]) != expect:
             errors.append(f"{trait} counts differ from the design")
     for trait, key in (("Arms", "arm"), ("Footwear", "footwear"), ("Weather", "weather")):
+        if key in free:
+            continue
         want = sum(n for v, n in q.get(key, {}).items() if v)
         if sum(counts[trait].values()) != want:
             errors.append(f"{sum(counts[trait].values())} tokens with {trait}, expected {want}")

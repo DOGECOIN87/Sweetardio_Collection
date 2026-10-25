@@ -25,6 +25,8 @@ BOARD_DIR = Path(__file__).resolve().parent
 DEFAULTS = BOARD_DIR / "board_defaults.json"
 SUPPLY = 444
 TIERS = ("one", "legendary", "rare", "uncommon", "common")
+TIER_LABELS = {"one": "1/1", "legendary": "Legendary", "rare": "Rare",
+               "uncommon": "Uncommon", "common": "Common"}
 
 # board key -> the compositor's own key, for every section whose files the
 # main collection still names by their authoring history
@@ -179,6 +181,12 @@ def rarity_tiers(board, ones):
     label = board["label"]
     if label["method"] == "none":
         return None, "none"
+    if label["method"] == "background":
+        # one system: a token's Rarity is its background's tier, in the
+        # board's own words, so the label can never disagree with the board
+        counts, tiers, _ = backgrounds(board)
+        n = {t: sum(c for f, c in counts.items() if tiers[f] == t) for t in TIERS}
+        return [(TIER_LABELS[t], n[t]) for t in TIERS if n[t]], "background"
     tiers = label["tiers"]
     middle = [(t["name"], int(t["count"])) for t in tiers[1:-1]]
     last = SUPPLY - ones - sum(n for _, n in middle)
