@@ -498,6 +498,9 @@ def combine(m):
 
 # ---- selection ----------------------------------------------------------------------
 
+# trait groups the selector leaves free (plan --free): a token keeps whatever
+# its best-scoring candidate carries instead of meeting the board's count
+FREE_KEYS = ()
 NO_CURATION = {"keep": {}, "add": set(), "reject": set(), "block": set()}
 QUOTA_KEYS = ("character", "background", "sticker", "arm", "footwear", "eyes", "mouth", "skin")
 
@@ -529,7 +532,7 @@ def curated(pool, q, cur):
             notes.append(f"{how} {cid}: Nightly needs its wallet sticker, skipped")
         else:
             forced.append(c)
-    caps = [(k, v, n) for k in QUOTA_KEYS for v, n in q[k].items()]
+    caps = [(k, v, n) for k in QUOTA_KEYS if k not in FREE_KEYS for v, n in q[k].items()]
     total = sum(q["character"].values())
     changed = True
     while changed:
@@ -609,15 +612,21 @@ def _select(pool, q, forced=()):
                 hi.append(math.ceil(target * (1 + tol)) + 1)
 
     for key in ("character", "background", "sticker", "arm", "footwear"):
-        group(key)
+        if key not in FREE_KEYS:
+            group(key)
     for key in ("eyes", "mouth", "skin"):
-        group(key, exact=EXACT_FACE, tol=SOFT_TOL if key != "skin" else 0.15)
+        if key not in FREE_KEYS:
+            group(key, exact=EXACT_FACE, tol=SOFT_TOL if key != "skin" else 0.15)
     pairs = defaultdict(list)
     for i, c in enumerate(pool):
         pairs[(c["traits"]["character"], c["traits"]["background"])].append(i)
-    for idx in pairs.values():
-        if len(idx) > PAIR_CAP:
-            rows.append(idx); lo.append(0); hi.append(PAIR_CAP)
+    # PAIR_CAP keeps a ~20-token plate varied; a plate holding a big share of
+    # the supply needs more of each character than that just to fill up
+    n_chars = max(1, sum(1 for n in q["character"].values() if n))
+    for (_, plate), idx in pairs.items():
+        cap = max(PAIR_CAP, math.ceil(1.5 * q["background"].get(plate, 0) / n_chars))
+        if len(idx) > cap:
+            rows.append(idx); lo.append(0); hi.append(cap)
     # the Nightly plate keeps its own wallet sticker
     nightly = [i for i, c in enumerate(pool)
                if c["traits"]["background"] == "Legendary_Nightly.png"
@@ -833,6 +842,8 @@ def _resolve(g, layers):
 
 
 def cmd_plan(args):
+    global FREE_KEYS
+    FREE_KEYS = tuple(k for k in (args.free or "").split(",") if k)
     g = cc.setup()
     design = apply_design(board_design(g, args.board) if args.board else default_design(g))
     q = design["q"]
@@ -1391,6 +1402,8 @@ def main():
                    help="re-select from work/pool.json without re-rendering")
     p.add_argument("--extend", type=int, default=0,
                    help="add N candidates targeted at the best pairings, then select")
+    p.add_argument("--free", help="comma-separated trait groups whose counts the "
+                                  "selector ignores, e.g. sticker,arm,mouth")
     p.add_argument("--board", help="the Rarity Board's exported choices "
                                    "(board.py merge); default: the constants above")
     s = sub.add_parser("sheet")
