@@ -125,6 +125,11 @@
     "keep": true,
     "tier": "one",
     "name": "Cookboy Blue Raspberry"
+   },
+   "Starfield": {
+    "keep": false,
+    "tier": "legendary",
+    "name": "Starfield"
    }
   }
  },
@@ -276,6 +281,17 @@
    "AR47": 7,
    "Military_Brat": 9,
    "Nerf_Blaster": 10
+  }
+ },
+ "traits_weather": {
+  "items": {
+   "rain": 0,
+   "snow": 0,
+   "fog": 0,
+   "storm": 0,
+   "blizzard": 0,
+   "flooded": 0,
+   "tornado": 0
   }
  }
 }

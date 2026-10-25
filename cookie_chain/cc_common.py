@@ -124,6 +124,7 @@ BACKGROUND_NAMES = {
     "Legendary_Shubbi.png": "Shubbi Legendary",
     "Legendary_Tenders.png": "Tenders Legendary",
     "Legendary_Opengotchi.png": "Opengotchi Legendary",
+    "Starfield.png": "Starfield",
 }
 # Every legendary plate mints exactly once. Mattrick is the alien plate (the
 # main collection carries the same art as Legendary_Just_Aliens); Opengotchi
@@ -147,6 +148,23 @@ ALL_ONE_OF_ONE_BACKGROUNDS = ONE_OF_ONE_BACKGROUNDS   # the pool draws all five,
 SECRET_RARES = {"Secret_Cookboy_Blue_Raspberry.png": "Cookboy Blue Raspberry"}
 ANIMATED_SECRET_RARES = {"Secret_Cookboy_Blue_Raspberry.png"}
 LOOP_SIZE, LOOP_MS = 640, 70          # build_mint.py's --anim-size / --anim-ms
+
+# ---- the two animated tiers from the main collection -------------------------
+# STARFIELD is a plate that MOVES: the 8-bit field and rainbow from
+# dynamic/starfield.py, the rainbow centred on each token's own figure, and a
+# 12-frame loop re-composited per plate frame (the grounding shadow lives on
+# the plate, so a frame cannot be made by swapping the plate under a finished
+# PNG). assets/backgroundz/Starfield.png is the dy=0 reference plate, copied
+# from the main collection. Only generator.STARFIELD_CHARS -- the 14 bodies
+# that read against a flat field -- may stand on it.
+STARFIELD = "Starfield.png"
+# WEATHER is a grade laid over the finished token (dynamic/sky.py), held off
+# the figure by the protect mask create_image() writes. It ships as a
+# weathered still plus a loop, exactly as asset_assessment/bake_weather.py
+# bakes the main mint. Never on a 1/1 (the point of one is to see it) or on
+# the Starfield (both own animation_url).
+WEATHER_STATES = ("rain", "snow", "fog", "storm", "blizzard", "flooded", "tornado")
+WEATHER_FRAMES, WEATHER_SIZE, WEATHER_MS = 36, 512, 55   # bake_weather.py defaults
 
 STICKER_NAMES = {
     "Anime_Detective.png": "L",

@@ -160,7 +160,9 @@ EXACT_FACE = False         # eyes / mouths / skins exact (board) or within SOFT_
 
 
 def default_design(g):
-    return {"q": quotas(g), "names": dict(cc.BACKGROUND_NAMES),
+    q = quotas(g)
+    q["weather"] = {None: cc.SUPPLY}
+    return {"q": q, "names": dict(cc.BACKGROUND_NAMES),
             "ones": list(cc.ONE_OF_ONE_BACKGROUNDS), "secrets": [],
             "tiers": [list(t) for t in RARITY_TIERS], "method": "traits",
             "exact_face": False}
@@ -182,7 +184,7 @@ def board_design(g, path):
         for _ in secrets:
             top = max(sorted(q[key]), key=lambda k: q[key][k])
             q[key][top] -= 1
-    for key in ("arm", "footwear"):
+    for key in ("arm", "footwear", "weather"):
         q[key][None] -= len(secrets)
         if q[key][None] < 0:
             raise SystemExit(f"board: {key} leave no room for the 1/1 token(s)")
@@ -350,6 +352,8 @@ def make_pool(g, q, size, seed, existing=None, aff=None, tau=0.35):
             plate = rng.choices(plates, w)[0]
         else:
             plate = rng.choices(plates, pw)[0]
+        if plate == cc.STARFIELD and char not in g.STARFIELD_CHARS:
+            char = rng.choice([c for c in chars if c in g.STARFIELD_CHARS])
         arm = None
         if rng.random() < max(0.25, min(0.75, 1.6 * sum(n for a, n in q["arm"].items() if a)
                                          / max(1, sum(q["character"].values())))):
@@ -565,11 +569,35 @@ def _select(pool, q):
     return chosen, res
 
 
+def assign_weather(chosen, q, seed):
+    """Weather is a grade laid over the finished token, so it changes nothing
+    the selector scored; it lands at exact counts on the tokens it may cover
+    -- never a 1/1 plate, never the Starfield (both own animation_url)."""
+    for c in chosen:
+        c["traits"]["weather"] = None
+    want = {w: n for w, n in q.get("weather", {}).items() if w}
+    if not want:
+        return
+    free = sorted((c for c in chosen
+                   if c["traits"]["background"] not in cc.ONE_OF_ONE_BACKGROUNDS
+                   and c["traits"]["background"] != cc.STARFIELD), key=lambda c: c["id"])
+    if sum(want.values()) > len(free):
+        raise SystemExit(f"weather: {sum(want.values())} tokens asked for, "
+                         f"{len(free)} can carry it")
+    random.Random(seed).shuffle(free)
+    pos = 0
+    for w in cc.WEATHER_STATES:
+        for c in free[pos:pos + want.get(w, 0)]:
+            c["traits"]["weather"] = w
+        pos += want.get(w, 0)
+
+
 def assign_rarity(chosen, n_secret=0):
     """The first tier is exactly the 1/1s (plates, plus any whole-token 1/1,
     which the caller places there); the rest are ranked by statistical rarity
     or, on METHOD "looks", by score."""
-    keys = ("character", "background", "skin", "eyes", "mouth", "footwear", "arm", "sticker")
+    keys = ("character", "background", "skin", "eyes", "mouth", "footwear", "arm", "sticker",
+            "weather")
     counts = {k: Counter(c["traits"].get(k) for c in chosen) for k in keys}
     for c in chosen:
         c["rarity_score"] = round(sum(-math.log(counts[k][c["traits"].get(k)] / len(chosen))
@@ -622,10 +650,19 @@ def attributes(g, cand):
         attrs.append({"trait_type": "Arms",
                       "value": cc.ARM_NAMES.get(t["arm"]) or g.trait_name("armz", t["arm"])})
     attrs.append({"trait_type": "Sticker", "value": cc.STICKER_NAMES[t["sticker"]]})
+    if t.get("weather"):
+        attrs.append({"trait_type": "Weather", "value": t["weather"].title()})
     attrs.append({"trait_type": "Edition", "value": cc.EDITION})
     if cand.get("rarity"):
         attrs.append({"trait_type": "Rarity", "value": cand["rarity"]})
     return attrs
+
+
+def is_animated(t):
+    """Ships a loop: the animated 1/1, a Starfield token, a Weather token."""
+    return (t.get("secret") in cc.ANIMATED_SECRET_RARES
+            or t["traits"].get("background") == cc.STARFIELD
+            or bool(t["traits"].get("weather")))
 
 
 def token_json(g, cand, seed):
@@ -633,7 +670,7 @@ def token_json(g, cand, seed):
     meta = {"name": f"{cc.EDITION} #{n:03d}",
             "description": f"One of {cc.SUPPLY} {cc.EDITION} collectibles.",
             "image": f"../images/{n:03d}.png"}
-    animated = cand.get("secret") in cc.ANIMATED_SECRET_RARES
+    animated = is_animated(cand)
     if animated:
         meta["animation_url"] = f"../animations/{n:03d}.mp4"
     meta["attributes"] = attributes(g, cand)
@@ -748,6 +785,7 @@ def cmd_plan(args):
     for c in pool:
         c["score"] = combine(c)
     chosen, res = select(pool, q)
+    assign_weather(chosen, q, args.seed)
     assign_rarity(chosen, len(design["secrets"]))
     secrets = [{"secret": f, "traits": {}, "layers": [], "score": None,
                 "rarity": RARITY_TIERS[0][0] if RARITY_TIERS else None}
@@ -872,13 +910,87 @@ def render_secret(g, name, path, anim_dir=None, tid=None):
         sys.exit("no ffmpeg -- pip install imageio-ffmpeg")
 
 
+def centre_starfield(g, layers):
+    """dynamic/starfield.centre_figure for a figure the edition scales. The
+    drop is measured on the SCALED render, and a layer's dy is applied before
+    the scale about FIGURE_PIVOT, so the drop goes in as dy / scale -- as is,
+    centre_figure would leave every starfield figure 12% short of centre."""
+    import starfield as sf
+    d = sf.figure_drop(layers, g)
+    if not d:
+        return layers
+    moves = sf._folders(g, *[getattr(g, n) for n in sf.FIGURE_MOVES])
+    out = []
+    for i, l in enumerate(layers):
+        l = dict(l)
+        if i and os.path.normpath(l["path"]).startswith(moves):
+            l["dy"] = l.get("dy", 0) + int(round(d / l.get("gscale", 1.0)))
+        out.append(l)
+    return out
+
+
+def render_full(g, t, path, anim_dir=None):
+    """A composited token as it ships: the still at `path` and, for a
+    Starfield or Weather token when `anim_dir` is given, its loop."""
+    tid = f"{t['token']:03d}"
+    layers, wx = t["layers"], t["traits"].get("weather")
+    if t["traits"].get("background") == cc.STARFIELD:
+        import starfield as sf
+        from dynamic.animate import write_mp4
+        tmp = WORK / "tmp"
+        tmp.mkdir(parents=True, exist_ok=True)
+        # centre the figure FIRST, then the rainbow on where it now stands
+        layers, dy, plate = sf.centre_layers(centre_starfield(g, layers), str(tmp), tid, g)
+        try:
+            render_token(g, layers, path)
+            if anim_dir is not None:
+                frames = sf.loop_layers(layers, str(tmp), tid, g, size=cc.LOOP_SIZE, dy=dy)
+                if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
+                             1000.0 / cc.LOOP_MS) is None:
+                    sys.exit("no ffmpeg -- pip install imageio-ffmpeg")
+        finally:
+            os.remove(plate)
+        return
+    if not wx:
+        render_token(g, layers, path)
+        return
+    # Weather: render clear WITH the protect and float masks, then grade.
+    from dynamic import sky
+    from dynamic.animate import write_mp4
+    tmp = Path(tempfile.mkdtemp(dir=WORK))
+    try:
+        clear, mask, fl = tmp / "clear.png", tmp / "mask.png", tmp / "float.png"
+        g.create_image(layers, str(clear), mask_path=str(mask), float_mask_path=str(fl))
+        base = Image.open(clear).convert("RGBA")
+        protect = Image.open(mask).convert("L")
+        afloat = Image.open(fl).convert("L") if fl.exists() else None
+        still = sky.apply_sky(base, protect, "day", wx, seed=t["token"], t=0.0, afloat=afloat)
+        still.convert("RGB").save(path, compress_level=6)
+        cc.add_plaque(path)
+        if anim_dir is not None:
+            n = cc.WEATHER_SIZE
+            sm = base.resize((n, n), Image.Resampling.LANCZOS)
+            mk = protect.resize((n, n), Image.Resampling.LANCZOS)
+            fk = afloat.resize((n, n), Image.Resampling.LANCZOS) if afloat else None
+            static = sky.grade_static(sm, "day", wx)
+            frames = [sky.frame(static, mk, t=i / cc.WEATHER_FRAMES, seed=t["token"], afloat=fk)
+                      for i in range(cc.WEATHER_FRAMES)]
+            if write_mp4(frames, os.path.join(anim_dir, f"{tid}.mp4"),
+                         1000.0 / cc.WEATHER_MS) is None:
+                sys.exit("no ffmpeg -- pip install imageio-ffmpeg")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def _render_job(job):
     t, path, anim_dir = job
     g = cc.setup()
+    if str(cc.REPO_ROOT / "dynamic") not in sys.path:
+        sys.path.insert(0, str(cc.REPO_ROOT / "dynamic"))
     if t.get("secret"):
         render_secret(g, t["secret"], path, anim_dir, f"{t['token']:03d}")
     else:
-        render_token(g, t["layers"], path)
+        render_full(g, t, path, anim_dir)
     return path
 
 
@@ -893,7 +1005,7 @@ def cmd_render(args):
                 f.unlink()
     for d in (images, metadata):
         d.mkdir(parents=True, exist_ok=True)
-    if any(t.get("secret") in cc.ANIMATED_SECRET_RARES for t in plan["tokens"]):
+    if any(is_animated(t) for t in plan["tokens"]):
         anims.mkdir(exist_ok=True)
     elif anims.exists():
         anims.rmdir()
@@ -958,6 +1070,7 @@ def write_readme(g, plan, out):
                  for t in plan["tokens"]
                  if t.get("secret") or t["traits"]["background"] in cc.ONE_OF_ONE_BACKGROUNDS)
     animated = [t["token"] for t in plan["tokens"] if t.get("secret") in cc.ANIMATED_SECRET_RARES]
+    looping = [t for t in plan["tokens"] if is_animated(t)]
 
     def table(trait):
         rows = sorted(counts[trait].items(), key=lambda kv: (-kv[1], kv[0]))
@@ -972,8 +1085,8 @@ metadata files.
 | Folder | Contents |
 | --- | --- |
 | `images/` | `001.png` … `{cc.SUPPLY}.png` — 1393×1393 PNG |
-| `metadata/` | `001.json` … `{cc.SUPPLY}.json` — one per image |{"".join(f"""
-| `animations/` | `{n:03d}.mp4` — the animated 1/1's loop ({cc.LOOP_SIZE}×{cc.LOOP_SIZE}, H.264) |""" for n in animated)}
+| `metadata/` | `001.json` … `{cc.SUPPLY}.json` — one per image |{f"""
+| `animations/` | one H.264 `.mp4` loop per animated token ({len(looping)}): the animated 1/1, every Starfield token and every Weather token; its metadata's `animation_url` points at it |""" if looping else ""}
 
 The numbers pair up: `metadata/007.json` describes `images/007.png`.
 
@@ -1032,7 +1145,13 @@ composited character, so it carries `1/1`, `Edition` and `Rarity` only, plus an
 {", ".join(f"{name} (#{n:03d})" for n, name in one)}. Every other tier is
 ranked by {"the build's visual score" if METHOD == "looks" else "statistical rarity (the sum of each trait's -ln(share)), so the label agrees with what a trait-frequency ranking would say"}.
 
-**Arms** ({n_arm} tokens)
+{f"""**Weather** ({sum(counts["Weather"].values())} tokens) — a still showing the weather, plus a loop
+
+| Weather | Tokens |
+| --- | --- |
+{table("Weather")}
+
+""" if counts["Weather"] else ""}**Arms** ({n_arm} tokens)
 
 | Arm | Tokens |
 | --- | --- |
@@ -1096,10 +1215,10 @@ def cmd_validate(args):
             if im.size != (1393, 1393):
                 errors.append(f"{w}: image is {im.size}")
         t = by_token[int(w)]
-        if t.get("secret") in cc.ANIMATED_SECRET_RARES:
+        if is_animated(t):
             if m.get("animation_url") != f"../animations/{w}.mp4" or \
                     not (out / "animations" / f"{w}.mp4").exists():
-                errors.append(f"{w}: the animated 1/1 has no loop at animations/{w}.mp4")
+                errors.append(f"{w}: an animated token has no loop at animations/{w}.mp4")
         elif "animation_url" in m:
             errors.append(f"{w}: animation_url on a still token")
         attrs = {a["trait_type"]: a["value"] for a in m["attributes"]}
@@ -1119,8 +1238,8 @@ def cmd_validate(args):
     for trait, expect in names.items():
         if dict(counts[trait]) != expect:
             errors.append(f"{trait} counts differ from the design")
-    for trait, key in (("Arms", "arm"), ("Footwear", "footwear")):
-        want = sum(n for v, n in q[key].items() if v)
+    for trait, key in (("Arms", "arm"), ("Footwear", "footwear"), ("Weather", "weather")):
+        want = sum(n for v, n in q.get(key, {}).items() if v)
         if sum(counts[trait].values()) != want:
             errors.append(f"{sum(counts[trait].values())} tokens with {trait}, expected {want}")
     for bg in cc.ONE_OF_ONE_BACKGROUNDS:

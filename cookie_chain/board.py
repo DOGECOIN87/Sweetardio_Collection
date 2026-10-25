@@ -57,6 +57,7 @@ ARMS = {
     "Nerf_Blaster": "layer-layer-layer-layer-Nerf_Blaster.png",
 }
 SKINS = {"Alien": "Alien", "Black": "Black", "White": "White"}
+WEATHER = {w: w for w in ("rain", "snow", "fog", "storm", "blizzard", "flooded", "tornado")}
 
 
 def load(path=None):
@@ -129,11 +130,13 @@ def quotas(board, characters):
         raise SystemExit(f"board: unknown characters: {', '.join(unknown)}")
     q_arm = _section(board, "arms", ARMS, required=False)
     q_wat = _section(board, "footwear", FOOTWEAR, required=False)
+    q_wx = _section(board, "weather", WEATHER, required=False) if "traits_weather" in board else {}
     q_arm[None] = SUPPLY - sum(q_arm.values())
     q_wat[None] = SUPPLY - sum(q_wat.values())
+    q_wx[None] = SUPPLY - sum(q_wx.values())
     return dict(character=q_char, background=counts,
                 sticker={f"{k}.png": v for k, v in _section(board, "stickers").items()},
-                arm=q_arm, footwear=q_wat,
+                arm=q_arm, footwear=q_wat, weather=q_wx,
                 eyes=_section(board, "eyes", EYES), mouth=_section(board, "mouths", MOUTHS),
                 skin=_section(board, "skins", SKINS))
 

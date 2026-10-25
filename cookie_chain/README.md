@@ -114,6 +114,27 @@ attributes `1/1`, `Edition`, `Rarity`.
 The top Rarity tier is exactly the kept 1/1s (plates plus the Cookboy); the
 bottom tier takes what the middle tiers leave.
 
+## Starfield and Weather, from the main collection
+
+Both are board options, off until the board turns them on.
+
+- **Starfield** is a background (`assets/backgroundz/Starfield.png` is the
+  dy=0 reference plate, copied from the main collection) that takes a tier
+  on the ladder like any other. Only `generator.STARFIELD_CHARS` may stand
+  on it. At render, each token's figure is centred on the field and the
+  rainbow lined up on it (`dynamic/starfield.py`), then the 12-frame loop is
+  re-composited per plate frame into `animations/`. The edition scales its
+  figures, so `centre_starfield()` applies the centring drop as
+  `dy / gscale`; `starfield.centre_figure` as-is would leave every figure
+  12% short of centre.
+- **Weather** is a trait with an exact count per state (rain, snow, fog,
+  storm, blizzard, flooded, tornado). It is a grade over the finished token,
+  so it is assigned after selection, never to a 1/1 plate or the Starfield
+  (both own `animation_url`). The token is rendered with its protect and
+  float masks and graded by `dynamic/sky.py` exactly as `bake_weather.py`
+  bakes the main mint: the weathered still goes to `images/`, a 36-frame
+  loop at 512 px to `animations/`. Weather counts toward the Rarity score.
+
 **The edition plaque is off** (`cc_common.PLAQUE_ON`, owner's call
 2026-10-25): no token carries it, the Cookboy included. The art stays in
 `assets/branding/`.
