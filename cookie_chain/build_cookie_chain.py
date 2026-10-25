@@ -791,9 +791,8 @@ def token_json(g, cand, seed):
         meta["properties"] = {"files": [{"uri": meta["image"], "type": "image/png"},
                                         {"uri": meta["animation_url"], "type": "video/mp4"}],
                               "category": "video"}
-    if cand.get("score") is not None:
-        meta["selection_score"] = cand["score"]
-    meta["seed"] = seed
+    # the build's own bookkeeping (look score, seed) stays in plan.json: it
+    # means nothing to a collector and would read as a second rarity
     return meta
 
 
