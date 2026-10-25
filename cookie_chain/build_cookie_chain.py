@@ -851,7 +851,12 @@ def cmd_plan(args):
     thumbs = WORK / "thumbs"
     if args.reuse or args.extend:
         # re-select from the scored pool without re-rendering it
-        pool = json.loads((WORK / "pool.json").read_text())
+        # work/ is the live pool; cookie_chain/pool.json is the committed copy
+        # a fresh clone re-selects from (the Rarity Board's build script)
+        src = WORK / "pool.json"
+        if not src.exists():
+            src = Path(__file__).resolve().parent / "pool.json"
+        pool = json.loads(src.read_text())
         for c in pool:
             c["layers"] = _resolve(g, c["layers"])
     if args.extend:
